@@ -31,8 +31,18 @@ const CH = [
   { name: 'Luffy', desc: 'Pirate élastique, coups à distance', hp: 100, spd: 4.4, jmp: 13.5, color: '#3b6fd8', atk: [
     { n: 'Pistol', type: 'm', su: 8, ac: 4, rc: 12, cd: 10, dmg: 8, rng: 170, h: 26, kb: 6, st: 14 },
     { n: 'Bazooka', type: 'm', su: 16, ac: 5, rc: 22, cd: 50, dmg: 16, rng: 115, h: 50, kb: 15, st: 28 },
-    { n: 'Gear Second (+vitesse, +dégâts)', type: 'buff', su: 10, ac: 1, rc: 12, cd: 420, dur: 300 },
-    { n: 'Gatling', ult: 1, ub: 1, type: 'm', su: 10, ac: 24, rc: 16, cd: 0, dmg: 7, rng: 190, h: 46, kb: 2, st: 10, multi: 6 }] }
+    { n: 'Gear Second', type: 'buff', su: 10, ac: 1, rc: 12, cd: 420, dur: 300 },
+    { n: 'Gatling', ult: 1, ub: 1, type: 'm', su: 10, ac: 24, rc: 16, cd: 0, dmg: 7, rng: 190, h: 46, kb: 2, st: 10, multi: 6 }] },
+  { name: 'Chevalier', desc: 'Épée et bouclier, défense solide (blocage renforcé)', hp: 130, spd: 3.2, jmp: 12, color: '#aab7c4', blk: 0.05, atk: [
+    { n: 'Estoc', type: 'm', su: 7, ac: 4, rc: 12, cd: 8, dmg: 8, rng: 88, h: 26, kb: 6, st: 15 },
+    { n: 'Coup de bouclier', type: 'm', su: 10, ac: 4, rc: 16, cd: 45, dmg: 9, rng: 50, h: 85, kb: 18, st: 30 },
+    { n: 'Taillade', type: 'm', su: 14, ac: 5, rc: 22, cd: 70, dmg: 17, rng: 95, h: 110, kb: 11, st: 26 },
+    { n: 'Lame divine', ult: 1, ub: 1, type: 'p', su: 20, ac: 1, rc: 24, cd: 0, dmg: 34, vx: 13, r: 26, kb: 16, st: 34, vis: 3 }] },
+  { name: 'Naruto', desc: 'Ninja de Konoha, clones et Rasengan', hp: 100, spd: 4.8, jmp: 14, color: '#ff7f27', atk: [
+    { n: 'Uzumaki Rendan', type: 'm', su: 8, ac: 12, rc: 14, cd: 40, dmg: 4, rng: 62, h: 50, kb: 2, st: 9, multi: 4 },
+    { n: 'Rasengan', type: 'm', su: 16, ac: 5, rc: 22, cd: 80, dmg: 18, rng: 72, h: 40, kb: 16, st: 30 },
+    { n: 'Kage Bunshin', type: 'p', su: 9, ac: 1, rc: 14, cd: 100, dmg: 7, vx: 8, r: 16, kb: 8, st: 18, cnt: 2, clone: 1, cy: 45, vis: 1 },
+    { n: 'Rasenshuriken', ult: 1, ub: 1, type: 'p', su: 24, ac: 1, rc: 26, cd: 0, dmg: 38, vx: 9, r: 30, kb: 18, st: 36, vis: 2 }] }
 ];
 const CHARS = CH.map(({ name, desc, hp, color, atk }) => ({ name, desc, hp, color, atk: atk.map(a => a.n) }));
 
@@ -50,7 +60,7 @@ const hit = (b, t) => b[0] < t.x + BW / 2 && b[1] > t.x - BW / 2 && b[2] < t.y &
 // t = victime, a = attaquant (pour la barre d'ultime), ub = non blocable
 function hurt(t, dmg, kb, st, lift, srcX, ub, a) {
   const dir = srcX < t.x ? 1 : -1;
-  if (!ub && t.block && t.stun <= 0 && t.y >= G) { t.hp -= dmg * .15; t.vx = dir * kb * .3; t.fl = 4; return; }
+  if (!ub && t.block && t.stun <= 0 && t.y >= G) { t.hp -= dmg * (CH[t.c].blk ?? .15); t.vx = dir * kb * .3; t.fl = 4; return; }
   t.hp -= dmg; t.stun = st; t.vx = dir * kb; if (lift) t.vy = lift; t.atk = null; t.fl = 6;
   if (!ub) { t.ult = Math.min(100, t.ult + dmg * 1.2); if (a) a.ult = Math.min(100, a.ult + dmg * 1.5); }
 }
@@ -69,7 +79,7 @@ function step(r, i) {
     if (a.f === d.su + 1) {
       if (d.type === 'p') {
         for (let j = 0; j < (d.cnt || 1); j++)
-          r.pj.push({ x: f.x + f.face * 30, y: f.y - (d.low ? 18 : BH * .6), vx: f.face * d.vx, vy: d.cnt ? (j - 1) * 1.8 : 0, r: d.r, o: i, d });
+          r.pj.push({ x: f.x + f.face * (30 - (d.clone ? j * 45 : 0)), y: f.y - (d.cy || (d.low ? 18 : BH * .6)), vx: f.face * d.vx, vy: d.cnt && !d.clone ? (j - 1) * 1.8 : 0, r: d.r, o: i, d });
       } else if (d.type === 'sky') r.fx.push({ x: o.x, t: 0, o: i, d });
       else if (d.type === 'buff') f.buff = d.dur;
     }
@@ -156,7 +166,7 @@ function tick(r) {
         ak: f.atk ? f.atk.k : -1, ap: d ? (f.atk.f <= d.su ? 0 : f.atk.f <= d.su + d.ac ? 1 : 2) : -1,
         b: f.atk && f.atk.b ? f.atk.b.map(Math.round) : null };
     }) : [],
-    pj: live ? r.pj.map(p => ({ x: Math.round(p.x), y: Math.round(p.y), r: p.r, o: p.o })) : [],
+    pj: live ? r.pj.map(p => ({ x: Math.round(p.x), y: Math.round(p.y), r: p.r, o: p.o, k: p.d.vis || 0, v: Math.sign(p.vx) })) : [],
     fx: live ? r.fx.map(e => ({ x: Math.round(e.x), p: e.t > e.d.warn ? 1 : 0 })) : [] };
   r.ps.forEach(p => tx(p, s));
 }
