@@ -9,7 +9,7 @@ button,input{font:inherit;padding:10px 18px;border-radius:8px;border:0}
 button{background:#3498db;color:#fff;cursor:pointer}
 input{text-transform:uppercase;width:90px;text-align:center}
 .cards{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-.card{background:#222;border:3px solid #444;border-radius:10px;padding:10px;width:160px;cursor:pointer;font-size:13px;text-align:left;line-height:1.5}
+.card{background:#222;border:3px solid #444;border-radius:10px;padding:10px;width:150px;cursor:pointer;font-size:13px;text-align:left;line-height:1.5}
 .card.sel{background:#444}
 </style></head><body>
 <div id="wrap"><canvas id="c" width="900" height="450"></canvas><div id="ov"></div></div>
@@ -40,15 +40,15 @@ function ui() {
     <div>ou <input id="cd" maxlength="4" placeholder="CODE" value="${location.hash.slice(1)}"> <button onclick="go({t:'join',code:document.getElementById('cd').value})">Rejoindre</button></div>`;
   else if (!S || S.p === 'wait') h = `<h2>En attente de l’adversaire…</h2><p>Code : <b style="font-size:34px">${code}</b></p><p>Ou envoie-lui ce lien :<br><b>${location.origin}/#${code}</b></p>`;
   else if (S.p === 'select') h = `<h2>Choisis ton combattant</h2><div class="cards">${chars.map((c, i) =>
-    `<div class="card ${S.sel[me] === i ? 'sel' : ''}" style="border-color:${c.color}" onclick="pick(${i})"><b style="color:${c.color};font-size:16px">${c.name}</b><br>${c.desc}<br>PV : ${c.hp}<br>${c.atk.map((a, j) => 'JKL'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div>
+    `<div class="card ${S.sel[me] === i ? 'sel' : ''}" style="border-color:${c.color}" onclick="pick(${i})"><b style="color:${c.color};font-size:16px">${c.name}</b><br>${c.desc}<br>PV : ${c.hp}<br>${c.atk.map((a, j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div>
     <p>${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.sel[1 - me] != null ? '· Adversaire prêt ✔' : ''}</p>
-    <p style="font-size:13px;opacity:.8">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques</p>`;
+    <p style="font-size:13px;opacity:.8">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques · U ou Espace : ultime (barre pleine)</p>`;
   else { ov.style.display = 'none'; last = ''; return; }
   if (h !== last) { ov.innerHTML = h; last = h; }
   ov.style.display = 'flex';
 }
 
-const map = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', ArrowUp: 'u', KeyW: 'u', ArrowDown: 'd', KeyS: 'd', KeyJ: 0, KeyK: 1, KeyL: 2 };
+const map = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', ArrowUp: 'u', KeyW: 'u', ArrowDown: 'd', KeyS: 'd', KeyJ: 0, KeyK: 1, KeyL: 2, KeyU: 3, Space: 3 };
 function key(e) {
   const k = map[e.code];
   if (k === undefined || e.target.tagName === 'INPUT') return;
@@ -56,42 +56,59 @@ function key(e) {
   const v = e.type === 'keydown';
   if (!!keys[k] !== v) {
     keys[k] = v;
-    if (ws && ws.readyState === 1 && me >= 0) ws.send(JSON.stringify({ t: 'in', l: keys.l, r: keys.r, u: keys.u, d: keys.d, a: [keys[0], keys[1], keys[2]] }));
+    if (ws && ws.readyState === 1 && me >= 0) ws.send(JSON.stringify({ t: 'in', l: keys.l, r: keys.r, u: keys.u, d: keys.d, a: [keys[0], keys[1], keys[2], keys[3]] }));
   }
 }
 addEventListener('keydown', key); addEventListener('keyup', key);
 
+const fmt = t => Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
+
 function fighter(f, i) {
-  const c = chars[f.c], s = f.fc;
+  const c = chars[f.c], s = f.fc, lf = c.name === 'Luffy';
   x.save(); x.translate(f.x, f.y);
-  x.fillStyle = f.fl ? '#fff' : c.color;
-  x.fillRect(-22, -90, 44, 90);
+  if (f.ak === 3 || f.bf) {
+    x.fillStyle = f.ak === 3 ? 'rgba(255,230,80,.35)' : 'rgba(255,90,90,.3)';
+    x.beginPath(); x.arc(0, -55, 70, 0, 7); x.fill();
+  }
+  const col = f.fl ? '#fff' : c.color;
+  x.fillStyle = col; x.fillRect(-22, -90, 44, 90);
+  if (lf && !f.fl) { x.fillStyle = '#e74c3c'; x.fillRect(-22, -90, 44, 45); }
+  x.fillStyle = f.fl ? '#fff' : (lf ? '#f5cba7' : c.color);
   x.beginPath(); x.arc(0, -102, 14, 0, 7); x.fill();
+  if (lf) {
+    x.fillStyle = '#f1c40f'; x.beginPath(); x.ellipse(0, -113, 25, 6, 0, 0, 7); x.fill(); x.fillRect(-12, -126, 24, 14);
+    x.fillStyle = '#c0392b'; x.fillRect(-12, -117, 24, 4);
+  }
   x.fillStyle = '#000'; x.fillRect(s * 6 - 2, -106, 5, 5);
   if (f.ak >= 0) {
-    const ext = f.ap === 1 ? 40 : f.ap === 0 ? -10 : 15;
-    x.strokeStyle = f.fl ? '#fff' : c.color; x.lineWidth = 9; x.lineCap = 'round';
-    x.beginPath(); x.moveTo(0, -65); x.lineTo(s * (22 + ext), -65); x.stroke();
+    let L = f.ap === 1 ? 62 : f.ap === 0 ? 12 : 37;
+    if (f.b && lf) L = Math.max(L, s > 0 ? f.b[1] - f.x : f.x - f.b[0]);
+    x.strokeStyle = col; x.lineWidth = lf ? 7 : 9; x.lineCap = 'round';
+    x.beginPath(); x.moveTo(0, -65); x.lineTo(s * L, -65); x.stroke();
+    if (lf) { x.fillStyle = col; x.beginPath(); x.arc(s * L, -65, 10, 0, 7); x.fill(); }
   }
   if (f.bl) { x.fillStyle = 'rgba(120,200,255,.6)'; x.fillRect(s * 24 - 5, -95, 10, 85); }
   x.restore();
-  if (f.b) { x.fillStyle = 'rgba(255,255,255,.35)'; x.fillRect(f.b[0], f.b[2], f.b[1] - f.b[0], f.b[3] - f.b[2]); }
-  if (i === me) { x.fillStyle = '#fff'; x.font = '12px sans-serif'; x.textAlign = 'center'; x.fillText('▼ TOI', f.x, f.y - 128); }
+  if (f.b) { x.fillStyle = 'rgba(255,255,255,.3)'; x.fillRect(f.b[0], f.b[2], f.b[1] - f.b[0], f.b[3] - f.b[2]); }
+  if (i === me) { x.fillStyle = '#fff'; x.font = '12px sans-serif'; x.textAlign = 'center'; x.fillText('▼ TOI', f.x, f.y - 138); }
 }
 
 function hud() {
   S.f.forEach((f, i) => {
-    const c = chars[f.c], w = 380, xx = i ? 900 - 20 - w : 20, pw = w * f.hp / c.hp;
+    const c = chars[f.c], w = 380, xx = i ? 900 - 20 - w : 20, pw = w * f.hp / c.hp, uw = w * f.ul / 100, rdy = f.ul >= 100;
     x.fillStyle = '#000'; x.fillRect(xx, 20, w, 22);
     x.fillStyle = c.color; x.fillRect(i ? xx + w - pw : xx, 20, pw, 22);
+    x.fillStyle = '#000'; x.fillRect(xx, 46, w, 9);
+    x.fillStyle = rdy && ((Date.now() / 150) | 0) % 2 ? '#fff' : '#f1c40f'; x.fillRect(i ? xx + w - uw : xx, 46, uw, 9);
     x.fillStyle = '#fff'; x.font = 'bold 14px sans-serif'; x.textAlign = i ? 'right' : 'left';
-    x.fillText(c.name + (i === me ? ' (toi)' : ''), i ? xx + w : xx, 60);
+    x.fillText(c.name + (i === me ? ' (toi)' : ''), i ? xx + w : xx, 74);
+    if (rdy) { x.fillStyle = '#f1c40f'; x.textAlign = i ? 'left' : 'right'; x.fillText(i === me ? '⚡ ULTIME PRÊT : U' : '⚡ ULTIME PRÊT', i ? xx : xx + w, 74); }
     for (let k = 0; k < 2; k++) {
       x.fillStyle = k < S.w[i] ? '#f1c40f' : '#555'; x.beginPath();
-      x.arc(i ? xx + w - 8 - k * 20 : xx + 8 + k * 20, 74, 6, 0, 7); x.fill();
+      x.arc(i ? xx + w - 8 - k * 20 : xx + 8 + k * 20, 90, 6, 0, 7); x.fill();
     }
   });
-  x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = 'bold 28px sans-serif'; x.fillText(S.tm, 450, 42);
+  x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = 'bold 28px sans-serif'; x.fillText(fmt(S.tm), 450, 42);
   const t = S.p === 'cd' ? S.n : (S.p === 'rend' || S.p === 'end') ? S.m : '';
   x.font = 'bold 44px sans-serif'; x.lineWidth = 5; x.strokeStyle = '#000'; x.strokeText(t, 450, 210); x.fillText(t, 450, 210);
 }
@@ -101,6 +118,15 @@ function draw() {
   x.fillStyle = g; x.fillRect(0, 0, 900, 450);
   x.fillStyle = '#2c2c3a'; x.fillRect(0, 380, 900, 70);
   if (S && S.f.length) {
+    S.fx.forEach(e => {
+      if (e.p) {
+        x.fillStyle = 'rgba(120,160,255,.6)'; x.fillRect(e.x - 40, 0, 80, 380);
+        x.fillStyle = 'rgba(255,255,210,.95)'; x.fillRect(e.x - 18, 0, 36, 380);
+      } else {
+        x.fillStyle = 'rgba(255,60,60,.15)'; x.fillRect(e.x - 45, 0, 90, 380);
+        x.fillStyle = 'rgba(255,60,60,.55)'; x.beginPath(); x.ellipse(e.x, 380, 45, 8, 0, 0, 7); x.fill();
+      }
+    });
     S.f.forEach(fighter);
     S.pj.forEach(p => { x.fillStyle = chars[S.f[p.o].c].color; x.beginPath(); x.arc(p.x, p.y, p.r, 0, 7); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 2; x.stroke(); });
     hud();
