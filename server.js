@@ -53,7 +53,7 @@ const CH = [
     { n: 'Coup de poing', type: 'm', su: 5, ac: 4, rc: 9, cd: 8, dmg: 7, rng: 62, h: 30, kb: 5, st: 14 },
     { n: 'Air Force', type: 'p', su: 8, ac: 1, rc: 12, cd: 26, dmg: 7, vx: 12, r: 11, kb: 9, st: 16, vis: 6 },
     { n: 'Full Cowling', type: 'buff', su: 10, ac: 1, rc: 12, cd: 420, dur: 360 },
-    { n: 'Detroit Smash 100%', ult: 1, ub: 1, type: 'dp', su: 10, dsh: 8, spd: 13, ac: 6, rc: 28, cd: 0, pct: 0.7, rng: 70, h: 60, kb: 20, st: 45 }] },
+    { n: 'Detroit Smash 100%', ult: 1, ub: 1, type: 'dp', su: 10, dsh: 8, spd: 13, ac: 6, rc: 28, cd: 0, pct: 0.45, rng: 70, h: 60, kb: 20, st: 45 }] },
   // bd = dash arrière (invulnérable), form = transformation (remplace les attaques par 'alt'), jam = saut + onde de choc à l'atterrissage
   { name: 'Denji', desc: 'Chainsaw Man : Pochita, recul, transformation', hp: 105, spd: 4.3, jmp: 13.5, color: '#d4402f', atk: [
     { n: 'Coup simple', type: 'm', su: 5, ac: 4, rc: 9, cd: 8, dmg: 6, rng: 58, h: 30, kb: 5, st: 13 },
