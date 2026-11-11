@@ -60,8 +60,8 @@ const CH = [
     { n: 'Dash arrière', type: 'bd', su: 2, ac: 10, rc: 8, cd: 70, spd: 12 },
     { n: 'Chainsaw Man', ult: 1, type: 'form', su: 20, ac: 1, rc: 20, cd: 0, dur: 600 }], alt: [
     { n: 'Coup tronçonneuse', type: 'm', su: 6, ac: 5, rc: 10, cd: 8, dmg: 11, rng: 70, h: 42, kb: 9, st: 16 },
-    { n: 'Charge', type: 'd', su: 8, ac: 16, rc: 18, cd: 50, spd: 11, dmg: 17, rng: 46, h: 70, kb: 14, st: 26 },
-    { n: 'Saut écrasant', type: 'jam', su: 8, ac: 0, rc: 22, cd: 70, dmg: 20, jv: 15, jx: 3, aoe: 80, kb: 14, st: 30 }] }
+    { n: 'Charge', type: 'd', su: 8, ac: 16, rc: 18, cd: 50, spd: 20, dmg: 19, rng: 67, h: 70, kb: 14, st: 26 },
+    { n: 'Saut écrasant', type: 'jam', su: 8, ac: 0, rc: 22, cd: 70, dmg: 24, jv: 15, jx: 3, aoe: 80, kb: 14, st: 30 }] }
 ];
 const CHARS = CH.map(({ name, desc, hp, color, atk, alt }) => ({ name, desc, hp, color, atk: atk.map(a => a.n), alt: alt ? alt.map(a => a.n) : null }));
 
