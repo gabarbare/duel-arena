@@ -66,8 +66,8 @@ const CH = [
   // fire = vague de feu au sol, grap = grappin, cut = coupe les projectiles, crys = cristallisation, sd = dash éclair, zz = 4 dashs alternés
   { name: 'Yugo', desc: 'Éliatrope : laser, téléportation, portails', hp: 90, spd: 4.6, jmp: 14, color: '#2f80ed', atk: [
     { n: 'Rayon laser', type: 'p', su: 6, ac: 1, rc: 10, cd: 32, dmg: 8, vx: 22, r: 7, kb: 4, st: 12, vis: 8 },
-    { n: 'Téléportation (flèches)', type: 'tp', su: 2, ac: 1, rc: 8, cd: 50, dist: 190 },
-    { n: 'Épée (dash)', type: 'd', su: 6, ac: 6, rc: 14, cd: 45, spd: 8, dmg: 13, rng: 62, h: 50, kb: 9, st: 20 },
+    { n: 'Téléportation (flèches)', type: 'tp', su: 2, ac: 1, rc: 8, cd: 50, dist: 270 },
+    { n: 'Épée (dash)', type: 'd', su: 6, ac: 6, rc: 14, cd: 45, spd: 8, dmg: 16, rng: 55, h: 50, kb: 9, st: 20 },
     { n: 'Portails éliatropes', ult: 1, ub: 1, type: 'portals', su: 18, ac: 1, rc: 20, cd: 0, dmg: 7, kb: 3, st: 10, cnt: 7, warn: 20, gap: 5, rad: 150 }] },
   { name: 'Shinra', desc: 'Pyrokinésiste : vol, coups de pied, feu', hp: 100, spd: 4.6, jmp: 14.5, color: '#ff5722', fspd: 1.9, atk: [
     { n: 'Vol (3 s)', type: 'fly', su: 3, ac: 1, rc: 6, cd: 240, dur: 180 },
@@ -76,11 +76,11 @@ const CH = [
     { n: 'Vitesse lumière', ult: 1, type: 'form', su: 14, ac: 1, rc: 16, cd: 0, dur: 480 }] },
   { name: 'Eren', desc: 'Éclaireur : grappins, épée, Titan Assaillant', hp: 105, spd: 4.5, jmp: 14, color: '#5d8a4e', big: 2, fspd: .85, atk: [
     { n: 'Grappin (flèches)', type: 'grap', su: 5, ac: 1, rc: 8, cd: 25 },
-    { n: 'Dash grappin / Épée', type: 'dk', tohook: 1, su: 3, ac: 12, rc: 12, cd: 40, spd: 18, dmg: 13, kb: 12, st: 22,
-      nohook: { n: 'Épée', type: 'm', su: 6, ac: 4, rc: 10, cd: 30, dmg: 10, rng: 85, h: 50, kb: 7, st: 16 } },
+    { n: 'Dash grappin / Épée', type: 'dk', tohook: 1, su: 3, ac: 12, rc: 12, cd: 40, spd: 18, dmg: 18, kb: 12, st: 22,
+      nohook: { n: 'Épée', type: 'm', su: 6, ac: 4, rc: 10, cd: 30, dmg: 13, rng: 85, h: 50, kb: 7, st: 16 } },
     { n: 'Coupe-projectiles', type: 'cut', su: 4, ac: 9, rc: 12, cd: 45, rng: 95, h: 100, by: .95 },
     { n: 'Titan Assaillant', ult: 1, type: 'form', su: 20, ac: 1, rc: 24, cd: 0, dur: 720 }], alt: [
-    { n: 'Coup de pied', type: 'm', su: 10, ac: 5, rc: 18, cd: 30, dmg: 15, rng: 100, h: 80, by: .45, kb: 16, st: 26 },
+    { n: 'Coup de pied', type: 'm', su: 10, ac: 5, rc: 18, cd: 30, dmg: 19, rng: 100, h: 80, by: .45, kb: 16, st: 26 },
     { n: 'Poing anti-air', type: 'm', su: 12, ac: 6, rc: 22, cd: 60, dmg: 24, rng: 90, h: 200, by: 1, kb: 10, st: 34, lift: -10, air: 1 },
     { n: 'Cristallisation (-60% dégâts)', type: 'crys', su: 6, ac: 1, rc: 10, cd: 300, dur: 200 }] },
   { name: 'Koro', desc: 'Koro-sensei : tentacules, vitesse Mach 20', hp: 95, spd: 5.2, jmp: 14.5, color: '#f1c40f', atk: [
