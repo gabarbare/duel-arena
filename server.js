@@ -338,6 +338,42 @@ function startTraining(r, characterIndex, skin) {
   r.msg = '';
 }
 
+function thinkBot(r) {
+  if (!r.bot || r.ph !== 'fight' || !r.f[1] || !r.f[0]) return;
+  const f = r.f[1], o = r.f[0], c = CH[f.c];
+  const dx = o.x - f.x, dist = Math.abs(dx), dy = o.y - f.y;
+  const input = { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] };
+  const attacks = atks(f);
+  // Le bot adapte sa distance au personnage : il avance au corps-à-corps,
+  // mais essaie de garder un peu d'espace avec les personnages à distance.
+  const ranged = attacks.some(a => a.type === 'p' || a.type === 'sky' || a.type === 'fire');
+  const ideal = ranged ? 245 : 62;
+  if (dist > ideal + 24) input[dx < 0 ? 'l' : 'r'] = 1;
+  else if (ranged && dist < 145) input[dx < 0 ? 'r' : 'l'] = 1;
+  if (dy < -45 && f.y >= G - 2 && dist < 260 && Math.random() < .035) input.u = 1;
+  // Défense occasionnelle si l'adversaire prépare une attaque proche.
+  if (o.atk && dist < 115 && Math.random() < .32) input.d = 1;
+  if (!f.atk && f.stun <= 0) {
+    let choice = -1, best = -Infinity;
+    for (let j = 0; j < attacks.length; j++) {
+      const a = attacks[j];
+      if (!a || f.cds[j] > 0 || (a.ult && f.ult < 100)) continue;
+      let score = 0;
+      if (a.type === 'buff' || a.type === 'shield' || a.type === 'form' || a.type === 'crys' || a.type === 'heal') {
+        score = (f.hp < c.hp * .72 || f.buff <= 0 || f.shield <= 0 || f.form <= 0) ? 75 : -10;
+      } else if (a.type === 'p') score = (dist < 520 ? 55 : 10) - Math.abs(dist - 260) * .04;
+      else if (a.type === 'sky' || a.type === 'portals' || a.type === 'fire') score = dist < 420 ? 58 : 5;
+      else if (a.type === 'tp' || a.type === 'grap') score = dist > 180 ? 38 : 5;
+      else score = dist < (a.rng || 75) + 45 ? 65 : -5;
+      if (a.ult && f.ult >= 100) score += 18;
+      score += Math.random() * 8;
+      if (score > best) { best = score; choice = j; }
+    }
+    if (choice >= 0 && (best > 20 || dist < 95)) input.a[choice] = 1;
+  }
+  f.inp = input;
+}
+
 function tick(r) {
   if (r.ph === 'training') {
     // L'ultime reste disponible pour tester librement toutes les capacités.
@@ -364,6 +400,7 @@ function tick(r) {
   }
   else if (r.ph === 'cd') { if (--r.t <= 0) r.ph = 'fight'; }
   else if (r.ph === 'fight') {
+    thinkBot(r);
     step(r, 0); step(r, 1); sep(r); projs(r); fxs(r); r.tm--;
     const [a, b] = r.f;
     if (a.hp <= 0 || b.hp <= 0 || r.tm <= 0) {
@@ -371,17 +408,17 @@ function tick(r) {
       if (w >= 0) r.wins[w]++;
       r.msg = w < 0 ? 'Égalité !' : CH[r.f[w].c].name + ' gagne la manche !';
       r.ph = 'rend'; r.t = 150;
-      if (r.wins[0] >= 2 || r.wins[1] >= 2) { r.ph = 'end'; r.msg = '🏆 ' + CH[r.f[w].c].name + ' remporte le match !'; r.again = [0, 0]; r.co = [0, 1].map(q => r.wins[q] * 10 + (r.wins[q] >= 2 ? 30 : 10)); }
+      if (r.wins[0] >= 2 || r.wins[1] >= 2) { r.ph = 'end'; r.msg = '🏆 ' + CH[r.f[w].c].name + ' remporte le match !'; r.again = r.bot ? [0, 1] : [0, 0]; r.co = [0, 1].map(q => r.wins[q] * 10 + (r.wins[q] >= 2 ? 30 : 10)); }
     }
   }
   else if (r.ph === 'rend') {
     if (--r.t <= 0) { r.f = r.f.map((f, i) => nf(f.c, i, f.inp, f.ult)); r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 120; r.tm = ROUND; r.msg = ''; }
   }
   else if (r.ph === 'end') {
-    if (r.again[0] && r.again[1]) { r.ph = 'select'; r.sel = [null, null]; r.wins = [0, 0]; r.msg = ''; r.f = []; }
+    if (r.again[0] && r.again[1]) { r.ph = 'select'; r.sel = [null, r.bot ? (Math.random() * CH.length | 0) : null]; r.wins = [0, 0]; r.msg = ''; r.f = []; }
   }
   const live = r.ph !== 'wait' && r.ph !== 'select';
-  const s = { t: 's', p: r.ph, training: !!r.training,
+  const s = { t: 's', p: r.ph, training: !!r.training, bot: !!r.bot,
     damage: r.training ? Math.round(r.f[1].totalDamage) : 0,
     hits: r.training ? r.f[1].hitCount : 0,
     lastDamage: r.training ? r.f[1].lastDamage : 0,
@@ -423,6 +460,9 @@ wss.on('connection', ws => {
     } else if (m.t === 'training_reset') {
       const r = ws.room;
       if (r && r.training && ws.idx === 0) startTraining(r, r.sel[0], r.sk[0]);
+    } else if (m.t === 'bot' && !ws.room) {
+      const r = { code: newCode(), ps: [ws], ph: 'select', sel: [null, Math.random() * CH.length | 0], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 1], co: [0, 0], bot: true };
+      rooms.set(r.code, r); ws.room = r; ws.idx = 0; join(ws);
     } else if (m.t === 'create' && !ws.room) {
       const r = { code: newCode(), ps: [ws], ph: 'wait', sel: [null, null], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 0], co: [0, 0] };
       rooms.set(r.code, r); ws.room = r; ws.idx = 0; join(ws);
