@@ -27,21 +27,43 @@ const keys = {};
 // type 'skin' : change les couleurs d'un perso ('pal' = { couleur d'origine : nouvelle couleur })
 // type 'char' : verrouille un perso tant qu'il n'est pas acheté
 const SHOP = [
-  { id: 'perso_gojo', type: 'char', char: 'Gojo', name: 'Gojo Satoru', price: 400, desc: 'Jujutsu Kaisen : sphères Rouge et Bleu, soin, Infini' },
-  { id: 'perso_deku', type: 'char', char: 'Deku', name: 'Izuku Midoriya', price: 300, desc: 'My Hero Academia : One For All, Air Force, Detroit Smash' },
-  { id: 'perso_denji', type: 'char', char: 'Denji', name: 'Denji', price: 300, desc: 'Chainsaw Man : Pochita, recul, transformation' },
-  { id: 'perso_yugo', type: 'char', char: 'Yugo', name: 'Yugo', price: 300, desc: 'Wakfu : Laser, téléportation, Prison lasers' },
-  { id: 'skin_kaze_or', type: 'skin', char: 'Kaze', name: 'Kaze doré', price: 80, pal: { '#1c1c28': '#c9a227', '#2ecc71': '#fff4c2' } },
-  { id: 'skin_bruno_bleu', type: 'skin', char: 'Bruno', name: 'Bruno bleu', price: 80, pal: { '#e74c3c': '#3498db', '#ff7675': '#74b9ff' } },
-  { id: 'skin_zephyr_blanc', type: 'skin', char: 'Zéphyr', name: 'Zéphyr blanc', price: 80, pal: { '#6c3483': '#f2f4f6', '#5b2c6f': '#dfe6e9', '#4a235a': '#b2bec3', '#ecf0f1': '#b0b8bf' } },
+  { id: 'perso_gojo', type: 'char', char: 'Gojo', name: 'Gojo Satoru', price: 400, desc: 'Jujutsu Kaisen : Rouge, Bleu, soin, Infini' },
+  { id: 'perso_deku', type: 'char', char: 'Deku', name: 'Izuku Midoriya', price: 300, desc: 'My Hero Academia : One For All' },
+  { id: 'perso_denji', type: 'char', char: 'Denji', name: 'Denji', price: 300, desc: 'Chainsaw Man : Pochita et transformation' },
+  { id: 'perso_luffy', type: 'char', char: 'Luffy', name: 'Monkey D. Luffy', price: 200, desc: 'One Piece : combattant élastique' },
+  { id: 'perso_naruto', type: 'char', char: 'Naruto', name: 'Naruto Uzumaki', price: 200, desc: 'Naruto : clones et Rasengan' },
+  { id: 'skin_kaze_or', type: 'skin', char: 'Kaze', name: 'Kaze doré', price: 60, pal: { '#1c1c28': '#c9a227', '#2ecc71': '#fff4c2' } },
+  { id: 'skin_bruno_bleu', type: 'skin', char: 'Bruno', name: 'Bruno bleu', price: 60, pal: { '#e74c3c': '#3498db', '#ff7675': '#74b9ff' } },
+  { id: 'skin_zephyr_blanc', type: 'skin', char: 'Zéphyr', name: 'Zéphyr blanc', price: 60, pal: { '#6c3483': '#f2f4f6', '#5b2c6f': '#dfe6e9', '#4a235a': '#b2bec3', '#ecf0f1': '#b0b8bf' } },
+  { id: 'skin_chevalier_noir', type: 'skin', char: 'Chevalier', name: 'Chevalier noir', price: 60, pal: { '#78909c': '#252932', '#455a64': '#11151d', '#b0bec5': '#343b49', '#2c5fa8': '#090d16', '#5d4037': '#171a22', '#90a4ae': '#596273', '#cfd8dc': '#697386', '#c0392b': '#111111' } },
+  { id: 'skin_viking_rouge', type: 'skin', char: 'Viking', name: 'Viking rouge', price: 60, pal: { '#6d4c41': '#8f2028', '#4e342e': '#5d1018', '#3e2723': '#29090e', '#d35400': '#a51e27', '#95a5a6': '#c4c8ce', '#7f8c8d': '#777e88' } },
+  { id: 'skin_luffy_noir', type: 'skin', char: 'Luffy', name: 'Luffy sombre', price: 60, pal: { '#e74c3c': '#252b38', '#3b6fd8': '#39465c', '#f1c40f': '#d7dbe2', '#c0392b': '#111820' } },
+  { id: 'skin_naruto_bleu', type: 'skin', char: 'Naruto', name: 'Naruto bleu', price: 60, pal: { '#ff7f27': '#2878c8', '#f9e03b': '#d7ecff', '#2c5fa8': '#14385e' } },
+  { id: 'skin_denji_blanc', type: 'skin', char: 'Denji', name: 'Denji blanc', price: 60, pal: { '#d4402f': '#e7e7e7', '#f2f2f2': '#ffffff', '#f4d03f': '#d8d8d8' } }
 ];
-let save = { coins: 0, owned: [], skin: {} }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false;
+const shopDay = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
+function refreshDailyShop() {
+  const today = shopDay();
+  if (save.shopDate !== today || !Array.isArray(save.dailyShopIds) || save.dailyShopIds.length !== 4 || save.dailyShopIds.some(id => !SHOP.some(q => q.id === id)) || new Set(save.dailyShopIds).size !== 4) {
+    const pool = SHOP.slice();
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    save.shopDate = today;
+    save.dailyShopIds = pool.slice(0, 4).map(q => q.id);
+    persist();
+  }
+  return save.dailyShopIds.map(id => SHOP.find(q => q.id === id)).filter(Boolean);
+}
+let DAILY_SHOP = [];
+let save = { coins: 0, owned: [], skin: {}, shopDate: '', dailyShopIds: [] }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false;
 try { Object.assign(save, JSON.parse(localStorage.getItem('duelArena') || '{}')); } catch (e) {}
+save.owned = Array.isArray(save.owned) ? save.owned : []; save.skin = save.skin && typeof save.skin === 'object' ? save.skin : {}; save.coins = Number.isFinite(save.coins) ? save.coins : 0;
 const persist = () => { try { localStorage.setItem('duelArena', JSON.stringify(save)); } catch (e) {} };
+DAILY_SHOP = refreshDailyShop();
 const owns = id => save.owned.includes(id);
 const locked = name => SHOP.some(q => q.type === 'char' && q.char === name && !owns(q.id));
 function buy(id) {
-  const q = SHOP.find(z => z.id === id);
+  DAILY_SHOP = refreshDailyShop();
+  const q = DAILY_SHOP.find(z => z.id === id);
   if (!q || owns(id) || save.coins < q.price) return;
   save.coins -= q.price; save.owned.push(id); persist(); ui();
 }
@@ -69,10 +91,9 @@ const again = () => ws.send(JSON.stringify({ t: 'again' }));
 function leave() { me = -1; S = null; err = ''; view = 'menu'; searching = false; try { ws.close(); } catch (e) {} ui(); }
 function setSkin(name, id, i) { save.skin[name] = id; persist(); if (S && S.p === 'select' && S.sel[me] === i) pick(i); ui(); }
 
-const shopHtml = () => `<h2>🛒 Boutique</h2><p>🪙 ${save.coins} pièces</p>` + (SHOP.length
-  ? `<div class="cards">${SHOP.map(q => `<div class="card" style="cursor:default"><b>${q.name}</b><br>${q.type === 'skin' ? 'Skin · ' + q.char : 'Personnage'}<br>${q.desc || ''}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.coins < q.price ? 'disabled' : ''} onclick="buy('${q.id}')">${q.price} 🪙</button>`}</div>`).join('')}</div>`
-  : '<p>La boutique ouvre bientôt…</p>') + `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
+const shopHtml = () => { DAILY_SHOP = refreshDailyShop(); return `<h2>🛒 Boutique quotidienne</h2><p>🪙 ${save.coins} pièces</p><p>4 offres du jour · renouvellement à minuit</p><div class="cards">${DAILY_SHOP.map(q => `<div class="card" style="cursor:default"><b>${q.name}</b><br>${q.type === 'skin' ? 'Skin · ' + q.char : 'Personnage'}<br>${q.desc || ''}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.coins < q.price ? 'disabled' : ''} onclick="buy('${q.id}')">${q.price} 🪙</button>`}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`; };
 const quitBtn = '<button onclick="leave()" style="background:#7f8c8d">Retour au menu</button>';
+setInterval(() => { const oldDay = save.shopDate; DAILY_SHOP = refreshDailyShop(); if (oldDay !== save.shopDate && me < 0 && view === 'shop') ui(); }, 30000);
 
 function ui() {
   let h = '';
@@ -160,7 +181,7 @@ function fighter(f, i) {
     x.fillStyle = 'rgba(120,200,255,' + (.15 + .08 * Math.sin(t / 150)) + ')'; x.strokeStyle = 'rgba(150,220,255,.9)'; x.lineWidth = 3;
     x.beginPath(); x.arc(0, -55, 68, 0, 7); x.fill(); x.stroke();
   }
-  const skin = n === 'Titan' ? '#e0ac69' : n === 'Bruno' ? '#e8b48a' : '#f5cba7';
+  const skin = n === 'Viking' ? '#e0ac69' : n === 'Bruno' ? '#e8b48a' : '#f5cba7';
   if (n === 'Bruno') { // boxeur : torse nu, short rouge, gants, bandeau
     R(skin, -16, -26, 13, 26); R(skin, 3, -26, 13, 26);
     R('#222', -18, -8, 17, 8); R('#222', 1, -8, 17, 8);
@@ -195,7 +216,7 @@ function fighter(f, i) {
     x.fillStyle = P('#4a235a'); x.beginPath(); x.ellipse(0, -112, 26, 6, 0, 0, 7); x.fill();
     Y('#5b2c6f', [[-15, -113], [15, -113], [s * 8, -154]]);
     R('#f1c40f', -14, -117, 28, 4); C('#f1c40f', s * 2, -134, 3);
-  } else if (n === 'Titan') { // viking : casque à cornes, barbe rousse, épaulières, ceinture dorée
+  } else if (n === 'Viking') { // viking : casque à cornes, barbe rousse, épaulières, ceinture dorée
     R('#4e342e', -17, -28, 15, 28); R('#4e342e', 2, -28, 15, 28);
     R('#2d2d2d', -19, -9, 18, 9); R('#2d2d2d', 1, -9, 18, 9);
     R('#6d4c41', -24, -92, 48, 66);
@@ -290,7 +311,7 @@ function fighter(f, i) {
   const hand = (px, py) => {
     if (n === 'Bruno') { C('#e74c3c', px, py, 11); C('#ff7675', px - 3, py - 3, 3); }
     else if (n === 'Kaze') { C(skin, px, py, 6); if (f.ak === 0 || f.ak === 3) LN('#ecf0f1', 3, px, py, px + s * 28, py); }
-    else if (n === 'Titan') { C('#7f8c8d', px, py, 12); C('#95a5a6', px - 3, py - 3, 4); }
+    else if (n === 'Viking') { C('#7f8c8d', px, py, 12); C('#95a5a6', px - 3, py - 3, 4); }
     else if (n === 'Gojo') { C(skin, px, py, 6); if (f.ak === 0 && f.ap < 2) orb(px + s * 10, py - 2, 11, '#e74c3c', '#ffd0d0'); if (f.ak === 1 && f.ap < 2) orb(px + s * 10, py - 2, 11, '#2f6df0', '#cfe3ff'); }
     else if (n === 'Denji') {
       C(skin, px, py, 6);
