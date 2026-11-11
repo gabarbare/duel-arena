@@ -9,9 +9,9 @@ const W = 900, G = 380, BW = 44, BH = 90, GR = 0.65, ROUND = 5400; // 5400 frame
 // ult:1 = ultime (barre pleine requise), ub:1 = ne peut pas être bloqué, multi = touche plusieurs fois
 const CH = [
   { name: 'Bruno', desc: 'Bagarreur, corps à corps', hp: 110, spd: 4.2, jmp: 13.5, color: '#e74c3c', atk: [
-    { n: 'Direct', type: 'm', su: 4, ac: 4, rc: 8, cd: 6, dmg: 6, rng: 60, h: 30, kb: 4, st: 14 },
-    { n: 'Crochet', type: 'm', su: 8, ac: 5, rc: 14, cd: 35, dmg: 12, rng: 72, h: 40, kb: 9, st: 20 },
-    { n: 'Uppercut', type: 'm', su: 12, ac: 6, rc: 24, cd: 100, dmg: 20, rng: 55, h: 80, kb: 12, st: 32, lift: -11 },
+    { n: 'Direct', type: 'm', su: 4, ac: 4, rc: 8, cd: 6, dmg: 9, rng: 68, h: 30, kb: 4, st: 14 },
+    { n: 'Crochet', type: 'm', su: 8, ac: 5, rc: 14, cd: 35, dmg: 15, rng: 74, h: 40, kb: 9, st: 20 },
+    { n: 'Uppercut', type: 'm', su: 12, ac: 6, rc: 24, cd: 100, dmg: 24, rng: 55, h: 80, kb: 12, st: 32, lift: -11 },
     { n: 'Charge rageuse', ult: 1, ub: 1, type: 'd', su: 10, ac: 14, rc: 20, cd: 0, dmg: 30, rng: 50, h: 90, kb: 18, st: 40, lift: -9, spd: 18 }] },
   { name: 'Zéphyr', desc: 'Mage, attaques à distance', hp: 90, spd: 3.6, jmp: 13, color: '#9b59b6', atk: [
     { n: 'Éclair', type: 'p', su: 6, ac: 1, rc: 8, cd: 18, dmg: 5, vx: 12, r: 7, kb: 3, st: 12 },
@@ -23,11 +23,11 @@ const CH = [
     { n: 'Dash', type: 'd', su: 4, ac: 10, rc: 14, cd: 60, dmg: 11, rng: 34, h: 60, kb: 10, st: 22, spd: 15 },
     { n: 'Kunaï', type: 'p', su: 5, ac: 1, rc: 10, cd: 30, dmg: 7, vx: 14, r: 6, kb: 4, st: 14 },
     { n: 'Danse des lames', ult: 1, ub: 1, type: 'm', su: 8, ac: 24, rc: 14, cd: 0, dmg: 8, rng: 80, h: 90, kb: 3, st: 11, both: 1, multi: 6 }] },
-  { name: 'Titan', desc: 'Tank, lent mais puissant', hp: 150, spd: 2.8, jmp: 11.5, color: '#f39c12', atk: [
-    { n: 'Poing', type: 'm', su: 10, ac: 5, rc: 16, cd: 10, dmg: 9, rng: 68, h: 50, kb: 8, st: 18 },
-    { n: 'Écrasement', type: 'm', su: 18, ac: 6, rc: 28, cd: 90, dmg: 18, rng: 90, h: 100, kb: 12, st: 28, both: 1 },
+  { name: 'Titan', desc: 'Tank, lent mais puissant', hp: 150, spd: 3.0, jmp: 11.9, color: '#f39c12', atk: [
+    { n: 'Poing', type: 'm', su: 10, ac: 5, rc: 16, cd: 10, dmg: 9, rng: 98, h: 60, kb: 8, st: 18 },
+    { n: 'Écrasement', type: 'm', su: 18, ac: 6, rc: 28, cd: 90, dmg: 22, rng: 90, h: 100, kb: 12, st: 28, both: 1 },
     { n: 'Séisme (au sol)', type: 'p', su: 14, ac: 1, rc: 24, cd: 120, dmg: 15, vx: 5, r: 20, kb: 11, st: 26, low: 1 },
-    { n: 'Poing du Géant', ult: 1, ub: 1, type: 'm', su: 22, ac: 6, rc: 34, cd: 0, dmg: 40, rng: 105, h: 120, kb: 20, st: 44, lift: -8 }] },
+    { n: 'Poing du Géant', ult: 1, ub: 1, type: 'm', su: 22, ac: 6, rc: 34, cd: 0, dmg: 45, rng: 105, h: 120, kb: 20, st: 44, lift: -8 }] },
   { name: 'Luffy', desc: 'Pirate élastique, coups à distance', hp: 100, spd: 4.4, jmp: 13.5, color: '#3b6fd8', atk: [
     { n: 'Pistol', type: 'm', su: 8, ac: 4, rc: 12, cd: 10, dmg: 8, rng: 170, h: 26, kb: 6, st: 14 },
     { n: 'Bazooka', type: 'm', su: 16, ac: 5, rc: 22, cd: 50, dmg: 16, rng: 115, h: 50, kb: 15, st: 28 },
