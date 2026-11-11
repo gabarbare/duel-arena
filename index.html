@@ -117,7 +117,8 @@ function connect(first) {
   w.onmessage = e => {
     if (w !== ws) return;
     const m = JSON.parse(e.data);
-    if (m.t === 'room') { me = m.idx; chars = m.chars; maps = m.maps; code = m.code; searching = false; }
+    if (m.t === 'chars') { chars = m.chars; view = 'training'; ui(); }
+    else if (m.t === 'room') { me = m.idx; chars = m.chars; maps = m.maps; code = m.code; searching = false; }
     else if (m.t === 'err') { err = m.m; me = -1; S = null; searching = false; w.close(); }
     else if (m.t === 's') {
       S = m;
@@ -129,6 +130,14 @@ function connect(first) {
 }
 const go = o => { err = ''; connect(o); };
 const search = () => { err = ''; searching = true; connect({ t: 'queue' }); ui(); };
+function openTraining() {
+  view = 'training';
+  if (!chars.length || !ws || ws.readyState !== 1) connect({ t: 'training_list' });
+  else ui();
+}
+function startTraining(i) {
+  if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'train', c: i, sk: save.skin[chars[i].name] || '' }));
+}
 const pick = i => { infoIdx = i; if (locked(chars[i].name)) { ui(); return; } ws.send(JSON.stringify({ t: 'pick', c: i, sk: save.skin[chars[i].name] || '' })); ui(); };
 const again = () => ws.send(JSON.stringify({ t: 'again' }));
 function leave() { me = -1; S = null; err = ''; view = 'menu'; searching = false; try { ws.close(); } catch (e) {} ui(); }
@@ -148,10 +157,11 @@ function ui() {
   let h = '';
   ov.className = me >= 0 && S && S.p === 'end' ? 'end' : '';
   if (me < 0 && searching) h = `<h2>🔎 Recherche d’un adversaire…</h2><p>Tu seras mis face à un joueur aléatoire.</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
-  else if (me < 0) h = view === 'shop' ? shopHtml() : `<h1>⚔️ Duel Arena</h1><p>🪙 ${save.coins} pièces</p>${err ? `<p style="color:#f66">${err}</p>` : ''}
+  else if (me < 0) h = view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : `<h1>⚔️ Duel Arena</h1><p>🪙 ${save.coins} pièces</p>${err ? `<p style="color:#f66">${err}</p>` : ''}
     <button onclick="search()" style="background:#e67e22">🎲 Matchmaking (adversaire aléatoire)</button>
     <button onclick="go({t:'create'})">Créer une partie</button>
     <div>ou <input id="cd" maxlength="4" placeholder="CODE" value="${location.hash.slice(1)}"> <button onclick="go({t:'join',code:document.getElementById('cd').value})">Rejoindre</button></div>
+    <button onclick="openTraining()" style="background:#16a085">🎯 Mode entraînement</button>
     <button onclick="view='shop';ui()" style="background:#8e44ad">🛒 Boutique</button>`;
   else if (!S || S.p === 'wait') h = `<h2>En attente de l’adversaire…</h2><p>Code : <b style="font-size:34px">${code}</b></p><p>Ou envoie-lui ce lien :<br><b>${location.origin}/#${code}</b></p>${quitBtn}`;
   else if (S.p === 'select') {
@@ -162,6 +172,7 @@ function ui() {
     <p style="margin:2px">${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.sel[1 - me] != null ? '· Adversaire prêt ✔' : ''}</p>
     <p style="font-size:12px;opacity:.8;margin:2px">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques · U ou Espace : ultime (barre pleine)</p>${quitBtn}`;
   }
+  else if (S.p === 'training') { ov.style.display = 'none'; last = ''; return; }
   else if (S.p === 'end') h = `<p style="font-size:18px">🪙 +${earned} pièces (total : ${save.coins})</p>${S.ag[me] ? '<p>En attente de l’adversaire…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
   else { ov.style.display = 'none'; last = ''; return; }
   if (h !== last) { ov.innerHTML = h; last = h; }
@@ -170,6 +181,10 @@ function ui() {
 
 const map = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', ArrowUp: 'u', KeyW: 'u', ArrowDown: 'd', KeyS: 'd', KeyJ: 0, KeyK: 1, KeyL: 2, KeyU: 3, Space: 3 };
 function key(e) {
+  if (S && S.p === 'training' && e.type === 'keydown') {
+    if (e.code === 'KeyR') { e.preventDefault(); if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'training_reset' })); return; }
+    if (e.code === 'Escape') { e.preventDefault(); leave(); return; }
+  }
   const k = map[e.code];
   if (k === undefined || e.target.tagName === 'INPUT') return;
   e.preventDefault();
@@ -483,6 +498,20 @@ function fighter(f, i) {
 }
 
 function hud() {
+  if (S.p === 'training') {
+    const f = S.f[0], c = chars[f.c];
+    x.fillStyle = 'rgba(0,0,0,.76)'; x.fillRect(15, 12, 370, 96);
+    x.fillStyle = '#fff'; x.textAlign = 'left'; x.font = 'bold 17px sans-serif';
+    x.fillText('🎯 ENTRAÎNEMENT · ' + c.name, 28, 36);
+    x.font = '14px sans-serif';
+    x.fillText('Dégâts totaux : ' + S.damage, 28, 59);
+    x.fillText('Coups réussis : ' + S.hits, 28, 80);
+    x.fillText('Dernier coup : ' + S.lastDamage + ' dégâts', 28, 100);
+    x.textAlign = 'right';
+    x.fillText('R : Réinitialiser  ·  Échap : Quitter', 885, 28);
+    x.fillText('Ultime toujours disponible', 885, 50);
+    return;
+  }
   S.f.forEach((f, i) => {
     const c = chars[f.c], w = 380, xx = i ? 900 - 20 - w : 20, pw = w * f.hp / c.hp, uw = w * f.ul / 100, rdy = f.ul >= 100;
     if (f.sh > 0) { x.fillStyle = '#000'; x.fillRect(xx, 12, w, 6); x.fillStyle = '#7fd4ff'; const sw = w * f.sh / 60; x.fillRect(i ? xx + w - sw : xx, 12, sw, 6); }
@@ -577,6 +606,10 @@ function draw() {
       }
     });
     S.f.forEach(fighter);
+    if (S.p === 'training') {
+      x.fillStyle = '#fff'; x.font = 'bold 14px sans-serif'; x.textAlign = 'center';
+      x.fillText('MANNEQUIN', S.f[1].x, S.f[1].y - 150);
+    }
     S.fx.forEach(e => {
       if (e.p === 2) { // éclat de téléportation
         const r0 = 10 + e.a * 40; x.strokeStyle = 'rgba(90,200,255,' + (1 - e.a) + ')'; x.lineWidth = 4; x.beginPath(); x.ellipse(e.x, e.y, r0, r0 * 1.3, 0, 0, 7); x.stroke();
