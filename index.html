@@ -134,7 +134,7 @@ function connect(first) {
           save.coins += earned;
           const charIndex = m.f && m.f[me] ? m.f[me].c : null;
           const charName = charIndex != null && chars[charIndex] ? chars[charIndex].name : 'Inconnu';
-          const won = Number(m.winner) === me;
+          const won = Number(m.co[me]) > Number(m.co[1 - me]);
           save.stats.played++;
           if (won) save.stats.wins++; else save.stats.losses++;
           if (!save.stats.byChar[charName]) save.stats.byChar[charName] = { played: 0, wins: 0, losses: 0 };
@@ -161,7 +161,6 @@ function startTraining(i) {
 }
 const pick = i => { infoIdx = i; if (locked(chars[i].name)) { ui(); return; } ws.send(JSON.stringify({ t: 'pick', c: i, sk: save.skin[chars[i].name] || '' })); ui(); };
 const again = () => ws.send(JSON.stringify({ t: 'again' }));
-const startRoom = () => { if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'start' })); };
 function leave() { me = -1; S = null; err = ''; view = 'menu'; searching = false; try { ws.close(); } catch (e) {} ui(); }
 function info(i) { if (infoIdx !== i) { infoIdx = i; ui(); } }
 function setSkin(name, id, i) { save.skin[name] = id; persist(); if (S && S.p === 'select' && S.sel[me] === i) pick(i); ui(); }
@@ -216,13 +215,13 @@ function ui() {
     <button onclick="openTraining()" style="background:#16a085">🎯 Mode entraînement</button>
     <button onclick="view='stats';ui()" style="background:#2980b9">📊 Statistiques</button>
     <button onclick="view='shop';ui()" style="background:#8e44ad">🛒 Boutique</button>`;
-  else if (!S || S.p === 'wait') h = `<h2>⚔️ Salon multijoueur</h2><p>Joueurs : ${S && S.count || 1} / 4</p><p>Code : <b style="font-size:34px">${code}</b></p><p>Envoie ce lien à tes amis :<br><b>${location.origin}/#${code}</b></p>${S && S.count >= 2 && me === 0 ? '<button onclick="startRoom()">Commencer la partie</button>' : S && S.count >= 2 ? '<p>En attente du lancement par l’hôte…</p>' : '<p>En attente d’au moins un autre joueur…</p>'}${quitBtn}`;
+  else if (!S || S.p === 'wait') h = `<h2>En attente de l’adversaire…</h2><p>Code : <b style="font-size:34px">${code}</b></p><p>Ou envoie-lui ce lien :<br><b>${location.origin}/#${code}</b></p>${quitBtn}`;
   else if (S.p === 'select') {
     const ii = infoIdx != null ? infoIdx : (S.sel[me] != null ? S.sel[me] : 0), ic = chars[ii];
     const sks = SHOP.filter(q => q.type === 'skin' && q.char === ic.name && owns(q.id)), cur = save.skin[ic.name] || '';
     h = `<h2 style="margin:2px">Choisis ton combattant</h2><div class="cards">${chars.map((c, i) => `<div class="card sm ${S.sel[me] === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})"><b style="color:${c.color}">${c.name}</b>${locked(c.name) ? '<br>🔒' : ''}</div>`).join('')}</div>
     <div class="panel"><b style="color:${ic.color};font-size:15px">${ic.name}</b>${locked(ic.name) ? ' 🔒 à débloquer dans la boutique' : ''} · ${ic.desc} · PV ${ic.hp}<br>${ic.atk.map((a, j) => 'JKLU'[j] + ' : ' + a).join(' &nbsp;·&nbsp; ')}${ic.alt ? '<br>✨ Forme : ' + ic.alt.join(' / ') : ''}${sks.length ? '<br>' + [{ id: '', name: 'Normal' }, ...sks].map(q => `<span class="chip ${cur === q.id ? 'on' : ''}" onclick="event.stopPropagation();setSkin('${ic.name}','${q.id}',${ii})">${q.name}</span>`).join('') : ''}</div>
-    <p style="margin:2px">${S.sel[me] != null ? 'Tu es prêt ✔' : 'Choisis ton personnage'} · Joueurs prêts : ${S.sel.filter(v=>v!=null).length}/${S.sel.length}</p>
+    <p style="margin:2px">${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.sel[1 - me] != null ? (S.bot ? '· Bot prêt 🤖' : '· Adversaire prêt ✔') : ''}</p>
     <p style="font-size:12px;opacity:.8;margin:2px">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques · U ou Espace : ultime (barre pleine)</p>${quitBtn}`;
   }
   else if (S.p === 'training') { ov.style.display = 'none'; last = ''; return; }
@@ -287,7 +286,6 @@ function fighter(f, i) {
   const sd = f.sk && SHOP.find(q => q.id === f.sk); PAL = sd && sd.pal || null;
   x.save(); x.translate(f.x, f.y);
   if (f.iv) x.globalAlpha = .45;
-  if (f.out) x.globalAlpha = .25;
   if (f.sz > 1) x.scale(f.sz, f.sz);
   const gn = n === 'Gojo', dk = n === 'Deku';
   if (f.ak === 3 || f.bf || (gn && f.ak === 2) || (n === 'Denji' && f.fm) || (n === 'Shinra' && f.fm)) {
@@ -566,19 +564,23 @@ function hud() {
     x.fillText('Ultime toujours disponible', 885, 50);
     return;
   }
-  const many = S.f.length > 2;
   S.f.forEach((f, i) => {
-    const c = chars[f.c], w = many ? 200 : 380, xx = many ? 15 + i * 220 : (i ? 500 : 20), pw = w * f.hp / c.hp, uw = w * f.ul / 100, rdy = f.ul >= 100;
+    const c = chars[f.c], w = 380, xx = i ? 900 - 20 - w : 20, pw = w * f.hp / c.hp, uw = w * f.ul / 100, rdy = f.ul >= 100;
+    if (f.sh > 0) { x.fillStyle = '#000'; x.fillRect(xx, 12, w, 6); x.fillStyle = '#7fd4ff'; const sw = w * f.sh / 60; x.fillRect(i ? xx + w - sw : xx, 12, sw, 6); }
     x.fillStyle = '#000'; x.fillRect(xx, 20, w, 22);
-    x.fillStyle = f.out ? '#555' : c.color; x.fillRect(xx, 20, pw, 22);
+    x.fillStyle = c.color; x.fillRect(i ? xx + w - pw : xx, 20, pw, 22);
     x.fillStyle = '#000'; x.fillRect(xx, 46, w, 9);
-    x.fillStyle = rdy && ((Date.now() / 150) | 0) % 2 ? '#fff' : '#f1c40f'; x.fillRect(xx, 46, uw, 9);
-    x.fillStyle = '#fff'; x.font = many ? 'bold 12px sans-serif' : 'bold 14px sans-serif'; x.textAlign = 'left';
-    x.fillText(c.name + (i === me ? ' (toi)' : '') + (f.out ? ' · KO' : ''), xx, 74);
-    if (rdy && !many) { x.fillStyle = '#f1c40f'; x.textAlign = 'center'; x.fillText(i === me ? '⚡ ULTIME PRÊT : U' : '⚡ ULTIME PRÊT', xx + w/2, 91); }
+    x.fillStyle = rdy && ((Date.now() / 150) | 0) % 2 ? '#fff' : '#f1c40f'; x.fillRect(i ? xx + w - uw : xx, 46, uw, 9);
+    x.fillStyle = '#fff'; x.font = 'bold 14px sans-serif'; x.textAlign = i ? 'right' : 'left';
+    x.fillText(c.name + (i === me ? ' (toi)' : ''), i ? xx + w : xx, 74);
+    if (rdy) { x.fillStyle = '#f1c40f'; x.textAlign = i ? 'left' : 'right'; x.fillText(i === me ? '⚡ ULTIME PRÊT : U' : '⚡ ULTIME PRÊT', i ? xx : xx + w, 74); }
+    for (let k = 0; k < 2; k++) {
+      x.fillStyle = k < S.w[i] ? '#f1c40f' : '#555'; x.beginPath();
+      x.arc(i ? xx + w - 8 - k * 20 : xx + 8 + k * 20, 90, 6, 0, 7); x.fill();
+    }
   });
-  x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = 'bold 28px sans-serif'; x.fillText(fmt(S.tm), 450, S.f.length > 2 ? 112 : 42);
-  if (S.p === 'cd' && maps[S.mp]) { x.font = '14px sans-serif'; x.fillStyle = '#ddd'; x.fillText('🗺 ' + maps[S.mp].n + (maps[S.mp].note ? ' · ' + maps[S.mp].note : ''), 450, S.f.length > 2 ? 132 : 62); }
+  x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = 'bold 28px sans-serif'; x.fillText(fmt(S.tm), 450, 42);
+  if (S.p === 'cd' && maps[S.mp]) { x.font = '14px sans-serif'; x.fillStyle = '#ddd'; x.fillText('🗺 ' + maps[S.mp].n + (maps[S.mp].note ? ' · ' + maps[S.mp].note : ''), 450, 62); }
   const t = S.p === 'cd' ? S.n : (S.p === 'rend' || S.p === 'end') ? S.m : '';
   x.font = 'bold 44px sans-serif'; x.lineWidth = 5; x.strokeStyle = '#000'; x.strokeText(t, 450, 210); x.fillText(t, 450, 210);
 }
