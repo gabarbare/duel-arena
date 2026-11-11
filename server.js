@@ -126,6 +126,14 @@ const segDist = (x1, y1, x2, y2, px, py) => {
   return Math.hypot(px - x1 - u * dx, py - y1 - u * dy);
 };
 
+// Statistiques du mannequin en mode entraînement.
+function recordTrainingHit(t, dmg) {
+  if (!t.trainingDummy) return;
+  t.totalDamage += dmg;
+  t.hitCount += 1;
+  t.lastDamage = Math.round(dmg);
+}
+
 // t = victime, a = attaquant (pour la barre d'ultime), ub = non blocable
 function hurt(t, dmg, kb, st, lift, srcX, ub, a) {
   const dir = srcX < t.x ? 1 : -1;
@@ -137,6 +145,7 @@ function hurt(t, dmg, kb, st, lift, srcX, ub, a) {
   }
   if (t.crys > 0) dmg *= .4; // cristallisation
   if (!ub && t.block && t.stun <= 0 && t.y >= G) { t.hp -= dmg * (CH[t.c].blk ?? .15); t.vx = dir * kb * .3; t.fl = 4; return; }
+  recordTrainingHit(t, dmg);
   t.hp -= dmg; t.stun = st; t.vx = dir * kb; if (lift) t.vy = lift; t.atk = null; t.fl = 6; t.fly = 0; t.hf = null; t.hook = null;
   if (!ub) { t.ult = Math.min(100, t.ult + dmg * 1.2); if (a) a.ult = Math.min(100, a.ult + dmg * 1.5); }
 }
@@ -144,7 +153,9 @@ function hurt(t, dmg, kb, st, lift, srcX, ub, a) {
 function burn(t, dmg) {
   if (t.inv) return;
   if (t.shield > 0) { t.shield = Math.max(0, t.shield - dmg); return; }
-  t.hp -= dmg * (t.crys > 0 ? .4 : 1); t.fl = 2;
+  const actualDamage = dmg * (t.crys > 0 ? .4 : 1);
+  recordTrainingHit(t, actualDamage);
+  t.hp -= actualDamage; t.fl = 2;
 }
 
 function step(r, i) {
@@ -306,8 +317,52 @@ function fxs(r) {
 
 function start(r) { r.f = [nf(r.sel[0], 0), nf(r.sel[1], 1)]; r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 150; r.tm = ROUND; r.msg = ''; }
 
+function startTraining(r, characterIndex, skin) {
+  r.training = true;
+  const dummyIndex = Math.max(0, CH.findIndex(c => c.name === 'Viking'));
+  r.sel = [characterIndex, dummyIndex];
+  r.sk = [String(skin || '').slice(0, 40), ''];
+  r.f = [nf(characterIndex, 0), nf(dummyIndex, 1)];
+  r.f[0].x = 250;
+  r.f[1].x = 650;
+  r.f[1].trainingDummy = true;
+  r.f[1].totalDamage = 0;
+  r.f[1].hitCount = 0;
+  r.f[1].lastDamage = 0;
+  r.pj = [];
+  r.fx = [];
+  r.mi = 0;
+  r.ph = 'training';
+  r.t = 0;
+  r.tm = 0;
+  r.msg = '';
+}
+
 function tick(r) {
-  if (r.ph === 'cd') { if (--r.t <= 0) r.ph = 'fight'; }
+  if (r.ph === 'training') {
+    // L'ultime reste disponible pour tester librement toutes les capacités.
+    r.f[0].ult = 100;
+    step(r, 0);
+    projs(r);
+    fxs(r);
+
+    // Le mannequin ne bouge pas et ne peut pas être éliminé.
+    const dummy = r.f[1];
+    dummy.x = 650;
+    dummy.y = G;
+    dummy.vx = 0;
+    dummy.vy = 0;
+    dummy.hp = 1000000000;
+    dummy.stun = 0;
+    dummy.atk = null;
+    dummy.fl = 0;
+    dummy.inv = 0;
+    dummy.block = 0;
+    dummy.fly = 0;
+    dummy.hf = null;
+    dummy.hook = null;
+  }
+  else if (r.ph === 'cd') { if (--r.t <= 0) r.ph = 'fight'; }
   else if (r.ph === 'fight') {
     step(r, 0); step(r, 1); sep(r); projs(r); fxs(r); r.tm--;
     const [a, b] = r.f;
@@ -326,7 +381,11 @@ function tick(r) {
     if (r.again[0] && r.again[1]) { r.ph = 'select'; r.sel = [null, null]; r.wins = [0, 0]; r.msg = ''; r.f = []; }
   }
   const live = r.ph !== 'wait' && r.ph !== 'select';
-  const s = { t: 's', p: r.ph, n: Math.ceil(r.t / 60), tm: Math.ceil(r.tm / 60), w: r.wins, m: r.msg, sel: r.sel, mp: r.mi, co: r.ph === 'end' ? r.co : null, ag: r.again,
+  const s = { t: 's', p: r.ph, training: !!r.training,
+    damage: r.training ? Math.round(r.f[1].totalDamage) : 0,
+    hits: r.training ? r.f[1].hitCount : 0,
+    lastDamage: r.training ? r.f[1].lastDamage : 0,
+    n: Math.ceil(r.t / 60), tm: Math.ceil(r.tm / 60), w: r.wins, m: r.msg, sel: r.sel, mp: r.mi, co: r.ph === 'end' ? r.co : null, ag: r.again,
     f: live ? r.f.map((f, q) => {
       const d = f.atk && f.atk.d;
       return { c: f.c, sk: r.sk[q], x: Math.round(f.x), y: Math.round(f.y), hp: Math.max(0, Math.round(f.hp)), fc: f.face, bl: f.block, fl: f.fl > 0 ? 1 : 0,
@@ -352,7 +411,19 @@ const join = ws => tx(ws, { t: 'room', code: ws.room.code, idx: ws.idx, chars: C
 wss.on('connection', ws => {
   ws.on('message', raw => {
     let m; try { m = JSON.parse(raw); } catch { return; }
-    if (m.t === 'create' && !ws.room) {
+    if (m.t === 'training_list' && !ws.room) {
+      tx(ws, { t: 'chars', chars: CHARS });
+    } else if (m.t === 'train' && !ws.room && CH[m.c]) {
+      const roomCode = 'TRAIN_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      const r = { code: roomCode, ps: [ws], ph: 'training', sel: [m.c, 0], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: 0, sk: ['', ''], again: [0, 0], co: [0, 0], training: true };
+      rooms.set(r.code, r);
+      ws.room = r; ws.idx = 0;
+      startTraining(r, m.c, m.sk);
+      join(ws);
+    } else if (m.t === 'training_reset') {
+      const r = ws.room;
+      if (r && r.training && ws.idx === 0) startTraining(r, r.sel[0], r.sk[0]);
+    } else if (m.t === 'create' && !ws.room) {
       const r = { code: newCode(), ps: [ws], ph: 'wait', sel: [null, null], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 0], co: [0, 0] };
       rooms.set(r.code, r); ws.room = r; ws.idx = 0; join(ws);
     } else if (m.t === 'queue' && !ws.room && !queue.includes(ws)) {
