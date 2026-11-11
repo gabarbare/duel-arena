@@ -87,7 +87,7 @@ const CH = [
     { n: 'Tentacule', type: 'm', su: 5, ac: 4, rc: 9, cd: 8, dmg: 7, rng: 75, h: 30, kb: 5, st: 14 },
     { n: 'Dash éclair', type: 'sd', su: 2, ac: 5, rc: 8, cd: 45, spd: 34 },
     { n: 'Fouet (2 s)', type: 'm', su: 6, ac: 120, rc: 14, cd: 300, dmg: 5, rng: 110, h: 100, kb: 4, st: 7, both: 1, multi: 12 },
-    { n: 'Mach 20 enchaîné', ult: 1, ub: 1, type: 'zz', su: 12, ac: 40, rc: 4, cd: 0, dmg: 12, kb: 3, st: 14, spd: 28, len: 12 }] }
+    { n: 'Mach 20 enchaîné', ult: 1, ub: 1, type: 'zz', su: 12, ac: 40, rc: 18, cd: 0, dmg: 12, kb: 3, st: 14, spd: 28, len: 12 }] }
 ];
 // Shinra en vitesse lumière : le vol devient une téléportation derrière l'ennemi
 const SHN = CH.find(c => c.name === 'Shinra');
