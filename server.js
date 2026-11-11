@@ -47,8 +47,8 @@ const CH = [
   { name: 'Gojo', desc: 'Sorcier suprême : sphères Rouge/Bleu, soin, Infini', hp: 100, spd: 4.2, jmp: 13.5, color: '#6ec6ff', atk: [
     { n: 'Rouge (repousse)', type: 'p', su: 9, ac: 1, rc: 14, cd: 45, dmg: 8, vx: 9, r: 16, kb: 24, st: 24, vis: 4 },
     { n: 'Bleu (attire)', type: 'p', su: 9, ac: 1, rc: 14, cd: 60, dmg: 5, vx: 6, r: 16, kb: 20, st: 26, vis: 5, pull: 1 },
-    { n: 'Soin (annulé si touché)', type: 'heal', su: 8, ac: 90, rc: 10, cd: 300, hps: 0.22 },
-    { n: 'Infini (2e barre de vie)', ult: 1, type: 'shield', su: 12, ac: 1, rc: 16, cd: 0, val: 60 }] },
+    { n: 'Soin (annulé si touché)', type: 'heal', su: 8, ac: 90, rc: 10, cd: 300, hps: 0.16 },
+    { n: 'Infini (2e barre de vie)', ult: 1, type: 'shield', su: 12, ac: 1, rc: 28, cd: 0, val: 60 }] },
   { name: 'Deku', desc: 'Héros en herbe, One For All', hp: 105, spd: 4.4, jmp: 14, color: '#388e3c', atk: [
     { n: 'Coup de poing', type: 'm', su: 5, ac: 4, rc: 9, cd: 8, dmg: 7, rng: 62, h: 30, kb: 5, st: 14 },
     { n: 'Air Force', type: 'p', su: 8, ac: 1, rc: 12, cd: 26, dmg: 7, vx: 12, r: 11, kb: 9, st: 16, vis: 6 },
