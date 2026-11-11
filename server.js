@@ -12,7 +12,7 @@ const CH = [
     { n: 'Direct', type: 'm', su: 4, ac: 4, rc: 8, cd: 6, dmg: 9, rng: 68, h: 30, kb: 4, st: 14 },
     { n: 'Crochet', type: 'm', su: 8, ac: 5, rc: 14, cd: 35, dmg: 15, rng: 74, h: 40, kb: 9, st: 20 },
     { n: 'Uppercut', type: 'm', su: 12, ac: 6, rc: 24, cd: 100, dmg: 24, rng: 55, h: 80, kb: 12, st: 32, lift: -11 },
-    { n: 'Charge rageuse', ult: 1, ub: 1, type: 'd', su: 10, ac: 14, rc: 20, cd: 0, dmg: 30, rng: 50, h: 90, kb: 18, st: 40, lift: -9, spd: 18 }] },
+    { n: 'Charge rageuse', ult: 1, ub: 1, type: 'd', su: 10, ac: 14, rc: 20, cd: 0, dmg: 30, rng: 50, h: 90, kb: 18, st: 50, lift: -9, spd: 18 }] },
   { name: 'Zéphyr', desc: 'Mage, attaques à distance', hp: 90, spd: 3.6, jmp: 13, color: '#9b59b6', atk: [
     { n: 'Éclair', type: 'p', su: 6, ac: 1, rc: 8, cd: 18, dmg: 5, vx: 12, r: 7, kb: 3, st: 12 },
     { n: 'Boule de feu', type: 'p', su: 12, ac: 1, rc: 16, cd: 70, dmg: 14, vx: 7, r: 16, kb: 10, st: 24 },
@@ -21,7 +21,7 @@ const CH = [
   { name: 'Kaze', desc: 'Ninja, rapide avec dash', hp: 85, spd: 5.6, jmp: 14.5, color: '#2ecc71', atk: [
     { n: 'Lame', type: 'm', su: 3, ac: 3, rc: 6, cd: 4, dmg: 4, rng: 55, h: 35, kb: 3, st: 11 },
     { n: 'Dash', type: 'd', su: 4, ac: 10, rc: 14, cd: 60, dmg: 11, rng: 34, h: 60, kb: 10, st: 22, spd: 15 },
-    { n: 'Kunaï', type: 'p', su: 5, ac: 1, rc: 10, cd: 30, dmg: 7, vx: 14, r: 6, kb: 4, st: 14 },
+    { n: 'Kunaï', type: 'p', su: 5, ac: 1, rc: 10, cd: 30, dmg: 5, vx: 14, r: 6, kb: 4, st: 5 },
     { n: 'Danse des lames', ult: 1, ub: 1, type: 'm', su: 8, ac: 24, rc: 14, cd: 0, dmg: 8, rng: 80, h: 90, kb: 3, st: 11, both: 1, multi: 6 }] },
   { name: 'Titan', desc: 'Tank, lent mais puissant', hp: 150, spd: 3.0, jmp: 11.9, color: '#f39c12', atk: [
     { n: 'Poing', type: 'm', su: 10, ac: 5, rc: 16, cd: 10, dmg: 9, rng: 98, h: 60, kb: 8, st: 18 },
