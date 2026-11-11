@@ -209,7 +209,8 @@ function ui() {
   if (me < 0 && searching) h = `<h2>🔎 Recherche d’un adversaire…</h2><p>Tu seras mis face à un joueur aléatoire.</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
   else if (me < 0) h = view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : `<h1>⚔️ Duel Arena</h1><p>🪙 ${save.coins} pièces</p>${err ? `<p style="color:#f66">${err}</p>` : ''}
     <button onclick="search()" style="background:#e67e22">🎲 Matchmaking (adversaire aléatoire)</button>
-    <button onclick="go({t:'create'})">Créer une partie</button>
+    <button onclick="go({t:'create'})">Créer une partie multijoueur</button>
+    <button onclick="go({t:'bot'})" style="background:#16a085">🤖 Jouer contre un bot</button>
     <div>ou <input id="cd" maxlength="4" placeholder="CODE" value="${location.hash.slice(1)}"> <button onclick="go({t:'join',code:document.getElementById('cd').value})">Rejoindre</button></div>
     <button onclick="openTraining()" style="background:#16a085">🎯 Mode entraînement</button>
     <button onclick="view='stats';ui()" style="background:#2980b9">📊 Statistiques</button>
@@ -220,7 +221,7 @@ function ui() {
     const sks = SHOP.filter(q => q.type === 'skin' && q.char === ic.name && owns(q.id)), cur = save.skin[ic.name] || '';
     h = `<h2 style="margin:2px">Choisis ton combattant</h2><div class="cards">${chars.map((c, i) => `<div class="card sm ${S.sel[me] === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})"><b style="color:${c.color}">${c.name}</b>${locked(c.name) ? '<br>🔒' : ''}</div>`).join('')}</div>
     <div class="panel"><b style="color:${ic.color};font-size:15px">${ic.name}</b>${locked(ic.name) ? ' 🔒 à débloquer dans la boutique' : ''} · ${ic.desc} · PV ${ic.hp}<br>${ic.atk.map((a, j) => 'JKLU'[j] + ' : ' + a).join(' &nbsp;·&nbsp; ')}${ic.alt ? '<br>✨ Forme : ' + ic.alt.join(' / ') : ''}${sks.length ? '<br>' + [{ id: '', name: 'Normal' }, ...sks].map(q => `<span class="chip ${cur === q.id ? 'on' : ''}" onclick="event.stopPropagation();setSkin('${ic.name}','${q.id}',${ii})">${q.name}</span>`).join('') : ''}</div>
-    <p style="margin:2px">${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.sel[1 - me] != null ? '· Adversaire prêt ✔' : ''}</p>
+    <p style="margin:2px">${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.sel[1 - me] != null ? (S.bot ? '· Bot prêt 🤖' : '· Adversaire prêt ✔') : ''}</p>
     <p style="font-size:12px;opacity:.8;margin:2px">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques · U ou Espace : ultime (barre pleine)</p>${quitBtn}`;
   }
   else if (S.p === 'training') { ov.style.display = 'none'; last = ''; return; }
