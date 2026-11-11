@@ -158,10 +158,8 @@ function burn(t, dmg) {
   t.hp -= actualDamage; t.fl = 2;
 }
 
-function enemies(r, i) { return r.f.filter((q, j) => j !== i && q && !q.eliminated && q.hp > 0); }
-function nearestEnemy(r, i) { const list = enemies(r, i); return list.sort((a, b) => Math.hypot(a.x-r.f[i].x, a.y-r.f[i].y) - Math.hypot(b.x-r.f[i].x, b.y-r.f[i].y))[0] || r.f.find((q,j)=>j!==i) || r.f[i]; }
 function step(r, i) {
-  const f = r.f[i], o = nearestEnemy(r, i), c = CH[f.c], k = f.inp, dm = f.buff > 0 ? 1.25 : 1, M = MAPS[r.mi];
+  const f = r.f[i], o = r.f[1 - i], c = CH[f.c], k = f.inp, dm = f.buff > 0 ? 1.25 : 1, M = MAPS[r.mi];
   f.cds = f.cds.map(v => v > 0 ? v - 1 : 0);
   if (f.fl > 0) f.fl--;
   if (f.buff > 0) f.buff--;
@@ -191,7 +189,7 @@ function step(r, i) {
       if (d.type === 'p') {
         for (let j = 0; j < (d.cnt || 1); j++)
           r.pj.push({ x: f.x + f.face * (30 - (d.clone ? j * 45 : 0)), y: f.y - (d.cy || (d.low ? 18 : BH * .6)), vx: f.face * d.vx, vy: d.vy0 || (d.cnt && !d.clone ? (j - 1) * 1.8 : 0), r: d.r, o: i, d });
-      } else if (d.type === 'sky') r.fx.push({ x: o.x, t: 0, o: i, target: r.f.indexOf(o), d });
+      } else if (d.type === 'sky') r.fx.push({ x: o.x, t: 0, o: i, d });
       else if (d.type === 'buff') f.buff = d.dur;
       else if (d.type === 'shield') f.shield = d.val;
       else if (d.type === 'form') f.form = d.dur;
@@ -215,7 +213,7 @@ function step(r, i) {
       } else if (d.type === 'portals') {
         for (let q = 0; q < d.cnt; q++) {
           const ph = Math.PI * (q + 1) / (d.cnt + 1);
-          r.fx.push({ k: 'por', o: i, target: r.f.indexOf(o), d, x: Math.max(25, Math.min(W - 25, o.x + Math.cos(ph) * d.rad * 1.1)), y: Math.max(35, o.y - 50 - Math.sin(ph) * d.rad), t: -q * d.gap - 1 });
+          r.fx.push({ k: 'por', o: i, d, x: Math.max(25, Math.min(W - 25, o.x + Math.cos(ph) * d.rad * 1.1)), y: Math.max(35, o.y - 50 - Math.sin(ph) * d.rad), t: -q * d.gap - 1 });
         }
       } else if (d.type === 'dk') {
         let ux, uy;
@@ -243,19 +241,12 @@ function step(r, i) {
       if (a.f === d.su + 1) { f.vy = -d.jv; f.vx = f.face * d.jx; a.air = 1; }
       else if (a.air && f.y >= G && a.f > d.su + 3) {
         a.air = 0; a.land = a.f; a.lb = 6; f.vx = 0;
-        for (const target of enemies(r, i)) if (hit([f.x - d.aoe, f.x + d.aoe, G - 70, G], target)) hurt(target, d.dmg * dm, d.kb, d.st, d.lift, f.x, d.ub, f);
+        if (hit([f.x - d.aoe, f.x + d.aoe, G - 70, G], o)) hurt(o, d.dmg * dm, d.kb, d.st, d.lift, f.x, d.ub, f);
       }
       if (a.lb > 0) { a.lb--; a.b = [f.x - d.aoe, f.x + d.aoe, G - 70, G]; }
     }
     if (a.b && d.multi && a.f % d.multi === 0) a.hit = 0;
-    if (a.b && d.type !== 'cut') {
-      if (!Array.isArray(a.hit)) a.hit = [];
-      for (const target of enemies(r, i)) {
-        if (a.hit.includes(r.f.indexOf(target)) || (d.air && target.y >= G - 15) || !hit(a.b, target)) continue;
-        a.hit.push(r.f.indexOf(target));
-        hurt(target, d.pct ? CH[target.c].hp * d.pct : d.dmg * dm, d.kb, d.st, d.lift, f.x, d.ub, f);
-      }
-    }
+    if (a.b && !a.hit && d.type !== 'cut' && (!d.air || o.y < G - 15) && hit(a.b, o)) { a.hit = 1; hurt(o, d.pct ? CH[o.c].hp * d.pct : d.dmg * dm, d.kb, d.st, d.lift, f.x, d.ub, f); }
     if (f.atk && (d.type === 'jam' ? (a.land && a.f >= a.land + d.rc) || a.f > 150 : a.f >= s0 + d.ac + d.rc)) f.atk = null;
   } else {
     f.face = o.x >= f.x ? 1 : -1;
@@ -279,26 +270,21 @@ function step(r, i) {
 }
 
 function sep(r) {
-  for (let i = 0; i < r.f.length; i++) for (let j = i + 1; j < r.f.length; j++) {
-    const a = r.f[i], b = r.f[j];
-    if (a.eliminated || b.eliminated || a.ghost || b.ghost) continue;
-    const w = BW * (sz(a) + sz(b)) / 2, hh = BH * Math.max(sz(a), sz(b)) * .8;
-    if (Math.abs(a.x - b.x) < w && Math.abs(a.y - b.y) < hh) {
-      const m = (w - Math.abs(a.x - b.x)) / 2, sign = a.x < b.x ? -1 : 1;
-      a.x = clampX(a.x + sign * m, sz(a)); b.x = clampX(b.x - sign * m, sz(b));
-    }
+  const [a, b] = r.f;
+  if (a.ghost || b.ghost) return;
+  const w = BW * (sz(a) + sz(b)) / 2, hh = BH * Math.max(sz(a), sz(b)) * .8;
+  if (Math.abs(a.x - b.x) < w && Math.abs(a.y - b.y) < hh) {
+    const m = (w - Math.abs(a.x - b.x)) / 2, s = a.x < b.x ? -1 : 1;
+    a.x += s * m; b.x -= s * m;
   }
 }
 
 function projs(r) {
   r.pj = r.pj.filter(p => {
     p.x += p.vx; p.y += p.vy; if (p.d.grav) p.vy += p.d.grav;
-    const ow = r.f[p.o];
-    for (const target of enemies(r, p.o)) {
-      const tz = sz(target);
-      if (Math.abs(p.x - target.x) < BW * tz / 2 + p.r && p.y > target.y - BH * tz - p.r && p.y < target.y + p.r) {
-        hurt(target, p.d.dmg * (ow.buff > 0 ? 1.25 : 1), p.d.kb, p.d.st, 0, p.d.pull ? target.x + Math.sign(p.vx) * 50 : p.x - p.vx * 3, p.d.ub, ow); return false;
-      }
+    const t = r.f[1 - p.o], ow = r.f[p.o], tz = sz(t);
+    if (Math.abs(p.x - t.x) < BW * tz / 2 + p.r && p.y > t.y - BH * tz - p.r && p.y < t.y + p.r) {
+      hurt(t, p.d.dmg * (ow.buff > 0 ? 1.25 : 1), p.d.kb, p.d.st, 0, p.d.pull ? t.x + Math.sign(p.vx) * 50 : p.x - p.vx * 3, p.d.ub, ow); return false;
     }
     return p.x > -50 && p.x < W + 50 && p.y < G + 25;
   });
@@ -309,13 +295,12 @@ function fxs(r) {
   r.fx = r.fx.filter(e => {
     e.t++;
     if (e.k === 'cos') return e.t <= e.life;
-    const d = e.d, ow = r.f[e.o], dm = ow.buff > 0 ? 1.25 : 1, targets = enemies(r, e.o);
+    const d = e.d, t = r.f[1 - e.o], ow = r.f[e.o], dm = ow.buff > 0 ? 1.25 : 1, tz = sz(t);
     if (e.k === 'fire') {
-      if (e.t % 12 === 0) for (const t of targets) if (t.y >= G - 2 && Math.abs(t.x - e.x) < e.w / 2 + 14 * sz(t)) burn(t, d.tick * dm);
+      if (t.y >= G - 2 && Math.abs(t.x - e.x) < e.w / 2 + 14 * tz && e.t % 12 === 0) burn(t, d.tick * dm);
       return e.t <= d.life;
     }
     if (e.k === 'por') { // le portail vise la position de l'ennemi à son ouverture, puis tire après "warn" frames
-      const t = r.f[e.target] || targets[0]; if (!t || t.eliminated) return e.t <= d.warn + 6; const tz = sz(t);
       if (e.t === 0) { e.tx = t.x; e.ty = t.y - BH * tz / 2; }
       if (e.t === d.warn && !e.hit) {
         e.hit = 1;
@@ -323,16 +308,14 @@ function fxs(r) {
       }
       return e.t <= d.warn + 6;
     }
-    if (e.t > d.warn && e.t <= d.warn + d.strike) for (const t of targets) if (!e.hitTargets?.includes(r.f.indexOf(t)) && Math.abs(t.x - e.x) < 45 * sz(t)) { e.hitTargets = e.hitTargets || []; e.hitTargets.push(r.f.indexOf(t)); hurt(t, d.dmg * dm, d.kb, d.st, -8, e.x, d.ub, ow); }
+    if (e.t > d.warn && e.t <= d.warn + d.strike && !e.hit && Math.abs(t.x - e.x) < 45 * tz) {
+      e.hit = 1; hurt(t, d.dmg * dm, d.kb, d.st, -8, e.x, d.ub, ow);
+    }
     return e.t <= d.warn + d.strike;
   });
 }
 
-function start(r) {
-  const spots = [150, 350, 550, 750];
-  r.f = r.sel.map((c, i) => { const f = nf(c, i); f.x = spots[i] || 450; f.face = f.x < 450 ? 1 : -1; return f; });
-  r.pj = []; r.fx = []; r.eliminated = []; rollMap(r); r.ph = 'cd'; r.t = 150; r.tm = ROUND; r.msg = '';
-}
+function start(r) { r.f = [nf(r.sel[0], 0), nf(r.sel[1], 1)]; r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 150; r.tm = ROUND; r.msg = ''; }
 
 function startTraining(r, characterIndex, skin) {
   r.training = true;
@@ -357,7 +340,7 @@ function startTraining(r, characterIndex, skin) {
 
 function thinkBot(r) {
   if (!r.bot || r.ph !== 'fight' || !r.f[1] || !r.f[0]) return;
-  const f = r.f[1], o = nearestEnemy(r, 1), c = CH[f.c];
+  const f = r.f[1], o = r.f[0], c = CH[f.c];
   const dx = o.x - f.x, dist = Math.abs(dx), dy = o.y - f.y;
   const input = { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] };
   const attacks = atks(f);
@@ -418,31 +401,24 @@ function tick(r) {
   else if (r.ph === 'cd') { if (--r.t <= 0) r.ph = 'fight'; }
   else if (r.ph === 'fight') {
     thinkBot(r);
-    for (let i = 0; i < r.f.length; i++) if (!r.f[i].eliminated) step(r, i);
-    sep(r); projs(r); fxs(r); r.tm--;
-    for (let i = 0; i < r.f.length; i++) if (r.f[i].hp <= 0) r.f[i].eliminated = true;
-    const alive = r.f.map((f,i)=>({f,i})).filter(q=>!q.f.eliminated);
-    if (alive.length <= 1 || r.tm <= 0) {
-      let winner = alive.length === 1 ? alive[0].i : r.f.reduce((best,f,i)=>f.hp > r.f[best].hp ? i : best, 0);
-      r.wins[winner] = (r.wins[winner] || 0) + 1;
-      r.msg = alive.length === 1 ? CH[r.f[winner].c].name + ' remporte la manche !' : 'Temps écoulé : ' + CH[r.f[winner].c].name + ' gagne la manche !';
-      r.roundWinner = winner; r.ph = 'rend'; r.t = 150;
-      if (r.wins[winner] >= 2 || r.rounds >= 2) {
-        r.ph = 'end'; r.winner = winner; r.msg = '🏆 ' + CH[r.f[winner].c].name + ' remporte le match !';
-        r.again = r.ps.map(()=>0);
-        r.co = r.f.map((f,i)=> (r.wins[i] || 0) * 10 + (i === winner ? 30 : 10));
-      }
-      r.rounds = (r.rounds || 0) + 1;
+    step(r, 0); step(r, 1); sep(r); projs(r); fxs(r); r.tm--;
+    const [a, b] = r.f;
+    if (a.hp <= 0 || b.hp <= 0 || r.tm <= 0) {
+      const w = a.hp === b.hp ? -1 : a.hp > b.hp ? 0 : 1;
+      if (w >= 0) r.wins[w]++;
+      r.msg = w < 0 ? 'Égalité !' : CH[r.f[w].c].name + ' gagne la manche !';
+      r.ph = 'rend'; r.t = 150;
+      if (r.wins[0] >= 2 || r.wins[1] >= 2) { r.ph = 'end'; r.msg = '🏆 ' + CH[r.f[w].c].name + ' remporte le match !'; r.again = r.bot ? [0, 1] : [0, 0]; r.co = [0, 1].map(q => r.wins[q] * 10 + (r.wins[q] >= 2 ? 30 : 10)); }
     }
   }
   else if (r.ph === 'rend') {
-    if (--r.t <= 0) { r.f = r.f.map((f, i) => { const n = nf(f.c, i, f.inp, f.ult); n.x = [150,350,550,750][i] || 450; return n; }); r.pj = []; r.fx = []; r.eliminated=[]; rollMap(r); r.ph = 'cd'; r.t = 120; r.tm = ROUND; r.msg = ''; }
+    if (--r.t <= 0) { r.f = r.f.map((f, i) => nf(f.c, i, f.inp, f.ult)); r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 120; r.tm = ROUND; r.msg = ''; }
   }
   else if (r.ph === 'end') {
-    if (r.again.every(Boolean)) { r.ph = 'select'; r.sel = r.bot ? [null, Math.random()*CH.length|0] : r.ps.map(()=>null); r.wins = r.bot ? [0,0] : r.ps.map(()=>0); r.rounds=0; r.msg = ''; r.f = []; r.again=r.bot ? [0,1] : r.ps.map(()=>0); r.winner=null; }
+    if (r.again[0] && r.again[1]) { r.ph = 'select'; r.sel = [null, r.bot ? (Math.random() * CH.length | 0) : null]; r.wins = [0, 0]; r.msg = ''; r.f = []; }
   }
   const live = r.ph !== 'wait' && r.ph !== 'select';
-  const s = { t: 's', p: r.ph, training: !!r.training, bot: !!r.bot, count: r.ps.length, host: 0, winner: r.winner, eliminated: r.f.map(f=>!!f.eliminated),
+  const s = { t: 's', p: r.ph, training: !!r.training, bot: !!r.bot,
     damage: r.training ? Math.round(r.f[1].totalDamage) : 0,
     hits: r.training ? r.f[1].hitCount : 0,
     lastDamage: r.training ? r.f[1].lastDamage : 0,
@@ -454,7 +430,7 @@ function tick(r) {
         hk: f.hook ? [Math.round(f.hook.x), Math.round(f.hook.y)] : f.hf ? [Math.round(f.hf.x), Math.round(f.hf.y)] : null,
         ad: f.atk && f.atk.dx !== undefined ? [Math.round(f.atk.dx * 10) / 10, Math.round((f.atk.dy || 0) * 10) / 10] : null,
         ak: f.atk ? f.atk.k : -1, ap: d ? (f.atk.f <= d.su + (d.dsh || 0) ? 0 : f.atk.f <= d.su + (d.dsh || 0) + d.ac ? 1 : 2) : -1,
-        b: f.atk && f.atk.b ? f.atk.b.map(Math.round) : null, out: !!f.eliminated };
+        b: f.atk && f.atk.b ? f.atk.b.map(Math.round) : null };
     }) : [],
     pj: live ? r.pj.map(p => ({ x: Math.round(p.x), y: Math.round(p.y), r: p.r, o: p.o, k: p.d.vis || 0, v: Math.sign(p.vx) })) : [],
     fx: live ? r.fx.filter(e => e.k !== 'por' || e.t >= 0).map(e => e.k === 'cos' ? { p: 2, x: Math.round(e.x), y: Math.round(e.y), a: e.t / e.life }
@@ -467,8 +443,7 @@ function tick(r) {
 const tx = (ws, o) => ws.readyState === 1 && ws.send(JSON.stringify(o));
 const rooms = new Map(), queue = [];
 const newCode = () => { let c; do { c = Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.random() * 24 | 0]).join(''); } while (rooms.has(c)); return c; };
-const join = ws => tx(ws, { t: 'room', code: ws.room.code, idx: ws.idx, chars: CHARS, maps: MAPS.map(({ n, note }) => ({ n, note })), count: ws.room.ps.length });
-const lobby = r => r.ps.forEach((p,i)=>tx(p,{t:'s',p:r.ph,count:r.ps.length,host:0,sel:r.sel,ag:r.again}));
+const join = ws => tx(ws, { t: 'room', code: ws.room.code, idx: ws.idx, chars: CHARS, maps: MAPS.map(({ n, note }) => ({ n, note })) });
 
 wss.on('connection', ws => {
   ws.on('message', raw => {
@@ -486,26 +461,25 @@ wss.on('connection', ws => {
       const r = ws.room;
       if (r && r.training && ws.idx === 0) startTraining(r, r.sel[0], r.sk[0]);
     } else if (m.t === 'bot' && !ws.room) {
-      const r = { code: newCode(), ps: [ws], ph: 'select', sel: [null, Math.random() * CH.length | 0], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 1], co: [0, 0], rounds: 0, bot: true };
+      const r = { code: newCode(), ps: [ws], ph: 'select', sel: [null, Math.random() * CH.length | 0], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 1], co: [0, 0], bot: true };
       rooms.set(r.code, r); ws.room = r; ws.idx = 0; join(ws);
     } else if (m.t === 'create' && !ws.room) {
-      const r = { code: newCode(), ps: [ws], ph: 'wait', sel: [null], wins: [0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: [''], again: [0], co: [0], rounds: 0 };
+      const r = { code: newCode(), ps: [ws], ph: 'wait', sel: [null, null], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 0], co: [0, 0] };
       rooms.set(r.code, r); ws.room = r; ws.idx = 0; join(ws);
     } else if (m.t === 'queue' && !ws.room && !queue.includes(ws)) {
       while (queue.length && queue[0].readyState !== 1) queue.shift();
       const other = queue.shift();
       if (other) {
-        const r = { code: newCode(), ps: [other, ws], ph: 'select', sel: [null, null], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 0], co: [0, 0], rounds: 0 };
+        const r = { code: newCode(), ps: [other, ws], ph: 'select', sel: [null, null], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 0], co: [0, 0] };
         rooms.set(r.code, r); other.room = r; other.idx = 0; ws.room = r; ws.idx = 1; join(other); join(ws);
       } else { queue.push(ws); tx(ws, { t: 'queued' }); }
     } else if (m.t === 'join' && !ws.room) {
       const r = rooms.get(String(m.code || '').toUpperCase().trim());
-      if (!r || r.ph !== 'wait' || r.ps.length >= 4) return tx(ws, { t: 'err', m: 'Code invalide ou partie pleine (4 joueurs maximum)' });
-      r.ps.push(ws); r.sel.push(null); r.sk.push(''); r.wins.push(0); r.again.push(0); r.co.push(0); ws.room = r; ws.idx = r.ps.length - 1; join(ws); r.ps.forEach((p,i)=>tx(p,{t:'room',code:r.code,idx:i,chars:CHARS,maps:MAPS.map(({n,note})=>({n,note})),count:r.ps.length})); lobby(r);
-    } else if (m.t === 'start') { const r=ws.room; if (r && r.ph==='wait' && ws.idx===0 && r.ps.length>=2) { r.ph='select'; lobby(r); }
+      if (!r || r.ps.length > 1) return tx(ws, { t: 'err', m: 'Code invalide ou partie pleine' });
+      r.ps.push(ws); ws.room = r; ws.idx = 1; r.ph = 'select'; join(ws); tx(r.ps[0], { t: 'room', code: r.code, idx: 0, chars: CHARS, maps: MAPS.map(({ n, note }) => ({ n, note })) });
     } else if (m.t === 'pick') {
       const r = ws.room;
-      if (r && r.ph === 'select' && CH[m.c] && r.ps[ws.idx]) { r.sel[ws.idx] = m.c; r.sk[ws.idx] = String(m.sk || '').slice(0, 40); if (r.sel.every(v=>v!=null)) { r.wins = r.ps.map(()=>0); r.again = r.ps.map(()=>0); r.rounds=0; r.winner=null; start(r); } }
+      if (r && r.ph === 'select' && CH[m.c]) { r.sel[ws.idx] = m.c; r.sk[ws.idx] = String(m.sk || '').slice(0, 40); if (r.sel[0] != null && r.sel[1] != null) { r.wins = [0, 0]; start(r); } }
     } else if (m.t === 'again') {
       const r = ws.room; if (r && r.ph === 'end') r.again[ws.idx] = 1;
     } else if (m.t === 'in') {
