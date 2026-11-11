@@ -64,6 +64,23 @@ const CH = [
     { n: 'Charge', type: 'd', su: 8, ac: 16, rc: 18, cd: 50, spd: 20, dmg: 19, rng: 67, h: 70, kb: 14, st: 26 },
     { n: 'Saut écrasant', type: 'jam', su: 8, ac: 0, rc: 22, cd: 70, dmg: 24, jv: 15, jx: 3, aoe: 80, kb: 14, st: 30 }] },
 
+
+  { name: 'Yugo', desc: 'Wakfu : portails, téléportation et énergie', hp: 95, spd: 4.8, jmp: 14, color: '#36c9c9', atk: [
+    { n: 'Rayon Wakfu', type: 'p', su: 7, ac: 1, rc: 10, cd: 24, dmg: 9, vx: 13, r: 10, kb: 6, st: 14, vis: 8 },
+    { n: 'Téléportation', type: 'd', su: 2, ac: 7, rc: 9, cd: 55, dmg: 8, rng: 42, h: 80, kb: 8, st: 16, spd: 19 },
+    { n: 'Onde de portail', type: 'p', su: 12, ac: 1, rc: 16, cd: 85, dmg: 15, vx: 8, r: 19, kb: 12, st: 22, vis: 8 },
+    { n: 'Pluie de portails', ult: 1, ub: 1, type: 'sky', su: 18, ac: 1, rc: 24, cd: 0, dmg: 8, kb: 5, st: 12, warn: 12, strike: 35, portals: 5 }] },
+  { name: 'Shinra', desc: 'Fire Force : propulsion, vol et vitesse lumière', hp: 100, spd: 4.7, jmp: 14, color: '#ff7b24', atk: [
+    { n: 'Vol (3 s)', type: 'fly', su: 5, ac: 1, rc: 8, cd: 100, dur: 180 },
+    { n: 'Pied propulsé', type: 'd', su: 5, ac: 9, rc: 12, cd: 55, dmg: 13, rng: 58, h: 75, kb: 12, st: 22, spd: 17 },
+    { n: 'Flammes au sol', type: 'flame', su: 8, ac: 1, rc: 14, cd: 90, dmg: 4, kb: 3, st: 8, dur: 150 },
+    { n: 'Adolla : vitesse lumière', ult: 1, ub: 1, type: 'shinra_ult', su: 8, ac: 1, rc: 16, cd: 0, dur: 240 }] },
+  { name: 'Koro-sensei', desc: 'Assassination Classroom : vitesse et tentacules', hp: 105, spd: 5.3, jmp: 14, color: '#f1d84a', atk: [
+    { n: 'Tentacule', type: 'm', su: 4, ac: 4, rc: 8, cd: 8, dmg: 7, rng: 78, h: 55, kb: 5, st: 13 },
+    { n: 'Dash éclair', type: 'd', su: 1, ac: 8, rc: 8, cd: 50, dmg: 8, rng: 48, h: 85, kb: 8, st: 15, spd: 23 },
+    { n: 'Fouet tentaculaire', type: 'aura', su: 6, ac: 120, rc: 12, cd: 100, dmg: 2.5, rng: 92, h: 100, kb: 2, st: 6, multi: 12 },
+    { n: 'Vitesse Mach', ult: 1, ub: 1, type: 'rush', su: 4, ac: 28, rc: 18, cd: 0, dmg: 9, rng: 65, h: 95, kb: 9, st: 14, spd: 22, multi: 7 }] },
+
 ];
 const CHARS = CH.map(({ name, desc, hp, color, atk, alt }) => ({ name, desc, hp, color, atk: atk.map(a => a.n), alt: alt ? alt.map(a => a.n) : null }));
 
@@ -79,7 +96,7 @@ function rollMap(r) { let m; do { m = Math.random() * MAPS.length | 0; } while (
 
 const atks = f => (f.form > 0 && CH[f.c].alt) || CH[f.c].atk;
 const nf = (c, i, inp, ult) => ({ c, x: i ? 650 : 250, y: G, vx: 0, vy: 0, hp: CH[c].hp, face: i ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
-  block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
+  block: 0, fl: 0, buff: 0, shield: 0, form: 0, fly: 0, light: 0, upPrev: 0, flames: 0, inv: 0, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
 
 const box = (f, d) => {
   const y1 = f.y - BH * .85;
@@ -114,26 +131,53 @@ function step(r, i) {
   if (f.fl > 0) f.fl--;
   if (f.buff > 0) f.buff--;
   if (f.form > 0) f.form--;
+  if (f.fly > 0) f.fly--;
+  if (f.light > 0) f.light--;
+  if (f.flames > 0) f.flames--;
   f.inv = 0;
   f.ult = Math.min(100, f.ult + 0.008);
   const gr = f.y >= G; f.block = 0;
   if (f.stun > 0) { f.stun--; f.vx *= .9 + (1 - M.acc) * .08; }
   else if (f.atk) {
     const a = f.atk, d = a.d, s0 = d.su + (d.dsh || 0); a.f++;
-    if ((d.type === 'd' && a.f > d.su && a.f <= d.su + d.ac) || (d.type === 'dp' && a.f > d.su && a.f <= s0)) f.vx = f.face * d.spd; else if (gr) f.vx *= .6 + (1 - M.acc) * .35;
+    if (d.type === 'd' && a.f > d.su && a.f <= d.su + d.ac) {
+      if (c.name === 'Yugo') {
+        const dx = k.r - k.l, dy = k.d - k.u;
+        f.vx = (dx || (!dy ? f.face : 0)) * d.spd;
+        f.vy = dy * d.spd;
+      } else {
+        f.vx = f.face * d.spd;
+        if (c.name === 'Shinra' && f.y < G) f.vy = -5.5;
+      }
+    } else if (d.type === 'dp' && a.f > d.su && a.f <= s0) f.vx = f.face * d.spd;
+    else if (d.type === 'rush' && a.f > d.su && a.f <= s0 + d.ac) {
+      const phase = Math.floor((a.f - d.su - 1) / 7);
+      f.face = a.dir * (phase % 2 === 0 ? 1 : -1);
+      f.vx = f.face * d.spd;
+    } else if (gr) f.vx *= .6 + (1 - M.acc) * .35;
     if (d.type === 'bd' && a.f > d.su && a.f <= d.su + d.ac) { f.vx = -f.face * d.spd; f.inv = 1; }
     if (a.f === d.su + 1) {
       if (d.type === 'p') {
         for (let j = 0; j < (d.cnt || 1); j++)
           r.pj.push({ x: f.x + f.face * (30 - (d.clone ? j * 45 : 0)), y: f.y - (d.cy || (d.low ? 18 : BH * .6)), vx: f.face * d.vx, vy: d.vy0 || (d.cnt && !d.clone ? (j - 1) * 1.8 : 0), r: d.r, o: i, d });
-      } else if (d.type === 'sky') r.fx.push({ x: o.x, t: 0, o: i, d });
+       } else if (d.type === 'sky') {
+        const count = d.portals || 1;
+        for (let q = 0; q < count; q++) r.fx.push({ x: Math.max(45, Math.min(W - 45, o.x + (q - (count - 1) / 2) * 48)), y: 145 + Math.abs(q - (count - 1) / 2) * 13, t: 0, o: i, d });
+      }
       else if (d.type === 'buff') f.buff = d.dur;
       else if (d.type === 'shield') f.shield = d.val;
       else if (d.type === 'form') f.form = d.dur;
+      else if (d.type === 'fly') f.fly = d.dur;
+      else if (d.type === 'flame') {
+        f.flames = d.dur;
+        r.fx.push({ x: f.x + f.face * 55, t: 0, o: i, d: { ...d, warn: 0, strike: d.dur, flame: 1 } });
+      }
+      else if (d.type === 'shinra_ult') f.light = d.dur;
     }
-    const act = a.f > s0 && a.f <= s0 + d.ac, mel = d.type === 'm' || d.type === 'd' || d.type === 'dp';
+    const act = a.f > s0 && a.f <= s0 + d.ac, mel = d.type === 'm' || d.type === 'd' || d.type === 'dp' || d.type === 'rush' || d.type === 'aura';
     if (d.type === 'heal' && act) f.hp = Math.min(c.hp, f.hp + d.hps);
     a.b = act && mel ? box(f, d) : null;
+    if (d.type === 'aura' && act) a.b = [f.x - d.rng, f.x + d.rng, f.y - d.h, f.y];
     if (d.type === 'jam') {
       if (a.f === d.su + 1) { f.vy = -d.jv; f.vx = f.face * d.jx; a.air = 1; }
       else if (a.air && f.y >= G && a.f > d.su + 3) {
@@ -147,19 +191,26 @@ function step(r, i) {
     if (f.atk && (d.type === 'jam' ? (a.land && a.f >= a.land + d.rc) || a.f > 150 : a.f >= s0 + d.ac + d.rc)) f.atk = null;
   } else {
     f.face = o.x >= f.x ? 1 : -1;
-    const spd = c.spd * (f.buff > 0 ? 1.4 : 1);
+    const spd = c.spd * (f.buff > 0 ? 1.4 : 1) * (f.light > 0 ? 1.8 : 1);
+    if (f.light > 0 && k.u && !f.upPrev) { f.x = Math.max(BW / 2, Math.min(W - BW / 2, o.x - o.face * 90)); f.vx = 0; }
     if (k.d && gr) { f.block = 1; f.vx *= 1 - M.acc; }
-    else { f.vx += ((k.r - k.l) * spd - f.vx) * (gr ? M.acc : 1); if (k.u && gr) f.vy = -c.jmp; }
+    else {
+      f.vx += ((k.r - k.l) * spd - f.vx) * (gr ? M.acc : 1);
+      if (f.fly > 0) f.vy = (k.u ? -7 : 0) + (k.d ? 7 : 0);
+      else if (k.u && gr) f.vy = -c.jmp;
+    }
+    f.upPrev = k.u;
     for (let j = 0; j < 4; j++) if (k.a[j] && !f.cds[j] && !f.block) {
       const d = atks(f)[j];
       if (!d) continue;
       if (d.ult && f.ult < 100) continue;
       if (d.ult) f.ult = 0;
-      f.atk = { k: j, f: 0, d }; f.cds[j] = d.cd + d.su + (d.dsh || 0) + d.ac + d.rc; break;
+      f.atk = { k: j, f: 0, d, dir: f.face }; f.cds[j] = d.cd + d.su + (d.dsh || 0) + d.ac + d.rc; break;
     }
   }
   f.x += f.vx; f.y += f.vy;
-  if (f.y < G) f.vy += M.gr; else { f.y = G; f.vy = 0; }
+  if (f.fly > 0) f.vy *= .92;
+  else if (f.y < G) f.vy += M.gr; else { f.y = G; f.vy = 0; }
   f.x = Math.max(BW / 2, Math.min(W - BW / 2, f.x));
 }
 
@@ -187,8 +238,9 @@ function fxs(r) {
   r.fx = r.fx.filter(e => {
     e.t++;
     const d = e.d, t = r.f[1 - e.o], ow = r.f[e.o];
-    if (e.t > d.warn && e.t <= d.warn + d.strike && !e.hit && Math.abs(t.x - e.x) < 45) {
-      e.hit = 1; hurt(t, d.dmg * (ow.buff > 0 ? 1.25 : 1), d.kb, d.st, -8, e.x, d.ub, ow);
+    if (e.t > d.warn && e.t <= d.warn + d.strike && Math.abs(t.x - e.x) < (d.flame ? 58 : 45) && (!e.hit || (d.flame && e.t % 25 === 0))) {
+      e.hit = d.flame ? 1 : 1;
+      hurt(t, d.dmg * (ow.buff > 0 ? 1.25 : 1), d.kb, d.st, d.flame ? -2 : -8, e.x, d.ub, ow);
     }
     return e.t <= d.warn + d.strike;
   });
@@ -251,12 +303,12 @@ function tick(r) {
     f: live ? r.f.map((f, q) => {
       const d = f.atk && f.atk.d;
       return { c: f.c, sk: r.sk[q], x: Math.round(f.x), y: Math.round(f.y), hp: Math.max(0, Math.round(f.hp)), fc: f.face, bl: f.block, fl: f.fl > 0 ? 1 : 0,
-        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0,
+        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, fly: f.fly > 0 ? 1 : 0, light: f.light > 0 ? 1 : 0, iv: f.inv ? 1 : 0,
         ak: f.atk ? f.atk.k : -1, ap: d ? (f.atk.f <= d.su + (d.dsh || 0) ? 0 : f.atk.f <= d.su + (d.dsh || 0) + d.ac ? 1 : 2) : -1,
         b: f.atk && f.atk.b ? f.atk.b.map(Math.round) : null };
     }) : [],
     pj: live ? r.pj.map(p => ({ x: Math.round(p.x), y: Math.round(p.y), r: p.r, o: p.o, k: p.d.vis || 0, v: Math.sign(p.vx) })) : [],
-    fx: live ? r.fx.map(e => ({ x: Math.round(e.x), p: e.t > e.d.warn ? 1 : 0 })) : [] };
+    fx: live ? r.fx.map(e => ({ x: Math.round(e.x), y: Math.round(e.y || 170), p: e.t > e.d.warn ? 1 : 0, portal: e.d.portals ? 1 : 0, flame: e.d.flame ? 1 : 0 })) : [] };
   r.ps.forEach(p => tx(p, s));
 }
 
