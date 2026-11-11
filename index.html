@@ -89,7 +89,12 @@ const SHOP = [
   { id: 'skin_chevalier_noir', type: 'skin', char: 'Chevalier', name: 'Chevalier noir', price: 60, pal: { '#b0bec5': '#2b2b33', '#cfd8dc': '#454550', '#78909c': '#1c1c24', '#455a64': '#111118', '#90a4ae': '#55555f', '#2c5fa8': '#22222b' } },
   { id: 'skin_viking_rouge', type: 'skin', char: 'Viking', name: 'Viking rouge', price: 60, pal: { '#6d4c41': '#c0392b', '#4e342e': '#7b241c', '#d35400': '#e67e22', '#3e2723': '#4a1410' } },
 ];
-let save = { coins: 0, owned: [], skin: {}, daily: null }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
+let save = { coins: 0, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
+if (!save.stats || typeof save.stats !== 'object') save.stats = { played: 0, wins: 0, losses: 0, byChar: {} };
+if (!save.stats.byChar || typeof save.stats.byChar !== 'object') save.stats.byChar = {};
+save.stats.played = Number(save.stats.played) || 0;
+save.stats.wins = Number(save.stats.wins) || 0;
+save.stats.losses = Number(save.stats.losses) || 0;
 try { Object.assign(save, JSON.parse(localStorage.getItem('duelArena') || '{}')); } catch (e) {}
 const persist = () => { try { localStorage.setItem('duelArena', JSON.stringify(save)); } catch (e) {} };
 const owns = id => save.owned.includes(id);
@@ -122,7 +127,23 @@ function connect(first) {
     else if (m.t === 'err') { err = m.m; me = -1; S = null; searching = false; w.close(); }
     else if (m.t === 's') {
       S = m;
-      if (m.p === 'end' && m.co) { if (!paid) { paid = 1; earned = m.co[me]; save.coins += earned; persist(); } } else paid = 0;
+      if (m.p === 'end' && m.co) {
+        if (!paid) {
+          paid = 1;
+          earned = m.co[me];
+          save.coins += earned;
+          const charIndex = m.f && m.f[me] ? m.f[me].c : null;
+          const charName = charIndex != null && chars[charIndex] ? chars[charIndex].name : 'Inconnu';
+          const won = Number(m.co[me]) > Number(m.co[1 - me]);
+          save.stats.played++;
+          if (won) save.stats.wins++; else save.stats.losses++;
+          if (!save.stats.byChar[charName]) save.stats.byChar[charName] = { played: 0, wins: 0, losses: 0 };
+          const cs = save.stats.byChar[charName];
+          cs.played++;
+          if (won) cs.wins++; else cs.losses++;
+          persist();
+        }
+      } else paid = 0;
     }
     ui();
   };
@@ -151,17 +172,47 @@ const shopHtml = () => {
     ? `<div class="cards">${items.map(q => `<div class="card shopc"><b>${q.name}</b><br>${q.type === 'skin' ? 'Skin · ' + q.char : 'Personnage'}<br>${q.desc || ''}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.coins < q.price ? 'disabled' : ''} onclick="buy('${q.id}')">${q.price} 🪙</button>`}</div>`).join('')}</div>`
     : '<p>Tu possèdes déjà tout ce que la boutique propose 🎉</p>') + `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 };
+function statsHtml() {
+  const s = save.stats;
+  const top = Object.entries(s.byChar)
+    .sort((a, b) => (b[1].played || 0) - (a[1].played || 0))
+    .slice(0, 3);
+  const rate = (w, p) => p ? Math.round(w / p * 100) : 0;
+  const cards = top.length ? top.map(([name, v], i) => {
+    const ch = chars.find(c => c.name === name);
+    const color = ch ? ch.color : '#3498db';
+    return `<div class="card" style="width:190px;border-color:${color};cursor:default">
+      <b style="color:${color}">#${i + 1} ${name}</b><br>
+      🎮 Parties : ${v.played || 0}<br>
+      🏆 Victoires : ${v.wins || 0}<br>
+      ❌ Défaites : ${v.losses || 0}<br>
+      📈 Winrate : ${rate(v.wins || 0, v.played || 0)}%
+    </div>`;
+  }).join('') : '<p>Aucune partie terminée pour le moment. Joue un match pour commencer à remplir tes statistiques !</p>';
+  return `<h2>📊 Statistiques</h2>
+    <p>Statistiques enregistrées sur cet appareil</p>
+    <div class="cards">
+      <div class="card" style="width:145px;cursor:default"><b>🎮 Parties jouées</b><br>${s.played}</div>
+      <div class="card" style="width:145px;cursor:default"><b>🏆 Victoires</b><br>${s.wins}</div>
+      <div class="card" style="width:145px;cursor:default"><b>❌ Défaites</b><br>${s.losses}</div>
+      <div class="card" style="width:145px;cursor:default"><b>📈 Winrate global</b><br>${rate(s.wins, s.played)}%</div>
+    </div>
+    <h3>⭐ Tes 3 personnages les plus joués</h3>
+    <div class="cards">${cards}</div>
+    <button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
+}
 const quitBtn = '<button onclick="leave()" style="background:#7f8c8d">Retour au menu</button>';
 
 function ui() {
   let h = '';
   ov.className = me >= 0 && S && S.p === 'end' ? 'end' : '';
   if (me < 0 && searching) h = `<h2>🔎 Recherche d’un adversaire…</h2><p>Tu seras mis face à un joueur aléatoire.</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
-  else if (me < 0) h = view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : `<h1>⚔️ Duel Arena</h1><p>🪙 ${save.coins} pièces</p>${err ? `<p style="color:#f66">${err}</p>` : ''}
+  else if (me < 0) h = view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : `<h1>⚔️ Duel Arena</h1><p>🪙 ${save.coins} pièces</p>${err ? `<p style="color:#f66">${err}</p>` : ''}
     <button onclick="search()" style="background:#e67e22">🎲 Matchmaking (adversaire aléatoire)</button>
     <button onclick="go({t:'create'})">Créer une partie</button>
     <div>ou <input id="cd" maxlength="4" placeholder="CODE" value="${location.hash.slice(1)}"> <button onclick="go({t:'join',code:document.getElementById('cd').value})">Rejoindre</button></div>
     <button onclick="openTraining()" style="background:#16a085">🎯 Mode entraînement</button>
+    <button onclick="view='stats';ui()" style="background:#2980b9">📊 Statistiques</button>
     <button onclick="view='shop';ui()" style="background:#8e44ad">🛒 Boutique</button>`;
   else if (!S || S.p === 'wait') h = `<h2>En attente de l’adversaire…</h2><p>Code : <b style="font-size:34px">${code}</b></p><p>Ou envoie-lui ce lien :<br><b>${location.origin}/#${code}</b></p>${quitBtn}`;
   else if (S.p === 'select') {
