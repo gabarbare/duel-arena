@@ -1,3 +1,4 @@
+
 const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
 const html = fs.readFileSync(path.join(__dirname, 'index.html'));
@@ -218,6 +219,8 @@ function startTraining(r, characterIndex, skin) {
 
 function tick(r) {
   if (r.ph === 'training') {
+    // En entraînement, l'ultime reste chargé pour pouvoir le tester autant de fois que souhaité.
+    r.f[0].ult = 100;
     step(r, 0);
     projs(r);
     fxs(r);
