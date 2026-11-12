@@ -710,10 +710,11 @@ function hud() {
   x.font = 'bold 44px sans-serif'; x.lineWidth = 5; x.strokeStyle = '#000'; x.strokeText(t, 450, 210); x.fillText(t, 450, 210);
 }
 
+const OFF = 80; // décalage visuel : le sol est abaissé de 80 px, le bas de l'écran est entièrement couvert par le sol
 function drawMap(m) {
   const t = Date.now() / 1000, rnd = k => ((k * 9301 + 49297) % 233280) / 233280;
-  const grad = (a, b) => { const g = x.createLinearGradient(0, 0, 0, 380); g.addColorStop(0, a); g.addColorStop(1, b); x.fillStyle = g; x.fillRect(0, 0, 900, 450); };
-  const floor = (col, line) => { x.fillStyle = col; x.fillRect(0, 380, 900, 70); x.fillStyle = line; x.fillRect(0, 380, 900, 3); };
+  const grad = (a, b) => { const g = x.createLinearGradient(0, -OFF, 0, 380); g.addColorStop(0, a); g.addColorStop(1, b); x.fillStyle = g; x.fillRect(0, -OFF, 900, OFF + 450); };
+  const floor = (col, line) => { x.fillStyle = col; x.fillRect(0, 380, 900, 260); x.fillStyle = line; x.fillRect(0, 380, 900, 3); };
   if (m === 0) { // Dojo
     grad('#2d1f1f', '#6b4a3a');
     for (let k = 0; k < 6; k++) { x.fillStyle = 'rgba(255,240,210,.16)'; x.fillRect(40 + k * 145, 90, 110, 270); x.fillStyle = '#4e342e'; x.fillRect(32 + k * 145, 90, 8, 270); }
@@ -788,12 +789,13 @@ function draw() {
   if (inGame !== touchOn) { touchOn = inGame; tc.style.display = inGame ? 'flex' : 'none'; if (!inGame) ['l', 'r', 'u', 'd', 0, 1, 2, 3].forEach(k => { keys[k] = false; }); }
   const tr = inGame && S.p === 'training';
   if (tr !== trOn) { trOn = tr; tm.style.display = tr ? 'flex' : 'none'; }
-  PAL = null; FL = 0; drawMap(S && S.f.length ? S.mp : -1);
+  PAL = null; FL = 0; x.save(); x.translate(0, OFF); drawMap(S && S.f.length ? S.mp : -1);
+  const gg = x.createLinearGradient(0, 380, 0, 540); gg.addColorStop(0, 'rgba(0,0,0,0)'); gg.addColorStop(1, 'rgba(0,0,0,.55)'); x.fillStyle = gg; x.fillRect(0, 380, 900, 260);
   if (S && S.f.length) {
     S.fx.forEach(e => {
       if (e.p === 1) {
-        x.fillStyle = 'rgba(120,160,255,.6)'; x.fillRect(e.x - 40, 0, 80, 380);
-        x.fillStyle = 'rgba(255,255,210,.95)'; x.fillRect(e.x - 18, 0, 36, 380);
+        x.fillStyle = 'rgba(120,160,255,.6)'; x.fillRect(e.x - 40, -OFF, 80, 380 + OFF);
+        x.fillStyle = 'rgba(255,255,210,.95)'; x.fillRect(e.x - 18, -OFF, 36, 380 + OFF);
       } else if (e.p === 0) {
         x.fillStyle = 'rgba(255,60,60,.15)'; x.fillRect(e.x - 45, 0, 90, 380);
         x.fillStyle = 'rgba(255,60,60,.55)'; x.beginPath(); x.ellipse(e.x, 380, 45, 8, 0, 0, 7); x.fill();
@@ -805,8 +807,9 @@ function draw() {
         }
       }
     });
+    S.f.forEach(f => { if (f.lz) return; const z = f.sz || 1, k = Math.min(1, (380 - f.y) / 250); x.fillStyle = 'rgba(0,0,0,' + (.35 * (1 - k)) + ')'; x.beginPath(); x.ellipse(f.x, 380, 34 * z * (1 - .4 * k), 7 * z, 0, 0, 7); x.fill(); });
     S.f.forEach(fighter);
-    if (S.f.some(q => q.fz)) { x.fillStyle = 'rgba(110,130,210,.22)'; x.fillRect(0, 0, 900, 600); }
+    if (S.f.some(q => q.fz)) { x.fillStyle = 'rgba(110,130,210,.22)'; x.fillRect(0, -OFF, 900, 600); }
     if (S.p === 'training') {
       x.fillStyle = '#fff'; x.font = 'bold 14px sans-serif'; x.textAlign = 'center';
       x.fillText('MANNEQUIN', S.f[1].x, S.f[1].y - 150);
@@ -868,8 +871,8 @@ function draw() {
         x.strokeStyle = '#fff'; x.lineWidth = 2; x.stroke(); x.restore();
       } else { x.fillStyle = chars[S.f[p.o].c].color; x.beginPath(); x.arc(p.x, p.y, p.r, 0, 7); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 2; x.stroke(); }
     });
-    hud();
-  }
+    x.restore(); hud();
+  } else x.restore();
   requestAnimationFrame(draw);
 }
 ui(); draw();
