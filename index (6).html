@@ -195,8 +195,10 @@ const SHOP = [
   { id: 'skin_viking_rouge', type: 'skin', char: 'Viking', name: 'Viking rouge', price: 60, pal: { '#6d4c41': '#c0392b', '#4e342e': '#7b241c', '#d35400': '#e67e22', '#3e2723': '#4a1410' } },
   { id: 'skin_gojo_lunettes', type: 'skin', char: 'Gojo', name: 'Gojo lunettes (saison 2)', price: 100, look: 'glasses', pal: {} },
   { id: 'skin_luffy_gear4', type: 'skin', char: 'Luffy', name: 'Luffy Gear 4 Snakeman', price: 120, look: 'snake', pal: { '#e74c3c': '#f5cba7', '#3b6fd8': '#c0392b' } },
-  { id: 'skin_deku_dark', type: 'skin', char: 'Deku', name: 'Dark Deku', price: 100, look: 'dark', pal: { '#2e7d32': '#15151b', '#1b5e20': '#0a0a0f', '#c0392b': '#24242c', '#b0bec5': '#2c2c35', '#78909c': '#111', '#fff': '#9dff9d', '#d5dbdb': '#24242c' } },
+  { id: 'skin_deku_dark', type: 'skin', char: 'Deku', name: 'Dark Deku', price: 100, look: 'dark', pal: { '#2e7d32': '#2a6a30', '#1b5e20': '#143318', '#c0392b': '#1c1c22', '#b0bec5': '#3a3a42', '#78909c': '#111', '#fff': '#9dff9d', '#d5dbdb': '#26262c' } },
   { id: 'skin_naruto_hermite', type: 'skin', char: 'Naruto', name: 'Naruto Mode Hermite', price: 100, look: 'sage', pal: { '#ff7f27': '#d0451b', '#2c5fa8': '#222', '#2c3e50': '#111' } },
+  { id: 'skin_koro_blanc', type: 'skin', char: 'Koro', name: 'Koro-sensei blanc', price: 100, look: 'white', pal: { '#f4d03f': '#f5f5f1', '#e6b800': '#dcdcd5', '#f1c40f': '#e8e8e2' } },
+  { id: 'skin_shinra_banshoman', type: 'skin', char: 'Shinra', name: 'Shinra Banshoman', price: 150, look: 'banshoman', pal: { '#f5cba7': '#c4533c', '#23232f': '#f6f2e8', '#1b1b24': '#e9e3d3', '#bdc3c7': '#f1c40f', '#111': '#c9a227', '#15151c': '#f4f4f4', '#000': '#fff' } },
 ];
 let fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
 let save = { coins: 0, crystals: 0, xp: 0, profile: null, friends: [], fid: null, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
@@ -650,13 +652,16 @@ function fighter(f, i) {
     R('#fff', s > 0 ? 1 : -9, -107, 8, 7); R('#1b5e20', s > 0 ? 4 : -6, -106, 4, 6);
     [-9, 9].forEach(d => { C('#b5651d', d, -101, 1); C('#b5651d', d, -98, 1); });
     R('#b0bec5', -9, -96, 18, 8); [-5, 0, 5].forEach(q => LN('#78909c', 1, q, -96, q, -88));
-    if (lk === 'dark') { // Dark Deku : costume noirci de boue et de sang, capuche à pointes, yeux verts brillants, écharpe déchirée, Blackwhip
+    if (lk === 'dark') { // Dark Deku (saison 6) : costume vert sali, écharpe jaune déchirée, capuche + masque couvrant tout le visage, yeux verts brillants, Blackwhip
       const w = Math.sin(t / 110) * 5;
-      Y('#1d1d26', [[-s * 8, -88], [-s * 36, -86 + w], [-s * 48, -58 + w], [-s * 32, -62], [-s * 42, -34 + w], [-s * 14, -52]]);
-      [[-14, -70], [8, -55], [-8, -36], [12, -82]].forEach(p => R('#3b3226', p[0], p[1], 7, 5)); R('#5a1a1a', -4, -62, 5, 4);
-      Y('#15151b', [[-14, -112], [-26, -152], [-5, -118]]); Y('#15151b', [[14, -112], [26, -152], [5, -118]]);
-      R('#0a0a0f', -14, -110, 28, 4);
-      x.fillStyle = 'rgba(120,255,120,.4)'; x.beginPath(); x.arc(s > 0 ? 5 : -5, -103.5, 9, 0, 7); x.fill();
+      [[-14, -70], [8, -55], [-8, -36], [12, -82]].forEach(p => R('#1f3d22', p[0], p[1], 7, 5)); R('#5a1a1a', -4, -62, 5, 4);
+      Y('#e8c514', [[-s * 8, -88], [-s * 38, -86 + w], [-s * 52, -64 + w], [-s * 34, -68], [-s * 44, -44 + w], [-s * 14, -58]]);
+      R('#e8c514', -16, -96, 32, 9); R('#c9a70f', -16, -90, 32, 2);
+      C('#143318', 0, -103, 16.5); Y('#143318', [[-12, -114], [-19, -146], [-4, -117]]); Y('#143318', [[12, -114], [19, -146], [4, -117]]);
+      const mx = s * 2; R('#33333b', mx - 13, -110, 26, 21); R('#0a0a0f', mx - 13, -110, 26, 3);
+      x.fillStyle = 'rgba(120,255,120,.4)'; x.beginPath(); x.arc(mx - 5, -102, 8, 0, 7); x.arc(mx + 6, -102, 8, 0, 7); x.fill();
+      R('#9dff9d', mx - 9, -103, 8, 3); R('#9dff9d', mx + 2, -103, 8, 3);
+      [-6, -2, 2, 6].forEach(q => LN('#16161b', 1.5, mx + q, -96, mx + q, -91));
       [0, 1, 2].forEach(q => { const g = t / 180 + q * 2; LN('#0a0a12', 3, -s * 10, -80, -s * (30 + q * 12) + Math.cos(g) * 8, -70 - q * 18 + Math.sin(g) * 10); });
     }
   } else if (n === 'Denji') { // Denji : cheveux blonds, chemise blanche, cravate noire ; transformé : tête tronçonneuse orange
@@ -702,6 +707,14 @@ function fighter(f, i) {
     Y('#15151c', [[-15, -104], [-19, -120], [-8, -112], [-6, -128], [2, -114], [8, -127], [12, -112], [20, -118], [15, -104]]);
     R('#fff', -7, -97, 14, 3); [-5, 0, 5].forEach(q => Y('#fff', [[q - 2, -97], [q + 2, -97], [q, -93]]));
     R('#000', s * 6 - 2, -106, 4, 4);
+    if (lk === 'banshoman') { // forme divine : peau rougeâtre, tenue blanche et or, cheveux blancs en flammes, halo de feu, cape blanche
+      const w = Math.sin(t / 100) * 5;
+      Y('#fdfbf4', [[-s * 10, -88], [-s * 40, -84 + w], [-s * 54, -56 + w], [-s * 36, -60], [-s * 46, -30 + w], [-s * 14, -44]]);
+      x.fillStyle = 'rgba(255,240,170,.22)'; x.beginPath(); x.arc(0, -55, 70, 0, 7); x.fill();
+      x.strokeStyle = 'rgba(255,215,90,.9)'; x.lineWidth = 4; x.beginPath(); x.arc(0, -105, 40, 0, 7); x.stroke();
+      for (let q = 0; q < 10; q++) { const g = q * .628 + t / 400; Y('#ffd34d', [[Math.cos(g) * 40, -105 + Math.sin(g) * 40], [Math.cos(g + .18) * 40, -105 + Math.sin(g + .18) * 40], [Math.cos(g + .09) * 52, -105 + Math.sin(g + .09) * 52]]); }
+      Y('#f4f4f4', [[-15, -104], [-21, -122], [-9, -114], [-8, -138], [1, -118], [9, -140], [13, -116], [22, -126], [15, -104]]);
+    }
   } else if (n === 'Eren') {
     if (f.fm) { // Titan Assaillant : colosse musclé, longs cheveux sombres, dents apparentes
       R('#8a4a35', -18, -30, 16, 30); R('#8a4a35', 2, -30, 16, 30);
@@ -734,6 +747,7 @@ function fighter(f, i) {
     x.strokeStyle = P('#111'); x.lineWidth = 2; x.beginPath(); x.arc(0, -105, 9, .2, Math.PI - .2); x.stroke();
     Y('#111', [[-24, -124], [24, -124], [18, -132], [-18, -132]]); R('#111', -16, -124, 32, 5);
     LN('#f1c40f', 2, 0, -128, 22, -118); C('#f1c40f', 22, -116, 3);
+    if (lk === 'white') { C('#f5f5f1', 0, -102, 11); C('#111', -6, -109, 2.5); C('#111', 6, -109, 2.5); LN('#111', 2, -7, -97, 7, -97); } // visage blanc, expression neutre
   } else if (n === 'Kairos') { // Kairos : horloger du temps, haut-de-forme, monocle, cadran sur le torse
     R('#2a2038', -16, -28, 13, 28); R('#2a2038', 3, -28, 13, 28);
     R('#111', -18, -9, 17, 9); R('#111', 1, -9, 17, 9);
@@ -799,7 +813,7 @@ function fighter(f, i) {
         LN('#7fe9ff', 7, px, py, px + s * a0[0], py + a0[1]); LN('#e6fbff', 3, px, py, px + s * a0[0], py + a0[1]);
       }
     }
-    else if (n === 'Shinra') C(skin, px, py, 6);
+    else if (n === 'Shinra') { C(skin, px, py, 6); if (lk === 'banshoman') Y('#ffd34d', [[px - 6, py], [px + 6, py], [px, py - 13 - Math.sin(t / 70) * 4]]); }
     else if (n === 'Eren') { if (f.fm) C('#8a4a35', px, py, 11); else { C('#ecf0f1', px, py, 6); if (f.ak === 1) LN('#dfe6e9', 4, px, py, px + s * (f.ad ? 16 : 42), py); } }
     else if (n === 'Koro') C('#f4d03f', px, py, 6);
     else if (n === 'Kairos') { C('#f5ecd0', px, py, 6); if (f.ak === 0) LN('#d9b84a', 4, px, py, px + s * 34, py); }
