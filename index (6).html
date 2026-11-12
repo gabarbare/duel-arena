@@ -200,7 +200,7 @@ const SHOP = [
   { id: 'skin_koro_blanc', type: 'skin', char: 'Koro', name: 'Koro-sensei blanc', price: 100, look: 'white', pal: { '#f4d03f': '#f5f5f1', '#e6b800': '#dcdcd5', '#f1c40f': '#e8e8e2' } },
   { id: 'skin_shinra_banshoman', type: 'skin', char: 'Shinra', name: 'Shinra Banshoman', price: 150, look: 'banshoman', pal: { '#f5cba7': '#c4533c', '#23232f': '#f6f2e8', '#1b1b24': '#e9e3d3', '#bdc3c7': '#f1c40f', '#111': '#c9a227', '#15151c': '#f4f4f4', '#000': '#fff' } },
 ];
-let chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
+let chestGain = '', chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
 let save = { coins: 0, crystals: 0, xp: 0, chests: 0, icons: [], profile: null, friends: [], fid: null, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
 if (!save.stats || typeof save.stats !== 'object') save.stats = { played: 0, wins: 0, losses: 0, byChar: {} };
 if (!save.stats.byChar || typeof save.stats.byChar !== 'object') save.stats.byChar = {};
@@ -327,15 +327,16 @@ const LOGOS = {
 };
 const iconHtml = (id, n) => LOGOS[id] ? `<svg viewBox="0 0 40 40" width="${n}" height="${n}" style="vertical-align:middle">${LOGOS[id].s}</svg>` : `<span style="font-size:${n - 4}px">${esc(id)}</span>`;
 const allIcons = () => [...ICONS, ...save.icons];
-function openChest() {
-  chestErr = ''; chestNew = null;
+function openChest() { // 45 % icône (si il en reste), 40 % pièces (10-60), 15 % cristaux (1-5)
+  chestErr = ''; chestNew = null; chestGain = '';
   if ((save.chests || 0) < 1) { ui(); return; }
-  const pool = Object.keys(LOGOS).filter(id => !save.icons.includes(id));
-  if (!pool.length) { chestErr = 'Tu as déjà toutes les icônes !'; ui(); return; }
-  chestNew = pool[Math.random() * pool.length | 0];
-  save.icons.push(chestNew); save.chests--; persist(); ui();
+  const pool = Object.keys(LOGOS).filter(id => !save.icons.includes(id)), r = Math.random();
+  if (pool.length && r < .45) { chestNew = pool[Math.random() * pool.length | 0]; save.icons.push(chestNew); }
+  else if (r > .85) { const n = 1 + Math.random() * 5 | 0; save.crystals += n; chestGain = '💎 +' + n + (n > 1 ? ' cristaux' : ' cristal'); }
+  else { const n = 10 + Math.random() * 51 | 0; save.coins += n; chestGain = '🪙 +' + n + ' pièces'; }
+  save.chests--; persist(); ui();
 }
-const chestHtml = () => `<div style="border:1px solid #66552a;border-radius:10px;padding:8px 12px;max-width:300px">🎁 Coffrets : <b>${save.chests || 0}</b> · Icônes : ${save.icons.length}/${Object.keys(LOGOS).length}<br><button onclick="openChest()" ${(save.chests || 0) > 0 ? '' : 'disabled'}>Ouvrir un coffret</button>${chestErr ? `<br><small>${chestErr}</small>` : ''}${chestNew ? `<br>🎉 Nouvelle icône : <b>${LOGOS[chestNew].n}</b><br>${iconHtml(chestNew, 56)}` : ''}</div>`;
+const chestHtml = () => `<div style="border:1px solid #66552a;border-radius:10px;padding:8px 12px;max-width:300px">🎁 Coffrets : <b>${save.chests || 0}</b> · Icônes : ${save.icons.length}/${Object.keys(LOGOS).length}<br><small>Icône, pièces ou cristaux (plus rare)</small><br><button onclick="openChest()" ${(save.chests || 0) > 0 ? '' : 'disabled'}>Ouvrir un coffret</button>${chestErr ? `<br><small>${chestErr}</small>` : ''}${chestGain ? `<br>🎉 ${chestGain}` : ''}${chestNew ? `<br>🎉 Nouvelle icône : <b>${LOGOS[chestNew].n}</b><br>${iconHtml(chestNew, 56)}` : ''}</div>`;
 const botLvlHtml = () => `<h2>🤖 Niveau du bot</h2><p>Choisis la difficulté, puis ton personnage</p>
   <button onclick="go({t:'bot',lvl:0})" style="background:#27ae60">😊 Facile<br><small>Lent, hésitant, bloque rarement</small></button>
   <button onclick="go({t:'bot',lvl:1})" style="background:#e67e22">😐 Moyen<br><small>Comportement classique</small></button>
@@ -355,7 +356,7 @@ function addXp(n) {
 }
 const xpBar = () => { const v = lvlInfo(); return `<div style="width:100%;height:12px;background:#000;border-radius:6px;overflow:hidden;margin:3px 0"><div style="width:${v.need ? v.xp / v.need * 100 : 100}%;height:100%;background:#2ecc71"></div></div><small>${v.need ? v.xp + ' / ' + v.need + ' XP' : 'Niveau maximum !'}</small>`; };
 const profileBar = () => save.profile ? `<div onclick="openProfile()" style="cursor:pointer;display:flex;align-items:center;gap:12px;background:#222;border:1px solid #66552a;border-radius:10px;padding:6px 14px;max-width:360px;width:100%;box-sizing:border-box">${iconHtml(save.profile.icon, 34)}<div style="flex:1;text-align:left"><b>${esc(save.profile.name)}</b> · Niv. ${lvlInfo().L} · ⭐ ${topChar()}${xpBar()}</div></div>` : '';
-function openProfile() { chestNew = null; chestErr = ''; pName = save.profile.name; pIcon = save.profile.icon; pErr = ''; view = 'profile'; ui(); }
+function openProfile() { chestGain = ''; chestNew = null; chestErr = ''; pName = save.profile.name; pIcon = save.profile.icon; pErr = ''; view = 'profile'; ui(); }
 function setIcon(i) { pIcon = allIcons()[i]; ui(); }
 function saveProfile() {
   const n = pName.trim().slice(0, 14);
@@ -389,15 +390,15 @@ function buyChar(id) {
 }
 // quêtes quotidiennes : rw 'c' = pièces, 'g' = cristaux
 function questList() {
-  if (!save.quests || save.quests.day !== dayKey() + 'k') {
+  if (!save.quests || save.quests.day !== dayKey() + 'k2') {
     const av = ALLN.filter(n => !locked(n)), ch = av[Math.random() * av.length | 0], mp = Math.random() * 5 | 0;
     const pool = [
-      { type: 'play', goal: 3, text: 'Jouer 3 parties', rw: 'c', n: 25 },
-      { type: 'win', goal: 2, text: 'Gagner 2 combats', rw: 'g', n: 2 },
-      { type: 'char', param: ch, goal: 2, text: 'Jouer 2 parties avec ' + ch, rw: 'c', n: 30 },
+      { type: 'play', goal: 3, text: 'Jouer 3 parties', rw: 'k', n: 1 },
+      { type: 'win', goal: 2, text: 'Gagner 2 combats', rw: 'k', n: 1 },
+      { type: 'char', param: ch, goal: 2, text: 'Jouer 2 parties avec ' + ch, rw: 'k', n: 1 },
       { type: 'earn', goal: 80, text: 'Gagner 80 pièces en combat', rw: 'k', n: 1 },
       { type: 'rm', param: mp, goal: 1, text: 'Gagner une manche sur la map ' + MAPN[mp], rw: 'k', n: 1 }];
-    save.quests = { day: dayKey() + 'k', list: shuf(pool).slice(0, 4).map(q => ({ ...q, p: 0, done: 0 })) }; persist();
+    save.quests = { day: dayKey() + 'k2', list: shuf(pool).slice(0, 4).map(q => ({ ...q, p: 0, done: 0 })) }; persist();
   }
   return save.quests.list;
 }
