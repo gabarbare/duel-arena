@@ -1,4 +1,3 @@
-
 const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
 const html = fs.readFileSync(path.join(__dirname, 'index (6).html'));
@@ -58,7 +57,7 @@ const CH = [
     { n: 'Coup de poing', type: 'm', su: 5, ac: 4, rc: 9, cd: 8, dmg: 7, rng: 62, h: 30, kb: 5, st: 14 },
     { n: 'Air Force', type: 'p', su: 8, ac: 1, rc: 12, cd: 26, dmg: 7, vx: 12, r: 11, kb: 9, st: 16, vis: 6 },
     { n: 'Full Cowling', type: 'buff', su: 10, ac: 1, rc: 12, cd: 420, dur: 360 },
-    { n: 'Detroit Smash 100%', ult: 1, ub: 1, type: 'dp', su: 10, dsh: 8, spd: 13, ac: 6, rc: 28, cd: 0, pct: 0.45, rng: 70, h: 60, kb: 20, st: 45 }] },
+    { n: 'Detroit Smash 100%', ult: 1, ub: 1, type: 'dp', su: 10, dsh: 8, spd: 13, ac: 6, rc: 28, cd: 0, pct: 0.7, rng: 70, h: 60, kb: 20, st: 45 }] },
   // bd = dash arrière (invulnérable), form = transformation (remplace les attaques par 'alt'), jam = saut + onde de choc à l'atterrissage
   { name: 'Denji', desc: 'Chainsaw Man : Pochita, recul, transformation', hp: 105, spd: 4.3, jmp: 13.5, color: '#d4402f', atk: [
     { n: 'Coup simple', type: 'm', su: 5, ac: 4, rc: 9, cd: 8, dmg: 6, rng: 58, h: 30, kb: 5, st: 13 },
@@ -428,22 +427,28 @@ function startTraining(r, characterIndex, skin) {
   r.msg = '';
 }
 
+// Niveaux des bots : 0 = facile, 1 = moyen (comportement d'origine), 2 = difficile
+// act = chance d'agir par frame | blk = chance de bloquer | jmp = chance de sauter | lazy = chance d'hésiter | ult = bonus d'ultime | noise = imprécision du choix | punish = enchaîne quand l'adversaire est étourdi
+const BOT = [
+  { act: .05, blk: .06, jmp: .01, lazy: .4, ult: -25, noise: 40, punish: 0 },
+  { act: 1, blk: .32, jmp: .035, lazy: 0, ult: 18, noise: 8, punish: 0 },
+  { act: 1, blk: .65, jmp: .06, lazy: 0, ult: 30, noise: 3, punish: 1 }];
 function thinkBot(r) {
   if (!r.bot || r.ph !== 'fight' || !r.f[1] || !r.f[0]) return;
   const f = r.f[1], o = r.f[0], c = CH[f.c];
   const dx = o.x - f.x, dist = Math.abs(dx), dy = o.y - f.y;
-  const input = { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] };
+  const input = { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] }, P = BOT[r.lvl ?? 1];
   const attacks = atks(f);
   // Le bot adapte sa distance au personnage : il avance au corps-à-corps,
   // mais essaie de garder un peu d'espace avec les personnages à distance.
   const ranged = attacks.some(a => a.type === 'p' || a.type === 'sky' || a.type === 'fire' || a.type === 'beam');
   const ideal = ranged ? 245 : 62;
-  if (dist > ideal + 24) input[dx < 0 ? 'l' : 'r'] = 1;
+  if (Math.random() < P.lazy) { /* hésite */ } else if (dist > ideal + 24) input[dx < 0 ? 'l' : 'r'] = 1;
   else if (ranged && dist < 145) input[dx < 0 ? 'r' : 'l'] = 1;
-  if (dy < -45 && f.y >= G - 2 && dist < 260 && Math.random() < .035) input.u = 1;
+  if (dy < -45 && f.y >= G - 2 && dist < 260 && Math.random() < P.jmp) input.u = 1;
   // Défense occasionnelle si l'adversaire prépare une attaque proche.
-  if (o.atk && dist < 115 && Math.random() < .32) input.d = 1;
-  if (!f.atk && f.stun <= 0) {
+  if (o.atk && dist < 115 && Math.random() < P.blk) input.d = 1;
+  if (!f.atk && f.stun <= 0 && Math.random() < P.act) {
     let choice = -1, best = -Infinity;
     for (let j = 0; j < attacks.length; j++) {
       const a = attacks[j];
@@ -456,8 +461,8 @@ function thinkBot(r) {
       else if (a.type === 'sky' || a.type === 'portals' || a.type === 'fire' || a.type === 'beam' || a.type === 'rush' || a.type === 'echo' || a.type === 'timestop') score = dist < 420 ? 58 : 5;
       else if (a.type === 'tp' || a.type === 'grap' || a.type === 'portal') score = dist > 180 ? 38 : 5;
       else score = dist < (a.rng || 75) + 45 ? 65 : -5;
-      if (a.ult && f.ult >= 100) score += 18;
-      score += Math.random() * 8;
+      if (a.ult && f.ult >= 100) score += P.ult;
+      score += Math.random() * P.noise; if (P.punish && o.stun > 0) score += 20;
       if (score > best) { best = score; choice = j; }
     }
     if (choice >= 0 && (best > 20 || dist < 95)) input.a[choice] = 1;
@@ -571,7 +576,7 @@ wss.on('connection', ws => {
       const r = ws.room;
       if (r && r.training && ws.idx === 0) startTraining(r, r.sel[0], r.sk[0]);
     } else if (m.t === 'bot' && !ws.room) {
-      const r = { code: newCode(), ps: [ws], ph: 'select', sel: [null, Math.random() * CH.length | 0], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 1], co: [0, 0], bot: true };
+      const r = { code: newCode(), ps: [ws], ph: 'select', sel: [null, Math.random() * CH.length | 0], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 1], co: [0, 0], bot: true, lvl: [0, 1, 2].includes(+m.lvl) ? +m.lvl : 1 };
       rooms.set(r.code, r); ws.room = r; ws.idx = 0; join(ws);
     } else if (m.t === 'create' && !ws.room) {
       const r = { code: newCode(), ps: [ws], ph: 'wait', sel: [null, null], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 0], co: [0, 0] };
