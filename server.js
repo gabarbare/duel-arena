@@ -1,6 +1,6 @@
 const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
-const html = fs.readFileSync(path.join(__dirname, 'index.html'));
+const html = fs.readFileSync(path.join(__dirname, 'index(1).html'));
 const server = http.createServer((q, r) => { r.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); r.end(html); });
 const wss = new WebSocketServer({ server });
 
@@ -62,18 +62,33 @@ const CH = [
     { n: 'Coup tronçonneuse', type: 'm', su: 6, ac: 5, rc: 10, cd: 8, dmg: 11, rng: 70, h: 42, kb: 9, st: 16 },
     { n: 'Charge', type: 'd', su: 8, ac: 16, rc: 18, cd: 50, spd: 20, dmg: 19, rng: 67, h: 70, kb: 14, st: 26 },
     { n: 'Saut écrasant', type: 'jam', su: 8, ac: 0, rc: 22, cd: 70, dmg: 24, jv: 15, jx: 3, aoe: 80, kb: 14, st: 30 }] },
-  // tp = téléportation dirigée, portals = ultime de Yugo, fly = vol, dk = dash-coup de pied (diagonale en l'air) / dash vers le grappin,
-  // fire = vague de feu au sol, grap = grappin, cut = coupe les projectiles, crys = cristallisation, sd = dash éclair, zz = 4 dashs alternés
-  { name: 'Yugo', desc: 'Éliatrope : laser, téléportation, portails', hp: 90, spd: 4.6, jmp: 14, color: '#2f80ed', atk: [
-    { n: 'Rayon laser', type: 'p', su: 6, ac: 1, rc: 10, cd: 32, dmg: 8, vx: 22, r: 7, kb: 4, st: 12, vis: 8 },
-    { n: 'Téléportation (flèches)', type: 'tp', su: 2, ac: 1, rc: 8, cd: 50, dist: 270 },
-    { n: 'Épée (dash)', type: 'd', su: 6, ac: 6, rc: 14, cd: 45, spd: 8, dmg: 16, rng: 55, h: 50, kb: 9, st: 20 },
-    { n: 'Portails éliatropes', ult: 1, ub: 1, type: 'portals', su: 18, ac: 1, rc: 20, cd: 0, dmg: 7, kb: 3, st: 10, cnt: 7, warn: 20, gap: 5, rad: 150 }] },
-  { name: 'Shinra', desc: 'Pyrokinésiste : vol, coups de pied, feu', hp: 100, spd: 4.6, jmp: 14.5, color: '#ff5722', fspd: 1.9, atk: [
+  // ===== LÉGENDE DES STATS (60 frames = 1 seconde) =====
+  // PERSO : hp = points de vie | spd = vitesse de marche | jmp = force du saut | blk = part des dégâts subis en blocage (défaut .15)
+  //   big = taille en forme (2 = double) | fspd = multiplicateur de vitesse en forme | atk = attaques J K L U | alt = attaques de remplacement en forme
+  // ATTAQUE : n = nom | type = comportement (voir plus bas) | su = frames avant que l'effet démarre | ac = frames où l'attaque touche
+  //   rc = frames de récupération après | cd = attente supplémentaire avant de la refaire | dmg = dégâts | kb = recul infligé | st = étourdissement (frames)
+  //   rng = portée (px, depuis le bord du corps) | h = hauteur de la zone de touche | by = hauteur de départ de la zone (fraction du corps, .85 par défaut, plus grand = plus haut)
+  //   lift = propulsion verticale (négatif = vers le haut) | both = touche des deux côtés | multi = retouche toutes les N frames | air = ne touche que les ennemis en l'air
+  //   ult = ultime (barre pleine requise) | ub = ne peut pas être bloqué | pct = dégâts en % des PV max de l'adversaire
+  //   vx / vy0 / grav = vitesse / vitesse verticale de départ / gravité d'un projectile | r = rayon projectile | cnt = nombre de projectiles | cy / low = hauteur de tir | vis = apparence | clone / pull = clones / attire
+  //   spd = vitesse d'un dash ou du déplacement | dsh = frames de dash avant le coup (dp) | len = durée d'une passe | legs = nombre de passes | fin = dégâts de la dernière passe
+  //   dur = durée d'un effet | val = taille du bouclier | hps = PV soignés par frame | warn / strike = foudre : frames d'alerte / de frappe | warn / life / wd = laser : alerte / durée / épaisseur
+  //   aoe = rayon de l'onde de choc | jv / jx = vitesse du saut vertical / horizontal | tick / life / w = brûlure : dégâts par tick / durée / largeur | trail = flammes laissées au sol
+  //   dist = distance (téléportation, portail) | ttl = durée de vie du portail | tohook / nohook = dash vers le grappin / attaque utilisée sans grappin | aim = vise l'ennemi automatiquement
+  // TYPE : m = mêlée | p = projectile | d = dash qui frappe | dp = dash puis coup | bd = dash arrière invulnérable | sd = dash éclair invulnérable | zz = passes alternées avant/arrière
+  //   dk = dash-coup de pied (direction des flèches, ou vers le grappin, ou auto) | rush = rafale de passes autour de l'ennemi | tp = téléportation | portal = pose / rejoint un portail
+  //   beam = gros laser | laserform = devient un rayon laser | fly = vol | fire = flammes au sol | grap = grappin | cut = coupe les projectiles | sky = foudre | portals = portails à lasers
+  //   buff = bonus | shield = 2e barre de vie | form = transformation | crys = cristallisation | heal = soin | jam = saut avec onde de choc
+  { name: 'Yugo', desc: 'Éliatrope : gros laser, portail, épée, forme laser', hp: 90, spd: 4.6, jmp: 14, color: '#2f80ed', atk: [
+    { n: 'Gros laser (part du portail s’il existe)', type: 'beam', su: 8, ac: 1, rc: 14, cd: 70, dmg: 14, kb: 10, st: 24, warn: 14, life: 8, wd: 26 },
+    { n: 'Portail : poser (flèches) / y aller', type: 'portal', su: 2, ac: 1, rc: 8, cd: 50, dist: 270, ttl: 600 },
+    { n: 'Épée montante', type: 'm', su: 5, ac: 4, rc: 12, cd: 40, dmg: 16, rng: 60, h: 165, by: 1.6, kb: 11, st: 22, lift: -6 },
+    { n: 'Forme laser', ult: 1, ub: 1, type: 'laserform', su: 12, ac: 1, rc: 10, cd: 0, dur: 240, spd: 9, dmg: 11, kb: 6, st: 14, tick: 14 }] },
+  { name: 'Shinra', desc: 'Pyrokinésiste : vol, coup de pied à visée auto, explosions', hp: 100, spd: 4.6, jmp: 14.5, color: '#ff5722', atk: [
     { n: 'Vol (3 s)', type: 'fly', su: 3, ac: 1, rc: 6, cd: 240, dur: 180 },
-    { n: 'Coup de pied dash', type: 'dk', su: 5, ac: 8, rc: 14, cd: 40, spd: 14, dmg: 12, kb: 12, st: 22 },
-    { n: 'Vague de feu', type: 'fire', su: 8, ac: 1, rc: 14, cd: 420, tick: 1.5, life: 300, w: 150 },
-    { n: 'Vitesse lumière', ult: 1, type: 'form', su: 14, ac: 1, rc: 16, cd: 0, dur: 480 }] },
+    { n: 'Coup de pied (visée auto)', type: 'dk', aim: 1, su: 5, ac: 11, rc: 14, cd: 40, spd: 15, dmg: 12, kb: 12, st: 22 },
+    { n: 'Explosion de flammes', type: 'm', both: 1, su: 10, ac: 3, rc: 16, cd: 110, dmg: 15, rng: 105, h: 150, by: 1, kb: 20, st: 28, trail: { tick: 1.5, life: 180, w: 170 } },
+    { n: 'Pas du Diable (rafale de coups de pied)', ult: 1, ub: 1, type: 'rush', su: 12, ac: 66, rc: 18, cd: 0, dmg: 6, kb: 6, st: 12, spd: 24, len: 11, legs: 6, fin: 20 }] },
   { name: 'Eren', desc: 'Éclaireur : grappins, épée, Titan Assaillant', hp: 105, spd: 4.5, jmp: 14, color: '#5d8a4e', big: 2, fspd: .85, atk: [
     { n: 'Grappin (flèches)', type: 'grap', su: 5, ac: 1, rc: 8, cd: 25 },
     { n: 'Dash grappin / Épée', type: 'dk', tohook: 1, su: 3, ac: 12, rc: 12, cd: 40, spd: 18, dmg: 18, kb: 12, st: 22,
@@ -87,11 +102,14 @@ const CH = [
     { n: 'Tentacule', type: 'm', su: 5, ac: 4, rc: 9, cd: 8, dmg: 7, rng: 75, h: 30, kb: 5, st: 14 },
     { n: 'Dash éclair', type: 'sd', su: 2, ac: 5, rc: 8, cd: 45, spd: 34 },
     { n: 'Fouet (2 s)', type: 'm', su: 6, ac: 120, rc: 14, cd: 300, dmg: 5, rng: 110, h: 100, kb: 4, st: 7, both: 1, multi: 12 },
-    { n: 'Mach 20 enchaîné', ult: 1, ub: 1, type: 'zz', su: 12, ac: 40, rc: 18, cd: 0, dmg: 12, kb: 3, st: 14, spd: 28, len: 12 }] }
+    { n: 'Mach 20 enchaîné', ult: 1, ub: 1, type: 'zz', su: 12, ac: 40, rc: 18, cd: 0, dmg: 12, kb: 3, st: 14, spd: 28, len: 12 }] },
+  // Kairos (perso original) : echo = frappe différée sur la position marquée | rewind = retour 2 s en arrière (rend une partie des PV perdus) | timestop = fige l'ennemi, ses dégâts sont mis de côté puis infligés d'un coup
+  { name: 'Kairos', desc: 'Horloger du temps : écho, rembobinage, arrêt du temps', hp: 95, spd: 4.4, jmp: 13.5, color: '#d9b84a', atk: [
+    { n: 'Aiguille', type: 'm', su: 6, ac: 4, rc: 10, cd: 8, dmg: 7, rng: 72, h: 30, kb: 5, st: 14 },
+    { n: 'Écho temporel (frappe différée)', type: 'echo', su: 8, ac: 1, rc: 14, cd: 150, dmg: 16, kb: 12, st: 26, warn: 50, rad: 75 },
+    { n: 'Rembobinage (retour 2 s en arrière)', type: 'rewind', su: 6, ac: 1, rc: 12, cd: 540, heal: .6 },
+    { n: 'Arrêt du temps', ult: 1, ub: 1, type: 'timestop', su: 14, ac: 1, rc: 12, cd: 0, dur: 120, mult: 1.2 }] }
 ];
-// Shinra en vitesse lumière : le vol devient une téléportation derrière l'ennemi
-const SHN = CH.find(c => c.name === 'Shinra');
-SHN.alt = [{ n: 'Téléportation derrière', type: 'tpb', su: 3, ac: 1, rc: 8, cd: 50 }, SHN.atk[1], SHN.atk[2]];
 const CHARS = CH.map(({ name, desc, hp, color, atk, alt }) => ({ name, desc, hp, color, atk: atk.map(a => a.n), alt: alt ? alt.map(a => a.n) : null }));
 
 // gr = gravité, acc = adhérence du sol (1 = normal, petit = glissant)
@@ -106,13 +124,13 @@ function rollMap(r) { let m; do { m = Math.random() * MAPS.length | 0; } while (
 
 const atks = f => (f.form > 0 && CH[f.c].alt) || CH[f.c].atk;
 const nf = (c, i, inp, ult) => ({ c, x: i ? 650 : 250, y: G, vx: 0, vy: 0, hp: CH[c].hp, face: i ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
-  block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
+  block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, portal: null, lz: 0, lzcd: 0, lzd: null, hist: [], frozen: 0, stored: 0, fzm: 1, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
 
 const sz = f => f.sz || 1;
 const clampX = (v, z) => Math.max(BW * z / 2, Math.min(W - BW * z / 2, v));
 const box = (f, d) => {
   const z = sz(f), y1 = f.y - BH * z * (d.by ?? .85);
-  if (d.type === 'dk' || d.type === 'zz') { // bulle autour du corps, décalée dans le sens du dash
+  if (d.type === 'dk' || d.type === 'zz' || d.type === 'rush') { // bulle autour du corps, décalée dans le sens du dash
     const a = f.atk, ox = ((a && a.dx) || 0) * 30, oy = ((a && a.dy) || 0) * 30;
     return [f.x + ox - 40 * z, f.x + ox + 40 * z, f.y + oy - BH * z - 12, f.y + oy + 12];
   }
@@ -138,6 +156,7 @@ function recordTrainingHit(t, dmg) {
 function hurt(t, dmg, kb, st, lift, srcX, ub, a) {
   const dir = srcX < t.x ? 1 : -1;
   if (t.inv) return;
+  if (t.frozen > 0) { t.stored += dmg * (t.fzm || 1); t.fl = 3; recordTrainingHit(t, dmg); return; }
   if (t.shield > 0) { // Infini : la 2e barre de vie absorbe tout, sans recul ni étourdissement
     t.shield = Math.max(0, t.shield - dmg); t.fl = 3;
     if (a && !ub) a.ult = Math.min(100, a.ult + dmg * .75);
@@ -160,6 +179,11 @@ function burn(t, dmg) {
 
 function step(r, i) {
   const f = r.f[i], o = r.f[1 - i], c = CH[f.c], k = f.inp, dm = f.buff > 0 ? 1.25 : 1, M = MAPS[r.mi];
+  if (f.frozen > 0) { // temps arrêté : figé, les dégâts reçus sont mis de côté puis infligés d'un coup à la reprise
+    if (--f.frozen === 0 && f.stored > 0) { f.hp -= f.stored; f.stored = 0; f.fl = 8; f.stun = 25; f.atk = null; f.vx = (f.x < o.x ? -1 : 1) * 8; }
+    return;
+  }
+  f.hist.push([f.x, f.y, f.hp]); if (f.hist.length > 130) f.hist.shift(); // mémoire des ~2 dernières secondes (rembobinage)
   f.cds = f.cds.map(v => v > 0 ? v - 1 : 0);
   if (f.fl > 0) f.fl--;
   if (f.buff > 0) f.buff--;
@@ -167,6 +191,7 @@ function step(r, i) {
   if (f.fly > 0) f.fly--;
   if (f.crys > 0) f.crys--;
   if (f.hook && --f.hkt <= 0) f.hook = null;
+  if (f.portal && --f.portal.t <= 0) f.portal = null;
   f.inv = 0; f.ghost = 0; f.sz = (f.form > 0 && c.big) || 1;
   f.ult = Math.min(100, f.ult + 0.008);
   const z = f.sz, dx0 = k.r - k.l, dy0 = k.d - k.u;
@@ -178,14 +203,22 @@ function step(r, i) {
     else if (h.t > 28) f.hf = null;
   }
   const gr = f.y >= G; f.block = 0;
-  if (f.stun > 0) { f.stun--; f.vx *= .9 + (1 - M.acc) * .08; }
+  if (f.lz > 0) { // forme laser (ultime de Yugo) : vol libre, invulnérable, blesse l'ennemi au contact
+    const d = f.lzd, L = Math.hypot(dx0, dy0);
+    f.lz--; f.inv = 1; f.ghost = 1; f.atk = null; f.stun = 0; f.block = 0;
+    if (L) { f.vx = dx0 / L * d.spd; f.vy = dy0 / L * d.spd; } else { f.vx *= .85; f.vy *= .85; }
+    if (f.lzcd > 0) f.lzcd--;
+    if (!f.lzcd && hit([f.x - 34, f.x + 34, f.y - 66, f.y + 8], o)) { hurt(o, d.dmg * dm, d.kb, d.st, d.lift, f.x, d.ub, f); f.lzcd = d.tick; }
+  }
+  else if (f.stun > 0) { f.stun--; f.vx *= .9 + (1 - M.acc) * .08; }
   else if (f.atk) {
     const a = f.atk, d = a.d, s0 = d.su + (d.dsh || 0); a.f++;
     if ((d.type === 'd' && a.f > d.su && a.f <= d.su + d.ac) || (d.type === 'dp' && a.f > d.su && a.f <= s0)) f.vx = f.face * d.spd; else if (gr) f.vx *= .6 + (1 - M.acc) * .35;
     if (f.fly > 0) f.vy = 0; // en vol, on reste en l'air pendant une attaque
     if (d.type === 'bd' && a.f > d.su && a.f <= d.su + d.ac) { f.vx = -f.face * d.spd; f.inv = 1; }
-    if ((d.type === 'tp' || d.type === 'tpb') && a.f <= d.su + 6) f.inv = 1;
+    if ((d.type === 'tp' || d.type === 'tpb' || (d.type === 'portal' && a.tp) || d.type === 'rewind') && a.f <= d.su + (d.type === 'rewind' ? 10 : 6)) f.inv = 1;
     if (a.f === d.su + 1) {
+      if (d.trail && f.y >= G - 2) r.fx.push({ k: 'fire', x: f.x, w: d.trail.w, t: 0, o: i, d: d.trail });
       if (d.type === 'p') {
         for (let j = 0; j < (d.cnt || 1); j++)
           r.pj.push({ x: f.x + f.face * (30 - (d.clone ? j * 45 : 0)), y: f.y - (d.cy || (d.low ? 18 : BH * .6)), vx: f.face * d.vx, vy: d.vy0 || (d.cnt && !d.clone ? (j - 1) * 1.8 : 0), r: d.r, o: i, d });
@@ -194,6 +227,33 @@ function step(r, i) {
       else if (d.type === 'shield') f.shield = d.val;
       else if (d.type === 'form') f.form = d.dur;
       else if (d.type === 'fly') f.fly = d.dur;
+      else if (d.type === 'echo') r.fx.push({ k: 'echo', x: o.x, y: o.y - BH * sz(o) / 2, t: 0, o: i, d });
+      else if (d.type === 'timestop') { o.frozen = d.dur; o.stored = 0; o.fzm = d.mult; }
+      else if (d.type === 'rewind') {
+        const hs = f.hist[0];
+        if (hs) {
+          r.fx.push({ k: 'cos', x: f.x, y: f.y - 45, t: 0, life: 14 });
+          f.hp = Math.min(c.hp, f.hp + Math.max(0, hs[2] - f.hp) * d.heal); f.x = hs[0]; f.y = hs[1]; f.vx = 0; f.vy = 0; f.hist = [];
+          r.fx.push({ k: 'cos', x: f.x, y: f.y - 45, t: 0, life: 14 });
+        }
+      }
+      else if (d.type === 'laserform') { f.lz = d.dur; f.lzd = d; }
+      else if (d.type === 'beam') { // gros laser : part du portail s'il existe, sinon de Yugo, vers la position actuelle de l'ennemi
+        r.fx.push({ k: 'beam', o: i, d, np: f.portal ? 0 : 1, x: f.portal ? f.portal.x : f.x + f.face * 18, y: f.portal ? f.portal.y - 45 : f.y - BH * z * .6, tx: o.x, ty: o.y - BH * sz(o) / 2, t: 0 });
+      } else if (d.type === 'portal') {
+        if (f.portal) { // un portail existe : on s'y téléporte
+          r.fx.push({ k: 'cos', x: f.x, y: f.y - 45, t: 0, life: 14 });
+          f.x = clampX(f.portal.x, z); f.y = Math.min(G, Math.max(BH * z + 10, f.portal.y)); f.vx = 0; f.vy = 0; f.portal = null; a.tp = 1;
+          r.fx.push({ k: 'cos', x: f.x, y: f.y - 45, t: 0, life: 14 });
+        } else { // sinon on en pose un dans la direction des flèches
+          let ux = dx0, uy = dy0;
+          if (uy > 0 && f.y >= G) uy = 0;
+          if (!ux && !uy) ux = f.face;
+          const L = Math.hypot(ux, uy);
+          f.portal = { x: clampX(f.x + ux / L * d.dist, 1), y: Math.max(BH + 10, Math.min(G, f.y + uy / L * d.dist)), t: d.ttl };
+          r.fx.push({ k: 'cos', x: f.portal.x, y: f.portal.y - 45, t: 0, life: 14 });
+        }
+      }
       else if (d.type === 'crys') f.crys = d.dur;
       else if (d.type === 'fire') r.fx.push({ k: 'fire', x: clampX(f.x + f.face * 80, 1), w: d.w, t: 0, o: i, d });
       else if (d.type === 'grap') { let ux = dx0, uy = dy0; if (!ux && !uy) ux = f.face; const L = Math.hypot(ux, uy); f.hf = { x: f.x, y: f.y - BH * z * .6, dx: ux / L, dy: uy / L, t: 0 }; }
@@ -218,6 +278,7 @@ function step(r, i) {
       } else if (d.type === 'dk') {
         let ux, uy;
         if (d.tohook && f.hook) { ux = (f.hook.e ? o.x : f.hook.x) - f.x; uy = (f.hook.e ? o.y - BH * sz(o) / 2 : f.hook.y) - (f.y - BH * z / 2); f.hook = null; }
+        else if (d.aim) { ux = o.x - f.x; uy = (o.y - BH * sz(o) / 2) - (f.y - BH * z / 2); } // visée automatique vers l'ennemi, même dans les airs
         else if (f.y < G || f.fly > 0) { ux = dx0; uy = dy0; } else { ux = f.face; uy = 0; }
         if (!ux && !uy) ux = f.face;
         const L = Math.hypot(ux, uy); a.dx = ux / L; a.dy = uy / L;
@@ -230,7 +291,19 @@ function step(r, i) {
       const q = a.f - d.su - 1; a.dx = a.dir * (Math.floor(q / d.len) % 2 ? -1 : 1);
       f.vx = a.dx * d.spd; f.inv = 1; f.ghost = 1; if (q % d.len === 0) a.hit = 0;
     }
-    const act = a.f > s0 && a.f <= s0 + d.ac, mel = d.type === 'm' || d.type === 'd' || d.type === 'dp' || d.type === 'dk' || d.type === 'zz';
+    if (d.type === 'rush' && a.f > d.su && a.f <= d.su + d.ac) { // Pas du Diable : passes successives autour de l'ennemi, toujours visées sur lui
+      const q = a.f - d.su - 1, leg = Math.floor(q / d.len);
+      if (q % d.len === 0) {
+        const ang = (leg * 137 + 200) * Math.PI / 180;
+        r.fx.push({ k: 'cos', x: f.x, y: f.y - 45, t: 0, life: 12 });
+        f.x = clampX(o.x + Math.cos(ang) * 150, z); f.y = Math.max(BH * z + 10, Math.min(G, o.y + Math.sin(ang) * 90));
+        r.fx.push({ k: 'cos', x: f.x, y: f.y - 45, t: 0, life: 12 });
+        a.hit = 0;
+      }
+      const ux = o.x - f.x, uy = (o.y - BH * sz(o) / 2) - (f.y - BH * z / 2), L = Math.hypot(ux, uy) || 1;
+      a.dx = ux / L; a.dy = uy / L; f.vx = a.dx * d.spd; f.vy = a.dy * d.spd; f.inv = 1; f.ghost = 1; a.fin = leg === d.legs - 1;
+    }
+    const act = a.f > s0 && a.f <= s0 + d.ac, mel = d.type === 'm' || d.type === 'd' || d.type === 'dp' || d.type === 'dk' || d.type === 'zz' || d.type === 'rush';
     if (d.type === 'heal' && act) f.hp = Math.min(c.hp, f.hp + d.hps);
     a.b = act && mel ? box(f, d) : null;
     if (d.type === 'cut' && act) { // coupe les projectiles adverses, sans dégâts
@@ -246,7 +319,7 @@ function step(r, i) {
       if (a.lb > 0) { a.lb--; a.b = [f.x - d.aoe, f.x + d.aoe, G - 70, G]; }
     }
     if (a.b && d.multi && a.f % d.multi === 0) a.hit = 0;
-    if (a.b && !a.hit && d.type !== 'cut' && (!d.air || o.y < G - 15) && hit(a.b, o)) { a.hit = 1; hurt(o, d.pct ? CH[o.c].hp * d.pct : d.dmg * dm, d.kb, d.st, d.lift, f.x, d.ub, f); }
+    if (a.b && !a.hit && d.type !== 'cut' && (!d.air || o.y < G - 15) && hit(a.b, o)) { a.hit = 1; hurt(o, d.pct ? CH[o.c].hp * d.pct : (a.fin ? d.fin : d.dmg) * dm, a.fin ? 22 : d.kb, a.fin ? 36 : d.st, d.lift, f.x, d.ub, f); }
     if (f.atk && (d.type === 'jam' ? (a.land && a.f >= a.land + d.rc) || a.f > 150 : a.f >= s0 + d.ac + d.rc)) f.atk = null;
   } else {
     f.face = o.x >= f.x ? 1 : -1;
@@ -264,7 +337,7 @@ function step(r, i) {
     }
   }
   f.x += f.vx; f.y += f.vy;
-  if (f.y < G) f.vy += M.gr; else { f.y = G; f.vy = 0; }
+  if (f.y < G) { if (!(f.lz > 0)) f.vy += M.gr; } else { f.y = G; f.vy = 0; }
   const top = BH * z + 10; if (f.y < top) { f.y = top; if (f.vy < 0) f.vy = 0; }
   f.x = clampX(f.x, z);
 }
@@ -281,6 +354,7 @@ function sep(r) {
 
 function projs(r) {
   r.pj = r.pj.filter(p => {
+    if (r.f[p.o].frozen > 0) return true; // projectile figé avec son lanceur
     p.x += p.vx; p.y += p.vy; if (p.d.grav) p.vy += p.d.grav;
     const t = r.f[1 - p.o], ow = r.f[p.o], tz = sz(t);
     if (Math.abs(p.x - t.x) < BW * tz / 2 + p.r && p.y > t.y - BH * tz - p.r && p.y < t.y + p.r) {
@@ -293,12 +367,27 @@ function projs(r) {
 // effets au sol / dans l'air : foudre, vague de feu, portails à lasers, éclats cosmétiques
 function fxs(r) {
   r.fx = r.fx.filter(e => {
+    if (e.o != null && r.f[e.o].frozen > 0) return true; // les effets d'un combattant figé sont figés aussi
     e.t++;
     if (e.k === 'cos') return e.t <= e.life;
     const d = e.d, t = r.f[1 - e.o], ow = r.f[e.o], dm = ow.buff > 0 ? 1.25 : 1, tz = sz(t);
     if (e.k === 'fire') {
       if (t.y >= G - 2 && Math.abs(t.x - e.x) < e.w / 2 + 14 * tz && e.t % 12 === 0) burn(t, d.tick * dm);
       return e.t <= d.life;
+    }
+    if (e.k === 'echo') { // écho : la zone marquée explose après "warn" frames
+      if (e.t === d.warn && !e.hit) {
+        e.hit = 1;
+        if (Math.hypot(t.x - e.x, t.y - BH * tz / 2 - e.y) < d.rad + 14 * tz) hurt(t, d.dmg * dm, d.kb, d.st, -4, e.x, d.ub, ow);
+      }
+      return e.t <= d.warn + 8;
+    }
+    if (e.k === 'beam') { // gros laser : visée affichée pendant "warn" frames, puis rayon épais
+      if (e.t === d.warn && !e.hit) {
+        e.hit = 1;
+        if (segDist(e.x, e.y, e.x + (e.tx - e.x) * 4, e.y + (e.ty - e.y) * 4, t.x, t.y - BH * tz / 2) < d.wd / 2 + 14 * tz) hurt(t, d.dmg * dm, d.kb, d.st, 0, e.x, d.ub, ow);
+      }
+      return e.t <= d.warn + d.life;
     }
     if (e.k === 'por') { // le portail vise la position de l'ennemi à son ouverture, puis tire après "warn" frames
       if (e.t === 0) { e.tx = t.x; e.ty = t.y - BH * tz / 2; }
@@ -346,7 +435,7 @@ function thinkBot(r) {
   const attacks = atks(f);
   // Le bot adapte sa distance au personnage : il avance au corps-à-corps,
   // mais essaie de garder un peu d'espace avec les personnages à distance.
-  const ranged = attacks.some(a => a.type === 'p' || a.type === 'sky' || a.type === 'fire');
+  const ranged = attacks.some(a => a.type === 'p' || a.type === 'sky' || a.type === 'fire' || a.type === 'beam');
   const ideal = ranged ? 245 : 62;
   if (dist > ideal + 24) input[dx < 0 ? 'l' : 'r'] = 1;
   else if (ranged && dist < 145) input[dx < 0 ? 'r' : 'l'] = 1;
@@ -359,11 +448,12 @@ function thinkBot(r) {
       const a = attacks[j];
       if (!a || f.cds[j] > 0 || (a.ult && f.ult < 100)) continue;
       let score = 0;
-      if (a.type === 'buff' || a.type === 'shield' || a.type === 'form' || a.type === 'crys' || a.type === 'heal') {
+      if (a.type === 'buff' || a.type === 'shield' || a.type === 'form' || a.type === 'crys' || a.type === 'heal' || a.type === 'laserform') {
         score = (f.hp < c.hp * .72 || f.buff <= 0 || f.shield <= 0 || f.form <= 0) ? 75 : -10;
-      } else if (a.type === 'p') score = (dist < 520 ? 55 : 10) - Math.abs(dist - 260) * .04;
-      else if (a.type === 'sky' || a.type === 'portals' || a.type === 'fire') score = dist < 420 ? 58 : 5;
-      else if (a.type === 'tp' || a.type === 'grap') score = dist > 180 ? 38 : 5;
+      } else if (a.type === 'rewind') score = f.hp < c.hp * .6 ? 70 : -10;
+      else if (a.type === 'p') score = (dist < 520 ? 55 : 10) - Math.abs(dist - 260) * .04;
+      else if (a.type === 'sky' || a.type === 'portals' || a.type === 'fire' || a.type === 'beam' || a.type === 'rush' || a.type === 'echo' || a.type === 'timestop') score = dist < 420 ? 58 : 5;
+      else if (a.type === 'tp' || a.type === 'grap' || a.type === 'portal') score = dist > 180 ? 38 : 5;
       else score = dist < (a.rng || 75) + 45 ? 65 : -5;
       if (a.ult && f.ult >= 100) score += 18;
       score += Math.random() * 8;
@@ -397,6 +487,7 @@ function tick(r) {
     dummy.fly = 0;
     dummy.hf = null;
     dummy.hook = null;
+    if (dummy.frozen > 0) dummy.frozen--; else dummy.stored = 0;
   }
   else if (r.ph === 'cd') { if (--r.t <= 0) r.ph = 'fight'; }
   else if (r.ph === 'fight') {
@@ -426,7 +517,7 @@ function tick(r) {
     f: live ? r.f.map((f, q) => {
       const d = f.atk && f.atk.d;
       return { c: f.c, sk: r.sk[q], x: Math.round(f.x), y: Math.round(f.y), hp: Math.max(0, Math.round(f.hp)), fc: f.face, bl: f.block, fl: f.fl > 0 ? 1 : 0,
-        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0,
+        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0, lz: f.lz > 0 ? 1 : 0, fz: f.frozen > 0 ? 1 : 0, sd: Math.round(f.stored), vx: Math.round(f.vx * 10) / 10, vy: Math.round(f.vy * 10) / 10, pt: f.portal ? [Math.round(f.portal.x), Math.round(f.portal.y)] : null,
         hk: f.hook ? [Math.round(f.hook.x), Math.round(f.hook.y)] : f.hf ? [Math.round(f.hf.x), Math.round(f.hf.y)] : null,
         ad: f.atk && f.atk.dx !== undefined ? [Math.round(f.atk.dx * 10) / 10, Math.round((f.atk.dy || 0) * 10) / 10] : null,
         ak: f.atk ? f.atk.k : -1, ap: d ? (f.atk.f <= d.su + (d.dsh || 0) ? 0 : f.atk.f <= d.su + (d.dsh || 0) + d.ac ? 1 : 2) : -1,
@@ -435,6 +526,8 @@ function tick(r) {
     pj: live ? r.pj.map(p => ({ x: Math.round(p.x), y: Math.round(p.y), r: p.r, o: p.o, k: p.d.vis || 0, v: Math.sign(p.vx) })) : [],
     fx: live ? r.fx.filter(e => e.k !== 'por' || e.t >= 0).map(e => e.k === 'cos' ? { p: 2, x: Math.round(e.x), y: Math.round(e.y), a: e.t / e.life }
       : e.k === 'fire' ? { p: 5, x: Math.round(e.x), w: e.w, a: e.t / e.d.life }
+      : e.k === 'echo' ? { p: 6, x: Math.round(e.x), y: Math.round(e.y), a: Math.min(1, e.t / e.d.warn), r: e.d.rad, h: e.t >= e.d.warn ? 1 : 0 }
+      : e.k === 'beam' ? { p: e.t >= e.d.warn ? 4 : 3, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: Math.min(1, e.t / e.d.warn), wd: e.d.wd, np: e.np }
       : e.k === 'por' ? { p: e.t >= e.d.warn ? 4 : 3, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: Math.min(1, e.t / e.d.warn) }
       : { p: e.t > e.d.warn ? 1 : 0, x: Math.round(e.x) }) : [] };
   r.ps.forEach(p => tx(p, s));
