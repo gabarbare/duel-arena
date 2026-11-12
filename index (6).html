@@ -110,8 +110,12 @@ const SHOP = [
   { id: 'skin_chevalier_noir', type: 'skin', char: 'Chevalier', name: 'Chevalier noir', price: 60, pal: { '#b0bec5': '#2b2b33', '#cfd8dc': '#454550', '#78909c': '#1c1c24', '#455a64': '#111118', '#90a4ae': '#55555f', '#2c5fa8': '#22222b' } },
   { id: 'skin_viking_rouge', type: 'skin', char: 'Viking', name: 'Viking rouge', price: 60, pal: { '#6d4c41': '#c0392b', '#4e342e': '#7b241c', '#d35400': '#e67e22', '#3e2723': '#4a1410' } },
   { id: 'skin_gojo_lunettes', type: 'skin', char: 'Gojo', name: 'Gojo lunettes (saison 2)', price: 100, look: 'glasses', pal: {} },
+  { id: 'skin_luffy_gear4', type: 'skin', char: 'Luffy', name: 'Luffy Gear 4 Snakeman', price: 120, pal: { '#f5cba7': '#2d2d36', '#e74c3c': '#2d2d36', '#3b6fd8': '#c0392b', '#c0392b': '#fff' } },
+  { id: 'skin_deku_dark', type: 'skin', char: 'Deku', name: 'Dark Deku', price: 100, pal: { '#2e7d32': '#17171f', '#1b5e20': '#0b0b11', '#c0392b': '#8e1b2f', '#b0bec5': '#3a3a46', '#fff': '#ff3b3b', '#d5dbdb': '#555' } },
+  { id: 'skin_naruto_hermite', type: 'skin', char: 'Naruto', name: 'Naruto Mode Hermite', price: 100, look: 'sage', pal: { '#ff7f27': '#d0451b', '#2c5fa8': '#222', '#2c3e50': '#111' } },
 ];
-let save = { coins: 0, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
+let earnedCr = 0, rw = 0;
+let save = { coins: 0, crystals: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
 if (!save.stats || typeof save.stats !== 'object') save.stats = { played: 0, wins: 0, losses: 0, byChar: {} };
 if (!save.stats.byChar || typeof save.stats.byChar !== 'object') save.stats.byChar = {};
 save.stats.played = Number(save.stats.played) || 0;
@@ -122,22 +126,6 @@ const persist = () => { try { localStorage.setItem('duelArena', JSON.stringify(s
 const owns = id => save.owned.includes(id);
 const locked = name => SHOP.some(q => q.type === 'char' && q.char === name && !owns(q.id));
 const dayKey = () => { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
-// boutique du jour : 4 articles tirés au hasard (persos et skins mélangés) parmi ce que le joueur ne possède pas, renouvelés à minuit
-function dailyIds() {
-  const key = dayKey();
-  if (!save.daily || save.daily.day !== key) {
-    const pool = SHOP.filter(q => !owns(q.id)).map(q => q.id);
-    for (let i = pool.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [pool[i], pool[j]] = [pool[j], pool[i]]; }
-    save.daily = { day: key, ids: pool.slice(0, 4) }; persist();
-  }
-  return save.daily.ids;
-}
-function buy(id) {
-  const q = SHOP.find(z => z.id === id);
-  if (!q || owns(id) || !dailyIds().includes(id) || save.coins < q.price) return;
-  save.coins -= q.price; save.owned.push(id); persist(); ui();
-}
-
 function connect(first) {
   const w = ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host);
   w.onopen = () => w.send(JSON.stringify(first));
@@ -148,7 +136,7 @@ function connect(first) {
     else if (m.t === 'room') { me = m.idx; chars = m.chars; maps = m.maps; code = m.code; searching = false; }
     else if (m.t === 'err') { err = m.m; me = -1; S = null; searching = false; w.close(); }
     else if (m.t === 's') {
-      S = m;
+      S = m; if (m.w) { if (m.w[me] > rw) qTrack('rm', 1, m.mp); rw = m.w[me]; }
       if (m.p === 'end' && m.co) {
         if (!paid) {
           paid = 1;
@@ -163,6 +151,8 @@ function connect(first) {
           const cs = save.stats.byChar[charName];
           cs.played++;
           if (won) cs.wins++; else cs.losses++;
+          earnedCr = won ? 1 : 0; save.crystals += earnedCr;
+          qTrack('play', 1); qTrack('char', 1, charName); qTrack('earn', earned); if (won) qTrack('win', 1);
           persist();
         }
       } else paid = 0;
@@ -187,13 +177,61 @@ function leave() { me = -1; S = null; err = ''; view = 'menu'; searching = false
 function info(i) { if (infoIdx !== i) { infoIdx = i; ui(); } }
 function setSkin(name, id, i) { save.skin[name] = id; persist(); if (S && S.p === 'select' && S.sel[me] === i) pick(i); ui(); }
 
+const CR = { perso_luffy: 30, perso_naruto: 30, perso_deku: 30, perso_koro: 50, perso_shinra: 50, perso_eren: 50, perso_kairos: 50, perso_gojo: 80, perso_yugo: 80, perso_denji: 80 };
+const MAPN = ['Dojo', 'Volcan', 'Ville de nuit', 'Banquise', 'Lune'];
+const ALLN = ['Bruno', 'Zéphyr', 'Kaze', 'Viking', 'Chevalier', 'Kairos', 'Luffy', 'Naruto', 'Gojo', 'Deku', 'Denji', 'Yugo', 'Shinra', 'Eren', 'Koro'];
+const bank = () => `🪙 ${save.coins} pièces · 💎 ${save.crystals} cristaux`;
+const shuf = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+// boutique de skins : 3 skins au hasard par jour (pièces), renouvelés à minuit
+function dailyIds() {
+  const key = dayKey();
+  if (!save.daily2 || save.daily2.day !== key) {
+    save.daily2 = { day: key, ids: shuf(SHOP.filter(q => q.type === 'skin' && !owns(q.id)).map(q => q.id)).slice(0, 3) }; persist();
+  }
+  return save.daily2.ids;
+}
+function buy(id) {
+  const q = SHOP.find(z => z.id === id);
+  if (!q || q.type !== 'skin' || owns(id) || !dailyIds().includes(id) || save.coins < q.price) return;
+  save.coins -= q.price; save.owned.push(id); persist(); ui();
+}
+function buyChar(id) {
+  const p = CR[id];
+  if (!p || owns(id) || save.crystals < p) return;
+  save.crystals -= p; save.owned.push(id); persist(); ui();
+}
+// quêtes quotidiennes : rw 'c' = pièces, 'g' = cristaux
+function questList() {
+  if (!save.quests || save.quests.day !== dayKey()) {
+    const av = ALLN.filter(n => !locked(n)), ch = av[Math.random() * av.length | 0], mp = Math.random() * 5 | 0;
+    const pool = [
+      { type: 'play', goal: 3, text: 'Jouer 3 parties', rw: 'c', n: 25 },
+      { type: 'win', goal: 2, text: 'Gagner 2 combats', rw: 'g', n: 2 },
+      { type: 'char', param: ch, goal: 2, text: 'Jouer 2 parties avec ' + ch, rw: 'c', n: 30 },
+      { type: 'earn', goal: 80, text: 'Gagner 80 pièces en combat', rw: 'g', n: 1 },
+      { type: 'rm', param: mp, goal: 1, text: 'Gagner une manche sur la map ' + MAPN[mp], rw: 'g', n: 1 }];
+    save.quests = { day: dayKey(), list: shuf(pool).slice(0, 4).map(q => ({ ...q, p: 0, done: 0 })) }; persist();
+  }
+  return save.quests.list;
+}
+function qTrack(type, n, param) {
+  questList().forEach(q => {
+    if (q.done || q.type !== type || (q.param !== undefined && String(q.param) !== String(param))) return;
+    q.p = Math.min(q.goal, q.p + n);
+    if (q.p >= q.goal) { q.done = 1; if (q.rw === 'g') save.crystals += q.n; else save.coins += q.n; }
+  });
+  persist();
+}
+const leftTxt = () => { const l = new Date().setHours(24, 0, 0, 0) - Date.now(); return Math.floor(l / 3600000) + ' h ' + Math.floor(l % 3600000 / 60000) + ' min'; };
+const questsHtml = () => `<h2>📜 Quêtes du jour</h2><p>${bank()} · renouvelées à minuit (dans ${leftTxt()})</p><div class="cards">${questList().map(q => `<div class="card" style="width:190px;cursor:default;border-color:${q.done ? '#2ecc71' : '#444'}"><b>${q.text}</b><br>Progression : ${q.p} / ${q.goal}<br>Récompense : ${q.n} ${q.rw === 'g' ? '💎' : '🪙'}<br>${q.done ? '✓ Terminée !' : ''}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 const shopHtml = () => {
   const items = dailyIds().map(id => SHOP.find(q => q.id === id)).filter(Boolean);
-  const left = new Date().setHours(24, 0, 0, 0) - Date.now(), hh = Math.floor(left / 3600000), mm = Math.floor(left % 3600000 / 60000);
-  return `<h2>🛒 Boutique du jour</h2><p>🪙 ${save.coins} pièces · nouvelle sélection à minuit (dans ${hh} h ${mm} min)</p>` + (items.length
-    ? `<div class="cards">${items.map(q => `<div class="card shopc"><b>${q.name}</b><br>${q.type === 'skin' ? 'Skin · ' + q.char : 'Personnage'}<br>${q.desc || ''}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.coins < q.price ? 'disabled' : ''} onclick="buy('${q.id}')">${q.price} 🪙</button>`}</div>`).join('')}</div>`
-    : '<p>Tu possèdes déjà tout ce que la boutique propose 🎉</p>') + `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
+  return `<h2>🎨 Boutique de skins</h2><p>${bank()} · 3 skins par jour, nouvelle sélection à minuit (dans ${leftTxt()})</p>` + (items.length
+    ? `<div class="cards">${items.map(q => `<div class="card shopc"><b>${q.name}</b><br>Skin · ${q.char}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.coins < q.price ? 'disabled' : ''} onclick="buy('${q.id}')">${q.price} 🪙</button>`}</div>`).join('')}</div>`
+    : '<p>Tu possèdes déjà tous les skins 🎉</p>') + `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 };
+const charShopHtml = () => `<h2>💎 Boutique de personnages</h2><p>${bank()} · 1 cristal par combat gagné, plus les quêtes</p><div class="cards">${SHOP.filter(q => q.type === 'char').map(q => `<div class="card shopc"><b>${q.name}</b><br>${q.desc}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.crystals < CR[q.id] ? 'disabled' : ''} onclick="buyChar('${q.id}')">${CR[q.id]} 💎</button>`}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
+
 function statsHtml() {
   const s = save.stats;
   const top = Object.entries(s.byChar)
@@ -229,14 +267,16 @@ function ui() {
   let h = '';
   ov.className = me >= 0 && S && S.p === 'end' ? 'end' : '';
   if (me < 0 && searching) h = `<h2>🔎 Recherche d’un adversaire…</h2><p>Tu seras mis face à un joueur aléatoire.</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
-  else if (me < 0) h = view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : `<h1>⚔️ Duel Arena</h1><p>🪙 ${save.coins} pièces</p>${err ? `<p style="color:#f66">${err}</p>` : ''}
+  else if (me < 0) h = view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : `<h1>⚔️ Duel Arena</h1><p>${bank()}</p>${err ? `<p style="color:#f66">${err}</p>` : ''}
     <button onclick="search()" style="background:#e67e22">🎲 Matchmaking (adversaire aléatoire)</button>
     <button onclick="go({t:'create'})">Créer une partie multijoueur</button>
     <button onclick="go({t:'bot'})" style="background:#16a085">🤖 Jouer contre un bot</button>
     <div>ou <input id="cd" maxlength="4" placeholder="CODE" value="${location.hash.slice(1)}"> <button onclick="go({t:'join',code:document.getElementById('cd').value})">Rejoindre</button></div>
     <button onclick="openTraining()" style="background:#16a085">🎯 Mode entraînement</button>
     <button onclick="view='stats';ui()" style="background:#2980b9">📊 Statistiques</button>
-    <button onclick="view='shop';ui()" style="background:#8e44ad">🛒 Boutique</button>`;
+    <button onclick="view='quests';ui()" style="background:#c0392b">📜 Quêtes du jour</button>
+    <button onclick="view='chars';ui()" style="background:#8e44ad">💎 Boutique persos</button>
+    <button onclick="view='shop';ui()" style="background:#8e44ad">🎨 Boutique skins</button>`;
   else if (!S || S.p === 'wait') h = `<h2>En attente de l’adversaire…</h2><p>Code : <b style="font-size:34px">${code}</b></p><p>Ou envoie-lui ce lien :<br><b>${location.origin}/#${code}</b></p>${quitBtn}`;
   else if (S.p === 'select') {
     const ii = infoIdx != null ? infoIdx : (S.sel[me] != null ? S.sel[me] : 0), ic = chars[ii];
@@ -247,7 +287,7 @@ function ui() {
     <p style="font-size:12px;opacity:.8;margin:2px">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques · U ou Espace : ultime (barre pleine)</p>${quitBtn}`;
   }
   else if (S.p === 'training') { ov.style.display = 'none'; last = ''; return; }
-  else if (S.p === 'end') h = `<p style="font-size:18px">🪙 +${earned} pièces (total : ${save.coins})</p>${S.ag[me] ? '<p>En attente de l’adversaire…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
+  else if (S.p === 'end') h = `<p style="font-size:18px">🪙 +${earned} pièces · 💎 +${earnedCr} cristal (total : ${save.coins} 🪙 / ${save.crystals} 💎)</p>${S.ag[me] ? '<p>En attente de l’adversaire…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
   else { ov.style.display = 'none'; last = ''; return; }
   if (h !== last) { ov.innerHTML = h; last = h; }
   ov.style.display = 'flex';
@@ -400,6 +440,7 @@ function fighter(f, i) {
     [-1, 1].forEach(d => { LN('#5d4037', 1.5, d * 13, -100, d * 8, -100); LN('#5d4037', 1.5, d * 13, -96, d * 8, -97); });
     R('#000', s * 6 - 2, -104, 4, 4);
     Y('#f9e03b', [[-15, -104], [-19, -120], [-8, -113], [-6, -130], [2, -115], [8, -131], [12, -113], [21, -121], [15, -104]]);
+    if (lk === 'sage') { R('#e8601c', s * 2, -107, 11, 3); R('#111', -22, -38, 44, 9); C('#f1c40f', s * 6, -102, 2); }
     R('#2c5fa8', -15, -110, 30, 5); R('#bdc3c7', -6, -110, 12, 5);
     const w = Math.sin(t / 85) * 5;
     Y('#2c5fa8', [[-s * 15, -108], [-s * 38, -104 + w], [-s * 36, -110 + w], [-s * 15, -112]]);
