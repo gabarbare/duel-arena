@@ -28,16 +28,21 @@ const CH = [
     { n: 'Écrasement', type: 'm', su: 18, ac: 6, rc: 28, cd: 90, dmg: 26, rng: 90, h: 100, kb: 12, st: 28, both: 1 },
     { n: 'Séisme (au sol)', type: 'p', su: 14, ac: 1, rc: 24, cd: 120, dmg: 15, vx: 5, r: 20, kb: 11, st: 26, low: 1 },
     { n: 'Poing du Géant', ult: 1, ub: 1, type: 'm', su: 22, ac: 6, rc: 34, cd: 0, dmg: 45, rng: 105, h: 120, kb: 20, st: 44, lift: -8 }] },
-  { name: 'Luffy', desc: 'Pirate élastique, coups à distance', hp: 100, spd: 4.4, jmp: 13.5, color: '#3b6fd8', atk: [
-    { n: 'Pistol', type: 'm', su: 8, ac: 4, rc: 12, cd: 10, dmg: 7, rng: 150, h: 26, kb: 6, st: 14 },
-    { n: 'Bazooka', type: 'm', su: 16, ac: 5, rc: 22, cd: 50, dmg: 16, rng: 115, h: 50, kb: 15, st: 28 },
-    { n: 'Gear Second', type: 'buff', su: 10, ac: 1, rc: 12, cd: 420, dur: 300 },
-    { n: 'Gatling', ult: 1, ub: 1, type: 'm', su: 10, ac: 24, rc: 16, cd: 0, dmg: 7, rng: 190, h: 46, kb: 2, st: 10, multi: 6 }] },
   { name: 'Chevalier', desc: 'Épée et bouclier, défense solide (blocage renforcé)', hp: 130, spd: 3.2, jmp: 12, color: '#aab7c4', blk: 0.05, atk: [
     { n: 'Estoc', type: 'm', su: 7, ac: 4, rc: 12, cd: 8, dmg: 8, rng: 88, h: 26, kb: 6, st: 15 },
     { n: 'Coup de bouclier', type: 'm', su: 10, ac: 4, rc: 16, cd: 20, dmg: 9, rng: 50, h: 85, kb: 18, st: 30 },
     { n: 'Taillade', type: 'm', su: 14, ac: 5, rc: 22, cd: 70, dmg: 17, rng: 95, h: 110, kb: 11, st: 26 },
     { n: 'Lame divine', ult: 1, ub: 1, type: 'p', su: 20, ac: 1, rc: 24, cd: 0, dmg: 34, vx: 13, r: 26, kb: 16, st: 34, vis: 3 }] },
+  { name: 'Kairos', desc: 'Horloger du temps : écho, rembobinage, arrêt du temps', hp: 95, spd: 4.4, jmp: 13.5, color: '#d9b84a', atk: [
+    { n: 'Aiguille', type: 'm', su: 6, ac: 4, rc: 10, cd: 8, dmg: 7, rng: 72, h: 30, kb: 5, st: 14 },
+    { n: 'Écho temporel (frappe différée)', type: 'echo', su: 8, ac: 1, rc: 14, cd: 150, dmg: 16, kb: 12, st: 26, warn: 50, rad: 75 },
+    { n: 'Rembobinage (retour 2 s en arrière)', type: 'rewind', su: 6, ac: 1, rc: 12, cd: 180, heal: .6 },
+    { n: 'Arrêt du temps', ult: 1, ub: 1, type: 'timestop', su: 14, ac: 1, rc: 12, cd: 0, dur: 120, mult: 1.2 }] }
+  { name: 'Luffy', desc: 'Pirate élastique, coups à distance', hp: 100, spd: 4.4, jmp: 13.5, color: '#3b6fd8', atk: [
+    { n: 'Pistol', type: 'm', su: 8, ac: 4, rc: 12, cd: 10, dmg: 7, rng: 150, h: 26, kb: 6, st: 14 },
+    { n: 'Bazooka', type: 'm', su: 16, ac: 5, rc: 22, cd: 50, dmg: 16, rng: 115, h: 50, kb: 15, st: 28 },
+    { n: 'Gear Second', type: 'buff', su: 10, ac: 1, rc: 12, cd: 420, dur: 300 },
+    { n: 'Gatling', ult: 1, ub: 1, type: 'm', su: 10, ac: 24, rc: 16, cd: 0, dmg: 7, rng: 190, h: 46, kb: 2, st: 10, multi: 6 }] },
   { name: 'Naruto', desc: 'Ninja de Konoha, clones et Rasengan', hp: 100, spd: 4.8, jmp: 14, color: '#ff7f27', atk: [
     { n: 'Uzumaki Rendan', type: 'm', su: 8, ac: 12, rc: 14, cd: 40, dmg: 4, rng: 62, h: 50, kb: 2, st: 9, multi: 4 },
     { n: 'Rasengan', type: 'm', su: 16, ac: 5, rc: 22, cd: 80, dmg: 18, rng: 72, h: 40, kb: 16, st: 30 },
@@ -102,13 +107,8 @@ const CH = [
     { n: 'Tentacule', type: 'm', su: 5, ac: 4, rc: 9, cd: 8, dmg: 7, rng: 75, h: 30, kb: 5, st: 14 },
     { n: 'Dash éclair', type: 'sd', su: 2, ac: 5, rc: 8, cd: 45, spd: 34 },
     { n: 'Fouet (2 s)', type: 'm', su: 6, ac: 120, rc: 14, cd: 300, dmg: 5, rng: 110, h: 100, kb: 4, st: 7, both: 1, multi: 12 },
-    { n: 'Mach 20 enchaîné', ult: 1, ub: 1, type: 'zz', su: 12, ac: 40, rc: 18, cd: 0, dmg: 12, kb: 3, st: 14, spd: 28, len: 12 }] },
+    { n: 'Mach 20 enchaîné', ult: 1, ub: 1, type: 'zz', su: 12, ac: 40, rc: 18, cd: 0, dmg: 12, kb: 3, st: 14, spd: 28, len: 12 }] }
   // Kairos (perso original) : echo = frappe différée sur la position marquée | rewind = retour 2 s en arrière (rend une partie des PV perdus) | timestop = fige l'ennemi, ses dégâts sont mis de côté puis infligés d'un coup
-  { name: 'Kairos', desc: 'Horloger du temps : écho, rembobinage, arrêt du temps', hp: 95, spd: 4.4, jmp: 13.5, color: '#d9b84a', atk: [
-    { n: 'Aiguille', type: 'm', su: 6, ac: 4, rc: 10, cd: 8, dmg: 7, rng: 72, h: 30, kb: 5, st: 14 },
-    { n: 'Écho temporel (frappe différée)', type: 'echo', su: 8, ac: 1, rc: 14, cd: 150, dmg: 16, kb: 12, st: 26, warn: 50, rad: 75 },
-    { n: 'Rembobinage (retour 2 s en arrière)', type: 'rewind', su: 6, ac: 1, rc: 12, cd: 540, heal: .6 },
-    { n: 'Arrêt du temps', ult: 1, ub: 1, type: 'timestop', su: 14, ac: 1, rc: 12, cd: 0, dur: 120, mult: 1.2 }] }
 ];
 const CHARS = CH.map(({ name, desc, hp, color, atk, alt }) => ({ name, desc, hp, color, atk: atk.map(a => a.n), alt: alt ? alt.map(a => a.n) : null }));
 
