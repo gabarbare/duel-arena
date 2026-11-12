@@ -336,6 +336,11 @@ function openChest() {
   save.icons.push(chestNew); save.chests--; persist(); ui();
 }
 const chestHtml = () => `<div style="border:1px solid #66552a;border-radius:10px;padding:8px 12px;max-width:300px">🎁 Coffrets : <b>${save.chests || 0}</b> · Icônes : ${save.icons.length}/${Object.keys(LOGOS).length}<br><button onclick="openChest()" ${(save.chests || 0) > 0 ? '' : 'disabled'}>Ouvrir un coffret</button>${chestErr ? `<br><small>${chestErr}</small>` : ''}${chestNew ? `<br>🎉 Nouvelle icône : <b>${LOGOS[chestNew].n}</b><br>${iconHtml(chestNew, 56)}` : ''}</div>`;
+const botLvlHtml = () => `<h2>🤖 Niveau du bot</h2><p>Choisis la difficulté, puis ton personnage</p>
+  <button onclick="go({t:'bot',lvl:0})" style="background:#27ae60">😊 Facile<br><small>Lent, hésitant, bloque rarement</small></button>
+  <button onclick="go({t:'bot',lvl:1})" style="background:#e67e22">😐 Moyen<br><small>Comportement classique</small></button>
+  <button onclick="go({t:'bot',lvl:2})" style="background:#c0392b">😈 Difficile<br><small>Rapide, bloque souvent, enchaîne les combos</small></button>
+  <button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 const ICONS = ['🥷', '🧙', '⚔️', '🛡️', '🐉', '🦊', '🐺', '👑', '🔥', '⚡', '🏴‍☠️', '🤖'];
 const xpNeed = L => 100 * 2 ** Math.floor(L / 5);
 function lvlInfo() {
@@ -450,7 +455,7 @@ function ui() {
   let h = '';
   ov.className = me >= 0 && S && S.p === 'end' ? 'end' : (me < 0 && !searching && view === 'menu' ? 'menu-screen' : '');
   if (me < 0 && searching) h = `<h2>🔎 Recherche d’un adversaire…</h2><p>Tu seras mis face à un joueur aléatoire.</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
-  else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'friends' ? friendsHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : `<div class="menu-top">
+  else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'botlvl' ? botLvlHtml() : view === 'friends' ? friendsHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : `<div class="menu-top">
       <h1>⚔️ Duel Arena</h1>
       <div class="menu-currency">${bank()}</div>
     </div>
@@ -466,7 +471,7 @@ function ui() {
         <h2>⚔️ Combats</h2>
         <button onclick="search()" style="background:#e67e22">🎲 Matchmaking</button>
         <button onclick="go({t:'create'})">🌐 Créer une partie</button>
-        <button onclick="go({t:'bot'})" style="background:#16a085">🤖 Jouer contre un bot</button>
+        <button onclick="view='botlvl';ui()" style="background:#16a085">🤖 Jouer contre un bot</button>
         <div class="menu-join">
           <input id="cd" maxlength="4" placeholder="CODE" value="${location.hash.slice(1)}">
           <button onclick="go({t:'join',code:document.getElementById('cd').value})">Rejoindre</button>
