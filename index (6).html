@@ -1,4 +1,6 @@
 
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -197,8 +199,8 @@ const SHOP = [
   { id: 'skin_deku_dark', type: 'skin', char: 'Deku', name: 'Dark Deku', price: 100, pal: { '#2e7d32': '#17171f', '#1b5e20': '#0b0b11', '#c0392b': '#8e1b2f', '#b0bec5': '#3a3a46', '#fff': '#ff3b3b', '#d5dbdb': '#555' } },
   { id: 'skin_naruto_hermite', type: 'skin', char: 'Naruto', name: 'Naruto Mode Hermite', price: 100, look: 'sage', pal: { '#ff7f27': '#d0451b', '#2c5fa8': '#222', '#2c3e50': '#111' } },
 ];
-let pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
-let save = { coins: 0, crystals: 0, xp: 0, profile: null, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
+let fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
+let save = { coins: 0, crystals: 0, xp: 0, profile: null, friends: [], fid: null, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
 if (!save.stats || typeof save.stats !== 'object') save.stats = { played: 0, wins: 0, losses: 0, byChar: {} };
 if (!save.stats.byChar || typeof save.stats.byChar !== 'object') save.stats.byChar = {};
 save.stats.played = Number(save.stats.played) || 0;
@@ -211,11 +213,15 @@ const locked = name => SHOP.some(q => q.type === 'char' && q.char === name && !o
 const dayKey = () => { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
 function connect(first) {
   const w = ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host);
-  w.onopen = () => w.send(JSON.stringify(first));
+  w.onopen = () => { if (save.profile) w.send(JSON.stringify({ t: 'hello', me: myPub() })); w.send(JSON.stringify(first)); };
   w.onmessage = e => {
     if (w !== ws) return;
     const m = JSON.parse(e.data);
     if (m.t === 'chars') { chars = m.chars; view = 'training'; ui(); }
+    else if (m.t === 'friends') {
+      fList = m.list;
+      if (fAdd) { if (m.missing.includes(fAdd)) fErr = 'Code introuvable'; else { save.friends.push(fAdd); persist(); fDraft = ''; } fAdd = null; }
+    }
     else if (m.t === 'room') { me = m.idx; chars = m.chars; maps = m.maps; code = m.code; searching = false; }
     else if (m.t === 'err') { err = m.m; me = -1; S = null; searching = false; w.close(); }
     else if (m.t === 's') {
@@ -273,6 +279,38 @@ const CR = { perso_luffy: 30, perso_naruto: 30, perso_deku: 30, perso_koro: 50, 
 const MAPN = ['Dojo', 'Volcan', 'Ville de nuit', 'Banquise', 'Lune'];
 const ALLN = ['Bruno', 'Zéphyr', 'Kaze', 'Viking', 'Chevalier', 'Kairos', 'Luffy', 'Naruto', 'Gojo', 'Deku', 'Denji', 'Yugo', 'Shinra', 'Eren', 'Koro'];
 // ===== PROFIL & NIVEAUX (max 10) : niveaux 1-4 = 100 XP chacun, niveaux 5-9 = 200 XP chacun (x2 tous les 5 niveaux) =====
+// ===== AMIS : code ami personnel, profil public envoyé au serveur =====
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function myCode() {
+  if (!save.fid) { save.fid = Array.from({ length: 6 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.random() * 32 | 0]).join(''); persist(); }
+  return save.fid;
+}
+function topChar() {
+  const e = Object.entries(save.stats.byChar).sort((a, b) => (b[1].played || 0) - (a[1].played || 0))[0];
+  return e ? e[0] : '—';
+}
+const myPub = () => ({ code: myCode(), name: save.profile.name, icon: save.profile.icon, lvl: lvlInfo().L, top: topChar() });
+function syncFriends(add) {
+  fErr = ''; fAdd = add || null;
+  const list = save.friends.slice(); if (add && !list.includes(add)) list.push(add);
+  try { if (ws) ws.close(); } catch (e) {}
+  connect({ t: 'friends', me: myPub(), list });
+}
+function openFriends() { view = 'friends'; syncFriends(); ui(); }
+function addFriend() {
+  const c = fDraft.trim().toUpperCase();
+  if (!c) return;
+  if (c === myCode()) { fErr = 'C’est ton propre code !'; ui(); return; }
+  if (save.friends.includes(c)) { fErr = 'Déjà dans tes amis'; ui(); return; }
+  syncFriends(c); ui();
+}
+function removeFriend(c) { save.friends = save.friends.filter(q => q !== c); persist(); ui(); }
+const friendsHtml = () => `<h2>👥 Amis</h2>${fErr ? `<p style="color:#f66">${fErr}</p>` : ''}
+  <p>Ton code ami : <b style="font-size:22px">${myCode()}</b><br><small>Donne-le à tes amis pour qu’ils t’ajoutent</small></p>
+  <div><input maxlength="6" placeholder="CODE" value="${esc(fDraft)}" oninput="fDraft=this.value"> <button onclick="addFriend()">➕ Ajouter</button></div>
+  <div class="cards">${save.friends.length ? save.friends.map(c => { const p = fList.find(q => q.code === c), rm = `<button onclick="removeFriend('${esc(c)}')" style="background:#7f8c8d;padding:4px 10px">Retirer</button>`;
+    return p ? `<div class="card" style="width:190px;cursor:default"><span style="font-size:28px">${esc(p.icon)}</span> <b>${esc(p.name)}</b><br>Niveau ${+p.lvl}<br>⭐ ${esc(p.top)}<br>${rm}</div>` : `<div class="card" style="width:190px;cursor:default">${esc(c)}<br>Profil introuvable<br>${rm}</div>`; }).join('') : '<p>Aucun ami pour le moment</p>'}</div>
+  <button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 const ICONS = ['🥷', '🧙', '⚔️', '🛡️', '🐉', '🦊', '🐺', '👑', '🔥', '⚡', '🏴‍☠️', '🤖'];
 const xpNeed = L => 100 * 2 ** Math.floor(L / 5);
 function lvlInfo() {
@@ -286,7 +324,7 @@ function addXp(n) {
   persist();
 }
 const xpBar = () => { const v = lvlInfo(); return `<div style="width:100%;height:12px;background:#000;border-radius:6px;overflow:hidden;margin:3px 0"><div style="width:${v.need ? v.xp / v.need * 100 : 100}%;height:100%;background:#2ecc71"></div></div><small>${v.need ? v.xp + ' / ' + v.need + ' XP' : 'Niveau maximum !'}</small>`; };
-const profileBar = () => save.profile ? `<div onclick="openProfile()" style="cursor:pointer;display:flex;align-items:center;gap:12px;background:#222;border:1px solid #66552a;border-radius:10px;padding:6px 14px;max-width:360px;width:100%;box-sizing:border-box"><span style="font-size:30px">${save.profile.icon}</span><div style="flex:1;text-align:left"><b>${save.profile.name}</b> · Niv. ${lvlInfo().L}${xpBar()}</div></div>` : '';
+const profileBar = () => save.profile ? `<div onclick="openProfile()" style="cursor:pointer;display:flex;align-items:center;gap:12px;background:#222;border:1px solid #66552a;border-radius:10px;padding:6px 14px;max-width:360px;width:100%;box-sizing:border-box"><span style="font-size:30px">${save.profile.icon}</span><div style="flex:1;text-align:left"><b>${esc(save.profile.name)}</b> · Niv. ${lvlInfo().L} · ⭐ ${topChar()}${xpBar()}</div></div>` : '';
 function openProfile() { pName = save.profile.name; pIcon = save.profile.icon; pErr = ''; view = 'profile'; ui(); }
 function setIcon(i) { pIcon = ICONS[i]; ui(); }
 function saveProfile() {
@@ -297,7 +335,7 @@ function saveProfile() {
 const profileHtml = () => `<h2>${save.profile ? '👤 Mon profil' : '👤 Crée ton profil'}</h2>${pErr ? `<p style="color:#f66">${pErr}</p>` : ''}
   <input maxlength="14" placeholder="Pseudo" value="${pName.replace(/"/g, '')}" oninput="pName=this.value" style="width:200px;text-transform:none">
   <div class="cards">${ICONS.map((ic, i) => `<div class="card ${pIcon === ic ? 'sel' : ''}" style="width:46px;text-align:center;font-size:26px" onclick="setIcon(${i})">${ic}</div>`).join('')}</div>
-  ${save.profile ? `<div style="width:260px"><b>Niveau ${lvlInfo().L}</b>${xpBar()}</div><p style="font-size:12px;opacity:.8">+20 XP par partie, +30 XP par victoire, +40 XP par quête</p>` : ''}
+  ${save.profile ? `<div style="width:260px"><b>Niveau ${lvlInfo().L}</b>${xpBar()}</div><p>🆔 Code ami : <b>${myCode()}</b> · ⭐ Perso le plus joué : <b>${topChar()}</b></p><p style="font-size:12px;opacity:.8">+20 XP par partie, +30 XP par victoire, +40 XP par quête</p>` : ''}
   <button onclick="saveProfile()">✔ ${save.profile ? 'Enregistrer' : 'Créer mon profil'}</button>${save.profile ? `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : ''}`;
 const bank = () => `🪙 ${save.coins} pièces · 💎 ${save.crystals} cristaux`;
 const shuf = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -387,7 +425,7 @@ function ui() {
   let h = '';
   ov.className = me >= 0 && S && S.p === 'end' ? 'end' : (me < 0 && !searching && view === 'menu' ? 'menu-screen' : '');
   if (me < 0 && searching) h = `<h2>🔎 Recherche d’un adversaire…</h2><p>Tu seras mis face à un joueur aléatoire.</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
-  else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : `<div class="menu-top">
+  else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'friends' ? friendsHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : `<div class="menu-top">
       <h1>⚔️ Duel Arena</h1>
       <div class="menu-currency">${bank()}</div>
     </div>
@@ -413,6 +451,7 @@ function ui() {
       <section class="menu-group menu-info">
         <h2>📈 Profil</h2>
         <button onclick="view='stats';ui()" style="background:#2980b9">📊 Statistiques</button>
+        <button onclick="openFriends()" style="background:#2980b9">👥 Amis</button>
         <button onclick="view='quests';ui()" style="background:#c0392b">📜 Quêtes du jour</button>
       </section>
     </div>`;
