@@ -14,9 +14,9 @@ const CH = [
     { n: 'Uppercut', type: 'm', su: 12, ac: 6, rc: 24, cd: 100, dmg: 24, rng: 55, h: 80, kb: 12, st: 32, lift: -11 },
     { n: 'Charge rageuse', ult: 1, ub: 1, type: 'd', su: 10, ac: 14, rc: 20, cd: 0, dmg: 30, rng: 50, h: 90, kb: 18, st: 50, lift: -9, spd: 18 }] },
   { name: 'Zéphyr', desc: 'Mage, attaques à distance', hp: 90, spd: 3.6, jmp: 13, color: '#9b59b6', atk: [
-    { n: 'Éclair', type: 'p', su: 6, ac: 1, rc: 8, cd: 18, dmg: 5, vx: 12, r: 7, kb: 3, st: 12 },
-    { n: 'Boule de feu', type: 'p', su: 12, ac: 1, rc: 16, cd: 70, dmg: 14, vx: 7, r: 16, kb: 10, st: 24 },
-    { n: 'Rafale (x3)', type: 'p', su: 10, ac: 1, rc: 18, cd: 110, dmg: 6, vx: 9, r: 8, kb: 5, st: 14, cnt: 3 },
+    { n: 'Éclair', type: 'p', su: 6, ac: 1, rc: 8, cd: 23, dmg: 5, vx: 12, r: 7, kb: 3, st: 12 },
+    { n: 'Boule de feu', type: 'p', su: 12, ac: 1, rc: 36, cd: 70, dmg: 14, vx: 7, r: 16, kb: 10, st: 24 },
+    { n: 'Rafale (x3)', type: 'p', su: 10, ac: 1, rc: 34, cd: 110, dmg: 6, vx: 9, r: 8, kb: 5, st: 14, cnt: 3 },
     { n: 'Foudre céleste', ult: 1, ub: 1, type: 'sky', su: 20, ac: 1, rc: 22, cd: 0, dmg: 36, kb: 12, st: 36, warn: 28, strike: 8 }] },
   { name: 'Kaze', desc: 'Ninja, rapide avec dash', hp: 85, spd: 5.6, jmp: 14.5, color: '#2ecc71', atk: [
     { n: 'Lame', type: 'm', su: 3, ac: 3, rc: 6, cd: 4, dmg: 4, rng: 55, h: 35, kb: 3, st: 11 },
@@ -49,8 +49,8 @@ const CH = [
     { n: 'Kage Bunshin', type: 'p', su: 9, ac: 1, rc: 14, cd: 100, dmg: 7, vx: 8, r: 16, kb: 8, st: 18, cnt: 2, clone: 1, cy: 45, vis: 1 },
     { n: 'Rasenshuriken', ult: 1, ub: 1, type: 'p', su: 24, ac: 1, rc: 26, cd: 0, dmg: 38, vx: 9, r: 30, kb: 18, st: 36, vis: 2 }] },
   { name: 'Gojo', desc: 'Sorcier suprême : sphères Rouge/Bleu, soin, Infini', hp: 100, spd: 4.2, jmp: 13.5, color: '#6ec6ff', atk: [
-    { n: 'Rouge (repousse)', type: 'p', su: 9, ac: 1, rc: 14, cd: 45, dmg: 8, vx: 9, r: 16, kb: 24, st: 24, vis: 4 },
-    { n: 'Bleu (attire)', type: 'p', su: 9, ac: 1, rc: 14, cd: 60, dmg: 5, vx: 6, r: 16, kb: 20, st: 26, vis: 5, pull: 1 },
+    { n: 'Rouge (repousse)', type: 'p', su: 9, ac: 1, rc: 14, cd: 75, dmg: 7, vx: 9, r: 16, kb: 24, st: 24, vis: 4 },
+    { n: 'Bleu (attire)', type: 'p', su: 9, ac: 1, rc: 14, cd: 70, dmg: 5, vx: 6, r: 16, kb: 20, st: 26, vis: 5, pull: 1 },
     { n: 'Soin (annulé si touché)', type: 'heal', su: 8, ac: 90, rc: 10, cd: 300, hps: 0.22 },
     { n: 'Infini (2e barre de vie)', ult: 1, type: 'shield', su: 12, ac: 1, rc: 16, cd: 0, val: 60 }] },
   { name: 'Deku', desc: 'Héros en herbe, One For All', hp: 105, spd: 4.4, jmp: 14, color: '#388e3c', atk: [
