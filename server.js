@@ -546,7 +546,7 @@ const clean = (v, n) => String(v || '').replace(/[<>&"'`\\]/g, '').trim().slice(
 function registerProfile(me) {
   me = me || {}; const code = String(me.code || '').toUpperCase();
   if (!/^[A-Z2-9]{6}$/.test(code)) return;
-  profiles[code] = { code, name: clean(me.name, 14) || 'Joueur', icon: clean(me.icon, 8) || '🥷', lvl: Math.max(1, Math.min(10, +me.lvl || 1)), top: clean(me.top, 20) || '—' };
+  profiles[code] = { code, name: clean(me.name, 14) || 'Joueur', icon: clean(me.icon, 8) || '🥷', lvl: Math.max(1, Math.min(10, +me.lvl || 1)), top: clean(me.top, 20) || '—', ttl: clean(me.ttl, 12) };
   clearTimeout(ptimer); ptimer = setTimeout(() => fs.writeFile(PFILE, JSON.stringify(profiles), () => {}), 1000);
 }
 const tx = (ws, o) => ws.readyState === 1 && ws.send(JSON.stringify(o));
