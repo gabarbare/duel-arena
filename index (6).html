@@ -114,8 +114,8 @@ const SHOP = [
   { id: 'skin_deku_dark', type: 'skin', char: 'Deku', name: 'Dark Deku', price: 100, pal: { '#2e7d32': '#17171f', '#1b5e20': '#0b0b11', '#c0392b': '#8e1b2f', '#b0bec5': '#3a3a46', '#fff': '#ff3b3b', '#d5dbdb': '#555' } },
   { id: 'skin_naruto_hermite', type: 'skin', char: 'Naruto', name: 'Naruto Mode Hermite', price: 100, look: 'sage', pal: { '#ff7f27': '#d0451b', '#2c5fa8': '#222', '#2c3e50': '#111' } },
 ];
-let earnedCr = 0, rw = 0;
-let save = { coins: 0, crystals: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
+let earnedCr = 0, rw = 0, pre = null, kNew = 0;
+let save = { coins: 0, crystals: 0, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
 if (!save.stats || typeof save.stats !== 'object') save.stats = { played: 0, wins: 0, losses: 0, byChar: {} };
 if (!save.stats.byChar || typeof save.stats.byChar !== 'object') save.stats.byChar = {};
 save.stats.played = Number(save.stats.played) || 0;
@@ -136,7 +136,7 @@ function connect(first) {
     else if (m.t === 'room') { me = m.idx; chars = m.chars; maps = m.maps; code = m.code; searching = false; }
     else if (m.t === 'err') { err = m.m; me = -1; S = null; searching = false; w.close(); }
     else if (m.t === 's') {
-      S = m; if (m.w) { if (m.w[me] > rw) qTrack('rm', 1, m.mp); rw = m.w[me]; }
+      S = m; if (m.p !== 'select') pre = null; if (m.w) { if (m.w[me] > rw) qTrack('rm', 1, m.mp); rw = m.w[me]; }
       if (m.p === 'end' && m.co) {
         if (!paid) {
           paid = 1;
@@ -152,10 +152,10 @@ function connect(first) {
           cs.played++;
           if (won) cs.wins++; else cs.losses++;
           earnedCr = won ? 1 : 0; save.crystals += earnedCr;
-          qTrack('play', 1); qTrack('char', 1, charName); qTrack('earn', earned); if (won) qTrack('win', 1);
+          qTrack('play', 1); qTrack('char', 1, charName); qTrack('earn', earned); if (won) { qTrack('win', 1); kairosWin(); }
           persist();
         }
-      } else paid = 0;
+      } else { paid = 0; kNew = 0; }
     }
     ui();
   };
@@ -171,13 +171,22 @@ function openTraining() {
 function startTraining(i) {
   if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'train', c: i, sk: save.skin[chars[i].name] || '' }));
 }
-const pick = i => { infoIdx = i; if (locked(chars[i].name)) { ui(); return; } ws.send(JSON.stringify({ t: 'pick', c: i, sk: save.skin[chars[i].name] || '' })); ui(); };
+// clic sur un perso = présélection (on peut changer de skin), puis "Valider" envoie le choix
+const pick = i => { infoIdx = i; if (!locked(chars[i].name)) pre = i; ui(); };
+const sendPick = i => ws.send(JSON.stringify({ t: 'pick', c: i, sk: save.skin[chars[i].name] || '' }));
+const confirmPick = () => { if (pre != null && S && S.p === 'select' && S.sel[me] == null) { sendPick(pre); ui(); } };
+function kairosWin() {
+  kNew = 0; if (owns('perso_kairos')) return;
+  save.kw = (save.kw || 0) + 1;
+  if (save.kw >= 8) { save.owned.push('perso_kairos'); kNew = 1; }
+  persist();
+}
 const again = () => ws.send(JSON.stringify({ t: 'again' }));
 function leave() { me = -1; S = null; err = ''; view = 'menu'; searching = false; try { ws.close(); } catch (e) {} ui(); }
-function info(i) { if (infoIdx !== i) { infoIdx = i; ui(); } }
-function setSkin(name, id, i) { save.skin[name] = id; persist(); if (S && S.p === 'select' && S.sel[me] === i) pick(i); ui(); }
+function info(i) { if (pre == null && infoIdx !== i) { infoIdx = i; ui(); } }
+function setSkin(name, id, i) { save.skin[name] = id; persist(); if (S && S.p === 'select' && S.sel[me] === i) sendPick(i); ui(); }
 
-const CR = { perso_luffy: 30, perso_naruto: 30, perso_deku: 30, perso_koro: 50, perso_shinra: 50, perso_eren: 50, perso_kairos: 50, perso_gojo: 80, perso_yugo: 80, perso_denji: 80 };
+const CR = { perso_luffy: 30, perso_naruto: 30, perso_deku: 30, perso_koro: 50, perso_shinra: 50, perso_eren: 50, perso_gojo: 80, perso_yugo: 80, perso_denji: 80 };
 const MAPN = ['Dojo', 'Volcan', 'Ville de nuit', 'Banquise', 'Lune'];
 const ALLN = ['Bruno', 'Zéphyr', 'Kaze', 'Viking', 'Chevalier', 'Kairos', 'Luffy', 'Naruto', 'Gojo', 'Deku', 'Denji', 'Yugo', 'Shinra', 'Eren', 'Koro'];
 const bank = () => `🪙 ${save.coins} pièces · 💎 ${save.crystals} cristaux`;
@@ -223,14 +232,15 @@ function qTrack(type, n, param) {
   persist();
 }
 const leftTxt = () => { const l = new Date().setHours(24, 0, 0, 0) - Date.now(); return Math.floor(l / 3600000) + ' h ' + Math.floor(l % 3600000 / 60000) + ' min'; };
-const questsHtml = () => `<h2>📜 Quêtes du jour</h2><p>${bank()} · renouvelées à minuit (dans ${leftTxt()})</p><div class="cards">${questList().map(q => `<div class="card" style="width:190px;cursor:default;border-color:${q.done ? '#2ecc71' : '#444'}"><b>${q.text}</b><br>Progression : ${q.p} / ${q.goal}<br>Récompense : ${q.n} ${q.rw === 'g' ? '💎' : '🪙'}<br>${q.done ? '✓ Terminée !' : ''}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
+const questsHtml = () => `<h2>📜 Quêtes du jour</h2><p>${bank()} · renouvelées à minuit (dans ${leftTxt()})</p><div class="cards">${kCard()}${questList().map(q => `<div class="card" style="width:190px;cursor:default;border-color:${q.done ? '#2ecc71' : '#444'}"><b>${q.text}</b><br>Progression : ${q.p} / ${q.goal}<br>Récompense : ${q.n} ${q.rw === 'g' ? '💎' : '🪙'}<br>${q.done ? '✓ Terminée !' : ''}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 const shopHtml = () => {
   const items = dailyIds().map(id => SHOP.find(q => q.id === id)).filter(Boolean);
   return `<h2>🎨 Boutique de skins</h2><p>${bank()} · 3 skins par jour, nouvelle sélection à minuit (dans ${leftTxt()})</p>` + (items.length
     ? `<div class="cards">${items.map(q => `<div class="card shopc"><b>${q.name}</b><br>Skin · ${q.char}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.coins < q.price ? 'disabled' : ''} onclick="buy('${q.id}')">${q.price} 🪙</button>`}</div>`).join('')}</div>`
     : '<p>Tu possèdes déjà tous les skins 🎉</p>') + `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 };
-const charShopHtml = () => `<h2>💎 Boutique de personnages</h2><p>${bank()} · 1 cristal par combat gagné, plus les quêtes</p><div class="cards">${SHOP.filter(q => q.type === 'char').map(q => `<div class="card shopc"><b>${q.name}</b><br>${q.desc}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.crystals < CR[q.id] ? 'disabled' : ''} onclick="buyChar('${q.id}')">${CR[q.id]} 💎</button>`}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
+const kCard = () => `<div class="card" style="width:190px;cursor:default;border-color:#d9b84a"><b>⭐ Quête spéciale : Kairos</b><br>Gagner 8 combats<br>${owns('perso_kairos') ? '✓ Débloqué !' : 'Progression : ' + (save.kw || 0) + ' / 8'}</div>`;
+const charShopHtml = () => `<h2>💎 Boutique de personnages</h2><p>${bank()} · 1 cristal par combat gagné, plus les quêtes</p><div class="cards">${kCard()}${SHOP.filter(q => q.type === 'char' && CR[q.id]).map(q => `<div class="card shopc"><b>${q.name}</b><br>${q.desc}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.crystals < CR[q.id] ? 'disabled' : ''} onclick="buyChar('${q.id}')">${CR[q.id]} 💎</button>`}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 
 function statsHtml() {
   const s = save.stats;
@@ -279,15 +289,16 @@ function ui() {
     <button onclick="view='shop';ui()" style="background:#8e44ad">🎨 Boutique skins</button>`;
   else if (!S || S.p === 'wait') h = `<h2>En attente de l’adversaire…</h2><p>Code : <b style="font-size:34px">${code}</b></p><p>Ou envoie-lui ce lien :<br><b>${location.origin}/#${code}</b></p>${quitBtn}`;
   else if (S.p === 'select') {
-    const ii = infoIdx != null ? infoIdx : (S.sel[me] != null ? S.sel[me] : 0), ic = chars[ii];
+    const ii = pre != null ? pre : infoIdx != null ? infoIdx : (S.sel[me] != null ? S.sel[me] : 0), ic = chars[ii];
     const sks = SHOP.filter(q => q.type === 'skin' && q.char === ic.name && owns(q.id)), cur = save.skin[ic.name] || '';
-    h = `<h2 style="margin:2px">Choisis ton combattant</h2><div class="cards">${chars.map((c, i) => `<div class="card sm ${S.sel[me] === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})"><b style="color:${c.color}">${c.name}</b>${locked(c.name) ? '<br>🔒' : ''}</div>`).join('')}</div>
+    h = `<h2 style="margin:2px">Choisis ton combattant</h2><div class="cards">${chars.map((c, i) => `<div class="card sm ${S.sel[me] === i || pre === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})"><b style="color:${c.color}">${c.name}</b>${locked(c.name) ? '<br>🔒' : ''}</div>`).join('')}</div>
     <div class="panel"><b style="color:${ic.color};font-size:15px">${ic.name}</b>${locked(ic.name) ? ' 🔒 à débloquer dans la boutique' : ''} · ${ic.desc} · PV ${ic.hp}<br>${ic.atk.map((a, j) => 'JKLU'[j] + ' : ' + a).join(' &nbsp;·&nbsp; ')}${ic.alt ? '<br>✨ Forme : ' + ic.alt.join(' / ') : ''}${sks.length ? '<br>' + [{ id: '', name: 'Normal' }, ...sks].map(q => `<span class="chip ${cur === q.id ? 'on' : ''}" onclick="event.stopPropagation();setSkin('${ic.name}','${q.id}',${ii})">${q.name}</span>`).join('') : ''}</div>
-    <p style="margin:2px">${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.sel[1 - me] != null ? (S.bot ? '· Bot prêt 🤖' : '· Adversaire prêt ✔') : ''}</p>
+    <button onclick="confirmPick()" ${pre == null || S.sel[me] != null ? 'disabled' : ''}>✔ Valider ${pre != null ? chars[pre].name : ''}</button>
+    <p style="margin:2px">${pre == null && S.sel[me] == null ? 'Clique sur un perso, choisis ton skin, puis valide' : ''}${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.sel[1 - me] != null ? (S.bot ? '· Bot prêt 🤖' : '· Adversaire prêt ✔') : ''}</p>
     <p style="font-size:12px;opacity:.8;margin:2px">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques · U ou Espace : ultime (barre pleine)</p>${quitBtn}`;
   }
   else if (S.p === 'training') { ov.style.display = 'none'; last = ''; return; }
-  else if (S.p === 'end') h = `<p style="font-size:18px">🪙 +${earned} pièces · 💎 +${earnedCr} cristal (total : ${save.coins} 🪙 / ${save.crystals} 💎)</p>${S.ag[me] ? '<p>En attente de l’adversaire…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
+  else if (S.p === 'end') h = `${kNew ? '<p>🔓 Kairos débloqué !</p>' : ''}<p style="font-size:18px">🪙 +${earned} pièces · 💎 +${earnedCr} cristal (total : ${save.coins} 🪙 / ${save.crystals} 💎)</p>${S.ag[me] ? '<p>En attente de l’adversaire…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
   else { ov.style.display = 'none'; last = ''; return; }
   if (h !== last) { ov.innerHTML = h; last = h; }
   ov.style.display = 'flex';
