@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -198,8 +197,8 @@ const SHOP = [
   { id: 'skin_deku_dark', type: 'skin', char: 'Deku', name: 'Dark Deku', price: 100, pal: { '#2e7d32': '#17171f', '#1b5e20': '#0b0b11', '#c0392b': '#8e1b2f', '#b0bec5': '#3a3a46', '#fff': '#ff3b3b', '#d5dbdb': '#555' } },
   { id: 'skin_naruto_hermite', type: 'skin', char: 'Naruto', name: 'Naruto Mode Hermite', price: 100, look: 'sage', pal: { '#ff7f27': '#d0451b', '#2c5fa8': '#222', '#2c3e50': '#111' } },
 ];
-let earnedCr = 0, rw = 0, pre = null, kNew = 0;
-let save = { coins: 0, crystals: 0, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
+let pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
+let save = { coins: 0, crystals: 0, xp: 0, profile: null, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
 if (!save.stats || typeof save.stats !== 'object') save.stats = { played: 0, wins: 0, losses: 0, byChar: {} };
 if (!save.stats.byChar || typeof save.stats.byChar !== 'object') save.stats.byChar = {};
 save.stats.played = Number(save.stats.played) || 0;
@@ -235,11 +234,11 @@ function connect(first) {
           const cs = save.stats.byChar[charName];
           cs.played++;
           if (won) cs.wins++; else cs.losses++;
-          earnedCr = won ? 1 : 0; save.crystals += earnedCr;
+          earnedCr = won ? 1 : 0; save.crystals += earnedCr; earnedXp = 20 + (won ? 30 : 0); addXp(earnedXp);
           qTrack('play', 1); qTrack('char', 1, charName); qTrack('earn', earned); if (won) { qTrack('win', 1); kairosWin(); }
           persist();
         }
-      } else { paid = 0; kNew = 0; }
+      } else { paid = 0; kNew = 0; lvUp = 0; }
     }
     ui();
   };
@@ -273,6 +272,33 @@ function setSkin(name, id, i) { save.skin[name] = id; persist(); if (S && S.p ==
 const CR = { perso_luffy: 30, perso_naruto: 30, perso_deku: 30, perso_koro: 50, perso_shinra: 50, perso_eren: 50, perso_gojo: 80, perso_yugo: 80, perso_denji: 80 };
 const MAPN = ['Dojo', 'Volcan', 'Ville de nuit', 'Banquise', 'Lune'];
 const ALLN = ['Bruno', 'Zéphyr', 'Kaze', 'Viking', 'Chevalier', 'Kairos', 'Luffy', 'Naruto', 'Gojo', 'Deku', 'Denji', 'Yugo', 'Shinra', 'Eren', 'Koro'];
+// ===== PROFIL & NIVEAUX (max 10) : niveaux 1-4 = 100 XP chacun, niveaux 5-9 = 200 XP chacun (x2 tous les 5 niveaux) =====
+const ICONS = ['🥷', '🧙', '⚔️', '🛡️', '🐉', '🦊', '🐺', '👑', '🔥', '⚡', '🏴‍☠️', '🤖'];
+const xpNeed = L => 100 * 2 ** Math.floor(L / 5);
+function lvlInfo() {
+  let xp = save.xp || 0, L = 1;
+  while (L < 10 && xp >= xpNeed(L)) { xp -= xpNeed(L); L++; }
+  return L >= 10 ? { L, xp: 0, need: 0 } : { L, xp, need: xpNeed(L) };
+}
+function addXp(n) {
+  const before = lvlInfo().L; save.xp = (save.xp || 0) + n;
+  const after = lvlInfo().L; if (after > before) lvUp = after;
+  persist();
+}
+const xpBar = () => { const v = lvlInfo(); return `<div style="width:100%;height:12px;background:#000;border-radius:6px;overflow:hidden;margin:3px 0"><div style="width:${v.need ? v.xp / v.need * 100 : 100}%;height:100%;background:#2ecc71"></div></div><small>${v.need ? v.xp + ' / ' + v.need + ' XP' : 'Niveau maximum !'}</small>`; };
+const profileBar = () => save.profile ? `<div onclick="openProfile()" style="cursor:pointer;display:flex;align-items:center;gap:12px;background:#222;border:1px solid #66552a;border-radius:10px;padding:6px 14px;max-width:360px;width:100%;box-sizing:border-box"><span style="font-size:30px">${save.profile.icon}</span><div style="flex:1;text-align:left"><b>${save.profile.name}</b> · Niv. ${lvlInfo().L}${xpBar()}</div></div>` : '';
+function openProfile() { pName = save.profile.name; pIcon = save.profile.icon; pErr = ''; view = 'profile'; ui(); }
+function setIcon(i) { pIcon = ICONS[i]; ui(); }
+function saveProfile() {
+  const n = pName.trim().slice(0, 14);
+  if (!n) { pErr = 'Écris un pseudo !'; ui(); return; }
+  save.profile = { name: n, icon: pIcon }; pErr = ''; view = 'menu'; persist(); ui();
+}
+const profileHtml = () => `<h2>${save.profile ? '👤 Mon profil' : '👤 Crée ton profil'}</h2>${pErr ? `<p style="color:#f66">${pErr}</p>` : ''}
+  <input maxlength="14" placeholder="Pseudo" value="${pName.replace(/"/g, '')}" oninput="pName=this.value" style="width:200px;text-transform:none">
+  <div class="cards">${ICONS.map((ic, i) => `<div class="card ${pIcon === ic ? 'sel' : ''}" style="width:46px;text-align:center;font-size:26px" onclick="setIcon(${i})">${ic}</div>`).join('')}</div>
+  ${save.profile ? `<div style="width:260px"><b>Niveau ${lvlInfo().L}</b>${xpBar()}</div><p style="font-size:12px;opacity:.8">+20 XP par partie, +30 XP par victoire, +40 XP par quête</p>` : ''}
+  <button onclick="saveProfile()">✔ ${save.profile ? 'Enregistrer' : 'Créer mon profil'}</button>${save.profile ? `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : ''}`;
 const bank = () => `🪙 ${save.coins} pièces · 💎 ${save.crystals} cristaux`;
 const shuf = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 // boutique de skins : 3 skins au hasard par jour (pièces), renouvelés à minuit
@@ -311,7 +337,7 @@ function qTrack(type, n, param) {
   questList().forEach(q => {
     if (q.done || q.type !== type || (q.param !== undefined && String(q.param) !== String(param))) return;
     q.p = Math.min(q.goal, q.p + n);
-    if (q.p >= q.goal) { q.done = 1; if (q.rw === 'g') save.crystals += q.n; else save.coins += q.n; }
+    if (q.p >= q.goal) { q.done = 1; addXp(40); if (q.rw === 'g') save.crystals += q.n; else save.coins += q.n; }
   });
   persist();
 }
@@ -361,10 +387,11 @@ function ui() {
   let h = '';
   ov.className = me >= 0 && S && S.p === 'end' ? 'end' : (me < 0 && !searching && view === 'menu' ? 'menu-screen' : '');
   if (me < 0 && searching) h = `<h2>🔎 Recherche d’un adversaire…</h2><p>Tu seras mis face à un joueur aléatoire.</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
-  else if (me < 0) h = view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : `<div class="menu-top">
+  else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : `<div class="menu-top">
       <h1>⚔️ Duel Arena</h1>
       <div class="menu-currency">${bank()}</div>
     </div>
+    ${profileBar()}
     ${err ? `<p class="menu-error">${err}</p>` : ''}
     <div class="menu-layout">
       <section class="menu-group menu-shop">
@@ -400,7 +427,7 @@ function ui() {
     <p style="font-size:12px;opacity:.8;margin:2px">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques · U ou Espace : ultime (barre pleine)</p>${quitBtn}`;
   }
   else if (S.p === 'training') { ov.style.display = 'none'; last = ''; return; }
-  else if (S.p === 'end') h = `${kNew ? '<p>🔓 Kairos débloqué !</p>' : ''}<p style="font-size:18px">🪙 +${earned} pièces · 💎 +${earnedCr} cristal (total : ${save.coins} 🪙 / ${save.crystals} 💎)</p>${S.ag[me] ? '<p>En attente de l’adversaire…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
+  else if (S.p === 'end') h = `${lvUp ? '<p>⬆️ Niveau ' + lvUp + ' atteint !</p>' : ''}${kNew ? '<p>🔓 Kairos débloqué !</p>' : ''}<p style="font-size:18px">🪙 +${earned} pièces · 💎 +${earnedCr} cristal · ✨ +${earnedXp} XP (total : ${save.coins} 🪙 / ${save.crystals} 💎)</p>${S.ag[me] ? '<p>En attente de l’adversaire…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
   else { ov.style.display = 'none'; last = ''; return; }
   if (h !== last) { ov.innerHTML = h; last = h; }
   ov.style.display = 'flex';
