@@ -200,7 +200,7 @@ const SHOP = [
   { id: 'skin_koro_blanc', type: 'skin', char: 'Koro', name: 'Koro-sensei blanc', price: 100, look: 'white', pal: { '#f4d03f': '#f5f5f1', '#e6b800': '#dcdcd5', '#f1c40f': '#e8e8e2' } },
   { id: 'skin_shinra_banshoman', type: 'skin', char: 'Shinra', name: 'Shinra Banshoman', price: 150, look: 'banshoman', pal: { '#f5cba7': '#c4533c', '#23232f': '#f6f2e8', '#1b1b24': '#e9e3d3', '#bdc3c7': '#f1c40f', '#111': '#c9a227', '#15151c': '#f4f4f4', '#000': '#fff' } },
 ];
-let chestGain = '', chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
+let tNew = '', chestGain = '', chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
 let save = { coins: 0, crystals: 0, xp: 0, chests: 0, icons: [], profile: null, friends: [], fid: null, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
 if (!save.stats || typeof save.stats !== 'object') save.stats = { played: 0, wins: 0, losses: 0, byChar: {} };
 if (!save.stats.byChar || typeof save.stats.byChar !== 'object') save.stats.byChar = {};
@@ -241,11 +241,12 @@ function connect(first) {
           const cs = save.stats.byChar[charName];
           cs.played++;
           if (won) cs.wins++; else cs.losses++;
+          if (cs.played === 30 && TITLES[charName]) { tNew = TITLES[charName]; if (save.profile && !save.profile.title) save.profile.title = charName; }
           earnedCr = won ? 1 : 0; save.crystals += earnedCr; earnedXp = 20 + (won ? 30 : 0); addXp(earnedXp);
           qTrack('play', 1); qTrack('char', 1, charName); qTrack('earn', earned); if (won) { qTrack('win', 1); kairosWin(); }
           persist();
         }
-      } else { paid = 0; kNew = 0; lvUp = 0; }
+      } else { paid = 0; kNew = 0; lvUp = 0; tNew = ''; }
     }
     ui();
   };
@@ -290,7 +291,7 @@ function topChar() {
   const e = Object.entries(save.stats.byChar).sort((a, b) => (b[1].played || 0) - (a[1].played || 0))[0];
   return e ? e[0] : '—';
 }
-const myPub = () => ({ code: myCode(), name: save.profile.name, icon: save.profile.icon, lvl: lvlInfo().L, top: topChar() });
+const myPub = () => ({ code: myCode(), name: save.profile.name, icon: save.profile.icon, lvl: lvlInfo().L, top: topChar(), ttl: save.profile.title || '' });
 function syncFriends(add) {
   fErr = ''; fAdd = add || null;
   const list = save.friends.slice(); if (add && !list.includes(add)) list.push(add);
@@ -310,7 +311,7 @@ const friendsHtml = () => `<h2>👥 Amis</h2>${fErr ? `<p style="color:#f66">${f
   <p>Ton code ami : <b style="font-size:22px">${myCode()}</b><br><small>Donne-le à tes amis pour qu’ils t’ajoutent</small></p>
   <div><input maxlength="6" placeholder="CODE" value="${esc(fDraft)}" oninput="fDraft=this.value"> <button onclick="addFriend()">➕ Ajouter</button></div>
   <div class="cards">${save.friends.length ? save.friends.map(c => { const p = fList.find(q => q.code === c), rm = `<button onclick="removeFriend('${esc(c)}')" style="background:#7f8c8d;padding:4px 10px">Retirer</button>`;
-    return p ? `<div class="card" style="width:190px;cursor:default">${iconHtml(p.icon, 30)} <b>${esc(p.name)}</b><br>Niveau ${+p.lvl}<br>⭐ ${esc(p.top)}<br>${rm}</div>` : `<div class="card" style="width:190px;cursor:default">${esc(c)}<br>Profil introuvable<br>${rm}</div>`; }).join('') : '<p>Aucun ami pour le moment</p>'}</div>
+    return p ? `<div class="card" style="width:190px;cursor:default">${iconHtml(p.icon, 30)} <b>${esc(p.name)}</b><br>Niveau ${+p.lvl}<br>⭐ ${esc(p.top)}<br>${TITLES[p.ttl] ? '🏷️ ' + esc(TITLES[p.ttl]) + '<br>' : ''}${rm}</div>` : `<div class="card" style="width:190px;cursor:default">${esc(c)}<br>Profil introuvable<br>${rm}</div>`; }).join('') : '<p>Aucun ami pour le moment</p>'}</div>
   <button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 // ===== ICÔNES DE PROFIL DÉBLOQUABLES (coffrets) : emblèmes inspirés des séries, dessinés en SVG. L'id (3 lettres) est ce qui est enregistré / envoyé aux amis =====
 const LOGOS = {
@@ -342,6 +343,12 @@ const botLvlHtml = () => `<h2>🤖 Niveau du bot</h2><p>Choisis la difficulté, 
   <button onclick="go({t:'bot',lvl:1})" style="background:#e67e22">😐 Moyen<br><small>Comportement classique</small></button>
   <button onclick="go({t:'bot',lvl:2})" style="background:#c0392b">😈 Difficile<br><small>Rapide, bloque souvent, enchaîne les combos</small></button>
   <button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
+// ===== TITRES : débloqués à 30 parties jouées avec un personnage (à choisir dans le profil) =====
+const TITLES = { Bruno: 'L’acharné', 'Zéphyr': 'L’éclair fou', Kaze: 'L’invisible', Viking: 'Le roi du nord', Chevalier: 'Le tueur de dragon', Kairos: 'Le maître du temps', Luffy: 'L’élastique', Naruto: 'Hokage', Deku: 'Plus Ultra', Gojo: 'L’exorciste de rang S', Denji: 'La tronçonneuse', Yugo: 'L’Éliatrope', Shinra: 'Le 4e pilier', Eren: 'Le Titan Assaillant', Koro: 'Le prof de la classe E' };
+const playedWith = n => (save.stats.byChar[n] && save.stats.byChar[n].played) || 0;
+const titleLine = () => save.profile.title && TITLES[save.profile.title] ? `<br><small style="color:#f1c40f">🏷️ ${esc(TITLES[save.profile.title])}</small>` : '';
+function setTitle(k) { save.profile.title = k; persist(); ui(); }
+const titleHtml = () => `<div style="max-width:340px"><b>🏷️ Titres</b> <small>(30 parties avec un perso)</small><div class="cards"><span class="chip ${!save.profile.title ? 'on' : ''}" onclick="setTitle('')">Aucun</span>${Object.keys(TITLES).map(k => playedWith(k) >= 30 ? `<span class="chip ${save.profile.title === k ? 'on' : ''}" onclick="setTitle('${k}')">${esc(TITLES[k])}</span>` : `<span class="chip" style="opacity:.45">🔒 ${k} ${playedWith(k)}/30</span>`).join('')}</div></div>`;
 const ICONS = ['🥷', '🧙', '⚔️', '🛡️', '🐉', '🦊', '🐺', '👑', '🔥', '⚡', '🏴‍☠️', '🤖'];
 const xpNeed = L => 100 * 2 ** Math.floor(L / 5);
 function lvlInfo() {
@@ -355,18 +362,18 @@ function addXp(n) {
   persist();
 }
 const xpBar = () => { const v = lvlInfo(); return `<div style="width:100%;height:12px;background:#000;border-radius:6px;overflow:hidden;margin:3px 0"><div style="width:${v.need ? v.xp / v.need * 100 : 100}%;height:100%;background:#2ecc71"></div></div><small>${v.need ? v.xp + ' / ' + v.need + ' XP' : 'Niveau maximum !'}</small>`; };
-const profileBar = () => save.profile ? `<div onclick="openProfile()" style="cursor:pointer;display:flex;align-items:center;gap:12px;background:#222;border:1px solid #66552a;border-radius:10px;padding:6px 14px;max-width:360px;width:100%;box-sizing:border-box">${iconHtml(save.profile.icon, 34)}<div style="flex:1;text-align:left"><b>${esc(save.profile.name)}</b> · Niv. ${lvlInfo().L} · ⭐ ${topChar()}${xpBar()}</div></div>` : '';
+const profileBar = () => save.profile ? `<div onclick="openProfile()" style="cursor:pointer;display:flex;align-items:center;gap:12px;background:#222;border:1px solid #66552a;border-radius:10px;padding:6px 14px;max-width:360px;width:100%;box-sizing:border-box">${iconHtml(save.profile.icon, 34)}<div style="flex:1;text-align:left"><b>${esc(save.profile.name)}</b> · Niv. ${lvlInfo().L} · ⭐ ${topChar()}${titleLine()}${xpBar()}</div></div>` : '';
 function openProfile() { chestGain = ''; chestNew = null; chestErr = ''; pName = save.profile.name; pIcon = save.profile.icon; pErr = ''; view = 'profile'; ui(); }
 function setIcon(i) { pIcon = allIcons()[i]; ui(); }
 function saveProfile() {
   const n = pName.trim().slice(0, 14);
   if (!n) { pErr = 'Écris un pseudo !'; ui(); return; }
-  save.profile = { name: n, icon: pIcon }; pErr = ''; view = 'menu'; persist(); ui();
+  save.profile = { ...save.profile, name: n, icon: pIcon }; pErr = ''; view = 'menu'; persist(); ui();
 }
 const profileHtml = () => `<h2>${save.profile ? '👤 Mon profil' : '👤 Crée ton profil'}</h2>${pErr ? `<p style="color:#f66">${pErr}</p>` : ''}
   <input maxlength="14" placeholder="Pseudo" value="${pName.replace(/"/g, '')}" oninput="pName=this.value" style="width:200px;text-transform:none">
   <div class="cards">${allIcons().map((ic, i) => `<div class="card ${pIcon === ic ? 'sel' : ''}" style="width:46px;text-align:center;font-size:26px" onclick="setIcon(${i})">${iconHtml(ic, 30)}</div>`).join('')}</div>
-  ${save.profile ? `<div style="width:260px"><b>Niveau ${lvlInfo().L}</b>${xpBar()}</div>${chestHtml()}<p>🆔 Code ami : <b>${myCode()}</b> · ⭐ Perso le plus joué : <b>${topChar()}</b></p><p style="font-size:12px;opacity:.8">+20 XP par partie, +30 XP par victoire, +40 XP par quête</p>` : ''}
+  ${save.profile ? `<div style="width:260px"><b>Niveau ${lvlInfo().L}</b>${xpBar()}</div>${chestHtml()}${titleHtml()}<p>🆔 Code ami : <b>${myCode()}</b> · ⭐ Perso le plus joué : <b>${topChar()}</b></p><p style="font-size:12px;opacity:.8">+20 XP par partie, +30 XP par victoire, +40 XP par quête</p>` : ''}
   <button onclick="saveProfile()">✔ ${save.profile ? 'Enregistrer' : 'Créer mon profil'}</button>${save.profile ? `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : ''}`;
 const bank = () => `🪙 ${save.coins} pièces · 💎 ${save.crystals} cristaux · 🎁 ${save.chests || 0} coffrets`;
 const shuf = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -497,7 +504,7 @@ function ui() {
     <p style="font-size:12px;opacity:.8;margin:2px">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques · U ou Espace : ultime (barre pleine)</p>${quitBtn}`;
   }
   else if (S.p === 'training') { ov.style.display = 'none'; last = ''; return; }
-  else if (S.p === 'end') h = `${lvUp ? '<p>⬆️ Niveau ' + lvUp + ' atteint !</p>' : ''}${kNew ? '<p>🔓 Kairos débloqué !</p>' : ''}<p style="font-size:18px">🪙 +${earned} pièces · 💎 +${earnedCr} cristal · ✨ +${earnedXp} XP (total : ${save.coins} 🪙 / ${save.crystals} 💎)</p>${S.ag[me] ? '<p>En attente de l’adversaire…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
+  else if (S.p === 'end') h = `${tNew ? '<p>🏷️ Titre débloqué : ' + tNew + ' !</p>' : ''}${lvUp ? '<p>⬆️ Niveau ' + lvUp + ' atteint !</p>' : ''}${kNew ? '<p>🔓 Kairos débloqué !</p>' : ''}<p style="font-size:18px">🪙 +${earned} pièces · 💎 +${earnedCr} cristal · ✨ +${earnedXp} XP (total : ${save.coins} 🪙 / ${save.crystals} 💎)</p>${S.ag[me] ? '<p>En attente de l’adversaire…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
   else { ov.style.display = 'none'; last = ''; return; }
   if (h !== last) { ov.innerHTML = h; last = h; }
   ov.style.display = 'flex';
