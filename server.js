@@ -1,6 +1,6 @@
 const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
-const html = fs.readFileSync(path.join(__dirname, 'index(1).html'));
+const html = fs.readFileSync(path.join(__dirname, 'index (6).html'));
 const server = http.createServer((q, r) => { r.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); r.end(html); });
 const wss = new WebSocketServer({ server });
 
