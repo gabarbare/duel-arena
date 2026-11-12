@@ -37,7 +37,7 @@ const CH = [
     { n: 'Aiguille', type: 'm', su: 6, ac: 4, rc: 10, cd: 8, dmg: 7, rng: 72, h: 30, kb: 5, st: 14 },
     { n: 'Écho temporel (frappe différée)', type: 'echo', su: 8, ac: 1, rc: 14, cd: 150, dmg: 16, kb: 12, st: 26, warn: 50, rad: 75 },
     { n: 'Rembobinage (retour 2 s en arrière)', type: 'rewind', su: 6, ac: 1, rc: 12, cd: 180, heal: .6 },
-    { n: 'Arrêt du temps', ult: 1, ub: 1, type: 'timestop', su: 14, ac: 1, rc: 12, cd: 0, dur: 120, mult: 1.2 }] }
+    { n: 'Arrêt du temps', ult: 1, ub: 1, type: 'timestop', su: 14, ac: 1, rc: 12, cd: 0, dur: 120, mult: 1.2 }] },
   { name: 'Luffy', desc: 'Pirate élastique, coups à distance', hp: 100, spd: 4.4, jmp: 13.5, color: '#3b6fd8', atk: [
     { n: 'Pistol', type: 'm', su: 8, ac: 4, rc: 12, cd: 10, dmg: 7, rng: 150, h: 26, kb: 6, st: 14 },
     { n: 'Bazooka', type: 'm', su: 16, ac: 5, rc: 22, cd: 50, dmg: 16, rng: 115, h: 50, kb: 15, st: 28 },
