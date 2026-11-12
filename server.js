@@ -1,3 +1,4 @@
+
 const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
 const html = fs.readFileSync(path.join(__dirname, 'index (6).html'));
@@ -57,7 +58,7 @@ const CH = [
     { n: 'Coup de poing', type: 'm', su: 5, ac: 4, rc: 9, cd: 8, dmg: 7, rng: 62, h: 30, kb: 5, st: 14 },
     { n: 'Air Force', type: 'p', su: 8, ac: 1, rc: 12, cd: 26, dmg: 7, vx: 12, r: 11, kb: 9, st: 16, vis: 6 },
     { n: 'Full Cowling', type: 'buff', su: 10, ac: 1, rc: 12, cd: 420, dur: 360 },
-    { n: 'Detroit Smash 100%', ult: 1, ub: 1, type: 'dp', su: 10, dsh: 8, spd: 13, ac: 6, rc: 28, cd: 0, pct: 0.7, rng: 70, h: 60, kb: 20, st: 45 }] },
+    { n: 'Detroit Smash 100%', ult: 1, ub: 1, type: 'dp', su: 10, dsh: 8, spd: 13, ac: 6, rc: 28, cd: 0, pct: 0.45, rng: 70, h: 60, kb: 20, st: 45 }] },
   // bd = dash arrière (invulnérable), form = transformation (remplace les attaques par 'alt'), jam = saut + onde de choc à l'atterrissage
   { name: 'Denji', desc: 'Chainsaw Man : Pochita, recul, transformation', hp: 105, spd: 4.3, jmp: 13.5, color: '#d4402f', atk: [
     { n: 'Coup simple', type: 'm', su: 5, ac: 4, rc: 9, cd: 8, dmg: 6, rng: 58, h: 30, kb: 5, st: 13 },
@@ -533,6 +534,16 @@ function tick(r) {
   r.ps.forEach(p => tx(p, s));
 }
 
+// ===== AMIS : profils publics (pseudo, icône, niveau, perso le plus joué), sauvegardés dans profiles.json =====
+const PFILE = path.join(__dirname, 'profiles.json'); let profiles = {}, ptimer = null;
+try { profiles = JSON.parse(fs.readFileSync(PFILE, 'utf8')); } catch (e) {}
+const clean = (v, n) => String(v || '').replace(/[<>&"'`\\]/g, '').trim().slice(0, n);
+function registerProfile(me) {
+  me = me || {}; const code = String(me.code || '').toUpperCase();
+  if (!/^[A-Z2-9]{6}$/.test(code)) return;
+  profiles[code] = { code, name: clean(me.name, 14) || 'Joueur', icon: clean(me.icon, 8) || '🥷', lvl: Math.max(1, Math.min(10, +me.lvl || 1)), top: clean(me.top, 20) || '—' };
+  clearTimeout(ptimer); ptimer = setTimeout(() => fs.writeFile(PFILE, JSON.stringify(profiles), () => {}), 1000);
+}
 const tx = (ws, o) => ws.readyState === 1 && ws.send(JSON.stringify(o));
 const rooms = new Map(), queue = [];
 const newCode = () => { let c; do { c = Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.random() * 24 | 0]).join(''); } while (rooms.has(c)); return c; };
@@ -541,6 +552,12 @@ const join = ws => tx(ws, { t: 'room', code: ws.room.code, idx: ws.idx, chars: C
 wss.on('connection', ws => {
   ws.on('message', raw => {
     let m; try { m = JSON.parse(raw); } catch { return; }
+    if (m.t === 'hello' || m.t === 'friends') { // amis : enregistre le profil public, renvoie les profils demandés
+      registerProfile(m.me);
+      if (m.t === 'hello') return;
+      const codes = (Array.isArray(m.list) ? m.list : []).slice(0, 50).map(c => String(c).toUpperCase());
+      return tx(ws, { t: 'friends', list: codes.filter(c => profiles[c]).map(c => profiles[c]), missing: codes.filter(c => !profiles[c]) });
+    }
     if (m.t === 'training_list' && !ws.room) {
       tx(ws, { t: 'chars', chars: CHARS });
     } else if (m.t === 'train' && !ws.room && CH[m.c]) {
