@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -195,8 +194,8 @@ const SHOP = [
   { id: 'skin_chevalier_noir', type: 'skin', char: 'Chevalier', name: 'Chevalier noir', price: 60, pal: { '#b0bec5': '#2b2b33', '#cfd8dc': '#454550', '#78909c': '#1c1c24', '#455a64': '#111118', '#90a4ae': '#55555f', '#2c5fa8': '#22222b' } },
   { id: 'skin_viking_rouge', type: 'skin', char: 'Viking', name: 'Viking rouge', price: 60, pal: { '#6d4c41': '#c0392b', '#4e342e': '#7b241c', '#d35400': '#e67e22', '#3e2723': '#4a1410' } },
   { id: 'skin_gojo_lunettes', type: 'skin', char: 'Gojo', name: 'Gojo lunettes (saison 2)', price: 100, look: 'glasses', pal: {} },
-  { id: 'skin_luffy_gear4', type: 'skin', char: 'Luffy', name: 'Luffy Gear 4 Snakeman', price: 120, pal: { '#f5cba7': '#2d2d36', '#e74c3c': '#2d2d36', '#3b6fd8': '#c0392b', '#c0392b': '#fff' } },
-  { id: 'skin_deku_dark', type: 'skin', char: 'Deku', name: 'Dark Deku', price: 100, pal: { '#2e7d32': '#17171f', '#1b5e20': '#0b0b11', '#c0392b': '#8e1b2f', '#b0bec5': '#3a3a46', '#fff': '#ff3b3b', '#d5dbdb': '#555' } },
+  { id: 'skin_luffy_gear4', type: 'skin', char: 'Luffy', name: 'Luffy Gear 4 Snakeman', price: 120, look: 'snake', pal: { '#e74c3c': '#f5cba7', '#3b6fd8': '#c0392b' } },
+  { id: 'skin_deku_dark', type: 'skin', char: 'Deku', name: 'Dark Deku', price: 100, look: 'dark', pal: { '#2e7d32': '#15151b', '#1b5e20': '#0a0a0f', '#c0392b': '#24242c', '#b0bec5': '#2c2c35', '#78909c': '#111', '#fff': '#9dff9d', '#d5dbdb': '#24242c' } },
   { id: 'skin_naruto_hermite', type: 'skin', char: 'Naruto', name: 'Naruto Mode Hermite', price: 100, look: 'sage', pal: { '#ff7f27': '#d0451b', '#2c5fa8': '#222', '#2c3e50': '#111' } },
 ];
 let fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
@@ -528,6 +527,7 @@ function fighter(f, i) {
   x.save(); x.translate(f.x, f.y);
   if (f.iv) x.globalAlpha = .45;
   if (f.sz > 1) x.scale(f.sz, f.sz);
+  if (lk === 'snake' && !f.lz) { x.rotate(s * .12); x.scale(1, .93); } // posture de combat penchée du Snakeman
   const gn = n === 'Gojo', dk = n === 'Deku';
   if (f.ak === 3 || f.bf || (gn && f.ak === 2) || (n === 'Denji' && f.fm) || (n === 'Shinra' && f.fm)) {
     x.fillStyle = gn && f.ak === 2 ? 'rgba(120,255,170,.3)' : f.ak === 3 ? 'rgba(255,230,80,.35)' : n === 'Shinra' ? 'rgba(255,240,170,.3)' : dk ? 'rgba(90,255,120,.28)' : 'rgba(255,90,90,.3)';
@@ -650,6 +650,15 @@ function fighter(f, i) {
     R('#fff', s > 0 ? 1 : -9, -107, 8, 7); R('#1b5e20', s > 0 ? 4 : -6, -106, 4, 6);
     [-9, 9].forEach(d => { C('#b5651d', d, -101, 1); C('#b5651d', d, -98, 1); });
     R('#b0bec5', -9, -96, 18, 8); [-5, 0, 5].forEach(q => LN('#78909c', 1, q, -96, q, -88));
+    if (lk === 'dark') { // Dark Deku : costume noirci de boue et de sang, capuche à pointes, yeux verts brillants, écharpe déchirée, Blackwhip
+      const w = Math.sin(t / 110) * 5;
+      Y('#1d1d26', [[-s * 8, -88], [-s * 36, -86 + w], [-s * 48, -58 + w], [-s * 32, -62], [-s * 42, -34 + w], [-s * 14, -52]]);
+      [[-14, -70], [8, -55], [-8, -36], [12, -82]].forEach(p => R('#3b3226', p[0], p[1], 7, 5)); R('#5a1a1a', -4, -62, 5, 4);
+      Y('#15151b', [[-14, -112], [-26, -152], [-5, -118]]); Y('#15151b', [[14, -112], [26, -152], [5, -118]]);
+      R('#0a0a0f', -14, -110, 28, 4);
+      x.fillStyle = 'rgba(120,255,120,.4)'; x.beginPath(); x.arc(s > 0 ? 5 : -5, -103.5, 9, 0, 7); x.fill();
+      [0, 1, 2].forEach(q => { const g = t / 180 + q * 2; LN('#0a0a12', 3, -s * 10, -80, -s * (30 + q * 12) + Math.cos(g) * 8, -70 - q * 18 + Math.sin(g) * 10); });
+    }
   } else if (n === 'Denji') { // Denji : cheveux blonds, chemise blanche, cravate noire ; transformé : tête tronçonneuse orange
     R('#222b3a', -16, -28, 13, 28); R('#222b3a', 3, -28, 13, 28);
     R('#111', -18, -9, 17, 9); R('#111', 1, -9, 17, 9);
@@ -739,7 +748,9 @@ function fighter(f, i) {
     x.strokeStyle = P('#d9b84a'); x.lineWidth = 2; x.beginPath(); x.arc(s * 6, -102, 6, 0, 7); x.stroke();
     R('#000', s * 6 - 2, -104, 4, 4);
   } else { // Luffy : gilet rouge, short bleu, sandales, cicatrice, chapeau de paille
-    R(skin, -16, -26, 13, 26); R(skin, 3, -26, 13, 26);
+    const lc = lk === 'snake' ? '#16161d' : skin; // Snakeman : jambes recouvertes de Haki noir
+    if (lk === 'snake') for (let q = 0; q < 6; q++) { x.fillStyle = 'rgba(255,255,255,' + (.28 - q * .035) + ')'; x.beginPath(); x.arc(-s * (14 + q * 8), -88 + Math.sin(t / 150 + q) * 9 + q * 7, 12 + q * 2, 0, 7); x.fill(); } // vapeur en cape
+    R(lc, -16, -26, 13, 26); R(lc, 3, -26, 13, 26);
     R('#8d6e63', -18, -5, 17, 5); R('#8d6e63', 1, -5, 17, 5);
     R('#3b6fd8', -22, -48, 44, 24);
     R(skin, -22, -90, 44, 42);
@@ -747,9 +758,14 @@ function fighter(f, i) {
     C(skin, 0, -102, 14);
     R('#000', s * 6 - 2, -104, 4, 4);
     LN('#c0392b', 1.5, s * 4, -97, s * 11, -97);
-    x.fillStyle = P('#f1c40f'); x.beginPath(); x.ellipse(0, -113, 25, 6, 0, 0, 7); x.fill();
-    x.beginPath(); x.arc(0, -113, 13, Math.PI, 0); x.fill();
-    R('#c0392b', -13, -119, 26, 4);
+    if (lk === 'snake') { // cheveux en flammes dressées, cicatrice en X sur le torse, pas de chapeau
+      Y('#111', [[-15, -104], [-22, -122], [-10, -114], [-9, -138], [0, -118], [9, -140], [13, -116], [23, -127], [15, -104]]);
+      LN('#b03a2e', 2, -10, -84, 10, -56); LN('#b03a2e', 2, 10, -84, -10, -56);
+    } else {
+      x.fillStyle = P('#f1c40f'); x.beginPath(); x.ellipse(0, -113, 25, 6, 0, 0, 7); x.fill();
+      x.beginPath(); x.arc(0, -113, 13, Math.PI, 0); x.fill();
+      R('#c0392b', -13, -119, 26, 4);
+    }
   }
   if (f.cr) { // cristallisation
     x.fillStyle = 'rgba(170,225,255,.55)'; x.fillRect(-26, -96, 52, 96);
@@ -794,11 +810,11 @@ function fighter(f, i) {
         else LN('#bdc3c7', 6, px, py, px + s * 4, py + 22);
       }
     }
-    else if (n === 'Deku') { C('#d5dbdb', px, py, 8); if (f.ak === 3 && f.ap === 1) C('rgba(130,255,130,.7)', px, py, 18); }
+    else if (n === 'Deku') { C('#d5dbdb', px, py, 8); if (lk === 'dark') [-4, 0, 4].forEach(q => LN('#cfd8dc', 1.5, px, py + q, px + s * 11, py + q * 1.6)); if (f.ak === 3 && f.ap === 1) C('rgba(130,255,130,.7)', px, py, 18); }
     else if (n === 'Naruto') { C(skin, px, py, 7); if (f.ak === 1) rasen(px + s * 12, py, 13, 0); if (f.ak === 3) rasen(px + s * 4, py - 26, 22, 1); }
-    else C(skin, px, py, 10);
+    else { C(lk === 'snake' ? '#16161d' : skin, px, py, 10); if (lk === 'snake') C('rgba(255,255,255,.14)', px - 3, py - 3, 4); }
   };
-  const sleeve = n === 'Kaze' ? '#1c1c28' : n === 'Naruto' ? '#ff7f27' : n === 'Chevalier' ? '#b0bec5' : n === 'Gojo' ? '#1a2a4f' : n === 'Deku' ? '#2e7d32' : n === 'Denji' ? '#f2f2f2' : n === 'Yugo' ? '#e2b283' : n === 'Shinra' ? '#23232f' : n === 'Eren' ? (f.fm ? '#8a4a35' : '#6d4c41') : n === 'Koro' ? '#f4d03f' : n === 'Kairos' ? '#3b2a5a' : skin;
+  const sleeve = n === 'Kaze' ? '#1c1c28' : n === 'Naruto' ? '#ff7f27' : n === 'Chevalier' ? '#b0bec5' : n === 'Gojo' ? '#1a2a4f' : n === 'Deku' ? '#2e7d32' : n === 'Denji' ? '#f2f2f2' : n === 'Yugo' ? '#e2b283' : n === 'Shinra' ? '#23232f' : n === 'Eren' ? (f.fm ? '#8a4a35' : '#6d4c41') : n === 'Koro' ? '#f4d03f' : n === 'Kairos' ? '#3b2a5a' : (n === 'Luffy' && lk === 'snake') ? '#16161d' : skin;
   if (n === 'Zéphyr') {
     if (f.ak === 3) { LN('#8d6e63', 4, s * 30, -2, s * 30, -140); C('#f1c40f', s * 30, -146, 14); }
     else if (f.ak >= 0) {
@@ -826,7 +842,10 @@ function fighter(f, i) {
     LN(sleeve, n === 'Luffy' ? 7 : 9, 0, -65, s * Lx, -65);
     hand(s * Lx, -65);
   } else if (n === 'Bruno') { LN(skin, 8, 0, -68, s * 14, -76); hand(s * 18, -78); }
-  else hand(s * 24, -50);
+  else if (n === 'Luffy' && lk === 'snake') { // garde du Snakeman : poing avant levé, bras arrière lové
+    LN('#16161d', 8, 0, -70, s * 26, -62); LN('#16161d', 8, s * 26, -62, s * 22, -82); hand(s * 22, -84);
+    LN('#16161d', 8, 0, -68, -s * 22, -50); C('#16161d', -s * 22, -50, 10);
+  } else hand(s * 24, -50);
   if (f.bl && n !== 'Chevalier') { x.fillStyle = 'rgba(120,200,255,.6)'; x.fillRect(s * 24 - 5, -95, 10, 85); }
   x.restore(); PAL = null;
   if (f.hk) { // grappin : câble et crochet
