@@ -1,4 +1,3 @@
-
 const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
 const html = fs.readFileSync(path.join(__dirname, 'index (6).html'));
@@ -108,7 +107,16 @@ const CH = [
     { n: 'Tentacule', type: 'm', su: 5, ac: 4, rc: 9, cd: 8, dmg: 7, rng: 75, h: 30, kb: 5, st: 14 },
     { n: 'Dash éclair', type: 'sd', su: 2, ac: 5, rc: 8, cd: 45, spd: 34 },
     { n: 'Fouet (2 s)', type: 'm', su: 6, ac: 120, rc: 14, cd: 300, dmg: 5, rng: 110, h: 100, kb: 4, st: 7, both: 1, multi: 12 },
-    { n: 'Mach 20 enchaîné', ult: 1, ub: 1, type: 'zz', su: 12, ac: 40, rc: 18, cd: 0, dmg: 12, kb: 3, st: 14, spd: 28, len: 12 }] }
+    { n: 'Mach 20 enchaîné', ult: 1, ub: 1, type: 'zz', su: 12, ac: 40, rc: 18, cd: 0, dmg: 12, kb: 3, st: 14, spd: 28, len: 12 }] },
+  // Ichigo (Bleach) : Zangetsu = grand sabre | tpb = Shunpo derrière l'ennemi | form = Bankai (vitesse x1.35, attaques remplacées par 'alt') | masque d'Hollow = bonus qui se cumule avec le Bankai
+  { name: 'Ichigo', desc: 'Shinigami remplaçant : Zangetsu, Getsuga Tenshō, Bankai', hp: 105, spd: 4.5, jmp: 14, color: '#f0801f', fspd: 1.35, atk: [
+    { n: 'Zangetsu (grand sabre)', type: 'm', su: 9, ac: 5, rc: 15, cd: 10, dmg: 12, rng: 92, h: 75, kb: 9, st: 19 },
+    { n: 'Getsuga Tenshō', type: 'p', su: 14, ac: 1, rc: 18, cd: 80, dmg: 15, vx: 11, r: 22, kb: 12, st: 24, vis: 9 },
+    { n: 'Shunpo (derrière l’ennemi)', type: 'tpb', su: 3, ac: 1, rc: 9, cd: 100 },
+    { n: 'Bankai : Tensa Zangetsu', ult: 1, type: 'form', su: 20, ac: 1, rc: 20, cd: 0, dur: 600 }], alt: [
+    { n: 'Tensa Zangetsu (katana rapide)', type: 'm', su: 4, ac: 4, rc: 7, cd: 6, dmg: 8, rng: 84, h: 34, kb: 5, st: 12 },
+    { n: 'Getsuga noir (Kuroi)', type: 'p', su: 10, ac: 1, rc: 14, cd: 55, dmg: 19, vx: 16, r: 24, kb: 14, st: 26, vis: 10 },
+    { n: 'Masque d’Hollow (bonus)', type: 'buff', su: 8, ac: 1, rc: 10, cd: 420, dur: 300 }] }
   // Kairos (perso original) : echo = frappe différée sur la position marquée | rewind = retour 2 s en arrière (rend une partie des PV perdus) | timestop = fige l'ennemi, ses dégâts sont mis de côté puis infligés d'un coup
 ];
 const CHARS = CH.map(({ name, desc, hp, color, atk, alt }) => ({ name, desc, hp, color, atk: atk.map(a => a.n), alt: alt ? alt.map(a => a.n) : null }));
