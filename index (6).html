@@ -242,6 +242,14 @@ save.stats.wins = Number(save.stats.wins) || 0;
 save.stats.losses = Number(save.stats.losses) || 0;
 try { Object.assign(save, JSON.parse(localStorage.getItem('duelArena') || '{}')); } catch (e) {}
 const persist = () => { try { localStorage.setItem('duelArena', JSON.stringify(save)); } catch (e) {} };
+// Offre de lancement Ichigo Blood Chains : 10 minutes à partir du premier lancement de cette version du jeu.
+const ICHIGO_PROMO_KEY = 'ichigoBloodchainsPromoStart';
+let ichigoPromoStart = 0;
+try { ichigoPromoStart = Number(localStorage.getItem(ICHIGO_PROMO_KEY)) || 0; } catch (e) {}
+if (!ichigoPromoStart) { ichigoPromoStart = Date.now(); try { localStorage.setItem(ICHIGO_PROMO_KEY, String(ichigoPromoStart)); } catch (e) {} }
+const ICHIGO_PROMO_END = ichigoPromoStart + 10 * 60 * 1000;
+const ichigoPromoActive = () => Date.now() < ICHIGO_PROMO_END;
+const ichigoPromoRemaining = () => Math.max(0, ICHIGO_PROMO_END - Date.now());
 const owns = id => save.owned.includes(id);
 const locked = name => SHOP.some(q => q.type === 'char' && q.char === name && !owns(q.id));
 const dayKey = () => { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
@@ -427,8 +435,10 @@ function dailyIds() {
 }
 function buy(id) {
   const q = SHOP.find(z => z.id === id);
-  if (!q || q.type !== 'skin' || owns(id) || !dailyIds().includes(id) || save.coins < q.price) return;
-  save.coins -= q.price; save.owned.push(id); persist(); ui();
+  const ichigoFree = id === 'skin_ichigo_bloodchains' && ichigoPromoActive();
+  if (!q || q.type !== 'skin' || owns(id) || (!ichigoFree && !dailyIds().includes(id)) || save.coins < (ichigoFree ? 0 : q.price)) return;
+  if (!ichigoFree) save.coins -= q.price;
+  save.owned.push(id); persist(); ui();
 }
 function buyChar(id) {
   const p = CR[id];
@@ -461,8 +471,11 @@ const leftTxt = () => { const l = new Date().setHours(24, 0, 0, 0) - Date.now();
 const questsHtml = () => `<h2>📜 Quêtes du jour</h2><p>${bank()} · renouvelées à minuit (dans ${leftTxt()})</p><div class="cards">${kCard()}${questList().map(q => `<div class="card" style="width:190px;cursor:default;border-color:${q.done ? '#2ecc71' : '#444'}"><b>${q.text}</b><br>Progression : ${q.p} / ${q.goal}<br>Récompense : ${q.n} ${q.rw === 'g' ? '💎' : q.rw === 'k' ? '🎁 coffret' : '🪙'}<br>${q.done ? '✓ Terminée !' : ''}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 const shopHtml = () => {
   const items = dailyIds().map(id => SHOP.find(q => q.id === id)).filter(Boolean);
-  return `<h2>🎨 Boutique de skins</h2><p>${bank()} · 3 skins par jour, nouvelle sélection à minuit (dans ${leftTxt()})</p>` + (items.length
-    ? `<div class="cards">${items.map(q => `<div class="card shopc"><b>${q.name}</b><br>Skin · ${q.char}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.coins < q.price ? 'disabled' : ''} onclick="buy('${q.id}')">${q.price} 🪙</button>`}</div>`).join('')}</div>`
+  const ichigo = SHOP.find(q => q.id === 'skin_ichigo_bloodchains');
+  if (ichigo && !owns(ichigo.id) && !items.some(q => q.id === ichigo.id)) items.unshift(ichigo);
+  const promoText = ichigoPromoActive() ? ` · 🎁 Ichigo Blood Chains gratuit encore ${Math.ceil(ichigoPromoRemaining() / 60000)} min` : '';
+  return `<h2>🎨 Boutique de skins</h2><p>${bank()} · 3 skins par jour, nouvelle sélection à minuit (dans ${leftTxt()})${promoText}</p>` + (items.length
+    ? `<div class="cards">${items.map(q => { const free = q.id === 'skin_ichigo_bloodchains' && ichigoPromoActive(); return `<div class="card shopc"><b>${q.name}</b><br>Skin · ${q.char}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.coins < (free ? 0 : q.price) ? 'disabled' : ''} onclick="buy('${q.id}')">${free ? 'GRATUIT 🎁' : q.price + ' 🪙'}</button>`}</div>`; }).join('')}</div>`
     : '<p>Tu possèdes déjà tous les skins 🎉</p>') + `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 };
 const kCard = () => `<div class="card" style="width:190px;cursor:default;border-color:#d9b84a"><b>⭐ Quête spéciale : Kairos</b><br>Gagner 8 combats<br>${owns('perso_kairos') ? '✓ Débloqué !' : 'Progression : ' + (save.kw || 0) + ' / 8'}</div>`;
@@ -1621,4 +1634,5 @@ function draw() {
   requestAnimationFrame(draw);
 }
 ui(); draw();
+if (ichigoPromoActive()) setTimeout(() => { if (view === 'shop') ui(); }, ichigoPromoRemaining() + 50);
 </script></body></html>
