@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -624,6 +625,35 @@ const gojoRed = (px, py, r) => {
   x.fillStyle = '#ffe3d6'; x.beginPath(); x.arc(px, py, r * (.3 + .05 * Math.sin(t * 14)), 0, 7); x.fill();
   const u = (t * 1.5) % 1; x.strokeStyle = 'rgba(255,120,90,' + (.7 - u * .7) + ')'; x.lineWidth = 2; x.beginPath(); x.arc(px, py, r * (1.2 + u * 1.2), 0, 7); x.stroke(); // onde qui repousse
 };
+// ===== Gojo : technique d'inversion / énergie positive de régénération =====
+const gojoHeal = (px, py, phase = 1) => {
+  const t = Date.now() / 1000, pulse = .5 + .5 * Math.sin(t * 5);
+  // halo chaud et doux : le soin est lumineux, pas explosif comme Rouge
+  const g = x.createRadialGradient(px, py, 3, px, py, 66);
+  g.addColorStop(0, 'rgba(255,255,235,.30)'); g.addColorStop(.48, 'rgba(255,224,150,.18)'); g.addColorStop(1, 'rgba(255,220,130,0)');
+  x.fillStyle = g; x.beginPath(); x.arc(px, py, 66, 0, 7); x.fill();
+  // deux anneaux fins qui se referment et repartent en spirale
+  for (let q = 0; q < 2; q++) {
+    x.strokeStyle = q ? 'rgba(255,248,220,.8)' : 'rgba(255,211,115,.8)';
+    x.lineWidth = q ? 1.5 : 2.2; x.beginPath();
+    x.ellipse(px, py, 27 + q * 13 + pulse * 4, 49 + q * 8, t * (q ? -.25 : .2), 0, Math.PI * 2); x.stroke();
+  }
+  // particules positives qui remontent autour du corps
+  for (let q = 0; q < 12; q++) {
+    const u = (t * .42 + q / 12) % 1, a = q * 2.399 + t * .7;
+    const xx = px + Math.cos(a) * (23 + 17 * Math.sin(u * Math.PI));
+    const yy = py + 42 - u * 86;
+    x.fillStyle = q % 3 === 0 ? 'rgba(255,255,255,.95)' : 'rgba(255,220,135,' + (.25 + .65 * Math.sin(u * Math.PI)) + ')';
+    x.beginPath(); x.arc(xx, yy, 1.2 + pulse * .9, 0, 7); x.fill();
+  }
+  // petites croix de lumière, signe visuel de restauration
+  for (let q = 0; q < 4; q++) {
+    const a = t * .55 + q * Math.PI / 2, xx = px + Math.cos(a) * 39, yy = py + Math.sin(a) * 50;
+    x.strokeStyle = 'rgba(255,250,225,' + (.45 + pulse * .4) + ')'; x.lineWidth = 1.5;
+    x.beginPath(); x.moveTo(xx - 3, yy); x.lineTo(xx + 3, yy); x.moveTo(xx, yy - 3); x.lineTo(xx, yy + 3); x.stroke();
+  }
+};
+
 // ===== Denji : onde de choc à l'atterrissage du Saut écrasant =====
 const WAVES = [], prevAir = [false, false];
 function drawWaves() {
@@ -674,13 +704,13 @@ function fighter(f, i) {
   if (n === 'Denji' && f.fm && f.ak === 1 && f.ap === 1) x.rotate(s * .16); // charge : buste penché en avant
   const gn = n === 'Gojo', dk = n === 'Deku';
   if (f.ak === 3 || f.bf || (gn && f.ak === 2) || (n === 'Denji' && f.fm) || (n === 'Shinra' && f.fm) || (n === 'Ichigo' && f.fm)) {
-    x.fillStyle = gn && f.ak === 2 ? 'rgba(120,255,170,.3)' : f.ak === 3 && !dk ? 'rgba(255,230,80,.35)' : n === 'Shinra' ? 'rgba(255,240,170,.3)' : n === 'Ichigo' ? 'rgba(40,10,25,.45)' : dk ? 'rgba(90,255,120,.28)' : 'rgba(255,90,90,.3)';
+    x.fillStyle = gn && f.ak === 2 ? 'rgba(255,225,155,.12)' : f.ak === 3 && !dk ? 'rgba(255,230,80,.35)' : n === 'Shinra' ? 'rgba(255,240,170,.3)' : n === 'Ichigo' ? 'rgba(40,10,25,.45)' : dk ? 'rgba(90,255,120,.14)' : 'rgba(255,90,90,.3)';
     x.beginPath(); x.arc(0, -55, 75, 0, 7); x.fill();
     if (dk && (f.bf || f.ak === 3)) { // Full Cowl : aura verte, arcs électriques et flux de puissance
       const pulse = .5 + .5 * Math.sin(t / 75);
-      x.strokeStyle = 'rgba(100,255,140,' + (.3 + pulse * .3) + ')'; x.lineWidth = 3 + pulse * 2;
+      x.strokeStyle = 'rgba(100,255,140,' + (.18 + pulse * .16) + ')'; x.lineWidth = 2 + pulse;
       x.beginPath(); x.ellipse(0, -57, 34 + pulse * 8, 66 + pulse * 5, 0, 0, 7); x.stroke();
-      bolt(0, -55, 38, 62, f.ak === 3 ? 30 : 18, f.ak === 3);
+      bolt(0, -55, 35, 58, f.ak === 3 ? 9 : 5, f.ak === 3);
       for (let q = 0; q < 7; q++) { const a = t / 230 + q * 6.283 / 7; const rr = 43 + 5 * Math.sin(t / 90 + q); C('rgba(180,255,190,.8)', Math.cos(a) * rr, -55 + Math.sin(a) * rr * 1.25, 1.5 + pulse); }
     }
   }
@@ -1053,8 +1083,8 @@ function fighter(f, i) {
           [1, -1].forEach(g => Y('#ecf0f1', [[bx - uy * 3 * g, by + ux * 3 * g], [bx - uy * 8 * g + ux * 3, by + ux * 8 * g + uy * 3], [bx - uy * 3 * g + ux * 6, by + ux * 3 * g + uy * 6]])); }
       }
     }
-    else if (n === 'Deku') { C('#d5dbdb', px, py, 8); if (lk === 'dark') [-4, 0, 4].forEach(q => LN('#cfd8dc', 1.5, px, py + q, px + s * 11, py + q * 1.6)); if (f.ak === 3 && f.ap === 1) C('rgba(130,255,130,.7)', px, py, 18); if (f.bf && f.ak >= 0) bolt(px, py, 8, 8, 5, false); }
-    else if (n === 'Naruto') { C(skin, px, py, 7); if (f.ak === 1) rasen(px + s * 12, py, 13, 0); if (f.ak === 3) rasen(px + s * 4, py - 26, 22, 1); }
+    else if (n === 'Deku') { C('#d5dbdb', px, py, 8); if (lk === 'dark') [-4, 0, 4].forEach(q => LN('#cfd8dc', 1.5, px, py + q, px + s * 11, py + q * 1.6)); if (f.ak === 3 && f.ap === 1) C('rgba(130,255,130,.7)', px, py, 18); if (f.bf && f.ak >= 0) bolt(px, py, 8, 8, 2, false); }
+    else if (n === 'Naruto') { C(skin, px, py, 7); if (f.ak === 1 && f.ap < 2) rasen(px + s * 12, py, 13 + 2 * Math.sin(t / 45), 0); if (f.ak === 3 && f.ap < 2) rasen(px + s * 4, py - 26, 22, 1); if (f.ak === 0 && f.ap < 2) { C('#f5cba7', px + s * 3, py, 8); LN('#fff0c2', 2, px + s * 2, py - 5, px + s * 10, py - 8); } }
     else { C(lk === 'snake' ? '#16161d' : skin, px, py, 10); if (lk === 'snake') C('rgba(255,255,255,.14)', px - 3, py - 3, 4); }
   };
   const sleeve = n === 'Kaze' ? '#1c1c28' : n === 'Naruto' ? '#ff7f27' : n === 'Chevalier' ? '#b0bec5' : n === 'Gojo' ? '#1a2a4f' : n === 'Deku' ? '#2e7d32' : n === 'Denji' ? '#f2f2f2' : n === 'Yugo' ? '#e2b283' : n === 'Shinra' ? '#23232f' : n === 'Eren' ? (f.fm ? '#8a4a35' : '#6d4c41') : n === 'Koro' ? '#f4d03f' : n === 'Kairos' ? '#3b2a5a' : n === 'Ichigo' ? '#16161d' : (n === 'Luffy' && lk === 'snake') ? '#16161d' : skin;
@@ -1102,6 +1132,46 @@ function fighter(f, i) {
     LN('#16161d', 8, 0, -68, -s * 22, -50); C('#16161d', -s * 22, -50, 10);
   } else hand(s * 24, -50);
   if (f.bl && n !== 'Chevalier') { x.fillStyle = 'rgba(120,200,255,.6)'; x.fillRect(s * 24 - 5, -95, 10, 85); }
+  // Naruto : mouvement de taijutsu, chakra et clones
+  if (n === 'Naruto') {
+    if (f.ak === 0 && f.ap >= 0) { // Uzumaki Rendan : rafale de coups aidée par des rémanences de clones
+      const pulse = .5 + .5 * Math.sin(t / 32);
+      for (let q = 0; q < 3; q++) {
+        const u = (t / 95 + q * .31) % 1, ex = s * (30 + u * 45), ey = -82 + q * 17 + Math.sin(t / 42 + q) * 9;
+        x.globalAlpha = .16 + .18 * q;
+        R('#ff7f27', ex - 8, ey - 16, 15, 27); C('#f5cba7', ex, ey - 21, 7);
+        Y('#f9e03b', [[ex-7,ey-25],[ex-10,ey-35],[ex-2,ey-28],[ex+4,ey-37],[ex+8,ey-25]]);
+      }
+      x.globalAlpha = 1;
+      for (let q = 0; q < 4; q++) {
+        const xx = s * (34 + q * 13), yy = -70 + Math.sin(t / 28 + q * 1.8) * 16;
+        LN('rgba(255,205,110,' + (.35 + pulse * .3) + ')', 3, s * 8, -68, xx, yy);
+      }
+      if (f.ap === 1) { x.strokeStyle = 'rgba(255,245,205,.9)'; x.lineWidth = 2.5; x.beginPath(); x.arc(s * 58, -72, 20 + pulse * 5, -1.2, 1.25); x.stroke(); }
+    }
+    if (f.ak === 1 && f.ap >= 0) { // Rasengan : spirale de chakra dense autour de la paume
+      const rr = 18 + 3 * Math.sin(t / 38), hx = s * 37, hy = -67;
+      const g = x.createRadialGradient(hx, hy, 1, hx, hy, rr * 1.9);
+      g.addColorStop(0, 'rgba(255,255,255,.9)'); g.addColorStop(.35, 'rgba(125,205,255,.85)'); g.addColorStop(1, 'rgba(35,115,230,0)');
+      x.fillStyle = g; x.beginPath(); x.arc(hx, hy, rr * 1.9, 0, 7); x.fill();
+      for (let q = 0; q < 4; q++) { x.strokeStyle = q % 2 ? 'rgba(240,250,255,.95)' : 'rgba(80,165,255,.95)'; x.lineWidth = q === 0 ? 3 : 1.7; x.beginPath(); x.arc(hx, hy, rr * (.45 + q * .2), t / (75 + q * 9) + q, t / (75 + q * 9) + q + 4.4); x.stroke(); }
+      for (let q = 0; q < 7; q++) { const a = t / 50 + q * .897, r = rr * (1.2 + .2 * Math.sin(t / 60 + q)); C('rgba(210,240,255,.9)', hx + Math.cos(a) * r, hy + Math.sin(a) * r, 1.5); }
+    }
+    if (f.ak === 2 && f.ap >= 0) { // Kage Bunshin : petits sceaux de fumée et silhouettes qui se dédoublent
+      for (let q = 0; q < 3; q++) { const a = t / 180 + q * 2.1, xx = Math.cos(a) * (36 + q * 8), yy = -72 + Math.sin(a) * 22;
+        x.globalAlpha = .16 + .12 * q; R('#ff7f27', xx - 7, yy, 14, 27); C('#f5cba7', xx, yy - 8, 7); Y('#f9e03b', [[xx-7,yy-10],[xx-9,yy-21],[xx-2,yy-14],[xx+3,yy-23],[xx+8,yy-10]]);
+      }
+      x.globalAlpha = 1;
+      for (let q = 0; q < 8; q++) { const a = q * Math.PI / 4 + t / 110; C('rgba(235,245,255,.55)', Math.cos(a) * 53, -70 + Math.sin(a) * 34, 2 + (q % 2)); }
+    }
+    if (f.ak === 3) { // Rasenshuriken : chakra venteux qui s'enroule autour du bras avant le lancer
+      const a = t / 55, cx = s * 35, cy = -75;
+      for (let q = 0; q < 4; q++) { x.strokeStyle = q % 2 ? 'rgba(225,250,255,.8)' : 'rgba(115,195,255,.8)'; x.lineWidth = 2 + (q === 0 ? 1 : 0); x.beginPath(); x.ellipse(cx, cy, 18 + q * 5, 9 + q * 3, a + q * .35, 0, 5.3); x.stroke(); }
+      for (let q = 0; q < 6; q++) { const aa = a + q * Math.PI / 3; LN('rgba(210,245,255,.8)', 2, cx + Math.cos(aa) * 15, cy + Math.sin(aa) * 10, cx + Math.cos(aa) * 34, cy + Math.sin(aa) * 23); }
+    }
+  }
+  if (n === 'Gojo' && f.ak === 2) gojoHeal(0, -57, f.ap);
+
   if (dk) {
     // Full Cowl : filaments verts qui parcourent les bras et les jambes, même hors attaque
     if (f.bf) {
@@ -1110,11 +1180,26 @@ function fighter(f, i) {
       [[-12,-82,-17,-28], [12,-82,17,-28], [-12,-22,-13,-5], [12,-22,13,-5]].forEach(a => { x.beginPath(); x.moveTo(a[0],a[1]); x.lineTo(a[0]+(a[2]-a[0])*.55-3,a[1]+(a[3]-a[1])*.55); x.lineTo(a[2],a[3]); x.stroke(); });
       for (let q=0;q<4;q++) { const yy=-24-((t/18+q*24)%105); C('rgba(190,255,200,.85)', Math.sin(t/90+q*2)*25, yy, 1.5); }
     }
-    // Coup de poing : compression de l'air et rémanence directionnelle
+    // Coup de poing : poing renforcé, compression d'air et impact en arc
     if (f.ak === 0 && f.ap >= 0) {
-      const u = f.ap === 0 ? .35 : f.ap === 1 ? 1 : .55;
-      for (let q=0;q<4;q++) { const xx=s*(30+q*13); LN('rgba(110,255,145,'+(u*.55)+')', 3-q*.4, xx, -68-q*3, xx+s*(18+q*7), -68-q*3); }
-      if (f.ap === 1) { x.strokeStyle='rgba(225,255,230,.9)'; x.lineWidth=2; x.beginPath(); x.arc(s*54,-66,18,t/90,t/90+4.7); x.stroke(); }
+      const u = f.ap === 0 ? .45 : f.ap === 1 ? 1 : .62, pulse = .5 + .5 * Math.sin(t / 34);
+      const hx = s * (f.ap === 1 ? 68 : 48), hy = -66;
+      // manchette renforcée et plaque de frappe au poing
+      LN('#174c22', 13, s * 10, -65, hx - s * 5, hy);
+      LN('#3c9b49', 8, s * 12, -66, hx - s * 5, hy);
+      R('#b9c8c7', hx - s * 7, hy - 8, 14, 16); R('#eef7f5', hx - s * 5, hy - 6, 8, 4);
+      // trois sillages d'air convergent vers le point de frappe
+      for (let q = 0; q < 3; q++) {
+        const yy = -88 + q * 20, ex = s * (hx * s - 12 - q * 7);
+        LN('rgba(150,255,175,' + (u * .5) + ')', 2.5 - q * .35, s * 22, yy, ex, yy + (hy - yy) * .35);
+      }
+      if (f.ap === 1) {
+        x.save(); x.translate(hx, hy); x.scale(s, 1);
+        x.strokeStyle = 'rgba(225,255,235,.95)'; x.lineWidth = 3; x.beginPath(); x.arc(0, 0, 24 + pulse * 7, -1.35, 1.35); x.stroke();
+        x.strokeStyle = 'rgba(90,255,135,.8)'; x.lineWidth = 2; x.beginPath(); x.arc(0, 0, 34 + pulse * 8, -1.15, 1.15); x.stroke();
+        for (let q = 0; q < 5; q++) { const yy = -25 + q * 12; LN('rgba(235,255,240,.8)', 1.5, 9, yy, 31 + q * 3, yy - 5); }
+        x.restore();
+      }
     }
     // Ultime Detroit Smash 100% : charge, impact blanc-vert, puis onde de choc persistante
     if (f.ak === 3) {
@@ -1377,7 +1462,18 @@ function draw() {
         x.fillStyle = '#f9e03b'; x.beginPath(); x.arc(0, -22, 8, Math.PI, 0); x.fill();
         R('#2c5fa8', -8, -22, 16, 3); R('#000', p.v * 3, -19, 2, 2);
         x.restore();
-      } else if (p.k === 2) rasen(p.x, p.y, p.r, 1);
+      } else if (p.k === 2) { // Rasenshuriken : noyau de chakra et quatre pales de vent tranchantes
+        x.save(); x.translate(p.x, p.y); x.rotate(Date.now() / 95 * (p.v || 1));
+        const rr = p.r, g = x.createRadialGradient(0, 0, 2, 0, 0, rr * 1.35);
+        g.addColorStop(0, 'rgba(255,255,255,.98)'); g.addColorStop(.32, 'rgba(155,220,255,.9)'); g.addColorStop(1, 'rgba(70,150,255,0)');
+        x.fillStyle = g; x.beginPath(); x.arc(0, 0, rr * 1.35, 0, 7); x.fill();
+        for (let q = 0; q < 4; q++) { const a = q * Math.PI / 2;
+          x.save(); x.rotate(a); Y('rgba(220,248,255,.92)', [[rr*.25,-rr*.18],[rr*.55,-rr*.55],[rr*1.55,-rr*.18],[rr*.95,0],[rr*1.55,rr*.18],[rr*.55,rr*.55],[rr*.25,rr*.18]]);
+          LN('#fff', 1.7, rr*.35, 0, rr*1.42, 0); x.restore();
+        }
+        x.strokeStyle = 'rgba(125,200,255,.95)'; x.lineWidth = 2.5; x.beginPath(); x.arc(0, 0, rr*.56, 0, 7); x.stroke();
+        C('#f8fdff', 0, 0, rr*.28); x.restore();
+      }
       else if (p.k === 4) gojoRed(p.x, p.y, p.r);
       else if (p.k === 5) gojoBlue(p.x, p.y, p.r);
       else if (p.k === 7) {
