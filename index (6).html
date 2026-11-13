@@ -230,7 +230,7 @@ const SHOP = [
   { id: 'skin_naruto_hermite', type: 'skin', char: 'Naruto', name: 'Naruto Mode Hermite', price: 150, look: 'sage', pal: { '#ff7f27': '#d0451b', '#2c5fa8': '#222', '#2c3e50': '#111' } },
   { id: 'skin_koro_blanc', type: 'skin', char: 'Koro', name: 'Koro-sensei blanc', price: 150, look: 'white', pal: { '#f4d03f': '#f5f5f1', '#e6b800': '#dcdcd5', '#f1c40f': '#e8e8e2' } },
   { id: 'skin_shinra_banshoman', type: 'skin', char: 'Shinra', name: 'Shinra Banshoman', price: 250, look: 'banshoman', pal: { '#f5cba7': '#b8402f', '#23232f': '#a63a2f', '#1b1b24': '#7a2a22', '#bdc3c7': '#a63a2f', '#111': '#3a1410', '#15151c': '#e9e9e9', '#000': '#fff' } },
-  { id: 'skin_ichigo_bloodchains', type: 'skin', char: 'Ichigo', name: 'Ichigo - Sauveur de Rukia', price: 250, look: 'bloodchains', desc: 'Ichigo à Soul Society : shihakushō noir déchiré, obi blanc, bandages, plaies, Zangetsu au dos et reiatsu bleu', pal: {} },
+  { id: 'skin_ichigo_bloodchains', type: 'skin', char: 'Ichigo', name: 'Ichigo - Sauveur de Rukia', price: 250, look: 'bloodchains', desc: 'Ichigo à Soul Society : grand manteau beige à capuche pointue, tunique noire, bandages, obi blanc et Zangetsu au ruban blanc', pal: {} },
   { id: 'skin_kairos_azur', type: 'skin', char: 'Kairos', name: 'Kairos azur', price: 150, pal: { '#3b2a5a': '#174b63', '#2b1f3d': '#102f45', '#2a2038': '#163b50', '#d9b84a': '#55d6d2', '#f5ecd0': '#d9ffff' } },
 ];
 let tNew = '', chestGain = '', chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
@@ -1290,25 +1290,25 @@ function fighter(f, i) {
     // Blackwhip : filaments sombres et verts lors des phases de mouvement rapide / ultime avancé
     if (lk === 'dark' && (f.ak === 3 || f.bf)) for(let q=0;q<4;q++){const w=Math.sin(t/120+q*1.7)*13; x.strokeStyle='rgba(12,24,18,.9)'; x.lineWidth=3; x.beginPath(); x.moveTo(-s*12,-78+q*9); x.quadraticCurveTo(-s*(52+q*8),-112+w,-s*(78+q*13),-65+q*20); x.stroke(); x.strokeStyle='rgba(90,255,130,.7)'; x.lineWidth=1; x.stroke();}
   }
-  if (n === 'Ichigo' && lk === 'bloodchains') { // Ichigo à Soul Society (sauvetage de Rukia) : shihakushō noir déchiré, obi blanc, bandages, kyahan, waraji, plaies, reiatsu bleu
-    const sway = Math.sin(t / 260) * 3;
+  if (n === 'Ichigo' && lk === 'bloodchains') { // Ichigo à Soul Society : grand manteau beige à capuche pointue, shihakushō noir, bandages, obi blanc, Zangetsu à poignée enveloppée et long ruban blanc
+    const w = Math.sin(t / 220) * 6, w2 = Math.cos(t / 260) * 5, sway = Math.sin(t / 260) * 3;
     x.save(); x.lineJoin = 'round'; x.lineCap = 'round';
-    Y('#15151c', [[-22, -30], [22, -30], [24, -22], [17, -26], [12, -16], [6, -24], [0, -14], [-6, -24], [-12, -16], [-17, -26], [-24, -22]]); // bas de la tunique en lambeaux
-    R('#d9d4c8', -16, -22, 13, 4); R('#d9d4c8', 3, -22, 13, 4); LN('#a39d90', 1, -16, -20, -3, -18); LN('#a39d90', 1, 3, -20, 16, -18); // bandes des jambes
-    R('#8d6e4a', -18, -3, 17, 3); R('#8d6e4a', 1, -3, 17, 3); LN('#5d4037', 1.5, -14, -6, -8, -2); LN('#5d4037', 1.5, 6, -6, 12, -2); // sandales waraji
-    R('#e9e6df', -22, -49, 44, 8); LN('rgba(0,0,0,.18)', 1, -22, -45, 22, -45); // obi blanc et son nœud
-    Y('#e9e6df', [[-s * 12, -46], [-s * 27, -57], [-s * 28, -39]]); Y('#e9e6df', [[-s * 14, -42], [-s * 22, -20 + sway], [-s * 12, -23]]);
-    Y(skin, [[s * 17, -88], [s * 29, -85], [s * 27, -70], [s * 21, -76], [s * 17, -68]]); // épaule déchirée
-    Y('#eeeae3', [[-22, -86], [-13, -91], [22, -58], [22, -48]]); LN('rgba(120,110,100,.6)', 1, -16, -80, 18, -52); LN('rgba(120,110,100,.6)', 1, -8, -86, 22, -55); // bandage en diagonale
-    C('#a93226', 8, -64, 4); LN('#a93226', 2, 8, -62, 8, -53); // sang
-    LN('#0b0b10', 3, -9, -90, 2, -63); LN('#0b0b10', 3, 9, -90, 2, -63); // revers du col
-    LN('#c0392b', 1.5, -s * 5, -98, -s * 1, -93); R('#efebe4', s * 7, -99, 7, 4); LN('#9a948a', 1, s * 10.5, -99, s * 10.5, -95); // plaie et pansement
-    LN('#2a1408', 3, 0, -108, s * 11, -105); // sourcil froncé
-    if (!f.fm && f.ak !== 0 && f.ak !== 1) { // Zangetsu au dos : poignée enveloppée de bandes blanches et chaîne
+    Y('#b8a89c', [[-s * 18, -94], [-s * 52, -100 + w], [-s * 100, -70 + w2], [-s * 92, -28 + w], [-s * 108, 6 + w2], [-s * 62, -4], [-s * 24, -18]]); // manteau qui flotte dans le dos
+    Y('#dcd2ca', [[-s * 30, -80], [-s * 70, -74 + w2], [-s * 95, -40 + w], [-s * 60, -42], [-s * 34, -50]]); // doublure claire
+    LN('#8d7d72', 2, -s * 52, -100 + w, -s * 100, -70 + w2); LN('#8d7d72', 1.5, -s * 40, -60, -s * 78, -20 + w);
+    Y('#15151c', [[-22, -30], [22, -30], [24, -22], [17, -26], [12, -16], [6, -24], [0, -14], [-6, -24], [-12, -16], [-17, -26], [-24, -22]]); // bas du hakama en lambeaux
+    Y('#efebe4', [[-8, -90], [8, -90], [6, -58], [-6, -58]]); for (let q = 0; q < 5; q++) LN('rgba(110,100,90,.7)', 1, -8, -88 + q * 7, 8, -84 + q * 7); // bandages sur la poitrine
+    Y('#b8a89c', [[-26, -92], [-6, -94], [-1, -72], [-24, -72]]); Y('#b8a89c', [[26, -92], [6, -94], [1, -72], [24, -72]]); // pans du manteau sur les épaules
+    LN('#8d7d72', 1.5, -24, -90, -22, -72); LN('#8d7d72', 1.5, 24, -90, 22, -72);
+    Y('#a39388', [[-s * 16, -112], [-s * 12, -150], [-s * 1, -118]]); LN('#7d6d62', 1.5, -s * 16, -112, -s * 12, -150); // capuche pointue
+    x.setLineDash([3, 2]); x.strokeStyle = '#6d5a4c'; x.lineWidth = 3; x.beginPath(); x.moveTo(-8, -93); x.quadraticCurveTo(14, -80, 10, -52); x.stroke(); x.setLineDash([]); // cordon tressé
+    R('#efece6', -22, -49, 44, 9); LN('rgba(0,0,0,.15)', 1, -22, -44, 22, -44); // obi blanc
+    Y('#efece6', [[-s * 8, -46], [-s * 22, -56], [-s * 24, -38]]); Y('#efece6', [[-s * 12, -41], [-s * 22, -12 + sway], [-s * 12, -16]]); Y('#e3dfd8', [[-s * 4, -41], [-s * 8, -10 + sway], [s * 2, -14]]);
+    R('#efebe4', s * 19, -66, 9, 14); LN('rgba(110,100,90,.7)', 1, s * 19, -62, s * 28, -60); LN('rgba(110,100,90,.7)', 1, s * 19, -57, s * 28, -55); // avant-bras bandé
+    if (!f.fm && f.ak !== 0 && f.ak !== 1) { // Zangetsu : poignée enveloppée de tissu et long ruban blanc qui flotte
       LN('#efebe4', 7, s * 6, -136, s * 11, -149); for (let q = 0; q < 3; q++) LN('#8a867e', 1.2, s * (6 + q * 1.7) - 3, -136 - q * 4.3, s * (6 + q * 1.7) + 3, -138 - q * 4.3);
-      x.strokeStyle = '#9aa0a6'; x.lineWidth = 2; for (let q = 0; q < 3; q++) { x.beginPath(); x.arc(s * (14 + q * 3), -153 + q * 5 + sway * .3, 2.4, 0, 7); x.stroke(); }
+      let ppx = s * 11, ppy = -149; for (let k = 1; k <= 9; k++) { const cx = s * 11 - s * k * 9, cy = -149 + Math.sin(t / 160 + k * .8) * 6 - k * 1.2; LN('#f2efe9', 5 - k * .4, ppx, ppy, cx, cy); ppx = cx; ppy = cy; }
     }
-    for (let q = 0; q < 5; q++) LN('rgba(150,210,255,.4)', 2, -22 + q * 11, -4, -24 + q * 11 + Math.sin(t / 200 + q) * 4, -34 - (t / 22 + q * 15) % 44); // reiatsu
     x.restore();
   }
   x.restore(); PAL = null;
