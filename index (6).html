@@ -8,7 +8,7 @@
 <title>Duel Arena</title>
 <style>
 body{margin:0;background:#111;color:#fff;font-family:system-ui,sans-serif;display:flex;justify-content:center;min-height:100vh;align-items:center}
-#wrap{position:relative;width:100%;max-width:900px}
+#wrap{position:relative;width:100%;max-width:min(100vw,150vh)}
 canvas{width:100%;display:block;background:#222}
 #ov{overflow:auto;position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(0,0,0,.8);text-align:center;padding:10px;box-sizing:border-box}
 
@@ -199,13 +199,13 @@ html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 #tmenu button{width:40px;height:40px;font-size:18px}
 #rot{display:none;position:absolute;top:0;left:0;right:0;background:#e67e22;color:#fff;text-align:center;padding:5px;font-size:13px;z-index:6}
 @media (pointer:coarse) and (orientation:portrait){#rot{display:block}}
-@media (pointer:coarse) and (orientation:landscape){#wrap{width:auto}canvas{width:auto;height:auto;max-width:100vw;max-height:100vh}}
+@media (pointer:coarse) and (orientation:landscape){#wrap{width:auto}canvas{width:min(100vw,150vh);height:auto}}
 </style>
 </head>
 <body>
 <div id="wrap">
 	<div id="rot">📱 Tourne ton téléphone en mode paysage pour mieux jouer</div>
-	<canvas id="c" width="900" height="600"></canvas>
+	<canvas id="c" width="1800" height="1200"></canvas>
 	<div id="ov"></div>
 	<div id="cfx"></div>
 	<div id="splash">
@@ -1531,7 +1531,12 @@ function gpMenu(c) {
   els.forEach(e => e.classList.toggle('gp', gpNav.active && e === curEl));
 }
 
+// ===== ÉCRAN AGRANDI : le jeu occupe toute la fenêtre (rapport 3:2), canvas en haute résolution et menus agrandis =====
+const KRES = 2, wrapEl = document.getElementById('wrap');
+function fitScreen() { const k = Math.max(1, wrapEl.clientWidth / 900); ov.style.zoom = k; document.getElementById('cfx').style.zoom = k; }
+new ResizeObserver(fitScreen).observe(wrapEl); fitScreen();
 function draw() {
+  x.setTransform(KRES, 0, 0, KRES, 0, 0);
   gpPoll();
   if (!splashOn && !cfPhase && (save.chests || 0) > 0 && !searching && (me < 0 || (S && S.p === 'end'))) cfStart();
   const inGame = isTouch && me >= 0 && !!S && !!S.f && S.f.length > 0 && S.p !== 'end';
