@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -149,82 +148,15 @@ html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 #touch{display:none;position:absolute;left:0;right:0;bottom:0;padding:0 10px 10px;justify-content:space-between;align-items:flex-end;pointer-events:none;z-index:5;user-select:none;-webkit-user-select:none;touch-action:none}
 #touch button,#tmenu button{pointer-events:auto;touch-action:none;border:0;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;font-size:20px;font-weight:bold;width:clamp(46px,9vw,68px);height:clamp(46px,9vw,68px);padding:0;margin:3px;-webkit-user-select:none;user-select:none}
 #touch button.on{background:rgba(52,152,219,.7)}
-#touch .joy-zone{width:clamp(126px,22vw,156px);height:clamp(126px,22vw,156px);display:flex;align-items:center;justify-content:center;pointer-events:auto;touch-action:none}
-#touch .joystick{position:relative;width:112px;height:112px;border-radius:50%;background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.32);box-shadow:inset 0 0 0 12px rgba(255,255,255,.035);touch-action:none}
-#touch .joystick:before{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.22);transform:translate(-50%,-50%)}
-#touch .joy-knob{position:absolute;left:50%;top:50%;width:48px;height:48px;border-radius:50%;background:rgba(52,152,219,.82);border:2px solid rgba(255,255,255,.7);box-shadow:0 2px 8px rgba(0,0,0,.35);transform:translate(-50%,-50%);pointer-events:none}
-#touch .acts{display:grid;grid-template-columns:auto auto;pointer-events:auto}
+#touch .pad{display:flex;flex-direction:column;align-items:center}
+#touch .row{display:flex}
+#touch .acts{display:grid;grid-template-columns:auto auto}
 #touch .ult{background:rgba(241,196,15,.45)}
-@media(max-height:430px) and (pointer:coarse){#touch .joy-zone{width:118px;height:118px}#touch .joystick{width:96px;height:96px}#touch .joy-knob{width:42px;height:42px}#touch button{width:clamp(42px,8vw,58px);height:clamp(42px,8vw,58px)}}
 #tmenu{display:none;position:absolute;top:4px;right:6px;z-index:5}
 #tmenu button{width:40px;height:40px;font-size:18px}
 #rot{display:none;position:absolute;top:0;left:0;right:0;background:#e67e22;color:#fff;text-align:center;padding:5px;font-size:13px;z-index:6}
 @media (pointer:coarse) and (orientation:portrait){#rot{display:block}}
 @media (pointer:coarse) and (orientation:landscape){#wrap{width:auto}canvas{width:auto;height:auto;max-width:100vw;max-height:100vh}}
-
-
-/* AFFICHAGE PLEIN ÉCRAN : le navigateur ne doit plus faire défiler la page */
-html, body {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  overscroll-behavior: none;
-  touch-action: none;
-}
-body {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#wrap {
-  position: relative;
-  width: min(100vw, 150dvh);
-  height: min(100dvh, 66.6667vw);
-  max-width: none;
-  max-height: none;
-  flex: none;
-  overflow: hidden;
-}
-#wrap > canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
-}
-#ov {
-  width: 100%;
-  height: 100%;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-#touch { bottom: 0; }
-
-/* Sur téléphone, le jeu occupe toute la surface disponible, sans scroll de page. */
-@media (pointer: coarse) {
-  #wrap {
-    width: 100vw;
-    height: 100dvh;
-  }
-  #wrap > canvas {
-    width: 100%;
-    height: 100%;
-  }
-  #ov { max-height: 100%; }
-}
-@supports not (height: 100dvh) {
-  #wrap { height: min(100vh, 66.6667vw); }
-  body { height: 100vh; }
-  @media (pointer: coarse) {
-    #wrap { height: 100vh; }
-  }
-}
-
 </style>
 </head>
 <body>
@@ -233,7 +165,7 @@ body {
 	<canvas id="c" width="900" height="600"></canvas>
 	<div id="ov"></div>
 	<div id="touch">
-		<div class="joy-zone"><div id="joystick" class="joystick" aria-label="Joystick de déplacement"><div id="joy-knob" class="joy-knob"></div></div></div>
+		<div class="pad"><button data-k="u">▲</button><div class="row"><button data-k="l">◀</button><button data-k="d">▼</button><button data-k="r">▶</button></div></div>
 		<div class="acts"><button data-k="0">J</button><button data-k="1">K</button><button data-k="2">L</button><button data-k="3" class="ult">U</button></div>
 	</div>
 	<div id="tmenu"><button id="tr">↺</button><button id="tq">✕</button></div>
@@ -1110,59 +1042,11 @@ function press(k, v) {
     if (ws && ws.readyState === 1 && me >= 0) ws.send(JSON.stringify({ t: 'in', l: keys.l, r: keys.r, u: keys.u, d: keys.d, a: [keys[0], keys[1], keys[2], keys[3]] }));
   }
 }
-// Joystick virtuel : les directions sont envoyées au serveur comme les anciennes touches.
-const joy = document.getElementById('joystick');
-const joyKnob = document.getElementById('joy-knob');
-let joyPointer = null;
-const joyRadius = 42;
-function updateJoystick(e) {
-  const rect = joy.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top + rect.height / 2;
-  let dx = e.clientX - cx, dy = e.clientY - cy;
-  const dist = Math.hypot(dx, dy);
-  if (dist > joyRadius) { dx = dx / dist * joyRadius; dy = dy / dist * joyRadius; }
-  joyKnob.style.left = `calc(50% + ${dx}px)`;
-  joyKnob.style.top = `calc(50% + ${dy}px)`;
-  const nx = dx / joyRadius, ny = dy / joyRadius;
-  press('l', nx < -0.24);
-  press('r', nx > 0.24);
-  press('u', ny < -0.24);
-  press('d', ny > 0.24);
-}
-function resetJoystick(e) {
-  if (joyPointer !== null && e && e.pointerId !== joyPointer) return;
-  joyPointer = null;
-  joyKnob.style.left = '50%';
-  joyKnob.style.top = '50%';
-  ['l', 'r', 'u', 'd'].forEach(k => press(k, false));
-}
-joy.addEventListener('pointerdown', e => {
-  e.preventDefault();
-  if (joyPointer !== null) return;
-  joyPointer = e.pointerId;
-  try { joy.setPointerCapture(e.pointerId); } catch (err) {}
-  updateJoystick(e);
-});
-joy.addEventListener('pointermove', e => {
-  if (e.pointerId !== joyPointer) return;
-  e.preventDefault();
-  updateJoystick(e);
-});
-joy.addEventListener('pointerup', e => { e.preventDefault(); resetJoystick(e); });
-joy.addEventListener('pointercancel', resetJoystick);
-joy.addEventListener('lostpointercapture', resetJoystick);
-joy.addEventListener('contextmenu', e => e.preventDefault());
-
-// Les boutons d'attaque conservent leur fonctionnement actuel.
-tc.querySelectorAll('.acts button').forEach(b => {
-  const k = Number(b.dataset.k);
-  const down = e => { e.preventDefault(); try { b.setPointerCapture(e.pointerId); } catch (err) {} b.classList.add('on'); press(k, true); };
+tc.querySelectorAll('button').forEach(b => {
+  const k = isNaN(b.dataset.k) ? b.dataset.k : Number(b.dataset.k);
+  const down = e => { e.preventDefault(); if (b.setPointerCapture) try { b.setPointerCapture(e.pointerId); } catch (x) {} b.classList.add('on'); press(k, true); };
   const up = e => { e.preventDefault(); b.classList.remove('on'); press(k, false); };
-  b.addEventListener('pointerdown', down);
-  b.addEventListener('pointerup', up);
-  b.addEventListener('pointercancel', up);
-  b.addEventListener('lostpointercapture', up);
+  b.addEventListener('pointerdown', down); b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('lostpointercapture', up);
   b.addEventListener('contextmenu', e => e.preventDefault());
 });
 document.getElementById('tr').addEventListener('click', () => { if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'training_reset' })); });
@@ -1170,7 +1054,7 @@ document.getElementById('tq').addEventListener('click', () => leave());
 
 function draw() {
   const inGame = isTouch && me >= 0 && !!S && !!S.f && S.f.length > 0 && S.p !== 'end';
-  if (inGame !== touchOn) { touchOn = inGame; tc.style.display = inGame ? 'flex' : 'none'; if (!inGame) { ['l', 'r', 'u', 'd', 0, 1, 2, 3].forEach(k => { keys[k] = false; }); resetJoystick(); } }
+  if (inGame !== touchOn) { touchOn = inGame; tc.style.display = inGame ? 'flex' : 'none'; if (!inGame) ['l', 'r', 'u', 'd', 0, 1, 2, 3].forEach(k => { keys[k] = false; }); }
   const tr = inGame && S.p === 'training';
   if (tr !== trOn) { trOn = tr; tm.style.display = tr ? 'flex' : 'none'; }
   PAL = null; FL = 0; x.save(); x.translate(0, OFF); drawMap(S && S.f.length ? S.mp : -1);
