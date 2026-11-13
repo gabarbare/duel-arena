@@ -136,6 +136,9 @@ input{text-transform:uppercase;width:90px;text-align:center}
 .menu-shop{border-color:#65458a}
 .menu-combat{border-color:#8b642e;background:rgba(35,29,20,.92)}
 .menu-combat button{min-height:48px;font-size:14px}
+.menu-combat .combat-row{display:flex;gap:8px;width:100%}
+.menu-combat .combat-row button{flex:1 1 0;min-width:0;width:0;padding:10px 6px;line-height:1.2}
+.menu-combat > .combat-matchmaking{width:100%}
 .menu-info{border-color:#385c83}
 .menu-join{display:flex;gap:5px;width:100%}
 .menu-join input{min-width:0;flex:1;width:50px;padding:8px 4px}
@@ -152,12 +155,16 @@ input{text-transform:uppercase;width:90px;text-align:center}
   .menu-group{padding:10px 8px;gap:8px}
   .menu-group h2{font-size:12px}
   .menu-group button{font-size:12px;min-height:40px}
+  .menu-combat .combat-row{gap:6px}
+  .menu-combat .combat-row button{font-size:11px;padding:9px 4px}
 }
 @media(max-width:380px){
   #ov.menu-screen{padding:8px 6px}
   .menu-layout{gap:6px}
   .menu-group{padding:8px 6px}
   .menu-group button{font-size:11px;padding:8px 5px}
+  .menu-combat .combat-row{gap:5px}
+  .menu-combat .combat-row button{font-size:10px;padding:8px 3px}
 }
 .card.lock{opacity:.45}
 .chip{display:inline-block;margin:3px 2px 0 0;padding:1px 7px;border-radius:9px;background:#555;font-size:11px}
@@ -569,11 +576,15 @@ function ui() {
       </section>
       <section class="menu-group menu-combat">
         <h2>⚔️ Combats</h2>
-        <button onclick="teamSolo()" style="background:#c0392b">👥 2v2 aléatoire</button>
-        <button onclick="teamCreate()" style="background:#c0392b">👥 Créer une équipe 2v2</button>
-        <button onclick="search()" style="background:#e67e22">🎲 Matchmaking</button>
-        <button onclick="go({t:'create'})">🌐 Créer une partie</button>
-        <button onclick="view='botlvl';ui()" style="background:#16a085">🤖 Jouer contre un bot</button>
+        <button class="combat-matchmaking" onclick="search()" style="background:#e67e22">🎲 Matchmaking</button>
+        <div class="combat-row">
+          <button onclick="teamSolo()" style="background:#c0392b">👥 2v2 aléatoire</button>
+          <button onclick="view='botlvl';ui()" style="background:#16a085">🤖 Jouer contre un bot</button>
+        </div>
+        <div class="combat-row">
+          <button onclick="teamCreate()" style="background:#c0392b">👥 Créer une équipe 2v2</button>
+          <button onclick="go({t:'create'})">🌐 Créer une partie</button>
+        </div>
         <div class="menu-join">
           <input id="cd" maxlength="4" placeholder="CODE" value="${location.hash.slice(1)}">
           <button onclick="go({t:'join',code:document.getElementById('cd').value})">Rejoindre</button>
