@@ -4,7 +4,8 @@ const html = fs.readFileSync(path.join(__dirname, 'index (6).html'));
 const server = http.createServer((q, r) => { r.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); r.end(html); });
 const wss = new WebSocketServer({ server });
 
-const W = 900, G = 380, BW = 44, BH = 90, GR = 0.65, ROUND = 5400; // 5400 frames = 1 min 30
+const W = 1200, // largeur de l'arène (doit être égale à WW dans index (6).html)
+  G = 380, BW = 44, BH = 90, GR = 0.65, ROUND = 5400; // 5400 frames = 1 min 30
 // type: m = mêlée, p = projectile, d = dash, sky = foudre du ciel, buff = bonus temporaire
 // ult:1 = ultime (barre pleine requise), ub:1 = ne peut pas être bloqué, multi = touche plusieurs fois
 const CH = [
@@ -132,7 +133,7 @@ const MAPS = [
 function rollMap(r) { let m; do { m = Math.random() * MAPS.length | 0; } while (m === r.mi); r.mi = m; }
 
 const atks = f => (f.form > 0 && CH[f.c].alt) || CH[f.c].atk;
-const nf = (c, i, inp, ult) => ({ c, x: i ? 650 : 250, y: G, vx: 0, vy: 0, hp: CH[c].hp, face: i ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
+const nf = (c, i, inp, ult) => ({ c, x: i ? W - 250 : 250, y: G, vx: 0, vy: 0, hp: CH[c].hp, face: i ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
   block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, portal: null, lz: 0, lzcd: 0, lzd: null, hist: [], frozen: 0, stored: 0, fzm: 1, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
 
 const sz = f => f.sz || 1;
@@ -431,7 +432,7 @@ function startTraining(r, characterIndex, skin) {
   r.sk = [String(skin || '').slice(0, 40), ''];
   r.f = [nf(characterIndex, 0), nf(dummyIndex, 1)];
   r.f[0].x = 250;
-  r.f[1].x = 650;
+  r.f[1].x = W - 250;
   r.f[1].trainingDummy = true;
   r.f[1].totalDamage = 0;
   r.f[1].hitCount = 0;
@@ -499,7 +500,7 @@ function tick(r) {
 
     // Le mannequin ne bouge pas et ne peut pas être éliminé.
     const dummy = r.f[1];
-    dummy.x = 650;
+    dummy.x = W - 250;
     dummy.y = G;
     dummy.vx = 0;
     dummy.vy = 0;
