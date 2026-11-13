@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -1507,7 +1506,41 @@ function draw() {
         x.fillStyle = 'rgba(255,240,150,.9)'; x.beginPath(); x.moveTo(-6, -p.r * 1.8);
         x.quadraticCurveTo(p.r * 1.4, 0, -6, p.r * 1.8); x.quadraticCurveTo(p.r * .4, 0, -6, -p.r * 1.8); x.fill();
         x.strokeStyle = '#fff'; x.lineWidth = 2; x.stroke(); x.restore();
-      } else { x.fillStyle = chars[S.f[p.o].c].color; x.beginPath(); x.arc(p.x, p.y, p.r, 0, 7); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 2; x.stroke(); }
+      }
+      else if (p.k === 18) { // Zéphyr 1 : éclair magique violet et blanc
+        x.save(); x.translate(p.x, p.y); x.scale(p.v || 1, 1);
+        const pulse = .8 + .2 * Math.sin(Date.now() / 35);
+        x.strokeStyle = 'rgba(190,125,255,.35)'; x.lineWidth = p.r * 2.5; x.lineCap = 'round';
+        x.beginPath(); x.moveTo(-p.r * 2.5, 0); x.lineTo(p.r * 2.5, 0); x.stroke();
+        x.fillStyle = 'rgba(185,115,255,.2)'; x.beginPath(); x.arc(0,0,p.r*2.2,0,7); x.fill();
+        x.strokeStyle = '#b96cff'; x.lineWidth = 5 * pulse; x.lineJoin = 'miter';
+        x.beginPath(); x.moveTo(-p.r*2.4,-p.r*.15); x.lineTo(-p.r*.65,-p.r*.85); x.lineTo(-p.r*.25,-p.r*.12); x.lineTo(p.r*.65,-p.r*.9); x.lineTo(p.r*.2,p.r*.08); x.lineTo(p.r*2.4,-p.r*.2); x.stroke();
+        x.strokeStyle = '#fff'; x.lineWidth = 2.2; x.beginPath(); x.moveTo(-p.r*2.4,-p.r*.15); x.lineTo(-p.r*.65,-p.r*.85); x.lineTo(-p.r*.25,-p.r*.12); x.lineTo(p.r*.65,-p.r*.9); x.lineTo(p.r*.2,p.r*.08); x.lineTo(p.r*2.4,-p.r*.2); x.stroke();
+        x.restore();
+      }
+      else if (p.k === 19) { // Zéphyr 2 : boule de feu avec noyau incandescent et flammes
+        x.save(); x.translate(p.x, p.y); x.scale(p.v || 1, 1);
+        const t = Date.now()/65, pulse = .92 + .12*Math.sin(t);
+        const g = x.createRadialGradient(-p.r*.28,-p.r*.2,1,0,0,p.r*1.45);
+        g.addColorStop(0,'#fff9c4'); g.addColorStop(.28,'#ffe36b'); g.addColorStop(.62,'#ff7a24'); g.addColorStop(1,'rgba(220,35,15,0)');
+        x.fillStyle=g; x.beginPath(); x.arc(0,0,p.r*1.35*pulse,0,7); x.fill();
+        for(let q=0;q<5;q++){ const a=t*.8+q*Math.PI*2/5, rr=p.r*(.72+.12*Math.sin(t+q));
+          x.fillStyle=q%2?'#ff8b28':'#ffe16b'; x.beginPath(); x.ellipse(Math.cos(a)*rr*.55,Math.sin(a)*rr*.55, p.r*.23,p.r*.48,a,0,7); x.fill(); }
+        x.strokeStyle='rgba(255,248,210,.95)'; x.lineWidth=2; x.beginPath(); x.arc(-p.r*.18,-p.r*.18,p.r*.48,-2.4,.8); x.stroke();
+        x.restore();
+      }
+      else if (p.k === 20) { // Zéphyr 3 : orbes de vent en rotation
+        x.save(); x.translate(p.x,p.y); x.scale(p.v || 1,1);
+        const t=Date.now()/180, rr=p.r;
+        x.strokeStyle='rgba(180,245,255,.65)'; x.lineWidth=2; x.beginPath(); x.ellipse(0,0,rr*1.8,rr*.85,t*.35,0,7); x.stroke();
+        for(let q=0;q<3;q++){ const a=t+q*Math.PI*2/3, ox=Math.cos(a)*rr*.85, oy=Math.sin(a)*rr*.48;
+          const g=x.createRadialGradient(ox-rr*.2,oy-rr*.2,1,ox,oy,rr*.72);
+          g.addColorStop(0,'#fff'); g.addColorStop(.35,'#d9ffff'); g.addColorStop(.75,'#83dcf2'); g.addColorStop(1,'rgba(105,205,240,.08)');
+          x.fillStyle=g; x.beginPath(); x.arc(ox,oy,rr*.58,0,7); x.fill();
+          x.strokeStyle='rgba(255,255,255,.9)'; x.lineWidth=1.4; x.beginPath(); x.arc(ox,oy,rr*.58,a,a+Math.PI*1.35); x.stroke(); }
+        x.restore();
+      }
+      else { x.fillStyle = chars[S.f[p.o].c].color; x.beginPath(); x.arc(p.x, p.y, p.r, 0, 7); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 2; x.stroke(); }
     });
     x.restore(); hud();
   } else x.restore();
