@@ -1064,7 +1064,7 @@ function gpPoll() {
   let p = null; for (const q of pads) if (q && q.connected) { p = q; break; }
   if (!p) return;
   const B = i => !!(p.buttons[i] && (p.buttons[i].pressed || p.buttons[i].value > .5)), ax = p.axes[0] || 0, ay = p.axes[1] || 0;
-  const cur = { l: ax < -.45 || B(14), r: ax > .45 || B(15), u: ay < -.45 || B(12) || B(0), d: ay > .45 || B(13) || B(4), 0: B(2), 1: B(3), 2: B(1), 3: B(5) || B(7), st: B(9), bk: B(8), a: B(0), b: B(1) };
+  const cur = { l: ax < -.45 || B(14), r: ax > .45 || B(15), u: ay < -.45 || B(12) || B(0), d: ay > .45 || B(13) || B(4), 0: B(2), 1: B(3), 2: B(1), 3: B(5) || B(7), st: B(9), bk: B(8), a: B(0), b: B(1), nu: ay < -.45 || B(12), nd: ay > .45 || B(13) }; // nu/nd : navigation des menus (sans A ni LB, qui servent au saut et au blocage en combat)
   if (cur.l || cur.r || cur.u || cur.d || cur[0] || cur[1] || cur[2] || cur[3] || cur.st || cur.bk) gpNav.active = true;
   const fight = me >= 0 && !!S && !!S.f && S.f.length > 0 && S.p !== 'end';
   if (fight) {
@@ -1085,7 +1085,7 @@ function gpMenu(c) {
   if (!els.length) return;
   gpNav.i = Math.min(gpNav.i, els.length - 1);
   let curEl = els[gpNav.i];
-  const dir = c.l ? 'l' : c.r ? 'r' : c.u ? 'u' : c.d ? 'd' : '', now = Date.now();
+  const dir = c.l ? 'l' : c.r ? 'r' : c.nu ? 'u' : c.nd ? 'd' : '', now = Date.now();
   if (dir && gpNav.active && (dir !== gpNav.dir || now - gpNav.t > 250)) {
     gpNav.dir = dir; gpNav.t = now;
     const r0 = curEl.getBoundingClientRect(), cx = r0.left + r0.width / 2, cy = r0.top + r0.height / 2;
