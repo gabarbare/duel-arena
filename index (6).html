@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -567,6 +566,59 @@ const orb = (px, py, r, col, core) => {
   x.strokeStyle = 'rgba(255,255,255,.7)'; x.lineWidth = 2; const a = Date.now() / 80;
   x.beginPath(); x.arc(px, py, r * 1.3, a, a + 2.2); x.stroke();
 };
+// ===== Gojo : Bleu (Lapse, attraction) et Rouge (Reversal, répulsion) =====
+const gojoBlue = (px, py, r) => {
+  const t = Date.now() / 1000, g = x.createRadialGradient(px, py, 0, px, py, r * 2.2);
+  g.addColorStop(0, 'rgba(120,190,255,.55)'); g.addColorStop(1, 'rgba(30,80,255,0)'); x.fillStyle = g; x.beginPath(); x.arc(px, py, r * 2.2, 0, 7); x.fill();
+  x.fillStyle = '#1f4fe0'; x.beginPath(); x.arc(px, py, r, 0, 7); x.fill();
+  x.fillStyle = '#6fb1ff'; x.beginPath(); x.arc(px, py, r * .72, 0, 7); x.fill();
+  x.fillStyle = '#e6f3ff'; x.beginPath(); x.arc(px, py, r * .32, 0, 7); x.fill();
+  x.lineCap = 'round';
+  for (let k = 0; k < 3; k++) { // spirale tournante
+    x.strokeStyle = 'rgba(225,240,255,' + (.9 - k * .2) + ')'; x.lineWidth = 2; x.beginPath();
+    for (let a = 0; a < 5; a += .25) { const rr = r * (.15 + a * .17), an = a + t * 5 + k * 2.09; if (a) x.lineTo(px + Math.cos(an) * rr, py + Math.sin(an) * rr); else x.moveTo(px + Math.cos(an) * rr, py + Math.sin(an) * rr); }
+    x.stroke();
+  }
+  for (let q = 0; q < 8; q++) { const u = (t * 1.6 + q / 8) % 1, an = q * 2.4 + t * 2, rr = r * (2.3 - u * 1.8); x.fillStyle = 'rgba(190,225,255,' + u * .9 + ')'; x.beginPath(); x.arc(px + Math.cos(an) * rr, py + Math.sin(an) * rr, 1.6 + u, 0, 7); x.fill(); } // matière aspirée
+  x.strokeStyle = 'rgba(150,200,255,.45)'; x.lineWidth = 1.5; x.beginPath(); x.arc(px, py, r * (1.5 + .15 * Math.sin(t * 8)), 0, 7); x.stroke(); // distorsion de l'espace
+};
+const gojoRed = (px, py, r) => {
+  const t = Date.now() / 1000, g = x.createRadialGradient(px, py, 0, px, py, r * 2.4);
+  g.addColorStop(0, 'rgba(255,90,70,.55)'); g.addColorStop(1, 'rgba(255,40,20,0)'); x.fillStyle = g; x.beginPath(); x.arc(px, py, r * 2.4, 0, 7); x.fill();
+  for (let q = 0; q < 10; q++) { const an = q * .628 + t * 3, ln = r * (.7 + .45 * Math.abs(Math.sin(t * 9 + q * 1.7))); Y('#ff6a4a', [[px + Math.cos(an - .14) * r, py + Math.sin(an - .14) * r], [px + Math.cos(an) * (r + ln), py + Math.sin(an) * (r + ln)], [px + Math.cos(an + .14) * r, py + Math.sin(an + .14) * r]]); } // pointes d'énergie vers l'extérieur
+  x.fillStyle = '#c0140f'; x.beginPath(); x.arc(px, py, r, 0, 7); x.fill();
+  x.fillStyle = '#ff4a3a'; x.beginPath(); x.arc(px, py, r * .7, 0, 7); x.fill();
+  x.fillStyle = '#ffe3d6'; x.beginPath(); x.arc(px, py, r * (.3 + .05 * Math.sin(t * 14)), 0, 7); x.fill();
+  const u = (t * 1.5) % 1; x.strokeStyle = 'rgba(255,120,90,' + (.7 - u * .7) + ')'; x.lineWidth = 2; x.beginPath(); x.arc(px, py, r * (1.2 + u * 1.2), 0, 7); x.stroke(); // onde qui repousse
+};
+// ===== Denji : onde de choc à l'atterrissage du Saut écrasant =====
+const WAVES = [], prevAir = [false, false];
+function drawWaves() {
+  const now = Date.now();
+  for (let i = WAVES.length - 1; i >= 0; i--) {
+    const w = WAVES[i], u = (now - w.t) / 650;
+    if (u > 1) { WAVES.splice(i, 1); continue; }
+    const rx = 20 + u * 130, a = 1 - u;
+    x.strokeStyle = 'rgba(255,200,120,' + a + ')'; x.lineWidth = 6 * a + 1; x.beginPath(); x.ellipse(w.x, 380, rx, rx * .12, 0, 0, 7); x.stroke();
+    x.strokeStyle = 'rgba(255,255,255,' + a * .8 + ')'; x.lineWidth = 2; x.beginPath(); x.ellipse(w.x, 380, rx * .7, rx * .08, 0, 0, 7); x.stroke();
+    x.strokeStyle = 'rgba(40,20,10,' + a + ')'; x.lineWidth = 2; // fissures dans le sol
+    for (let q = -3; q <= 3; q++) { const ex = w.x + q * 24 * (.5 + u), len = 10 + 14 * u; x.beginPath(); x.moveTo(w.x + q * 6, 382); x.lineTo(ex, 382 + len * .6); x.lineTo(ex + 6, 382 + len); x.stroke(); }
+    for (let q = 0; q < 10; q++) { // poussière et débris projetés
+      const sg = q % 2 ? 1 : -1, d = (q * 17 % 50 + 10) * u * 2.2, hg = Math.sin(u * 3.14) * (20 + q * 4);
+      x.fillStyle = q < 5 ? 'rgba(200,170,140,' + a * .6 + ')' : 'rgba(80,60,50,' + a + ')'; x.beginPath(); x.arc(w.x + sg * d, 378 - hg, q < 5 ? 7 + u * 8 : 2.5, 0, 7); x.fill();
+    }
+  }
+}
+// ===== Deku : éclairs verts du One For All autour d'un point =====
+const bolt = (cx, cy, rx, ry, n, big) => {
+  const sd = Math.floor(Date.now() / 70);
+  for (let q = 0; q < n; q++) {
+    const r1 = Math.sin((q + 1) * 12.9898 + sd * 3.1) * 43758.5453, rr = r1 - Math.floor(r1), r2 = Math.sin((q + 7) * 78.233 + sd * 1.7) * 12345.678, r3 = r2 - Math.floor(r2);
+    const an = rr * 6.283, len = (big ? 34 : 22) + r3 * (big ? 40 : 26); let bx = cx + Math.cos(an) * rx, by = cy + Math.sin(an) * ry; const pts = [[bx, by]];
+    for (let k = 0; k < 4; k++) { const da = an + (r3 - .5) * 1.6 + (k % 2 ? .6 : -.6); bx += Math.cos(da) * len / 4 + (rr - .5) * 6; by += Math.sin(da) * len / 4 - 2; pts.push([bx, by]); }
+    [['rgba(40,255,90,.35)', big ? 6 : 4.5], ['#c8ffc8', big ? 2.4 : 1.6]].forEach(([c, w]) => { x.strokeStyle = c; x.lineWidth = w; x.lineJoin = 'round'; x.beginPath(); pts.forEach((p, j) => j ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1])); x.stroke(); });
+  }
+};
 const shield = (px, py, z) => {
   const pts = m => [[-12 * m, -22 * m], [12 * m, -22 * m], [12 * m, 6 * m], [0, 24 * m], [-12 * m, 6 * m]].map(q => [px + q[0] * z, py + q[1] * z]);
   Y('#f1c40f', pts(1)); Y('#2c5fa8', pts(.8));
@@ -580,18 +632,20 @@ const sword = (hx, hy, tx, ty, col) => {
 function fighter(f, i) {
   const c = chars[f.c], s = f.fc, n = c.name, t = Date.now();
   FL = f.fl;
+  const air = f.y < 378; if (n === 'Denji' && f.fm && f.ak === 2 && prevAir[i] && !air) WAVES.push({ x: f.x, t: Date.now() }); prevAir[i] = air;
   const sd = f.sk && SHOP.find(q => q.id === f.sk); PAL = sd && sd.pal || null; const lk = sd && sd.look;
   x.save(); x.translate(f.x, f.y);
   if (f.iv) x.globalAlpha = .45;
   if (f.sz > 1) x.scale(f.sz, f.sz);
   if (lk === 'snake' && !f.lz) { x.rotate(s * .12); x.scale(1, .93); } // posture de combat penchée du Snakeman
+  if (n === 'Denji' && f.fm && f.ak === 1 && f.ap === 1) x.rotate(s * .16); // charge : buste penché en avant
   const gn = n === 'Gojo', dk = n === 'Deku';
   if (f.ak === 3 || f.bf || (gn && f.ak === 2) || (n === 'Denji' && f.fm) || (n === 'Shinra' && f.fm) || (n === 'Ichigo' && f.fm)) {
-    x.fillStyle = gn && f.ak === 2 ? 'rgba(120,255,170,.3)' : f.ak === 3 ? 'rgba(255,230,80,.35)' : n === 'Shinra' ? 'rgba(255,240,170,.3)' : n === 'Ichigo' ? 'rgba(40,10,25,.45)' : dk ? 'rgba(90,255,120,.28)' : 'rgba(255,90,90,.3)';
+    x.fillStyle = gn && f.ak === 2 ? 'rgba(120,255,170,.3)' : f.ak === 3 && !dk ? 'rgba(255,230,80,.35)' : n === 'Shinra' ? 'rgba(255,240,170,.3)' : n === 'Ichigo' ? 'rgba(40,10,25,.45)' : dk ? 'rgba(90,255,120,.28)' : 'rgba(255,90,90,.3)';
     x.beginPath(); x.arc(0, -55, 75, 0, 7); x.fill();
-    if (dk && f.bf) {
-      x.strokeStyle = '#8dff8d'; x.lineWidth = 2; const q0 = (t / 70) | 0;
-      for (let q = 0; q < 6; q++) { const bx = -40 + ((q * 37 + q0 * 11) % 80), by = -100 + ((q * 53 + q0 * 7) % 90); x.beginPath(); x.moveTo(bx, by); x.lineTo(bx + 7, by - 12); x.lineTo(bx - 4, by - 20); x.stroke(); }
+    if (dk && (f.bf || f.ak === 3)) { // revêtement One For All : contour lumineux et éclairs verts
+      x.strokeStyle = 'rgba(100,255,140,.55)'; x.lineWidth = 4; x.strokeRect(-25, -118, 50, 118);
+      bolt(0, -55, 38, 62, f.ak === 3 ? 22 : 14, f.ak === 3);
     }
   }
   if (f.sh > 0) {
@@ -890,6 +944,16 @@ function fighter(f, i) {
       for (let q = 0; q < 5; q++) { x.fillStyle = 'rgba(255,255,255,' + (.35 - (((t / 25 + q * 13) % 60) / 60) * .3) + ')'; x.beginPath(); x.arc(Math.sin(t / 200 + q * 2) * 22, -95 - ((t / 25 + q * 13) % 60), 5 + q % 3 * 2, 0, 7); x.fill(); }
     }
   }
+  if (n === 'Denji' && f.fm && f.ak === 2 && f.y < 378) { // saut écrasant : lames vers le bas et lignes de vitesse
+    [-8, 8].forEach(q => { LN('#7f8c8d', 7, q, -28, q * 1.4, 4); for (let k = 0; k < 4; k++) { const o = (t / 30) % 7; Y('#ecf0f1', [[q + 3, -22 + k * 7 + o], [q + 9, -19 + k * 7 + o], [q + 3, -16 + k * 7 + o]]); } });
+    [-12, 0, 12].forEach(q => LN('rgba(255,255,255,.5)', 2, q, -125 - (t / 15) % 30, q, -160 - (t / 15) % 30));
+  }
+  if (n === 'Denji' && f.fm && f.ak === 1 && f.ap === 1) { // charge : images rémanentes, lignes de vitesse, étincelles, poussière
+    for (let q = 1; q <= 3; q++) { x.fillStyle = 'rgba(232,116,44,' + (.24 - q * .06) + ')'; x.fillRect(-s * q * 24 - 20, -98, 40, 98); }
+    for (let q = 0; q < 6; q++) LN('rgba(255,255,255,.6)', 2, -s * (34 + q * 9), -15 - q * 19, -s * (80 + q * 9 + (t / 8 + q * 11) % 25), -15 - q * 19);
+    for (let q = 0; q < 6; q++) C('#ffe066', s * (50 + (t / 12 + q * 23) % 40), -65 + Math.sin(t / 40 + q * 2) * 14, 1.8);
+    for (let q = 0; q < 4; q++) C('rgba(200,170,140,' + (.5 - q * .1) + ')', -s * (10 + q * 14), -4 - q * 3, 6 + q * 2);
+  }
   if (f.cr) { // cristallisation
     x.fillStyle = 'rgba(170,225,255,.55)'; x.fillRect(-26, -96, 52, 96);
     x.strokeStyle = 'rgba(255,255,255,.85)'; x.lineWidth = 2; x.beginPath();
@@ -913,7 +977,7 @@ function fighter(f, i) {
     if (n === 'Bruno') { C('#e74c3c', px, py, 11); C('#ff7675', px - 3, py - 3, 3); }
     else if (n === 'Kaze') { C(skin, px, py, 6); if (f.ak === 0 || f.ak === 3) LN('#ecf0f1', 3, px, py, px + s * 28, py); }
     else if (n === 'Viking') { C('#7f8c8d', px, py, 12); C('#95a5a6', px - 3, py - 3, 4); }
-    else if (n === 'Gojo') { C(skin, px, py, 6); if (f.ak === 0 && f.ap < 2) orb(px + s * 10, py - 2, 11, '#e74c3c', '#ffd0d0'); if (f.ak === 1 && f.ap < 2) orb(px + s * 10, py - 2, 11, '#2f6df0', '#cfe3ff'); }
+    else if (n === 'Gojo') { C(skin, px, py, 6); if (f.ak === 0 && f.ap < 2) gojoRed(px + s * 10, py - 2, 11); if (f.ak === 1 && f.ap < 2) gojoBlue(px + s * 10, py - 2, 11); }
     else if (n === 'Yugo') {
       C('#e2b283', px, py, 6);
       if (f.ak === 0 && f.ap < 2) orb(px + s * 10, py - 2, 10, '#27c4ff', '#e6fbff');
@@ -938,13 +1002,13 @@ function fighter(f, i) {
       C(skin, px, py, 6);
       if (f.fm) { // lame de tronçonneuse qui sort de l'avant-bras
         C('#e8742c', px, py, 7);
-        const ex = f.ak >= 0 ? px + s * 46 : px + s * 6, ey = f.ak >= 0 ? py : py + 38, L = Math.hypot(ex - px, ey - py), ux = (ex - px) / L, uy = (ey - py) / L;
+        const ex = f.ak >= 0 ? px + s * (f.ak === 1 ? 62 : 46) : px + s * 6, ey = f.ak >= 0 ? py : py + 38, L = Math.hypot(ex - px, ey - py), ux = (ex - px) / L, uy = (ey - py) / L;
         LN('#7f8c8d', 10, px, py, ex, ey); LN('#bdc3c7', 6, px, py, ex, ey);
         for (let q = 0; q < 7; q++) { const d = 8 + q * 6 + ((t / 35) % 6); if (d > L - 6) continue; const bx = px + ux * d, by = py + uy * d;
           [1, -1].forEach(g => Y('#ecf0f1', [[bx - uy * 3 * g, by + ux * 3 * g], [bx - uy * 8 * g + ux * 3, by + ux * 8 * g + uy * 3], [bx - uy * 3 * g + ux * 6, by + ux * 3 * g + uy * 6]])); }
       }
     }
-    else if (n === 'Deku') { C('#d5dbdb', px, py, 8); if (lk === 'dark') [-4, 0, 4].forEach(q => LN('#cfd8dc', 1.5, px, py + q, px + s * 11, py + q * 1.6)); if (f.ak === 3 && f.ap === 1) C('rgba(130,255,130,.7)', px, py, 18); }
+    else if (n === 'Deku') { C('#d5dbdb', px, py, 8); if (lk === 'dark') [-4, 0, 4].forEach(q => LN('#cfd8dc', 1.5, px, py + q, px + s * 11, py + q * 1.6)); if (f.ak === 3 && f.ap === 1) C('rgba(130,255,130,.7)', px, py, 18); if (f.bf && f.ak >= 0) bolt(px, py, 8, 8, 5, false); }
     else if (n === 'Naruto') { C(skin, px, py, 7); if (f.ak === 1) rasen(px + s * 12, py, 13, 0); if (f.ak === 3) rasen(px + s * 4, py - 26, 22, 1); }
     else { C(lk === 'snake' ? '#16161d' : skin, px, py, 10); if (lk === 'snake') C('rgba(255,255,255,.14)', px - 3, py - 3, 4); }
   };
@@ -1195,6 +1259,7 @@ function draw() {
         }
       }
     });
+    drawWaves();
     S.f.forEach(f => { if (f.lz) return; const z = f.sz || 1, k = Math.min(1, (380 - f.y) / 250); x.fillStyle = 'rgba(0,0,0,' + (.35 * (1 - k)) + ')'; x.beginPath(); x.ellipse(f.x, 380, 34 * z * (1 - .4 * k), 7 * z, 0, 0, 7); x.fill(); });
     S.f.forEach(fighter);
     if (S.f.some(q => q.fz)) { x.fillStyle = 'rgba(110,130,210,.22)'; x.fillRect(0, -OFF, 900, 600); }
@@ -1234,8 +1299,8 @@ function draw() {
         R('#2c5fa8', -8, -22, 16, 3); R('#000', p.v * 3, -19, 2, 2);
         x.restore();
       } else if (p.k === 2) rasen(p.x, p.y, p.r, 1);
-      else if (p.k === 4) orb(p.x, p.y, p.r, '#e74c3c', '#ffd0d0');
-      else if (p.k === 5) orb(p.x, p.y, p.r, '#2f6df0', '#cfe3ff');
+      else if (p.k === 4) gojoRed(p.x, p.y, p.r);
+      else if (p.k === 5) gojoBlue(p.x, p.y, p.r);
       else if (p.k === 7) {
         FL = 0; x.save(); x.translate(p.x, p.y); x.scale(p.v, 1); x.rotate(((Date.now() / 140) % 6.283) * .35);
         C('#e8742c', 0, 0, 10); Y('#c85a1a', [[-6, -8], [-11, -17], [-1, -10]]);
