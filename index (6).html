@@ -136,9 +136,6 @@ input{text-transform:uppercase;width:90px;text-align:center}
 .menu-shop{border-color:#65458a}
 .menu-combat{border-color:#8b642e;background:rgba(35,29,20,.92)}
 .menu-combat button{min-height:48px;font-size:14px}
-.menu-combat .combat-row{display:flex;gap:8px;width:100%}
-.menu-combat .combat-row button{flex:1 1 0;min-width:0;width:0;padding:10px 6px;line-height:1.2}
-.menu-combat > .combat-matchmaking{width:100%}
 .menu-info{border-color:#385c83}
 .menu-join{display:flex;gap:5px;width:100%}
 .menu-join input{min-width:0;flex:1;width:50px;padding:8px 4px}
@@ -155,16 +152,12 @@ input{text-transform:uppercase;width:90px;text-align:center}
   .menu-group{padding:10px 8px;gap:8px}
   .menu-group h2{font-size:12px}
   .menu-group button{font-size:12px;min-height:40px}
-  .menu-combat .combat-row{gap:6px}
-  .menu-combat .combat-row button{font-size:11px;padding:9px 4px}
 }
 @media(max-width:380px){
   #ov.menu-screen{padding:8px 6px}
   .menu-layout{gap:6px}
   .menu-group{padding:8px 6px}
   .menu-group button{font-size:11px;padding:8px 5px}
-  .menu-combat .combat-row{gap:5px}
-  .menu-combat .combat-row button{font-size:10px;padding:8px 3px}
 }
 .card.lock{opacity:.45}
 .chip{display:inline-block;margin:3px 2px 0 0;padding:1px 7px;border-radius:9px;background:#555;font-size:11px}
@@ -207,8 +200,7 @@ html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 	<div id="tmenu"><button id="tr">↺</button><button id="tq">✕</button></div>
 </div>
 <script>
-const cv = document.getElementById('c'), ov = document.getElementById('ov');
-let x = cv.getContext('2d');
+const cv = document.getElementById('c'), x = cv.getContext('2d'), ov = document.getElementById('ov');
 let ws, me = -1, chars = [], S = null, code = '', err = '', last = '';
 const keys = {};
 
@@ -238,11 +230,11 @@ const SHOP = [
   { id: 'skin_naruto_hermite', type: 'skin', char: 'Naruto', name: 'Naruto Mode Hermite', price: 150, look: 'sage', pal: { '#ff7f27': '#d0451b', '#2c5fa8': '#222', '#2c3e50': '#111' } },
   { id: 'skin_koro_blanc', type: 'skin', char: 'Koro', name: 'Koro-sensei blanc', price: 150, look: 'white', pal: { '#f4d03f': '#f5f5f1', '#e6b800': '#dcdcd5', '#f1c40f': '#e8e8e2' } },
   { id: 'skin_shinra_banshoman', type: 'skin', char: 'Shinra', name: 'Shinra Banshoman', price: 250, look: 'banshoman', pal: { '#f5cba7': '#b8402f', '#23232f': '#a63a2f', '#1b1b24': '#7a2a22', '#bdc3c7': '#a63a2f', '#111': '#3a1410', '#15151c': '#e9e9e9', '#000': '#fff' } },
-  { id: 'skin_ichigo_bloodchains', type: 'skin', char: 'Ichigo', name: 'Ichigo - Manteau du porteur', price: 250, look: 'bloodchains', desc: 'Ichigo seul avec grand manteau rose-gris, écharpe claire, bandages et immense Zangetsu dans le dos', pal: { '#15151c': '#18171d', '#1b1b26': '#242128', '#16161d': '#17161c', '#101015': '#211e24', '#0e0e14': '#17151b', '#ecf0f1': '#b9a5a8', '#cfd8dc': '#d8d1d0' } },
+  { id: 'skin_ichigo_bloodchains', type: 'skin', char: 'Ichigo', name: 'Ichigo - Sauveur de Rukia', price: 250, look: 'bloodchains', desc: 'Ichigo à Soul Society : shihakushō noir déchiré, obi blanc, bandages, plaies, Zangetsu au dos et reiatsu bleu', pal: {} },
   { id: 'skin_kairos_azur', type: 'skin', char: 'Kairos', name: 'Kairos azur', price: 150, pal: { '#3b2a5a': '#174b63', '#2b1f3d': '#102f45', '#2a2038': '#163b50', '#d9b84a': '#55d6d2', '#f5ecd0': '#d9ffff' } },
 ];
 let tNew = '', chestGain = '', chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
-let save = { coins: 0, crystals: 0, xp: 0, chests: 0, icons: [], profile: null, friends: [], fid: null, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null, team = null, note = '', q2 = false;
+let save = { coins: 0, crystals: 0, xp: 0, chests: 0, icons: [], profile: null, friends: [], fid: null, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
 if (!save.stats || typeof save.stats !== 'object') save.stats = { played: 0, wins: 0, losses: 0, byChar: {} };
 if (!save.stats.byChar || typeof save.stats.byChar !== 'object') save.stats.byChar = {};
 save.stats.played = Number(save.stats.played) || 0;
@@ -250,7 +242,7 @@ save.stats.wins = Number(save.stats.wins) || 0;
 save.stats.losses = Number(save.stats.losses) || 0;
 try { Object.assign(save, JSON.parse(localStorage.getItem('duelArena') || '{}')); } catch (e) {}
 const persist = () => { try { localStorage.setItem('duelArena', JSON.stringify(save)); } catch (e) {} };
-// Offre de lancement Ichigo Blood Chains : 10 minutes à partir du premier lancement de cette version du jeu.
+// Offre de lancement Ichigo Sauveur de Rukia : 10 minutes à partir du premier lancement de cette version du jeu.
 const ICHIGO_PROMO_KEY = 'ichigoBloodchainsPromoStart';
 let ichigoPromoStart = 0;
 try { ichigoPromoStart = Number(localStorage.getItem(ICHIGO_PROMO_KEY)) || 0; } catch (e) {}
@@ -272,14 +264,10 @@ function connect(first) {
       fList = m.list;
       if (fAdd) { if (m.missing.includes(fAdd)) fErr = 'Code introuvable'; else { save.friends.push(fAdd); persist(); fDraft = ''; } fAdd = null; }
     }
-    else if (m.t === 'room') { me = m.idx; chars = m.chars; maps = m.maps; code = m.code; searching = false; q2 = false; team = null; }
-    else if (m.t === 'err') { err = m.m; me = -1; S = null; searching = false; team = null; q2 = false; note = ''; w.close(); }
-    else if (m.t === 'team') { team = m; searching = false; q2 = false; view = 'menu'; }
-    else if (m.t === 'queued2') { q2 = true; searching = true; }
-    else if (m.t === 'note') { note = m.m; setTimeout(() => { note = ''; ui(); }, 4000); }
-    else if (m.t === 'left') { team = null; q2 = false; view = 'menu'; }
+    else if (m.t === 'room') { me = m.idx; chars = m.chars; maps = m.maps; code = m.code; searching = false; }
+    else if (m.t === 'err') { err = m.m; me = -1; S = null; searching = false; w.close(); }
     else if (m.t === 's') {
-      S = m; if (m.p !== 'select') pre = null; if (m.w) { const myT = m.team ? (me < 2 ? 0 : 1) : me; if (m.w[myT] > rw) qTrack('rm', 1, m.mp); rw = m.w[myT]; }
+      S = m; if (m.p !== 'select') pre = null; if (m.w) { if (m.w[me] > rw) qTrack('rm', 1, m.mp); rw = m.w[me]; }
       if (m.p === 'end' && m.co) {
         if (!paid) {
           paid = 1;
@@ -287,7 +275,7 @@ function connect(first) {
           save.coins += earned;
           const charIndex = m.f && m.f[me] ? m.f[me].c : null;
           const charName = charIndex != null && chars[charIndex] ? chars[charIndex].name : 'Inconnu';
-          const foeI = m.team ? (me < 2 ? 2 : 0) : 1 - me, won = Number(m.co[me]) > Number(m.co[foeI]);
+          const won = Number(m.co[me]) > Number(m.co[1 - me]);
           save.stats.played++;
           if (won) save.stats.wins++; else save.stats.losses++;
           if (!save.stats.byChar[charName]) save.stats.byChar[charName] = { played: 0, wins: 0, losses: 0 };
@@ -303,18 +291,10 @@ function connect(first) {
     }
     ui();
   };
-  w.onclose = () => { if (w === ws && me >= 0) { err = 'Connexion perdue'; me = -1; S = null; ui(); } else if (w === ws) { team = null; q2 = false; searching = false; ui(); } };
+  w.onclose = () => { if (w === ws && me >= 0) { err = 'Connexion perdue'; me = -1; S = null; ui(); } };
 }
 const go = o => { err = ''; connect(o); };
 const search = () => { err = ''; searching = true; connect({ t: 'queue' }); ui(); };
-const teamCreate = () => { err = ''; connect({ t: 'tcreate' }); };
-const teamJoin = () => { err = ''; connect({ t: 'tjoin', code: document.getElementById('cdt').value }); };
-const teamSolo = () => { err = ''; q2 = true; searching = true; connect({ t: 'queue2' }); ui(); };
-const teamQueueStart = () => { if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'tqueue' })); ui(); };
-function teamHtml() {
-  const pl = (team.players || []).map((q, i) => q ? '<b>' + esc(q.icon) + ' ' + esc(q.name) + '</b> · niveau ' + q.lvl + (i === team.idx ? ' (toi)' : '') : '— Emplacement libre —');
-  return `<h2>👥 Équipe 2v2</h2><p>Code : <b style="font-size:34px">${team.code}</b></p><p>Invite ton ami avec ce lien :<br><b>${location.origin}/#${team.code}</b></p><p>${pl[0]}<br>${pl[1]}</p>${team.ph === 'tqueue' ? '<p style="font-size:18px">🔎 Recherche d’une équipe adverse…</p>' : '<button onclick="teamQueueStart()" style="background:#e67e22">🔎 Trouver un match</button>'}<p style="font-size:12px;opacity:.8">Sans adversaire après 15 s : match contre une équipe de bots.</p>${quitBtn}`;
-}
 function openTraining() {
   view = 'training';
   if (!chars.length || !ws || ws.readyState !== 1) connect({ t: 'training_list' });
@@ -334,7 +314,7 @@ function kairosWin() {
   persist();
 }
 const again = () => ws.send(JSON.stringify({ t: 'again' }));
-function leave() { me = -1; S = null; err = ''; view = 'menu'; searching = false; team = null; note = ''; q2 = false; try { ws.close(); } catch (e) {} ui(); }
+function leave() { me = -1; S = null; err = ''; view = 'menu'; searching = false; try { ws.close(); } catch (e) {} ui(); }
 function info(i) { if (pre == null && infoIdx !== i) { infoIdx = i; ui(); } }
 function setSkin(name, id, i) { save.skin[name] = id; persist(); if (S && S.p === 'select' && S.sel[me] === i) sendPick(i); ui(); }
 
@@ -493,7 +473,7 @@ const shopHtml = () => {
   const items = dailyIds().map(id => SHOP.find(q => q.id === id)).filter(Boolean);
   const ichigo = SHOP.find(q => q.id === 'skin_ichigo_bloodchains');
   if (ichigo && !owns(ichigo.id) && !items.some(q => q.id === ichigo.id)) items.unshift(ichigo);
-  const promoText = ichigoPromoActive() ? ` · 🎁 Ichigo Blood Chains gratuit encore ${Math.ceil(ichigoPromoRemaining() / 60000)} min` : '';
+  const promoText = ichigoPromoActive() ? ` · 🎁 Ichigo Sauveur de Rukia gratuit encore ${Math.ceil(ichigoPromoRemaining() / 60000)} min` : '';
   return `<h2>🎨 Boutique de skins</h2><p>${bank()} · 3 skins par jour, nouvelle sélection à minuit (dans ${leftTxt()})${promoText}</p>` + (items.length
     ? `<div class="cards">${items.map(q => { const free = q.id === 'skin_ichigo_bloodchains' && ichigoPromoActive(); return `<div class="card shopc"><b>${q.name}</b><br>Skin · ${q.char}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.coins < (free ? 0 : q.price) ? 'disabled' : ''} onclick="buy('${q.id}')">${free ? 'GRATUIT 🎁' : q.price + ' 🪙'}</button>`}</div>`; }).join('')}</div>`
     : '<p>Tu possèdes déjà tous les skins 🎉</p>') + `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
@@ -532,37 +512,35 @@ function statsHtml() {
 }
 const quitBtn = '<button onclick="leave()" style="background:#7f8c8d">Retour au menu</button>';
 
-// Portraits de sélection : le personnage est dessiné par la même fonction fighter() que dans le jeu,
-// sur un canvas hors écran, pour que le portrait corresponde exactement au visuel en combat (skins compris).
-const portCv = document.createElement('canvas');
-portCv.width = 128; portCv.height = 128;
-const portCtx = portCv.getContext('2d');
-const portraitCache = {};
-function portraitDataUrl(i) {
-  const c = chars[i], sk = save.skin[c.name] || '', key = c.name + '|' + sk;
-  if (portraitCache[key]) return portraitCache[key];
-  const old = x; x = portCtx;
-  portCtx.setTransform(1, 0, 0, 1, 0, 0);
-  portCtx.clearRect(0, 0, 128, 128);
-  portCtx.fillStyle = '#20242b';
-  portCtx.fillRect(0, 0, 128, 128);
-  portCtx.save();
-  portCtx.translate(64, 121);
-  portCtx.scale(.75, .75);
-  try { fighter({ c: i, x: 0, y: 0, vx: 0, vy: 0, fc: 1, fl: 0, sk, iv: 0, sz: 1, ak: -1, ap: -1, bl: 0, bf: 0, sh: 0, fm: 0, cr: 0, fz: 0, fy: 0, sd: 0, atk: null, b: null, hk: null, pt: null, ad: null }, -1); } catch (e) {}
-  portCtx.restore();
-  x = old;
-  return portraitCache[key] = portCv.toDataURL();
-}
-function selectPortrait(c, i) {
-  return `<img class="portrait" src="${portraitDataUrl(i)}" alt="Portrait de ${c.name}" draggable="false" style="border-radius:8px;border:2px solid ${c.color};box-sizing:border-box;background:#20242b">`;
+// Portraits détaillés calqués sur les silhouettes, coiffures et costumes dessinés en combat.
+function selectPortrait(c) {
+  const commonFace = `<ellipse cx="32" cy="27" rx="11" ry="13" fill="${c.name === 'Viking' ? '#e0ac69' : c.name === 'Bruno' ? '#e8b48a' : c.name === 'Koro' ? '#f4d03f' : '#f5cba7'}"/>`;
+  const portraits = {
+    Bruno: `<path d="M8 64 Q10 43 21 42 L43 42 Q55 43 57 64Z" fill="#e74c3c"/><path d="M20 46 H44 V52 H20Z" fill="#fff"/><path d="M20 8 Q32 -1 44 8 L43 18 H21Z" fill="#171717"/><path d="M19 16 H45 V20 H19Z" fill="#e74c3c"/>${commonFace}<path d="M21 36 Q32 45 43 36" fill="none" stroke="#171717" stroke-width="3"/><circle cx="27" cy="27" r="1.7"/><circle cx="37" cy="27" r="1.7"/>`,
+    'Zéphyr': `<path d="M7 64 L13 42 Q32 35 51 42 L57 64Z" fill="#6c3483"/><path d="M14 49 H50" stroke="#f1c40f" stroke-width="3"/><path d="M23 36 L32 49 L41 36 L38 31 H26Z" fill="#ecf0f1"/>${commonFace}<path d="M19 20 Q32 15 45 20 L39 11 L25 11Z" fill="#5b2c6f"/><path d="M5 22 Q32 15 59 22 Q32 28 5 22Z" fill="#4a235a" stroke="#f1c40f" stroke-width="2"/><path d="M23 32 Q32 40 41 32" fill="#ecf0f1"/><circle cx="28" cy="27" r="1.5"/><circle cx="36" cy="27" r="1.5"/>`,
+    Kaze: `<path d="M9 64 L13 42 H51 L55 64Z" fill="#1c1c28"/><path d="M12 48 H52 V54 H12Z" fill="#2ecc71"/><path d="M17 17 Q32 8 47 17 L44 37 Q32 44 20 37Z" fill="#1c1c28"/>${commonFace}<path d="M19 30 Q32 36 45 30 L43 38 Q32 44 21 38Z" fill="#1c1c28"/><path d="M20 18 H44 V22 H20Z" fill="#2ecc71"/><path d="M43 20 L59 14 L58 19 L44 25Z" fill="#2ecc71"/><path d="M47 46 L57 17" stroke="#9aa4ad" stroke-width="4"/><path d="M27 27 H30 M36 27 H39" stroke="#fff" stroke-width="2"/>`,
+    Viking: `<path d="M7 64 L11 43 H53 L57 64Z" fill="#6d4c41"/><path d="M14 48 H50 L47 55 H17Z" fill="#3e2723"/><path d="M27 49 H37 V57 H27Z" fill="#f1c40f"/><path d="M19 30 Q32 40 45 30 L43 43 Q32 53 21 43Z" fill="#d35400"/>${commonFace}<path d="M17 20 Q32 5 47 20 L44 25 H20Z" fill="#95a5a6" stroke="#6c757d" stroke-width="2"/><path d="M19 20 Q8 19 8 7 Q19 10 23 20 M45 20 Q56 19 56 7 Q45 10 41 20" fill="#ecf0f1" stroke="#95a5a6" stroke-width="3"/><path d="M20 32 Q32 43 44 32" fill="none" stroke="#8e3b0b" stroke-width="5"/><circle cx="27" cy="27" r="1.6"/><circle cx="37" cy="27" r="1.6"/>`,
+    Chevalier: `<path d="M8 64 L13 42 H51 L56 64Z" fill="#b0bec5"/><path d="M20 45 H44 V62 H20Z" fill="#2c5fa8"/><path d="M30 45 H34 V61 H30Z M24 51 H40 V55 H24Z" fill="#f1c40f"/>${commonFace}<path d="M17 25 Q17 10 32 10 Q47 10 47 25 L43 34 H21Z" fill="#b0bec5" stroke="#607d8b" stroke-width="2"/><path d="M21 26 H43 V31 H21Z" fill="#263238"/><path d="M32 9 L32 1 L36 9" fill="#c0392b"/><path d="M30 24 H34" stroke="#cfd8dc" stroke-width="2"/>`,
+    Kairos: `<path d="M8 64 L13 42 H51 L56 64Z" fill="#3b2a5a"/><path d="M14 48 H50" stroke="#d9b84a" stroke-width="4"/><circle cx="32" cy="48" r="7" fill="#f5ecd0" stroke="#d9b84a" stroke-width="3"/><path d="M22 16 Q32 10 42 16 L42 22 H22Z" fill="#cfd3da"/>${commonFace}<path d="M16 20 H48 V24 H16Z" fill="#2b1f3d"/><path d="M22 5 H42 L45 21 H19Z" fill="#2b1f3d" stroke="#d9b84a" stroke-width="2"/><path d="M28 5 Q32 0 36 5" fill="none" stroke="#d9b84a" stroke-width="2"/><circle cx="38" cy="27" r="5" fill="none" stroke="#d9b84a" stroke-width="1.5"/><circle cx="28" cy="27" r="1.5"/>`,
+    Luffy: `<path d="M8 64 L13 42 H51 L56 64Z" fill="#e74c3c"/><path d="M22 43 L32 56 L42 43" fill="#f5cba7"/><path d="M20 45 L32 60 L44 45" fill="none" stroke="#b03a2e" stroke-width="2"/>${commonFace}<path d="M20 18 Q32 9 44 18 L44 21 H20Z" fill="#111"/><path d="M5 20 Q32 12 59 20 Q32 29 5 20Z" fill="#f1c40f" stroke="#b8860b" stroke-width="1.5"/><path d="M18 19 H46 V23 H18Z" fill="#c0392b"/><path d="M28 27 Q32 31 36 27" fill="none" stroke="#111" stroke-width="1.5"/><circle cx="27" cy="26" r="1.5"/><circle cx="37" cy="26" r="1.5"/>`,
+    Naruto: `<path d="M8 64 L13 42 H51 L56 64Z" fill="#ff7f27"/><path d="M16 47 H48 V54 H16Z" fill="#2c3e50"/><path d="M20 17 Q32 7 44 17 L42 22 H22Z" fill="#f9e03b"/>${commonFace}<path d="M17 20 H47 V25 H17Z" fill="#2c5fa8"/><rect x="26" y="19" width="12" height="5" rx="1" fill="#bdc3c7"/><path d="M22 31 l5 -2 M22 35 l5 -2 M42 31 l-5 -2 M42 35 l-5 -2" stroke="#8d5a42" stroke-width="1.5"/><circle cx="27" cy="27" r="1.5"/><circle cx="37" cy="27" r="1.5"/>`,
+    Gojo: `<path d="M8 64 L13 42 H51 L56 64Z" fill="#1a2a4f"/><path d="M18 43 H46 V50 H18Z" fill="#111b38"/>${commonFace}<path d="M17 20 Q14 8 24 8 L32 12 L40 7 Q50 10 47 22 L43 20 L40 15 L35 21 L31 15 L26 22 L22 16Z" fill="#f4f6f8"/><rect x="17" y="24" width="30" height="6" rx="2" fill="#111"/><path d="M22 27 H42" stroke="#536b9c" stroke-width="1.2"/>`,
+    Deku: `<path d="M8 64 L13 42 H51 L56 64Z" fill="#2e7d32"/><path d="M14 48 H50 V54 H14Z" fill="#c0392b"/><path d="M20 16 Q32 7 44 16 L42 21 H22Z" fill="#245c2b"/>${commonFace}<path d="M18 20 L14 6 L25 15 L31 3 L35 16 L47 7 L44 23Z" fill="#2e7d32" stroke="#174c22" stroke-width="1"/><path d="M20 31 L24 34 M44 31 L40 34" stroke="#b5651d" stroke-width="1.5"/><path d="M22 39 H42 L39 44 H25Z" fill="#b0bec5"/>`,
+    Denji: `<path d="M8 64 L13 42 H51 L56 64Z" fill="#f2f2f2"/><path d="M29 42 H35 V60 H29Z" fill="#111"/><path d="M19 17 Q32 7 45 17 L42 21 H22Z" fill="#f4d03f"/>${commonFace}<path d="M17 19 L20 8 L27 15 L31 5 L36 15 L45 9 L46 22Z" fill="#f4d03f"/><path d="M22 31 L32 35 L42 31" fill="none" stroke="#713d32" stroke-width="1.5"/><circle cx="27" cy="27" r="1.5"/><circle cx="37" cy="27" r="1.5"/>`,
+    Yugo: `<path d="M8 64 L13 42 H51 L56 64Z" fill="#e8872a"/><path d="M25 47 H39 V56 H25Z" fill="#f4d03f"/><path d="M17 20 Q32 8 47 20 L44 25 H20Z" fill="#c9a35a"/>${commonFace}<path d="M15 20 Q32 14 49 20 L46 25 H18Z" fill="#2a64c8"/><path d="M18 18 L8 5 L4 8 L16 27 M46 18 L56 5 L60 8 L48 27" fill="#2a64c8" stroke="#f4d03f" stroke-width="2"/><path d="M26 27 H38" stroke="#3b2417" stroke-width="2"/>`,
+    Shinra: `<path d="M8 64 L13 42 H51 L56 64Z" fill="#23232f"/><path d="M17 44 V62 M47 44 V62" stroke="#bdc3c7" stroke-width="3"/><path d="M19 17 Q32 6 45 17 L42 22 H22Z" fill="#15151c"/>${commonFace}<path d="M18 19 L15 7 L25 15 L27 4 L34 15 L42 6 L45 22Z" fill="#15151c"/><path d="M23 35 Q32 42 41 35" fill="none" stroke="#fff" stroke-width="2"/><circle cx="27" cy="27" r="1.5"/><circle cx="37" cy="27" r="1.5"/>`,
+    Eren: `<path d="M5 64 L12 39 H52 L59 64Z" fill="#3a6b46"/><path d="M17 45 H47 V62 H17Z" fill="#6d4c41"/><path d="M20 17 Q32 8 44 17 L43 23 H21Z" fill="#5d4037"/>${commonFace}<path d="M18 20 L18 8 L25 14 L29 4 L34 15 L43 8 L45 23Z" fill="#5d4037"/><path d="M24 29 H40" stroke="#27ae60" stroke-width="2"/><circle cx="27" cy="27" r="1.5"/><circle cx="37" cy="27" r="1.5"/>`,
+    Koro: `<path d="M8 64 L13 42 H51 L56 64Z" fill="#111"/><path d="M18 12 H46 L43 19 H21Z" fill="#111"/>${commonFace}<path d="M20 31 Q32 43 44 31" fill="none" stroke="#111" stroke-width="2.5"/><circle cx="27" cy="25" r="2" fill="#111"/><circle cx="37" cy="25" r="2" fill="#111"/><path d="M18 17 Q32 9 46 17 L44 21 H20Z" fill="#111"/><path d="M16 13 H48 L45 8 H19Z" fill="#111"/><path d="M32 10 L48 17" stroke="#f1c40f" stroke-width="2"/>`,
+    Ichigo: `<path d="M8 64 L13 42 H51 L56 64Z" fill="#15151c"/><path d="M27 43 L32 54 L37 43" fill="#ecf0f1"/>${commonFace}<path d="M17 19 L17 8 L25 15 L29 3 L34 15 L42 6 L47 20 L43 24 H21Z" fill="#f28c28"/><path d="M21 34 L32 39 L43 34" fill="none" stroke="#15151c" stroke-width="2"/><circle cx="27" cy="27" r="1.5"/><circle cx="37" cy="27" r="1.5"/>`
+  };
+  const art = portraits[c.name] || `<path d="M8 64 L13 42 H51 L56 64Z" fill="${c.color}"/>${commonFace}<path d="M18 20 Q32 7 46 20Z" fill="#333"/>`;
+  return `<svg class="portrait" viewBox="0 0 64 64" role="img" aria-label="Portrait de ${c.name}" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="portraitClip"><rect x="1" y="1" width="62" height="62" rx="9"/></clipPath></defs><g clip-path="url(#portraitClip)"><path d="M0 0H64V64H0Z" fill="#20242b"/>${art}</g><rect x="1" y="1" width="62" height="62" rx="9" fill="none" stroke="${c.color}" stroke-width="2"/></svg>`;
 }
 
 function ui() {
   let h = '';
   ov.className = me >= 0 && S && S.p === 'end' ? 'end' : (me < 0 && !searching && view === 'menu' ? 'menu-screen' : '');
-  if (me < 0 && searching) h = `<h2>🔍 ${q2 ? 'Recherche de joueurs pour un 2v2…' : 'Recherche d’un adversaire…'}</h2><p>${q2 ? 'Tu seras associé à un autre joueur solo, puis face à une autre équipe.' : 'Tu seras mis face à un joueur aléatoire.'}</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
-  else if (me < 0 && team) h = teamHtml();
+  if (me < 0 && searching) h = `<h2>🔎 Recherche d’un adversaire…</h2><p>Tu seras mis face à un joueur aléatoire.</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
   else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'botlvl' ? botLvlHtml() : view === 'friends' ? friendsHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : `<div class="menu-top">
       ${profileBar()}
       <div class="menu-currency">${bank()}</div>
@@ -576,22 +554,12 @@ function ui() {
       </section>
       <section class="menu-group menu-combat">
         <h2>⚔️ Combats</h2>
-        <button class="combat-matchmaking" onclick="search()" style="background:#e67e22">🎲 Matchmaking</button>
-        <div class="combat-row">
-          <button onclick="teamSolo()" style="background:#c0392b">👥 2v2 aléatoire</button>
-          <button onclick="view='botlvl';ui()" style="background:#16a085">🤖 Jouer contre un bot</button>
-        </div>
-        <div class="combat-row">
-          <button onclick="teamCreate()" style="background:#c0392b">👥 Créer une équipe 2v2</button>
-          <button onclick="go({t:'create'})">🌐 Créer une partie</button>
-        </div>
+        <button onclick="search()" style="background:#e67e22">🎲 Matchmaking</button>
+        <button onclick="go({t:'create'})">🌐 Créer une partie</button>
+        <button onclick="view='botlvl';ui()" style="background:#16a085">🤖 Jouer contre un bot</button>
         <div class="menu-join">
           <input id="cd" maxlength="4" placeholder="CODE" value="${location.hash.slice(1)}">
           <button onclick="go({t:'join',code:document.getElementById('cd').value})">Rejoindre</button>
-        </div>
-        <div class="menu-join">
-          <input id="cdt" maxlength="4" placeholder="CODE" value="${location.hash.slice(1)}">
-          <button onclick="teamJoin()">Rejoindre une équipe 2v2</button>
         </div>
         <button onclick="openTraining()" style="background:#16a085">🎯 Mode entraînement</button>
       </section>
@@ -606,14 +574,14 @@ function ui() {
   else if (S.p === 'select') {
     const ii = pre != null ? pre : infoIdx != null ? infoIdx : (S.sel[me] != null ? S.sel[me] : 0), ic = chars[ii];
     const sks = SHOP.filter(q => q.type === 'skin' && q.char === ic.name && owns(q.id)), cur = save.skin[ic.name] || '';
-    h = `<h2 style="margin:2px">Choisis ton combattant</h2>${S.team ? '<p style="margin:2px">👥 Mode 2v2 — ton coéquipier est l’autre joueur de ton équipe</p>' : ''}<div class="cards">${chars.map((c, i) => `<div class="card sm ${S.sel[me] === i || pre === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})">${selectPortrait(c, i)}<span class="char-name" style="color:${c.color}">${c.name}</span>${locked(c.name) ? '<span class="lock-mark">🔒</span>' : ''}</div>`).join('')}</div>
+    h = `<h2 style="margin:2px">Choisis ton combattant</h2><div class="cards">${chars.map((c, i) => `<div class="card sm ${S.sel[me] === i || pre === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})">${selectPortrait(c)}<span class="char-name" style="color:${c.color}">${c.name}</span>${locked(c.name) ? '<span class="lock-mark">🔒</span>' : ''}</div>`).join('')}</div>
     <div class="panel"><b style="color:${ic.color};font-size:15px">${ic.name}</b>${locked(ic.name) ? ' 🔒 à débloquer dans la boutique' : ''} · ${ic.desc} · PV ${ic.hp}<br>${ic.atk.map((a, j) => 'JKLU'[j] + ' : ' + a).join(' &nbsp;·&nbsp; ')}${ic.alt ? '<br>✨ Forme : ' + ic.alt.join(' / ') : ''}${sks.length ? '<br>' + [{ id: '', name: 'Normal' }, ...sks].map(q => `<span class="chip ${cur === q.id ? 'on' : ''}" onclick="event.stopPropagation();setSkin('${ic.name}','${q.id}',${ii})">${q.name}</span>`).join('') : ''}</div>
     <button onclick="confirmPick()" ${pre == null || S.sel[me] != null ? 'disabled' : ''}>✔ Valider ${pre != null ? chars[pre].name : ''}</button>
-    <p style="margin:2px">${pre == null && S.sel[me] == null ? 'Clique sur un perso, choisis ton skin, puis valide' : ''}${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.sel[S.team ? (me < 2 ? 1 - me : 5 - me) : 1 - me] != null ? (S.team ? '· Coéquipier prêt ✔' : S.bot ? '· Bot prêt 🤖' : '· Adversaire prêt ✔') : ''}</p>
+    <p style="margin:2px">${pre == null && S.sel[me] == null ? 'Clique sur un perso, choisis ton skin, puis valide' : ''}${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.sel[1 - me] != null ? (S.bot ? '· Bot prêt 🤖' : '· Adversaire prêt ✔') : ''}</p>
     <p style="font-size:12px;opacity:.8;margin:2px">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques · U ou Espace : ultime (barre pleine)</p>${quitBtn}`;
   }
   else if (S.p === 'training') { ov.style.display = 'none'; last = ''; return; }
-  else if (S.p === 'end') h = `${tNew ? '<p>🏷️ Titre débloqué : ' + tNew + ' !</p>' : ''}${lvUp ? '<p>⬆️ Niveau ' + lvUp + ' atteint !</p>' : ''}${kNew ? '<p>🔓 Kairos débloqué !</p>' : ''}<p style="font-size:18px">🪙 +${earned} pièces · 💎 +${earnedCr} cristal · ✨ +${earnedXp} XP (total : ${save.coins} 🪙 / ${save.crystals} 💎)</p>${S.ag[me] ? '<p>En attente' + (S.team ? ' des autres joueurs' : ' de l’adversaire') + '…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
+  else if (S.p === 'end') h = `${tNew ? '<p>🏷️ Titre débloqué : ' + tNew + ' !</p>' : ''}${lvUp ? '<p>⬆️ Niveau ' + lvUp + ' atteint !</p>' : ''}${kNew ? '<p>🔓 Kairos débloqué !</p>' : ''}<p style="font-size:18px">🪙 +${earned} pièces · 💎 +${earnedCr} cristal · ✨ +${earnedXp} XP (total : ${save.coins} 🪙 / ${save.crystals} 💎)</p>${S.ag[me] ? '<p>En attente de l’adversaire…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
   else { ov.style.display = 'none'; last = ''; return; }
   if (h !== last) { ov.innerHTML = h; last = h; }
   ov.style.display = 'flex';
@@ -713,7 +681,7 @@ const gojoHeal = (px, py, phase = 1) => {
 };
 
 // ===== Denji : onde de choc à l'atterrissage du Saut écrasant =====
-const WAVES = [], prevAir = [false, false];
+const WAVES = [], prevAir = [false, false], vkPrev = [-1, -1];
 function drawWaves() {
   const now = Date.now();
   for (let i = WAVES.length - 1; i >= 0; i--) {
@@ -749,26 +717,19 @@ const sword = (hx, hy, tx, ty, col) => {
   const dx = tx - hx, dy = ty - hy;
   LN(col || '#dfe6e9', 5, hx, hy, tx, ty); LN('#f1c40f', 4, hx + dy * .15, hy - dx * .15, hx - dy * .15, hy + dx * .15);
 };
-const axe = (hx, hy, ang, len) => { // hache : manche en bois et large lame en demi-lune
-  const ex = hx + Math.cos(ang) * len, ey = hy + Math.sin(ang) * len;
-  LN('#5d4037', 7, hx - Math.cos(ang) * 14, hy - Math.sin(ang) * 14, ex, ey);
-  LN('#8d6e63', 3, hx - Math.cos(ang) * 14, hy - Math.sin(ang) * 14, ex, ey);
-  const nx = -Math.sin(ang), ny = Math.cos(ang), bx = ex + Math.cos(ang) * 7, by = ey + Math.sin(ang) * 7;
-  Y('#6d4c41', [[bx + nx * 6, by + ny * 6], [bx + Math.cos(ang) * 20 + nx * 24, by + Math.sin(ang) * 20 + ny * 24], [bx + Math.cos(ang) * 20 - nx * 24, by + Math.sin(ang) * 20 - ny * 24], [bx - nx * 6, by - ny * 6]]);
-  Y('#95a5a6', [[bx + nx * 6, by + ny * 6], [bx + Math.cos(ang) * 24 + nx * 25, by + Math.sin(ang) * 24 + ny * 25], [bx + Math.cos(ang) * 24 - nx * 25, by + Math.sin(ang) * 24 - ny * 25], [bx - nx * 6, by - ny * 6]]);
-  LN('#dfe6e9', 3.5, bx + Math.cos(ang) * 24 + nx * 25, by + Math.sin(ang) * 24 + ny * 25, bx + Math.cos(ang) * 24 - nx * 25, by + Math.sin(ang) * 24 - ny * 25);
-};
 
 function fighter(f, i) {
   const c = chars[f.c], s = f.fc, n = c.name, t = Date.now();
   FL = f.fl;
-  const air = f.y < 378; if (n === 'Denji' && f.fm && f.ak === 2 && prevAir[i] && !air) WAVES.push({ x: f.x, t: Date.now() }); prevAir[i] = air;
+  const air = f.y < 378; if (n === 'Denji' && f.fm && f.ak === 2 && prevAir[i] && !air) WAVES.push({ x: f.x, t: Date.now() }); prevAir[i] = air; if (!(n === 'Viking' && f.ak >= 0)) vkPrev[i] = -1;
   const sd = f.sk && SHOP.find(q => q.id === f.sk); PAL = sd && sd.pal || null; const lk = sd && sd.look;
   x.save(); x.translate(f.x, f.y);
   if (f.iv) x.globalAlpha = .45;
   if (f.sz > 1) x.scale(f.sz, f.sz);
   if (lk === 'snake' && !f.lz) { x.rotate(s * .12); x.scale(1, .93); } // posture de combat penchée du Snakeman
   if (n === 'Denji' && f.fm && f.ak === 1 && f.ap === 1) x.rotate(s * .16); // charge : buste penché en avant
+  if (n === 'Kaze' && f.ak === 3 && f.ad && f.ad[1] === 0) x.rotate(s * .22); // Kaze fonce sur l'ennemi
+  if (n === 'Viking' && f.ak >= 0) x.rotate(s * (f.ap === 1 ? .08 : f.ap === 0 ? -.04 : .03 * (1 - (f.pp || 0)))); // le buste suit chaque coup
   const gn = n === 'Gojo', dk = n === 'Deku';
   if (f.ak === 3 || f.bf || (gn && f.ak === 2) || (n === 'Denji' && f.fm) || (n === 'Shinra' && f.fm) || (n === 'Ichigo' && f.fm)) {
     x.fillStyle = gn && f.ak === 2 ? 'rgba(255,225,155,.12)' : f.ak === 3 && !dk ? 'rgba(255,230,80,.35)' : n === 'Shinra' ? 'rgba(255,240,170,.3)' : n === 'Ichigo' ? 'rgba(40,10,25,.45)' : dk ? 'rgba(90,255,120,.14)' : 'rgba(255,90,90,.3)';
@@ -1096,6 +1057,10 @@ function fighter(f, i) {
     for (let q = 0; q < 6; q++) C('#ffe066', s * (50 + (t / 12 + q * 23) % 40), -65 + Math.sin(t / 40 + q * 2) * 14, 1.8);
     for (let q = 0; q < 4; q++) C('rgba(200,170,140,' + (.5 - q * .1) + ')', -s * (10 + q * 14), -4 - q * 3, 6 + q * 2);
   }
+  if (n === 'Kaze' && f.ak === 3 && f.ad && f.ad[1] === 0) { // fonce : images rémanentes vertes et lignes de vitesse
+    for (let q = 1; q <= 4; q++) { x.fillStyle = 'rgba(46,204,113,' + (.28 - q * .05) + ')'; x.fillRect(-s * q * 26 - 20, -98, 40, 98); }
+    for (let q = 0; q < 6; q++) LN('rgba(255,255,255,.65)', 2, -s * (30 + q * 8), -12 - q * 17, -s * (90 + q * 8 + (t / 6 + q * 9) % 30), -12 - q * 17);
+  }
   if (f.cr) { // cristallisation
     x.fillStyle = 'rgba(170,225,255,.55)'; x.fillRect(-26, -96, 52, 96);
     x.strokeStyle = 'rgba(255,255,255,.85)'; x.lineWidth = 2; x.beginPath();
@@ -1117,7 +1082,10 @@ function fighter(f, i) {
   // bras, mains, sceptre
   const hand = (px, py) => {
     if (n === 'Bruno') { C('#e74c3c', px, py, 11); C('#ff7675', px - 3, py - 3, 3); }
-    else if (n === 'Kaze') { C(skin, px, py, 6); if (f.ak === 0) { const kt = .5 + .5 * Math.sin(t / 42); LN('#7f8c8d', 3, px - s * 5, py + 2, px + s * 24, py - 3); LN('#dfe6e9', 5, px + s * 8, py - 3, px + s * (31 + kt * 5), py - 8); Y('#ecf0f1', [[px + s * (31 + kt * 5), py - 8], [px + s * 18, py - 12], [px + s * 23, py - 4]]); LN('#2ecc71', 3, px + s * 2, py - 2, px + s * 9, py - 4); } else if (f.ak === 3) LN('#ecf0f1', 3, px, py, px + s * 28, py); }
+    else if (n === 'Kaze') { C(skin, px, py, 6); if (f.ak === 0) { const kt = .5 + .5 * Math.sin(t / 42); LN('#7f8c8d', 3, px - s * 5, py + 2, px + s * 24, py - 3); LN('#dfe6e9', 5, px + s * 8, py - 3, px + s * (31 + kt * 5), py - 8); Y('#ecf0f1', [[px + s * (31 + kt * 5), py - 8], [px + s * 18, py - 12], [px + s * 23, py - 4]]); LN('#2ecc71', 3, px + s * 2, py - 2, px + s * 9, py - 4); } else if (f.ak === 3) { // ultime : lancers de kunaï, puis kunaï planté
+        if (f.ad && f.ad[1] === 1) { LN('#7f8c8d', 3, px - s * 5, py + 2, px + s * 20, py); LN('#dfe6e9', 5, px + s * 8, py - 2, px + s * 34, py - 2); Y('#ecf0f1', [[px + s * 34, py - 6], [px + s * 44, py - 2], [px + s * 34, py + 2]]); C('#2ecc71', px + s * 4, py, 3); }
+        else if (!f.ad) { const kt = (t / 55) % 1; LN('#dfe6e9', 4, px + s * 4, py - 2, px + s * (22 + kt * 10), py - 4); C('#2ecc71', px + s * 3, py, 3); }
+      } }
     else if (n === 'Viking') { C('#7f8c8d', px, py, 12); C('#95a5a6', px - 3, py - 3, 4); }
     else if (n === 'Gojo') { C(skin, px, py, 6); if (f.ak === 0 && f.ap < 2) gojoRed(px + s * 10, py - 2, 11); if (f.ak === 1 && f.ap < 2) gojoBlue(px + s * 10, py - 2, 11); }
     else if (n === 'Yugo') {
@@ -1176,6 +1144,28 @@ function fighter(f, i) {
       if (p === 0) { C('rgba(255,240,150,.6)', s * 14, -150, 22); sword(s * 10, -72, s * 14, -165, '#fff3a0'); }
       else sword(s * 20, -80, s * 105, -80, '#fff3a0');
     } else sword(s * 14, -70, s * 22, -130);
+  } else if (n === 'Viking' && f.ak >= 0) { // animations fluides du Viking : chaque phase suit une courbe douce (pp)
+    const k = f.ak, ap = f.ap, pp = f.pp || 0, eo = u => 1 - (1 - u) * (1 - u), ei = u => u * u, sm = u => u * u * (3 - 2 * u), mix = (a, b, u) => a + (b - a) * u, key = k * 10 + ap;
+    if (key !== vkPrev[i] && ap === 1 && (k === 1 || k === 3)) WAVES.push({ x: f.x + s * (k === 3 ? 90 : 0), t: Date.now() });
+    vkPrev[i] = key;
+    let hx, hy, big = 12, rx = null, ry = null;
+    if (k === 0) { hx = ap === 0 ? mix(24, -8, eo(pp)) : ap === 1 ? mix(-8, 100, eo(pp)) : mix(100, 24, sm(pp)); hy = -66; } // Poing : recul puis jab droit
+    else if (k === 1) { // Écrasement : bras levés puis claque au sol des deux côtés
+      hy = ap === 0 ? mix(-50, -150, eo(pp)) : ap === 1 ? mix(-150, -12, ei(pp)) : mix(-12, -50, sm(pp));
+      hx = ap === 0 ? mix(24, 14, eo(pp)) : ap === 1 ? mix(14, 52, ei(pp)) : mix(52, 24, sm(pp)); rx = -hx; ry = hy;
+    } else if (k === 2) { // Séisme : poing levé puis frappé au sol, la fissure file vers l'ennemi
+      hy = ap === 0 ? mix(-50, -118, eo(pp)) : ap === 1 ? mix(-118, -10, ei(pp)) : mix(-10, -50, sm(pp));
+      hx = ap === 0 ? mix(24, 18, eo(pp)) : ap === 1 ? mix(18, 56, ei(pp)) : mix(56, 24, sm(pp));
+      if (ap >= 1) { x.strokeStyle = 'rgba(30,15,10,' + (ap === 1 ? 1 : 1 - pp) + ')'; x.lineWidth = 3; x.beginPath(); x.moveTo(s * 56, -1); for (let q = 1; q <= 6; q++) x.lineTo(s * (56 + q * 16 * (ap === 1 ? pp : 1)), -1 + (q % 2 ? 4 : -2)); x.stroke(); }
+    } else { // Poing du Géant : charge à deux mains au-dessus de la tête, puis coup colossal
+      big = ap === 1 ? 26 : 20;
+      hy = ap === 0 ? mix(-60, -170, eo(pp)) : ap === 1 ? mix(-170, -55, ei(pp)) : mix(-55, -60, sm(pp));
+      hx = ap === 0 ? mix(24, 12, eo(pp)) : ap === 1 ? mix(12, 112, eo(pp)) : mix(112, 24, sm(pp)); rx = hx * .4; ry = hy + 6;
+      if (ap === 0) { x.fillStyle = 'rgba(255,200,60,' + (.15 + .3 * pp) + ')'; x.beginPath(); x.arc(s * hx, hy, 24 + pp * 20, 0, 7); x.fill(); }
+      if (ap === 1) LN('rgba(255,220,120,.55)', 14, s * mix(12, hx, Math.max(0, pp - .3)), mix(-170, hy, Math.max(0, pp - .3)), s * hx, hy);
+    }
+    if (rx !== null) { LN(sleeve, 11, 0, -70, s * rx, ry); C('#7f8c8d', s * rx, ry, big - 1); }
+    LN(sleeve, 11, 0, -70, s * hx, hy); C('#7f8c8d', s * hx, hy, big); hand(s * hx, hy);
   } else if (f.ak >= 0) {
     let Lx = f.ap === 1 ? 62 : f.ap === 0 ? 12 : 37;
     if (f.b && n === 'Luffy') Lx = Math.max(Lx, s > 0 ? f.b[1] - f.x : f.x - f.b[0]);
@@ -1189,18 +1179,14 @@ function fighter(f, i) {
         if (q > 6) { const px = s * (ext + 12), sz = 6 + Math.sin(t / 30 + q) * 3; Y('#fff3a0', [[px, yy - sz], [px + 2, yy - 2], [px + sz, yy], [px + 2, yy + 2], [px, yy + sz], [px - 2, yy + 2], [px - sz, yy], [px - 2, yy - 2]]); }
       }
       x.globalAlpha = ga;
-    } else if (n === 'Viking' && (f.ak === 0 || f.ak === 1 || f.ak === 3)) { // coups de hache : arme levée en préparation, abattue pendant la frappe
-      const big = f.ak !== 0;
-      const wind = f.ap === 0 ? -20 : f.ap === 1 ? 10 : -6;
-      const reach = (f.ak === 1 ? 76 : f.ak === 3 ? 82 : 60) + (f.ap === 1 ? 18 : 0);
+    } else if (n === 'Viking' && (f.ak === 0 || f.ak === 1)) {
+      const wind = f.ap === 0 ? -18 : f.ap === 1 ? 12 : -5;
+      const reach = (f.ak === 1 ? 76 : 60) + (f.ap === 1 ? 18 : 0);
       const bob = Math.sin(t / 38) * (f.ap === 1 ? 5 : 2);
-      const hy2 = -64 + bob;
       LN('#4e342e', 13, 0, -66, s * (reach * .38), -66 + wind + bob);
-      LN('#6d4c41', 11, s * (reach * .38), -66 + wind + bob, s * reach * .82, hy2);
-      C('#7f8c8d', s * reach * .82, hy2, 9);
-      x.save(); x.scale(s, 1);
-      axe(reach * .82, hy2, f.ap === 0 ? -2.3 : f.ap === 1 ? .45 : -.6, big ? 50 : 40);
-      x.restore();
+      LN('#6d4c41', 11, s * (reach * .38), -66 + wind + bob, s * reach, -62 + bob);
+      C('#7f8c8d', s * reach, -62 + bob, 13);
+      C('#bdc3c7', s * (reach + 3), -65 + bob, 6);
       if (f.ap === 1) {
         for (let q = 0; q < 3; q++) LN('rgba(255,225,160,' + (.55 - q * .13) + ')', 3, s * (reach - 24 - q * 10), -58 + q * 7, s * (reach + 10), -58 + q * 7);
         C('rgba(255,210,120,.28)', s * (reach + 8), -62 + bob, 23);
@@ -1213,10 +1199,6 @@ function fighter(f, i) {
   else if (n === 'Luffy' && lk === 'snake') { // garde du Snakeman : poing avant levé, bras arrière lové
     LN('#16161d', 8, 0, -70, s * 26, -62); LN('#16161d', 8, s * 26, -62, s * 22, -82); hand(s * 22, -84);
     LN('#16161d', 8, 0, -68, -s * 22, -50); C('#16161d', -s * 22, -50, 10);
-  } else if (n === 'Viking') { // au repos : la hache repose sur l'épaule
-    LN('#4e342e', 13, 0, -66, s * 18, -92);
-    C('#7f8c8d', s * 18, -92, 10);
-    x.save(); x.scale(s, 1); axe(18, -92, -1.9, 46); x.restore();
   } else hand(s * 24, -50);
   if (f.bl && n !== 'Chevalier') { x.fillStyle = 'rgba(120,200,255,.6)'; x.fillRect(s * 24 - 5, -95, 10, 85); }
   // Naruto : mouvement de taijutsu, chakra et clones
@@ -1308,46 +1290,25 @@ function fighter(f, i) {
     // Blackwhip : filaments sombres et verts lors des phases de mouvement rapide / ultime avancé
     if (lk === 'dark' && (f.ak === 3 || f.bf)) for(let q=0;q<4;q++){const w=Math.sin(t/120+q*1.7)*13; x.strokeStyle='rgba(12,24,18,.9)'; x.lineWidth=3; x.beginPath(); x.moveTo(-s*12,-78+q*9); x.quadraticCurveTo(-s*(52+q*8),-112+w,-s*(78+q*13),-65+q*20); x.stroke(); x.strokeStyle='rgba(90,255,130,.7)'; x.lineWidth=1; x.stroke();}
   }
-  if (n === 'Ichigo' && lk === 'bloodchains') { // Ichigo seul : grand manteau clair, bandages et immense Zangetsu
+  if (n === 'Ichigo' && lk === 'bloodchains') { // Ichigo à Soul Society (sauvetage de Rukia) : shihakushō noir déchiré, obi blanc, bandages, kyahan, waraji, plaies, reiatsu bleu
     const sway = Math.sin(t / 260) * 3;
     x.save(); x.lineJoin = 'round'; x.lineCap = 'round';
-    // Immense lame blanche portée en travers du dos, avec garde et poignée enveloppée.
-    x.save(); x.rotate(-0.16);
-    x.strokeStyle = '#292b31'; x.lineWidth = 13; x.beginPath(); x.moveTo(-8,-83); x.lineTo(8,-132); x.stroke();
-    x.strokeStyle = '#d8dce0'; x.lineWidth = 8; x.beginPath(); x.moveTo(8,-132); x.lineTo(125,-157); x.lineTo(145,-151); x.lineTo(17,-119); x.closePath(); x.fillStyle = '#f0eee9'; x.fill(); x.stroke();
-    x.strokeStyle = '#aeb4bc'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(16,-128); x.lineTo(132,-153); x.stroke();
-    x.strokeStyle = '#3c4149'; x.lineWidth = 5; x.beginPath(); x.moveTo(-9,-83); x.lineTo(-28,-135); x.stroke();
-    for(let q=0;q<6;q++){x.strokeStyle=q%2?'#ece7df':'#777d85';x.lineWidth=2;x.beginPath();x.moveTo(-25+q*2,-126-q*2);x.lineTo(-17+q*2,-131-q*2);x.stroke();}
-    x.restore();
-    // Grand manteau rose-gris, ample et déchiré aux extrémités.
-    x.fillStyle = '#b9a5a8'; x.strokeStyle = '#574d54'; x.lineWidth = 2;
-    x.beginPath(); x.moveTo(-17,-91); x.quadraticCurveTo(-42,-83,-57,-48+sway); x.lineTo(-78,4); x.lineTo(-59,-5); x.lineTo(-48,8); x.lineTo(-35,-3); x.lineTo(-23,-35); x.lineTo(0,-55); x.lineTo(24,-35); x.lineTo(39,-2); x.lineTo(54,8); x.lineTo(64,-4); x.lineTo(80,4); x.lineTo(57,-50-sway); x.quadraticCurveTo(38,-83,17,-91); x.closePath(); x.fill(); x.stroke();
-    // Doublure et plis du manteau.
-    x.strokeStyle = '#e0d1cf'; x.lineWidth = 2;
-    [[-43,-76,-57,-7],[-31,-82,-40,-18],[-20,-76,-25,-26],[42,-76,57,-7],[30,-82,40,-18],[19,-76,25,-26]].forEach(a=>{x.beginPath();x.moveTo(a[0],a[1]);x.quadraticCurveTo(a[0]-3,a[3]-15,a[2],a[3]);x.stroke();});
-    x.strokeStyle = '#806f76'; x.lineWidth = 1.5;
-    x.beginPath();x.moveTo(-56,-10);x.lineTo(-66,2);x.moveTo(55,-10);x.lineTo(67,2);x.stroke();
-    // Écharpe claire volumineuse autour du cou et retombant sur l'épaule.
-    x.fillStyle = '#d8d1d0'; x.strokeStyle = '#777178'; x.lineWidth = 1.5;
-    x.beginPath(); x.moveTo(-18,-112); x.quadraticCurveTo(-2,-120,16,-111); x.lineTo(31,-99); x.quadraticCurveTo(9,-91,-11,-99); x.lineTo(-29,-103); x.closePath(); x.fill(); x.stroke();
-    x.beginPath(); x.moveTo(-16,-108); x.quadraticCurveTo(-31,-98,-48,-105); x.lineTo(-42,-92); x.quadraticCurveTo(-17,-88,2,-101); x.closePath(); x.fill(); x.stroke();
-    // Bandages serrés sur les avant-bras et les épaules.
-    for (const side of [-1,1]) {
-      x.save(); x.translate(side*24,-72); x.rotate(side*.35);
-      x.fillStyle='#eeeae4'; x.strokeStyle='#8e8a88'; x.lineWidth=1;
-      x.fillRect(-5,-12,10,30); x.strokeRect(-5,-12,10,30);
-      for(let q=0;q<5;q++){x.beginPath();x.moveTo(-6,-10+q*7);x.lineTo(6,-5+q*7);x.stroke();}
-      x.restore();
+    Y('#15151c', [[-22, -30], [22, -30], [24, -22], [17, -26], [12, -16], [6, -24], [0, -14], [-6, -24], [-12, -16], [-17, -26], [-24, -22]]); // bas de la tunique en lambeaux
+    R('#d9d4c8', -16, -22, 13, 4); R('#d9d4c8', 3, -22, 13, 4); LN('#a39d90', 1, -16, -20, -3, -18); LN('#a39d90', 1, 3, -20, 16, -18); // bandes des jambes
+    R('#8d6e4a', -18, -3, 17, 3); R('#8d6e4a', 1, -3, 17, 3); LN('#5d4037', 1.5, -14, -6, -8, -2); LN('#5d4037', 1.5, 6, -6, 12, -2); // sandales waraji
+    R('#e9e6df', -22, -49, 44, 8); LN('rgba(0,0,0,.18)', 1, -22, -45, 22, -45); // obi blanc et son nœud
+    Y('#e9e6df', [[-s * 12, -46], [-s * 27, -57], [-s * 28, -39]]); Y('#e9e6df', [[-s * 14, -42], [-s * 22, -20 + sway], [-s * 12, -23]]);
+    Y(skin, [[s * 17, -88], [s * 29, -85], [s * 27, -70], [s * 21, -76], [s * 17, -68]]); // épaule déchirée
+    Y('#eeeae3', [[-22, -86], [-13, -91], [22, -58], [22, -48]]); LN('rgba(120,110,100,.6)', 1, -16, -80, 18, -52); LN('rgba(120,110,100,.6)', 1, -8, -86, 22, -55); // bandage en diagonale
+    C('#a93226', 8, -64, 4); LN('#a93226', 2, 8, -62, 8, -53); // sang
+    LN('#0b0b10', 3, -9, -90, 2, -63); LN('#0b0b10', 3, 9, -90, 2, -63); // revers du col
+    LN('#c0392b', 1.5, -s * 5, -98, -s * 1, -93); R('#efebe4', s * 7, -99, 7, 4); LN('#9a948a', 1, s * 10.5, -99, s * 10.5, -95); // plaie et pansement
+    LN('#2a1408', 3, 0, -108, s * 11, -105); // sourcil froncé
+    if (!f.fm && f.ak !== 0 && f.ak !== 1) { // Zangetsu au dos : poignée enveloppée de bandes blanches et chaîne
+      LN('#efebe4', 7, s * 6, -136, s * 11, -149); for (let q = 0; q < 3; q++) LN('#8a867e', 1.2, s * (6 + q * 1.7) - 3, -136 - q * 4.3, s * (6 + q * 1.7) + 3, -138 - q * 4.3);
+      x.strokeStyle = '#9aa0a6'; x.lineWidth = 2; for (let q = 0; q < 3; q++) { x.beginPath(); x.arc(s * (14 + q * 3), -153 + q * 5 + sway * .3, 2.4, 0, 7); x.stroke(); }
     }
-    // Harnais et médaillon métallique au centre de la poitrine.
-    x.strokeStyle='#45464b'; x.lineWidth=4; x.beginPath(); x.moveTo(-16,-91); x.lineTo(10,-65); x.lineTo(22,-89); x.stroke();
-    x.fillStyle='#6e716f'; x.strokeStyle='#25272b'; x.lineWidth=1.5;
-    x.beginPath();x.arc(9,-83,7,0,7);x.fill();x.stroke();
-    x.fillStyle='#c4c4b9';x.beginPath();x.arc(9,-83,3,0,7);x.fill();
-    // Ichigo reste seul : aucune autre personne n’est dessinée sur ce skin.
-    // Petits plis lumineux et coutures du vêtement.
-    x.strokeStyle='rgba(255,247,238,.65)';x.lineWidth=1;
-    for(let q=0;q<4;q++){x.beginPath();x.moveTo(-36+q*5,-72);x.quadraticCurveTo(-31+q*7,-48,-35+q*8,-22);x.stroke();}
+    for (let q = 0; q < 5; q++) LN('rgba(150,210,255,.4)', 2, -22 + q * 11, -4, -24 + q * 11 + Math.sin(t / 200 + q) * 4, -34 - (t / 22 + q * 15) % 44); // reiatsu
     x.restore();
   }
   x.restore(); PAL = null;
@@ -1380,29 +1341,24 @@ function hud() {
     return;
   }
   S.f.forEach((f, i) => {
-    const c = chars[f.c], tm = !!S.team, left = tm ? i < 2 : !i, w = tm ? 372 : 380, xx = left ? 20 : 900 - 20 - w;
-    const yy = tm ? 10 + (i % 2) * 22 : 20, hh = tm ? 12 : 22, uy = tm ? yy + 14 : 46, uh = tm ? 4 : 9;
-    const pw = w * f.hp / c.hp, uw = w * f.ul / 100, rdy = f.ul >= 100;
-    if (f.sh > 0) { x.fillStyle = '#000'; x.fillRect(xx, uy - 8, w, 6); x.fillStyle = '#7fd4ff'; const sw = w * f.sh / 60; x.fillRect(left ? xx : xx + w - sw, uy - 8, sw, 6); }
-    x.fillStyle = '#000'; x.fillRect(xx, yy, w, hh);
-    x.fillStyle = c.color; x.fillRect(left ? xx : xx + w - pw, yy, pw, hh);
-    x.fillStyle = '#000'; x.fillRect(xx, uy, w, uh);
-    x.fillStyle = rdy && ((Date.now() / 150) | 0) % 2 ? '#fff' : '#f1c40f'; x.fillRect(left ? xx : xx + w - uw, uy, uw, uh);
-    x.fillStyle = '#fff'; x.font = tm ? 'bold 11px sans-serif' : 'bold 14px sans-serif'; x.textAlign = left ? 'left' : 'right';
-    const ny = tm ? yy + 26 : 74;
-    x.fillText(c.name + (i === me ? ' (toi)' : ''), left ? xx : xx + w, ny);
-    if (rdy) { x.fillStyle = '#f1c40f'; x.textAlign = left ? 'right' : 'left'; x.fillText(i === me ? '⚡ ULTIME PRÊT : U' : '⚡ ULTIME PRÊT', left ? xx + w : xx, ny); }
-    const wt = tm ? (me < 2 ? 0 : 1) : i;
+    const c = chars[f.c], w = 380, xx = i ? 900 - 20 - w : 20, pw = w * f.hp / c.hp, uw = w * f.ul / 100, rdy = f.ul >= 100;
+    if (f.sh > 0) { x.fillStyle = '#000'; x.fillRect(xx, 12, w, 6); x.fillStyle = '#7fd4ff'; const sw = w * f.sh / 60; x.fillRect(i ? xx + w - sw : xx, 12, sw, 6); }
+    x.fillStyle = '#000'; x.fillRect(xx, 20, w, 22);
+    x.fillStyle = c.color; x.fillRect(i ? xx + w - pw : xx, 20, pw, 22);
+    x.fillStyle = '#000'; x.fillRect(xx, 46, w, 9);
+    x.fillStyle = rdy && ((Date.now() / 150) | 0) % 2 ? '#fff' : '#f1c40f'; x.fillRect(i ? xx + w - uw : xx, 46, uw, 9);
+    x.fillStyle = '#fff'; x.font = 'bold 14px sans-serif'; x.textAlign = i ? 'right' : 'left';
+    x.fillText(c.name + (i === me ? ' (toi)' : ''), i ? xx + w : xx, 74);
+    if (rdy) { x.fillStyle = '#f1c40f'; x.textAlign = i ? 'left' : 'right'; x.fillText(i === me ? '⚡ ULTIME PRÊT : U' : '⚡ ULTIME PRÊT', i ? xx : xx + w, 74); }
     for (let k = 0; k < 2; k++) {
-      x.fillStyle = k < (S.w[wt] || 0) ? '#f1c40f' : '#555'; x.beginPath();
-      x.arc(left ? xx + 8 + k * 20 : xx + w - 8 - k * 20, tm ? yy + 34 : 90, 6, 0, 7); x.fill();
+      x.fillStyle = k < S.w[i] ? '#f1c40f' : '#555'; x.beginPath();
+      x.arc(i ? xx + w - 8 - k * 20 : xx + 8 + k * 20, 90, 6, 0, 7); x.fill();
     }
   });
   x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = 'bold 28px sans-serif'; x.fillText(fmt(S.tm), 450, 42);
   if (S.p === 'cd' && maps[S.mp]) { x.font = '14px sans-serif'; x.fillStyle = '#ddd'; x.fillText('🗺 ' + maps[S.mp].n + (maps[S.mp].note ? ' · ' + maps[S.mp].note : ''), 450, 62); }
   const t = S.p === 'cd' ? S.n : (S.p === 'rend' || S.p === 'end') ? S.m : '';
   x.font = 'bold 44px sans-serif'; x.lineWidth = 5; x.strokeStyle = '#000'; x.strokeText(t, 450, 210); x.fillText(t, 450, 210);
-  if (note) { x.fillStyle = 'rgba(0,0,0,.75)'; x.fillRect(230, 556, 440, 30); x.fillStyle = '#ffd54f'; x.font = 'bold 15px sans-serif'; x.textAlign = 'center'; x.fillText(note, 450, 576); }
 }
 
 const OFF = 80; // décalage visuel : le sol est abaissé de 80 px, le bas de l'écran est entièrement couvert par le sol
