@@ -230,7 +230,7 @@ const SHOP = [
   { id: 'skin_naruto_hermite', type: 'skin', char: 'Naruto', name: 'Naruto Mode Hermite', price: 150, look: 'sage', pal: { '#ff7f27': '#d0451b', '#2c5fa8': '#222', '#2c3e50': '#111' } },
   { id: 'skin_koro_blanc', type: 'skin', char: 'Koro', name: 'Koro-sensei blanc', price: 150, look: 'white', pal: { '#f4d03f': '#f5f5f1', '#e6b800': '#dcdcd5', '#f1c40f': '#e8e8e2' } },
   { id: 'skin_shinra_banshoman', type: 'skin', char: 'Shinra', name: 'Shinra Banshoman', price: 250, look: 'banshoman', pal: { '#f5cba7': '#b8402f', '#23232f': '#a63a2f', '#1b1b24': '#7a2a22', '#bdc3c7': '#a63a2f', '#111': '#3a1410', '#15151c': '#e9e9e9', '#000': '#fff' } },
-  { id: 'skin_ichigo_bloodchains', type: 'skin', char: 'Ichigo', name: 'Ichigo Blood Chains', price: 250, look: 'bloodchains', desc: 'Forme ultime de Bleach TYBW : semi-Hollowfication, deux cornes et chaînes de reiatsu rouge sang', pal: { '#15151c': '#1b0b12', '#1b1b26': '#250c14', '#16161d': '#190910', '#101015': '#22070d', '#0e0e14': '#16070b', '#ecf0f1': '#8e1726', '#cfd8dc': '#c02b39' } },
+  { id: 'skin_ichigo_bloodchains', type: 'skin', char: 'Ichigo', name: 'Ichigo - Manteau du porteur', price: 250, look: 'bloodchains', desc: 'Ichigo seul avec grand manteau rose-gris, écharpe claire, bandages et immense Zangetsu dans le dos', pal: { '#15151c': '#18171d', '#1b1b26': '#242128', '#16161d': '#17161c', '#101015': '#211e24', '#0e0e14': '#17151b', '#ecf0f1': '#b9a5a8', '#cfd8dc': '#d8d1d0' } },
   { id: 'skin_kairos_azur', type: 'skin', char: 'Kairos', name: 'Kairos azur', price: 150, pal: { '#3b2a5a': '#174b63', '#2b1f3d': '#102f45', '#2a2038': '#163b50', '#d9b84a': '#55d6d2', '#f5ecd0': '#d9ffff' } },
 ];
 let tNew = '', chestGain = '', chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
@@ -1259,36 +1259,46 @@ function fighter(f, i) {
     // Blackwhip : filaments sombres et verts lors des phases de mouvement rapide / ultime avancé
     if (lk === 'dark' && (f.ak === 3 || f.bf)) for(let q=0;q<4;q++){const w=Math.sin(t/120+q*1.7)*13; x.strokeStyle='rgba(12,24,18,.9)'; x.lineWidth=3; x.beginPath(); x.moveTo(-s*12,-78+q*9); x.quadraticCurveTo(-s*(52+q*8),-112+w,-s*(78+q*13),-65+q*20); x.stroke(); x.strokeStyle='rgba(90,255,130,.7)'; x.lineWidth=1; x.stroke();}
   }
-  if (n === 'Ichigo' && lk === 'bloodchains') { // Blood Chains Ichigo : semi-Hollowfication + Bankai
-    const pulse = .72 + .28 * Math.sin(t / 95);
-    // Pression spirituelle rouge sombre autour du corps.
-    x.save(); x.globalCompositeOperation = 'lighter';
-    const aura = x.createRadialGradient(0, -70, 18, 0, -70, 100);
-    aura.addColorStop(0, 'rgba(160,12,32,.04)'); aura.addColorStop(.65, 'rgba(180,12,35,.14)'); aura.addColorStop(1, 'rgba(180,12,35,0)');
-    x.fillStyle = aura; x.beginPath(); x.ellipse(0, -70, 88, 112, 0, 0, 7); x.fill();
-    // Les deux cornes osseuses caractéristiques de cette forme.
-    x.lineCap = 'round'; x.lineJoin = 'round';
-    [[-8,-119,-18,-137,-31,-145], [8,-119,18,-137,31,-145]].forEach((a,j) => {
-      x.strokeStyle = 'rgba(255,35,55,.45)'; x.lineWidth = 9; x.beginPath(); x.moveTo(a[0],a[1]); x.quadraticCurveTo(a[2],a[3],a[4],a[5]); x.stroke();
-      x.strokeStyle = '#211116'; x.lineWidth = 7; x.beginPath(); x.moveTo(a[0],a[1]); x.quadraticCurveTo(a[2],a[3],a[4],a[5]); x.stroke();
-      x.strokeStyle = j ? '#f0e6dc' : '#d9d0c7'; x.lineWidth = 4.2; x.beginPath(); x.moveTo(a[0],a[1]); x.quadraticCurveTo(a[2],a[3],a[4],a[5]); x.stroke();
-      x.strokeStyle = '#fff4e9'; x.lineWidth = 1; x.beginPath(); x.moveTo(a[0]+1,a[1]); x.quadraticCurveTo(a[2]+1,a[3],a[4],a[5]); x.stroke();
-    });
-    // Chaînes rouges avec lueur, maillons visibles : cou, bras et jambes.
-    const chain = (pts,w=3) => {
-      x.lineCap='round'; x.lineJoin='round';
-      x.strokeStyle='rgba(255,20,48,'+(.28+pulse*.22)+')'; x.lineWidth=w+5; x.beginPath(); pts.forEach((p,j)=>j?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke();
-      x.strokeStyle='#4b0713'; x.lineWidth=w+1.5; x.beginPath(); pts.forEach((p,j)=>j?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke();
-      x.strokeStyle='#e52b42'; x.lineWidth=w; x.beginPath(); pts.forEach((p,j)=>j?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke();
-      for(let j=0;j<pts.length-1;j++){const [ax,ay]=pts[j],[bx,by]=pts[j+1],len=Math.hypot(bx-ax,by-ay),count=Math.max(1,Math.floor(len/8));for(let k=0;k<=count;k++){const u=k/count,xx=ax+(bx-ax)*u,yy=ay+(by-ay)*u;x.save();x.translate(xx,yy);x.rotate(Math.atan2(by-ay,bx-ax)+Math.PI/2);x.strokeStyle='#ff8791';x.lineWidth=1.15;x.beginPath();x.ellipse(0,0,2.2,3.2,0,0,7);x.stroke();x.restore();}}
-    };
-    chain([[-13,-111],[-18,-101],[-10,-92],[0,-96],[10,-91],[18,-101],[13,-111]],3);
-    chain([[-19,-83],[-28,-75],[-23,-65],[-29,-55],[-23,-46],[-28,-35]],3);
-    chain([[19,-83],[28,-75],[23,-65],[29,-55],[23,-46],[28,-35]],3);
-    chain([[-10,-28],[-15,-19],[-10,-10],[-14,-2]],2.8); chain([[10,-28],[15,-19],[10,-10],[14,-2]],2.8);
-    // Marques sombres de Hollow sur les côtés du visage et du cou.
-    x.strokeStyle='rgba(34,5,12,.95)'; x.lineWidth=3.2; x.beginPath(); x.moveTo(-9,-108); x.quadraticCurveTo(-13,-101,-9,-96); x.moveTo(9,-108); x.quadraticCurveTo(13,-101,9,-96); x.stroke();
-    for(let q=0;q<7;q++){const a=t/240+q*6.283/7,rr=35+(q%3)*12;x.fillStyle='rgba(255,90,105,'+(.45+.45*pulse)+')';x.beginPath();x.arc(Math.cos(a)*rr,-65+Math.sin(a)*rr*1.1,1.2+(q%2),0,7);x.fill();}
+  if (n === 'Ichigo' && lk === 'bloodchains') { // Ichigo seul : grand manteau clair, bandages et immense Zangetsu
+    const sway = Math.sin(t / 260) * 3;
+    x.save(); x.lineJoin = 'round'; x.lineCap = 'round';
+    // Immense lame blanche portée en travers du dos, avec garde et poignée enveloppée.
+    x.save(); x.rotate(-0.16);
+    x.strokeStyle = '#292b31'; x.lineWidth = 13; x.beginPath(); x.moveTo(-8,-83); x.lineTo(8,-132); x.stroke();
+    x.strokeStyle = '#d8dce0'; x.lineWidth = 8; x.beginPath(); x.moveTo(8,-132); x.lineTo(125,-157); x.lineTo(145,-151); x.lineTo(17,-119); x.closePath(); x.fillStyle = '#f0eee9'; x.fill(); x.stroke();
+    x.strokeStyle = '#aeb4bc'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(16,-128); x.lineTo(132,-153); x.stroke();
+    x.strokeStyle = '#3c4149'; x.lineWidth = 5; x.beginPath(); x.moveTo(-9,-83); x.lineTo(-28,-135); x.stroke();
+    for(let q=0;q<6;q++){x.strokeStyle=q%2?'#ece7df':'#777d85';x.lineWidth=2;x.beginPath();x.moveTo(-25+q*2,-126-q*2);x.lineTo(-17+q*2,-131-q*2);x.stroke();}
+    x.restore();
+    // Grand manteau rose-gris, ample et déchiré aux extrémités.
+    x.fillStyle = '#b9a5a8'; x.strokeStyle = '#574d54'; x.lineWidth = 2;
+    x.beginPath(); x.moveTo(-17,-91); x.quadraticCurveTo(-42,-83,-57,-48+sway); x.lineTo(-78,4); x.lineTo(-59,-5); x.lineTo(-48,8); x.lineTo(-35,-3); x.lineTo(-23,-35); x.lineTo(0,-55); x.lineTo(24,-35); x.lineTo(39,-2); x.lineTo(54,8); x.lineTo(64,-4); x.lineTo(80,4); x.lineTo(57,-50-sway); x.quadraticCurveTo(38,-83,17,-91); x.closePath(); x.fill(); x.stroke();
+    // Doublure et plis du manteau.
+    x.strokeStyle = '#e0d1cf'; x.lineWidth = 2;
+    [[-43,-76,-57,-7],[-31,-82,-40,-18],[-20,-76,-25,-26],[42,-76,57,-7],[30,-82,40,-18],[19,-76,25,-26]].forEach(a=>{x.beginPath();x.moveTo(a[0],a[1]);x.quadraticCurveTo(a[0]-3,a[3]-15,a[2],a[3]);x.stroke();});
+    x.strokeStyle = '#806f76'; x.lineWidth = 1.5;
+    x.beginPath();x.moveTo(-56,-10);x.lineTo(-66,2);x.moveTo(55,-10);x.lineTo(67,2);x.stroke();
+    // Écharpe claire volumineuse autour du cou et retombant sur l'épaule.
+    x.fillStyle = '#d8d1d0'; x.strokeStyle = '#777178'; x.lineWidth = 1.5;
+    x.beginPath(); x.moveTo(-18,-112); x.quadraticCurveTo(-2,-120,16,-111); x.lineTo(31,-99); x.quadraticCurveTo(9,-91,-11,-99); x.lineTo(-29,-103); x.closePath(); x.fill(); x.stroke();
+    x.beginPath(); x.moveTo(-16,-108); x.quadraticCurveTo(-31,-98,-48,-105); x.lineTo(-42,-92); x.quadraticCurveTo(-17,-88,2,-101); x.closePath(); x.fill(); x.stroke();
+    // Bandages serrés sur les avant-bras et les épaules.
+    for (const side of [-1,1]) {
+      x.save(); x.translate(side*24,-72); x.rotate(side*.35);
+      x.fillStyle='#eeeae4'; x.strokeStyle='#8e8a88'; x.lineWidth=1;
+      x.fillRect(-5,-12,10,30); x.strokeRect(-5,-12,10,30);
+      for(let q=0;q<5;q++){x.beginPath();x.moveTo(-6,-10+q*7);x.lineTo(6,-5+q*7);x.stroke();}
+      x.restore();
+    }
+    // Harnais et médaillon métallique au centre de la poitrine.
+    x.strokeStyle='#45464b'; x.lineWidth=4; x.beginPath(); x.moveTo(-16,-91); x.lineTo(10,-65); x.lineTo(22,-89); x.stroke();
+    x.fillStyle='#6e716f'; x.strokeStyle='#25272b'; x.lineWidth=1.5;
+    x.beginPath();x.arc(9,-83,7,0,7);x.fill();x.stroke();
+    x.fillStyle='#c4c4b9';x.beginPath();x.arc(9,-83,3,0,7);x.fill();
+    // Ichigo reste seul : aucune autre personne n’est dessinée sur ce skin.
+    // Petits plis lumineux et coutures du vêtement.
+    x.strokeStyle='rgba(255,247,238,.65)';x.lineWidth=1;
+    for(let q=0;q<4;q++){x.beginPath();x.moveTo(-36+q*5,-72);x.quadraticCurveTo(-31+q*7,-48,-35+q*8,-22);x.stroke();}
     x.restore();
   }
   x.restore(); PAL = null;
