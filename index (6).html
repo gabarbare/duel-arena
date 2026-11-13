@@ -1049,7 +1049,7 @@ function fighter(f, i) {
   // bras, mains, sceptre
   const hand = (px, py) => {
     if (n === 'Bruno') { C('#e74c3c', px, py, 11); C('#ff7675', px - 3, py - 3, 3); }
-    else if (n === 'Kaze') { C(skin, px, py, 6); if (f.ak === 0 || f.ak === 3) LN('#ecf0f1', 3, px, py, px + s * 28, py); }
+    else if (n === 'Kaze') { C(skin, px, py, 6); if (f.ak === 0) { const kt = .5 + .5 * Math.sin(t / 42); LN('#7f8c8d', 3, px - s * 5, py + 2, px + s * 24, py - 3); LN('#dfe6e9', 5, px + s * 8, py - 3, px + s * (31 + kt * 5), py - 8); Y('#ecf0f1', [[px + s * (31 + kt * 5), py - 8], [px + s * 18, py - 12], [px + s * 23, py - 4]]); LN('#2ecc71', 3, px + s * 2, py - 2, px + s * 9, py - 4); } else if (f.ak === 3) LN('#ecf0f1', 3, px, py, px + s * 28, py); }
     else if (n === 'Viking') { C('#7f8c8d', px, py, 12); C('#95a5a6', px - 3, py - 3, 4); }
     else if (n === 'Gojo') { C(skin, px, py, 6); if (f.ak === 0 && f.ap < 2) gojoRed(px + s * 10, py - 2, 11); if (f.ak === 1 && f.ap < 2) gojoBlue(px + s * 10, py - 2, 11); }
     else if (n === 'Yugo') {
@@ -1121,6 +1121,18 @@ function fighter(f, i) {
         if (q > 6) { const px = s * (ext + 12), sz = 6 + Math.sin(t / 30 + q) * 3; Y('#fff3a0', [[px, yy - sz], [px + 2, yy - 2], [px + sz, yy], [px + 2, yy + 2], [px, yy + sz], [px - 2, yy + 2], [px - sz, yy], [px - 2, yy - 2]]); }
       }
       x.globalAlpha = ga;
+    } else if (n === 'Viking' && (f.ak === 0 || f.ak === 1)) {
+      const wind = f.ap === 0 ? -18 : f.ap === 1 ? 12 : -5;
+      const reach = (f.ak === 1 ? 76 : 60) + (f.ap === 1 ? 18 : 0);
+      const bob = Math.sin(t / 38) * (f.ap === 1 ? 5 : 2);
+      LN('#4e342e', 13, 0, -66, s * (reach * .38), -66 + wind + bob);
+      LN('#6d4c41', 11, s * (reach * .38), -66 + wind + bob, s * reach, -62 + bob);
+      C('#7f8c8d', s * reach, -62 + bob, 13);
+      C('#bdc3c7', s * (reach + 3), -65 + bob, 6);
+      if (f.ap === 1) {
+        for (let q = 0; q < 3; q++) LN('rgba(255,225,160,' + (.55 - q * .13) + ')', 3, s * (reach - 24 - q * 10), -58 + q * 7, s * (reach + 10), -58 + q * 7);
+        C('rgba(255,210,120,.28)', s * (reach + 8), -62 + bob, 23);
+      }
     } else {
       LN(sleeve, n === 'Luffy' ? 7 : 9, 0, -65, s * Lx, -65);
       hand(s * Lx, -65);
@@ -1538,6 +1550,22 @@ function draw() {
           g.addColorStop(0,'#fff'); g.addColorStop(.35,'#d9ffff'); g.addColorStop(.75,'#83dcf2'); g.addColorStop(1,'rgba(105,205,240,.08)');
           x.fillStyle=g; x.beginPath(); x.arc(ox,oy,rr*.58,0,7); x.fill();
           x.strokeStyle='rgba(255,255,255,.9)'; x.lineWidth=1.4; x.beginPath(); x.arc(ox,oy,rr*.58,a,a+Math.PI*1.35); x.stroke(); }
+        x.restore();
+      }
+      else if (p.k === 21) { // Kaze : kunai lancé, lame métallique et ruban vert
+        x.save(); x.translate(p.x,p.y); x.scale(p.v || 1,1); x.rotate(-.12);
+        x.shadowColor='rgba(190,235,255,.85)'; x.shadowBlur=10;
+        LN('#34495e',5,-13,0,9,0); LN('#2ecc71',3,-16,-4,-8,4);
+        Y('#dfe6e9',[ [7,-3],[p.r*2.5,-1],[7,3] ]); LN('#fff',1.5,8,-2,p.r*2.1,-1);
+        x.restore();
+      }
+      else if (p.k === 22) { // Viking : onde de choc sismique qui déchire le sol
+        x.save(); x.translate(p.x,p.y); x.scale(p.v || 1,1);
+        const pulse=.65+.35*Math.sin(Date.now()/42), rr=p.r;
+        x.fillStyle='rgba(210,170,105,.22)'; x.beginPath(); x.ellipse(0,rr*.45,rr*2.15,rr*.62,0,0,7); x.fill();
+        x.strokeStyle='rgba(255,205,125,.95)'; x.lineWidth=4; x.beginPath(); x.moveTo(-rr*2.2,rr*.35); x.lineTo(-rr*.9,-rr*.45*pulse); x.lineTo(-rr*.25,rr*.2); x.lineTo(rr*.35,-rr*.75*pulse); x.lineTo(rr*1.05,rr*.25); x.lineTo(rr*2.1,-rr*.25); x.stroke();
+        x.strokeStyle='rgba(105,75,48,.95)'; x.lineWidth=3; x.beginPath(); x.moveTo(-rr*1.8,rr*.7); x.lineTo(-rr*.7,rr*.45); x.lineTo(0,rr*.85); x.lineTo(rr*.8,rr*.42); x.lineTo(rr*1.9,rr*.68); x.stroke();
+        for(let q=0;q<4;q++){ const xx=(q-1.5)*rr*.8; Y('rgba(225,205,165,.8)',[[xx,rr*.2],[xx+rr*.18,-rr*(.7+(q%2)*.25)*pulse],[xx+rr*.36,rr*.3]]); }
         x.restore();
       }
       else { x.fillStyle = chars[S.f[p.o].c].color; x.beginPath(); x.arc(p.x, p.y, p.r, 0, 7); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 2; x.stroke(); }
