@@ -235,7 +235,7 @@ const SHOP = [
   { id: 'skin_kairos_azur', type: 'skin', char: 'Kairos', name: 'Kairos azur', price: 150, pal: { '#3b2a5a': '#174b63', '#2b1f3d': '#102f45', '#2a2038': '#163b50', '#d9b84a': '#55d6d2', '#f5ecd0': '#d9ffff' } },
 ];
 let tNew = '', chestGain = '', chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
-let save = { coins: 0, crystals: 0, xp: 0, chests: 0, icons: [], profile: null, friends: [], fid: null, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
+let save = { coins: 0, crystals: 0, xp: 0, chests: 0, icons: [], profile: null, friends: [], fid: null, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null, team = null, note = '', q2 = false;
 if (!save.stats || typeof save.stats !== 'object') save.stats = { played: 0, wins: 0, losses: 0, byChar: {} };
 if (!save.stats.byChar || typeof save.stats.byChar !== 'object') save.stats.byChar = {};
 save.stats.played = Number(save.stats.played) || 0;
@@ -265,10 +265,14 @@ function connect(first) {
       fList = m.list;
       if (fAdd) { if (m.missing.includes(fAdd)) fErr = 'Code introuvable'; else { save.friends.push(fAdd); persist(); fDraft = ''; } fAdd = null; }
     }
-    else if (m.t === 'room') { me = m.idx; chars = m.chars; maps = m.maps; code = m.code; searching = false; }
-    else if (m.t === 'err') { err = m.m; me = -1; S = null; searching = false; w.close(); }
+    else if (m.t === 'room') { me = m.idx; chars = m.chars; maps = m.maps; code = m.code; searching = false; q2 = false; team = null; }
+    else if (m.t === 'err') { err = m.m; me = -1; S = null; searching = false; team = null; q2 = false; note = ''; w.close(); }
+    else if (m.t === 'team') { team = m; searching = false; q2 = false; view = 'menu'; }
+    else if (m.t === 'queued2') { q2 = true; searching = true; }
+    else if (m.t === 'note') { note = m.m; setTimeout(() => { note = ''; ui(); }, 4000); }
+    else if (m.t === 'left') { team = null; q2 = false; view = 'menu'; }
     else if (m.t === 's') {
-      S = m; if (m.p !== 'select') pre = null; if (m.w) { if (m.w[me] > rw) qTrack('rm', 1, m.mp); rw = m.w[me]; }
+      S = m; if (m.p !== 'select') pre = null; if (m.w) { const myT = m.team ? (me < 2 ? 0 : 1) : me; if (m.w[myT] > rw) qTrack('rm', 1, m.mp); rw = m.w[myT]; }
       if (m.p === 'end' && m.co) {
         if (!paid) {
           paid = 1;
@@ -276,7 +280,7 @@ function connect(first) {
           save.coins += earned;
           const charIndex = m.f && m.f[me] ? m.f[me].c : null;
           const charName = charIndex != null && chars[charIndex] ? chars[charIndex].name : 'Inconnu';
-          const won = Number(m.co[me]) > Number(m.co[1 - me]);
+          const foeI = m.team ? (me < 2 ? 2 : 0) : 1 - me, won = Number(m.co[me]) > Number(m.co[foeI]);
           save.stats.played++;
           if (won) save.stats.wins++; else save.stats.losses++;
           if (!save.stats.byChar[charName]) save.stats.byChar[charName] = { played: 0, wins: 0, losses: 0 };
@@ -292,10 +296,18 @@ function connect(first) {
     }
     ui();
   };
-  w.onclose = () => { if (w === ws && me >= 0) { err = 'Connexion perdue'; me = -1; S = null; ui(); } };
+  w.onclose = () => { if (w === ws && me >= 0) { err = 'Connexion perdue'; me = -1; S = null; ui(); } else if (w === ws) { team = null; q2 = false; searching = false; ui(); } };
 }
 const go = o => { err = ''; connect(o); };
 const search = () => { err = ''; searching = true; connect({ t: 'queue' }); ui(); };
+const teamCreate = () => { err = ''; connect({ t: 'tcreate' }); };
+const teamJoin = () => { err = ''; connect({ t: 'tjoin', code: document.getElementById('cdt').value }); };
+const teamSolo = () => { err = ''; q2 = true; searching = true; connect({ t: 'queue2' }); ui(); };
+const teamQueueStart = () => { if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'tqueue' })); ui(); };
+function teamHtml() {
+  const pl = (team.players || []).map((q, i) => q ? '<b>' + esc(q.icon) + ' ' + esc(q.name) + '</b> · niveau ' + q.lvl + (i === team.idx ? ' (toi)' : '') : '— Emplacement libre —');
+  return `<h2>👥 Équipe 2v2</h2><p>Code : <b style="font-size:34px">${team.code}</b></p><p>Invite ton ami avec ce lien :<br><b>${location.origin}/#${team.code}</b></p><p>${pl[0]}<br>${pl[1]}</p>${team.ph === 'tqueue' ? '<p style="font-size:18px">🔎 Recherche d’une équipe adverse…</p>' : '<button onclick="teamQueueStart()" style="background:#e67e22">🔎 Trouver un match</button>'}<p style="font-size:12px;opacity:.8">Sans adversaire après 15 s : match contre une équipe de bots.</p>${quitBtn}`;
+}
 function openTraining() {
   view = 'training';
   if (!chars.length || !ws || ws.readyState !== 1) connect({ t: 'training_list' });
@@ -315,7 +327,7 @@ function kairosWin() {
   persist();
 }
 const again = () => ws.send(JSON.stringify({ t: 'again' }));
-function leave() { me = -1; S = null; err = ''; view = 'menu'; searching = false; try { ws.close(); } catch (e) {} ui(); }
+function leave() { me = -1; S = null; err = ''; view = 'menu'; searching = false; team = null; note = ''; q2 = false; try { ws.close(); } catch (e) {} ui(); }
 function info(i) { if (pre == null && infoIdx !== i) { infoIdx = i; ui(); } }
 function setSkin(name, id, i) { save.skin[name] = id; persist(); if (S && S.p === 'select' && S.sel[me] === i) sendPick(i); ui(); }
 
@@ -542,7 +554,8 @@ function selectPortrait(c, i) {
 function ui() {
   let h = '';
   ov.className = me >= 0 && S && S.p === 'end' ? 'end' : (me < 0 && !searching && view === 'menu' ? 'menu-screen' : '');
-  if (me < 0 && searching) h = `<h2>🔎 Recherche d’un adversaire…</h2><p>Tu seras mis face à un joueur aléatoire.</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
+  if (me < 0 && searching) h = `<h2>🔍 ${q2 ? 'Recherche de joueurs pour un 2v2…' : 'Recherche d’un adversaire…'}</h2><p>${q2 ? 'Tu seras associé à un autre joueur solo, puis face à une autre équipe.' : 'Tu seras mis face à un joueur aléatoire.'}</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
+  else if (me < 0 && team) h = teamHtml();
   else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'botlvl' ? botLvlHtml() : view === 'friends' ? friendsHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : `<div class="menu-top">
       ${profileBar()}
       <div class="menu-currency">${bank()}</div>
@@ -556,12 +569,18 @@ function ui() {
       </section>
       <section class="menu-group menu-combat">
         <h2>⚔️ Combats</h2>
+        <button onclick="teamSolo()" style="background:#c0392b">👥 2v2 aléatoire</button>
+        <button onclick="teamCreate()" style="background:#c0392b">👥 Créer une équipe 2v2</button>
         <button onclick="search()" style="background:#e67e22">🎲 Matchmaking</button>
         <button onclick="go({t:'create'})">🌐 Créer une partie</button>
         <button onclick="view='botlvl';ui()" style="background:#16a085">🤖 Jouer contre un bot</button>
         <div class="menu-join">
           <input id="cd" maxlength="4" placeholder="CODE" value="${location.hash.slice(1)}">
           <button onclick="go({t:'join',code:document.getElementById('cd').value})">Rejoindre</button>
+        </div>
+        <div class="menu-join">
+          <input id="cdt" maxlength="4" placeholder="CODE" value="${location.hash.slice(1)}">
+          <button onclick="teamJoin()">Rejoindre une équipe 2v2</button>
         </div>
         <button onclick="openTraining()" style="background:#16a085">🎯 Mode entraînement</button>
       </section>
@@ -576,14 +595,14 @@ function ui() {
   else if (S.p === 'select') {
     const ii = pre != null ? pre : infoIdx != null ? infoIdx : (S.sel[me] != null ? S.sel[me] : 0), ic = chars[ii];
     const sks = SHOP.filter(q => q.type === 'skin' && q.char === ic.name && owns(q.id)), cur = save.skin[ic.name] || '';
-    h = `<h2 style="margin:2px">Choisis ton combattant</h2><div class="cards">${chars.map((c, i) => `<div class="card sm ${S.sel[me] === i || pre === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})">${selectPortrait(c, i)}<span class="char-name" style="color:${c.color}">${c.name}</span>${locked(c.name) ? '<span class="lock-mark">🔒</span>' : ''}</div>`).join('')}</div>
+    h = `<h2 style="margin:2px">Choisis ton combattant</h2>${S.team ? '<p style="margin:2px">👥 Mode 2v2 — ton coéquipier est l’autre joueur de ton équipe</p>' : ''}<div class="cards">${chars.map((c, i) => `<div class="card sm ${S.sel[me] === i || pre === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})">${selectPortrait(c, i)}<span class="char-name" style="color:${c.color}">${c.name}</span>${locked(c.name) ? '<span class="lock-mark">🔒</span>' : ''}</div>`).join('')}</div>
     <div class="panel"><b style="color:${ic.color};font-size:15px">${ic.name}</b>${locked(ic.name) ? ' 🔒 à débloquer dans la boutique' : ''} · ${ic.desc} · PV ${ic.hp}<br>${ic.atk.map((a, j) => 'JKLU'[j] + ' : ' + a).join(' &nbsp;·&nbsp; ')}${ic.alt ? '<br>✨ Forme : ' + ic.alt.join(' / ') : ''}${sks.length ? '<br>' + [{ id: '', name: 'Normal' }, ...sks].map(q => `<span class="chip ${cur === q.id ? 'on' : ''}" onclick="event.stopPropagation();setSkin('${ic.name}','${q.id}',${ii})">${q.name}</span>`).join('') : ''}</div>
     <button onclick="confirmPick()" ${pre == null || S.sel[me] != null ? 'disabled' : ''}>✔ Valider ${pre != null ? chars[pre].name : ''}</button>
-    <p style="margin:2px">${pre == null && S.sel[me] == null ? 'Clique sur un perso, choisis ton skin, puis valide' : ''}${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.sel[1 - me] != null ? (S.bot ? '· Bot prêt 🤖' : '· Adversaire prêt ✔') : ''}</p>
+    <p style="margin:2px">${pre == null && S.sel[me] == null ? 'Clique sur un perso, choisis ton skin, puis valide' : ''}${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.sel[S.team ? (me < 2 ? 1 - me : 5 - me) : 1 - me] != null ? (S.team ? '· Coéquipier prêt ✔' : S.bot ? '· Bot prêt 🤖' : '· Adversaire prêt ✔') : ''}</p>
     <p style="font-size:12px;opacity:.8;margin:2px">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques · U ou Espace : ultime (barre pleine)</p>${quitBtn}`;
   }
   else if (S.p === 'training') { ov.style.display = 'none'; last = ''; return; }
-  else if (S.p === 'end') h = `${tNew ? '<p>🏷️ Titre débloqué : ' + tNew + ' !</p>' : ''}${lvUp ? '<p>⬆️ Niveau ' + lvUp + ' atteint !</p>' : ''}${kNew ? '<p>🔓 Kairos débloqué !</p>' : ''}<p style="font-size:18px">🪙 +${earned} pièces · 💎 +${earnedCr} cristal · ✨ +${earnedXp} XP (total : ${save.coins} 🪙 / ${save.crystals} 💎)</p>${S.ag[me] ? '<p>En attente de l’adversaire…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
+  else if (S.p === 'end') h = `${tNew ? '<p>🏷️ Titre débloqué : ' + tNew + ' !</p>' : ''}${lvUp ? '<p>⬆️ Niveau ' + lvUp + ' atteint !</p>' : ''}${kNew ? '<p>🔓 Kairos débloqué !</p>' : ''}<p style="font-size:18px">🪙 +${earned} pièces · 💎 +${earnedCr} cristal · ✨ +${earnedXp} XP (total : ${save.coins} 🪙 / ${save.crystals} 💎)</p>${S.ag[me] ? '<p>En attente' + (S.team ? ' des autres joueurs' : ' de l’adversaire') + '…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
   else { ov.style.display = 'none'; last = ''; return; }
   if (h !== last) { ov.innerHTML = h; last = h; }
   ov.style.display = 'flex';
@@ -1350,24 +1369,29 @@ function hud() {
     return;
   }
   S.f.forEach((f, i) => {
-    const c = chars[f.c], w = 380, xx = i ? 900 - 20 - w : 20, pw = w * f.hp / c.hp, uw = w * f.ul / 100, rdy = f.ul >= 100;
-    if (f.sh > 0) { x.fillStyle = '#000'; x.fillRect(xx, 12, w, 6); x.fillStyle = '#7fd4ff'; const sw = w * f.sh / 60; x.fillRect(i ? xx + w - sw : xx, 12, sw, 6); }
-    x.fillStyle = '#000'; x.fillRect(xx, 20, w, 22);
-    x.fillStyle = c.color; x.fillRect(i ? xx + w - pw : xx, 20, pw, 22);
-    x.fillStyle = '#000'; x.fillRect(xx, 46, w, 9);
-    x.fillStyle = rdy && ((Date.now() / 150) | 0) % 2 ? '#fff' : '#f1c40f'; x.fillRect(i ? xx + w - uw : xx, 46, uw, 9);
-    x.fillStyle = '#fff'; x.font = 'bold 14px sans-serif'; x.textAlign = i ? 'right' : 'left';
-    x.fillText(c.name + (i === me ? ' (toi)' : ''), i ? xx + w : xx, 74);
-    if (rdy) { x.fillStyle = '#f1c40f'; x.textAlign = i ? 'left' : 'right'; x.fillText(i === me ? '⚡ ULTIME PRÊT : U' : '⚡ ULTIME PRÊT', i ? xx : xx + w, 74); }
+    const c = chars[f.c], tm = !!S.team, left = tm ? i < 2 : !i, w = tm ? 372 : 380, xx = left ? 20 : 900 - 20 - w;
+    const yy = tm ? 10 + (i % 2) * 22 : 20, hh = tm ? 12 : 22, uy = tm ? yy + 14 : 46, uh = tm ? 4 : 9;
+    const pw = w * f.hp / c.hp, uw = w * f.ul / 100, rdy = f.ul >= 100;
+    if (f.sh > 0) { x.fillStyle = '#000'; x.fillRect(xx, uy - 8, w, 6); x.fillStyle = '#7fd4ff'; const sw = w * f.sh / 60; x.fillRect(left ? xx : xx + w - sw, uy - 8, sw, 6); }
+    x.fillStyle = '#000'; x.fillRect(xx, yy, w, hh);
+    x.fillStyle = c.color; x.fillRect(left ? xx : xx + w - pw, yy, pw, hh);
+    x.fillStyle = '#000'; x.fillRect(xx, uy, w, uh);
+    x.fillStyle = rdy && ((Date.now() / 150) | 0) % 2 ? '#fff' : '#f1c40f'; x.fillRect(left ? xx : xx + w - uw, uy, uw, uh);
+    x.fillStyle = '#fff'; x.font = tm ? 'bold 11px sans-serif' : 'bold 14px sans-serif'; x.textAlign = left ? 'left' : 'right';
+    const ny = tm ? yy + 26 : 74;
+    x.fillText(c.name + (i === me ? ' (toi)' : ''), left ? xx : xx + w, ny);
+    if (rdy) { x.fillStyle = '#f1c40f'; x.textAlign = left ? 'right' : 'left'; x.fillText(i === me ? '⚡ ULTIME PRÊT : U' : '⚡ ULTIME PRÊT', left ? xx + w : xx, ny); }
+    const wt = tm ? (me < 2 ? 0 : 1) : i;
     for (let k = 0; k < 2; k++) {
-      x.fillStyle = k < S.w[i] ? '#f1c40f' : '#555'; x.beginPath();
-      x.arc(i ? xx + w - 8 - k * 20 : xx + 8 + k * 20, 90, 6, 0, 7); x.fill();
+      x.fillStyle = k < (S.w[wt] || 0) ? '#f1c40f' : '#555'; x.beginPath();
+      x.arc(left ? xx + 8 + k * 20 : xx + w - 8 - k * 20, tm ? yy + 34 : 90, 6, 0, 7); x.fill();
     }
   });
   x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = 'bold 28px sans-serif'; x.fillText(fmt(S.tm), 450, 42);
   if (S.p === 'cd' && maps[S.mp]) { x.font = '14px sans-serif'; x.fillStyle = '#ddd'; x.fillText('🗺 ' + maps[S.mp].n + (maps[S.mp].note ? ' · ' + maps[S.mp].note : ''), 450, 62); }
   const t = S.p === 'cd' ? S.n : (S.p === 'rend' || S.p === 'end') ? S.m : '';
   x.font = 'bold 44px sans-serif'; x.lineWidth = 5; x.strokeStyle = '#000'; x.strokeText(t, 450, 210); x.fillText(t, 450, 210);
+  if (note) { x.fillStyle = 'rgba(0,0,0,.75)'; x.fillRect(230, 556, 440, 30); x.fillStyle = '#ffd54f'; x.font = 'bold 15px sans-serif'; x.textAlign = 'center'; x.fillText(note, 450, 576); }
 }
 
 const OFF = 80; // décalage visuel : le sol est abaissé de 80 px, le bas de l'écran est entièrement couvert par le sol
