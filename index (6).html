@@ -143,6 +143,7 @@ input{text-transform:uppercase;width:90px;text-align:center}
 .chip{display:inline-block;margin:3px 2px 0 0;padding:1px 7px;border-radius:9px;background:#555;font-size:11px}
 .chip.on{background:#3498db}
 button:disabled{opacity:.4;cursor:default}
+.gp{outline:3px solid #f1c40f !important;outline-offset:2px}
 /* Contrôles tactiles : visibles uniquement sur mobile / tablette, et seulement pendant un combat */
 html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 #touch{display:none;position:absolute;left:0;right:0;bottom:0;padding:0 10px 10px;justify-content:space-between;align-items:flex-end;pointer-events:none;z-index:5;user-select:none;-webkit-user-select:none;touch-action:none}
@@ -1052,7 +1053,60 @@ tc.querySelectorAll('button').forEach(b => {
 document.getElementById('tr').addEventListener('click', () => { if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'training_reset' })); });
 document.getElementById('tq').addEventListener('click', () => leave());
 
+// ===== MANETTE (Xbox / PlayStation, mapping standard du navigateur) =====
+// Combat : stick gauche ou croix = bouger / sauter / bloquer · A(✕) = saut · X(▢) = J · Y(△) = K · B(○) = L · RB/RT (R1/R2) = ultime · LB (L1) = blocage
+//          Start = réinitialiser (entraînement) · Select/Back = quitter l'entraînement
+// Menus : croix ou stick = naviguer · A(✕) = valider · B(○) = retour
+const gpPrev = {}, gpNav = { i: 0, t: 0, dir: '', active: false };
+window.addEventListener('mousemove', () => { gpNav.active = false; });
+function gpPoll() {
+  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+  let p = null; for (const q of pads) if (q && q.connected) { p = q; break; }
+  if (!p) return;
+  const B = i => !!(p.buttons[i] && (p.buttons[i].pressed || p.buttons[i].value > .5)), ax = p.axes[0] || 0, ay = p.axes[1] || 0;
+  const cur = { l: ax < -.45 || B(14), r: ax > .45 || B(15), u: ay < -.45 || B(12) || B(0), d: ay > .45 || B(13) || B(4), 0: B(2), 1: B(3), 2: B(1), 3: B(5) || B(7), st: B(9), bk: B(8), a: B(0), b: B(1) };
+  if (cur.l || cur.r || cur.u || cur.d || cur[0] || cur[1] || cur[2] || cur[3] || cur.st || cur.bk) gpNav.active = true;
+  const fight = me >= 0 && !!S && !!S.f && S.f.length > 0 && S.p !== 'end';
+  if (fight) {
+    ['l', 'r', 'u', 'd', 0, 1, 2, 3].forEach(k => { if (!!gpPrev[k] !== cur[k]) { gpPrev[k] = cur[k]; press(k, cur[k]); } });
+    if (S.p === 'training') {
+      if (cur.st && !gpPrev.st && ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'training_reset' }));
+      if (cur.bk && !gpPrev.bk) leave();
+    }
+  } else {
+    ['l', 'r', 'u', 'd', 0, 1, 2, 3].forEach(k => { if (gpPrev[k]) { gpPrev[k] = false; press(k, false); } });
+    gpMenu(cur);
+  }
+  gpPrev.st = cur.st; gpPrev.bk = cur.bk; gpPrev.a = cur.a; gpPrev.b = cur.b;
+}
+function gpMenu(c) {
+  if (ov.style.display === 'none') return;
+  const els = [...ov.querySelectorAll('button:not(:disabled), .card[onclick], .chip[onclick]')].filter(e => e.offsetParent);
+  if (!els.length) return;
+  gpNav.i = Math.min(gpNav.i, els.length - 1);
+  let curEl = els[gpNav.i];
+  const dir = c.l ? 'l' : c.r ? 'r' : c.u ? 'u' : c.d ? 'd' : '', now = Date.now();
+  if (dir && gpNav.active && (dir !== gpNav.dir || now - gpNav.t > 250)) {
+    gpNav.dir = dir; gpNav.t = now;
+    const r0 = curEl.getBoundingClientRect(), cx = r0.left + r0.width / 2, cy = r0.top + r0.height / 2;
+    let best = null, bs = 1e9;
+    els.forEach(e => {
+      if (e === curEl) return;
+      const r = e.getBoundingClientRect(), dx = r.left + r.width / 2 - cx, dy = r.top + r.height / 2 - cy;
+      const ok = dir === 'l' ? dx < -4 : dir === 'r' ? dx > 4 : dir === 'u' ? dy < -4 : dy > 4;
+      const sc = dir === 'l' || dir === 'r' ? Math.abs(dx) + 2 * Math.abs(dy) : Math.abs(dy) + 2 * Math.abs(dx);
+      if (ok && sc < bs) { bs = sc; best = e; }
+    });
+    if (best) { gpNav.i = els.indexOf(best); curEl = best; if (best.hasAttribute('onmouseenter')) best.dispatchEvent(new Event('mouseenter')); best.scrollIntoView({ block: 'nearest' }); }
+  }
+  if (!dir) gpNav.dir = '';
+  if (c.a && !gpPrev.a && gpNav.active) curEl.click();
+  if (c.b && !gpPrev.b && gpNav.active) { const bk = els.find(e => /←|Retour|Annuler/.test(e.textContent)); if (bk) bk.click(); }
+  els.forEach(e => e.classList.toggle('gp', gpNav.active && e === curEl));
+}
+
 function draw() {
+  gpPoll();
   const inGame = isTouch && me >= 0 && !!S && !!S.f && S.f.length > 0 && S.p !== 'end';
   if (inGame !== touchOn) { touchOn = inGame; tc.style.display = inGame ? 'flex' : 'none'; if (!inGame) ['l', 'r', 'u', 'd', 0, 1, 2, 3].forEach(k => { keys[k] = false; }); }
   const tr = inGame && S.p === 'training';
