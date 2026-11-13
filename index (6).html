@@ -689,10 +689,12 @@ function fighter(f, i) {
     R('#0b0b12', -22, -42, 44, 5);
     C(skin, 0, -102, 14);
     Y('#f4f6f8', [[-15, -104], [-20, -118], [-9, -112], [-8, -129], [0, -114], [8, -130], [11, -112], [21, -119], [15, -104]]);
-    if (lk === 'glasses') { // saison 2 : lunettes rondes noires, lueur bleue des yeux
-      C('#14141f', -6, -103, 6.5); C('#14141f', 6, -103, 6.5);
-      x.strokeStyle = P('#000'); x.lineWidth = 2; x.beginPath(); x.arc(-6, -103, 6.5, 0, 7); x.stroke(); x.beginPath(); x.arc(6, -103, 6.5, 0, 7); x.stroke(); LN('#000', 2, -0.5, -104, 0.5, -104);
-      C('#8fd3ff', -4, -104, 1.6); C('#8fd3ff', 8, -104, 1.6);
+    if (lk === 'glasses') { // saison 2 (Hidden Inventory) : petites lunettes rondes noires à fine monture, reflet bleu discret
+      const gx = s * 1.5;
+      [-5.5, 5.5].forEach(d => C('#0a0a12', gx + d, -103, 4));
+      x.strokeStyle = P('#000'); x.lineWidth = 1.3; [-5.5, 5.5].forEach(d => { x.beginPath(); x.arc(gx + d, -103, 4, 0, 7); x.stroke(); });
+      LN('#000', 1.3, gx - 1.5, -103.5, gx + 1.5, -103.5); LN('#000', 1.2, gx - 9.5, -103, -14, -104); LN('#000', 1.2, gx + 9.5, -103, 14, -104);
+      C('rgba(140,210,255,.55)', gx - 6.5, -104.5, 1); C('rgba(140,210,255,.55)', gx + 4.5, -104.5, 1);
     } else R('#111', -14, -107, 28, 7);
   } else if (n === 'Deku') { // Deku : combinaison verte, ceinture et bottes rouges, capuche à oreilles, masque, taches de rousseur
     R('#2e7d32', -16, -28, 13, 28); R('#2e7d32', 3, -28, 13, 28);
@@ -724,13 +726,20 @@ function fighter(f, i) {
     R('#111', -18, -9, 17, 9); R('#111', 1, -9, 17, 9);
     R('#f2f2f2', -22, -90, 44, 64);
     R('#111', -2, -86, 5, 32); Y('#111', [[-3, -88], [5, -88], [3, -80], [-1, -80]]);
-    if (f.fm) {
-      LN('#ecf0f1', 2, 8, -74, 8, -58); C('#ecf0f1', 8, -56, 4);
-      R('#bdc3c7', -5, -154, 10, 40);
-      for (let q = 0; q < 5; q++) { Y('#ecf0f1', [[5, -118 - q * 8], [11, -122 - q * 8], [5, -126 - q * 8]]); Y('#ecf0f1', [[-5, -118 - q * 8], [-11, -122 - q * 8], [-5, -126 - q * 8]]); }
-      C('#e8742c', 0, -102, 15);
-      R('#111', s * 6 - 2, -106, 4, 4);
-      R('#fff', -8, -96, 16, 3); [-6, -2, 2, 6].forEach(q => Y('#fff', [[q - 2, -96], [q + 2, -96], [q, -90]]));
+    if (f.fm) { // Chainsaw Man : tête orange mécanique, grande lame sur le front, poignées aux tempes, pointes, crocs, câble sur la poitrine
+      const sp = '#9aa4ad';
+      Y(sp, [[-22, -90], [-33, -108], [-14, -92]]); Y(sp, [[22, -90], [33, -108], [14, -92]]); // pointes d'épaules
+      x.strokeStyle = '#ecf0f1'; x.lineWidth = 2; x.beginPath(); x.moveTo(8, -74); x.quadraticCurveTo(15, -66, 8, -58); x.stroke();
+      x.lineWidth = 2.5; x.beginPath(); x.arc(8, -54, 4, 0, 7); x.stroke(); // câble de démarrage et sa poignée
+      Y('#7f8c8d', [[-s * 14, -112], [-s * 25, -128], [-s * 10, -120]]); Y('#7f8c8d', [[-s * 8, -118], [-s * 15, -140], [-s * 3, -122]]); // pointes à l'arrière du crâne
+      C('#e8742c', 0, -102, 16); R('#c85a1a', -16, -96, 32, 7);
+      R('#222', -22, -108, 7, 9); R('#222', 15, -108, 7, 9); // poignées de tronçonneuse aux tempes
+      R('#7f8c8d', -7, -166, 14, 54); R('#bdc3c7', -5, -166, 10, 54); // lame centrale
+      for (let q = 0; q < 9; q++) { const ty = -116 - q * 6.5 - ((t / 40) % 6.5); if (ty < -164) continue; Y('#ecf0f1', [[5, ty], [12, ty - 3], [5, ty - 6]]); Y('#ecf0f1', [[-5, ty], [-12, ty - 3], [-5, ty - 6]]); } // dents de chaîne en mouvement
+      R('#c85a1a', -9, -120, 18, 9);
+      R('#111', s - 8, -106, 4, 4); R('#111', s + 4, -106, 4, 4);
+      R('#3a0d0d', -12, -97, 24, 7);
+      for (let q = -10; q <= 10; q += 4) { Y('#fff', [[q - 2, -97], [q + 2, -97], [q, -91]]); Y('#fff', [[q - 2, -90], [q + 2, -90], [q, -95]]); } // crocs
     } else {
       C(skin, 0, -102, 14);
       Y('#f4d03f', [[-15, -104], [-21, -115], [-10, -111], [-12, -125], [-2, -114], [4, -128], [9, -113], [19, -120], [15, -104]]);
@@ -843,18 +852,30 @@ function fighter(f, i) {
     R(lc, -16, -26, 13, 26); R(lc, 3, -26, 13, 26);
     R('#8d6e63', -18, -5, 17, 5); R('#8d6e63', 1, -5, 17, 5);
     R('#3b6fd8', -22, -48, 44, 24);
+    x.fillStyle = 'rgba(0,0,0,.18)'; x.fillRect(-1, -46, 2, 22); x.fillRect(-22, -27, 44, 3); // plis du short
+    R('#5d4037', -18, -3, 17, 2); R('#5d4037', 1, -3, 17, 2); // lanières des sandales
     R(skin, -22, -90, 44, 42);
     R('#e74c3c', -22, -90, 13, 42); R('#e74c3c', 9, -90, 13, 42);
+    LN('rgba(0,0,0,.25)', 2, -9, -90, -9, -50); LN('rgba(0,0,0,.25)', 2, 9, -90, 9, -50); // bords du gilet
+    if (lk !== 'snake') { LN('#b03a2e', 1.8, -8, -82, 8, -60); LN('#b03a2e', 1.8, 8, -82, -8, -60); } // cicatrice en X
+    R('#f1c40f', -22, -52, 44, 5); Y('#f1c40f', [[-s * 14, -48], [-s * 24, -34 + Math.sin(t / 140) * 2], [-s * 17, -32], [-s * 9, -46]]); // ceinture jaune et son nœud
     C(skin, 0, -102, 14);
     R('#000', s * 6 - 2, -104, 4, 4);
     LN('#c0392b', 1.5, s * 4, -97, s * 11, -97);
+    LN('#000', 2, s * 3, -109, s * 10, -108); x.strokeStyle = '#000'; x.lineWidth = 2; x.beginPath(); x.arc(s * 3, -98, 6, .15, Math.PI - .15); x.stroke(); // sourcil et grand sourire
     if (lk === 'snake') { // cheveux en flammes dressées, cicatrice en X sur le torse, pas de chapeau
       Y('#111', [[-15, -104], [-22, -122], [-10, -114], [-9, -138], [0, -118], [9, -140], [13, -116], [23, -127], [15, -104]]);
       LN('#b03a2e', 2, -10, -84, 10, -56); LN('#b03a2e', 2, 10, -84, -10, -56);
     } else {
+      Y('#111', [[-14, -112], [-15, -104], [-10, -108], [-6, -105], [-1, -109], [4, -105], [9, -108], [14, -104], [14, -112]]); // frange
       x.fillStyle = P('#f1c40f'); x.beginPath(); x.ellipse(0, -113, 25, 6, 0, 0, 7); x.fill();
       x.beginPath(); x.arc(0, -113, 13, Math.PI, 0); x.fill();
       R('#c0392b', -13, -119, 26, 4);
+      [-18, -10, -2, 6, 14].forEach(q => LN('rgba(120,80,0,.45)', 1, q, -117, q + 2, -109)); // paille tressée
+    }
+    if (f.bf) { // Gear Second : peau rougie et vapeur
+      x.fillStyle = 'rgba(255,90,90,.28)'; x.fillRect(-22, -90, 44, 42);
+      for (let q = 0; q < 5; q++) { x.fillStyle = 'rgba(255,255,255,' + (.35 - (((t / 25 + q * 13) % 60) / 60) * .3) + ')'; x.beginPath(); x.arc(Math.sin(t / 200 + q * 2) * 22, -95 - ((t / 25 + q * 13) % 60), 5 + q % 3 * 2, 0, 7); x.fill(); }
     }
   }
   if (f.cr) { // cristallisation
@@ -903,9 +924,12 @@ function fighter(f, i) {
     else if (n === 'Kairos') { C('#f5ecd0', px, py, 6); if (f.ak === 0) LN('#d9b84a', 4, px, py, px + s * 34, py); }
     else if (n === 'Denji') {
       C(skin, px, py, 6);
-      if (f.fm) {
-        if (f.ak >= 0) { LN('#bdc3c7', 6, px, py, px + s * 30, py); for (let q = 0; q < 5; q++) Y('#ecf0f1', [[px + s * (4 + q * 5), py - 3], [px + s * (7 + q * 5), py - 9], [px + s * (9 + q * 5), py - 3]]); }
-        else LN('#bdc3c7', 6, px, py, px + s * 4, py + 22);
+      if (f.fm) { // lame de tronçonneuse qui sort de l'avant-bras
+        C('#e8742c', px, py, 7);
+        const ex = f.ak >= 0 ? px + s * 46 : px + s * 6, ey = f.ak >= 0 ? py : py + 38, L = Math.hypot(ex - px, ey - py), ux = (ex - px) / L, uy = (ey - py) / L;
+        LN('#7f8c8d', 10, px, py, ex, ey); LN('#bdc3c7', 6, px, py, ex, ey);
+        for (let q = 0; q < 7; q++) { const d = 8 + q * 6 + ((t / 35) % 6); if (d > L - 6) continue; const bx = px + ux * d, by = py + uy * d;
+          [1, -1].forEach(g => Y('#ecf0f1', [[bx - uy * 3 * g, by + ux * 3 * g], [bx - uy * 8 * g + ux * 3, by + ux * 8 * g + uy * 3], [bx - uy * 3 * g + ux * 6, by + ux * 3 * g + uy * 6]])); }
       }
     }
     else if (n === 'Deku') { C('#d5dbdb', px, py, 8); if (lk === 'dark') [-4, 0, 4].forEach(q => LN('#cfd8dc', 1.5, px, py + q, px + s * 11, py + q * 1.6)); if (f.ak === 3 && f.ap === 1) C('rgba(130,255,130,.7)', px, py, 18); }
@@ -937,8 +961,20 @@ function fighter(f, i) {
   } else if (f.ak >= 0) {
     let Lx = f.ap === 1 ? 62 : f.ap === 0 ? 12 : 37;
     if (f.b && n === 'Luffy') Lx = Math.max(Lx, s > 0 ? f.b[1] - f.x : f.x - f.b[0]);
-    LN(sleeve, n === 'Luffy' ? 7 : 9, 0, -65, s * Lx, -65);
-    hand(s * Lx, -65);
+    if (n === 'Luffy' && f.ak === 3 && f.ap === 1) { // Gomu Gomu no Gatling : une rafale de poings à toute vitesse, avec flou et étoiles d'impact
+      const ga = x.globalAlpha;
+      for (let q = 0; q < 10; q++) {
+        const u = (t / 38 + q / 10) % 1, ext = Math.max(40, Lx) * (.5 + .5 * (u < .5 ? u * 2 : 2 - u * 2)), yy = -92 + (q * 29) % 50, py = -70 + (yy + 70) * .25;
+        x.globalAlpha = ga * (.35 + .65 * (q / 9));
+        LN(sleeve, 6, 0, py, s * ext, yy); LN('rgba(255,255,255,.55)', 2, s * (ext - 34), yy, s * ext, yy);
+        C(sleeve, s * ext, yy, q > 6 ? 11 : 9);
+        if (q > 6) { const px = s * (ext + 12), sz = 6 + Math.sin(t / 30 + q) * 3; Y('#fff3a0', [[px, yy - sz], [px + 2, yy - 2], [px + sz, yy], [px + 2, yy + 2], [px, yy + sz], [px - 2, yy + 2], [px - sz, yy], [px - 2, yy - 2]]); }
+      }
+      x.globalAlpha = ga;
+    } else {
+      LN(sleeve, n === 'Luffy' ? 7 : 9, 0, -65, s * Lx, -65);
+      hand(s * Lx, -65);
+    }
   } else if (n === 'Bruno') { LN(skin, 8, 0, -68, s * 14, -76); hand(s * 18, -78); }
   else if (n === 'Luffy' && lk === 'snake') { // garde du Snakeman : poing avant levé, bras arrière lové
     LN('#16161d', 8, 0, -70, s * 26, -62); LN('#16161d', 8, s * 26, -62, s * 22, -82); hand(s * 22, -84);
