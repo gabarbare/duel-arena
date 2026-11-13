@@ -1,10 +1,10 @@
 const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
-const html = fs.readFileSync(path.join(__dirname, 'index_2v2.html'));
+const html = fs.readFileSync(path.join(__dirname, 'index (6).html'));
 const server = http.createServer((q, r) => { r.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); r.end(html); });
 const wss = new WebSocketServer({ server });
 
-const W = 1200, // largeur de l'arène (doit être égale à WW dans index_2v2.html)
+const W = 1200, // largeur de l'arène (doit être égale à WW dans index (6).html)
   G = 380, BW = 44, BH = 90, GR = 0.65, ROUND = 5400; // 5400 frames = 1 min 30
 // type: m = mêlée, p = projectile, d = dash, sky = foudre du ciel, buff = bonus temporaire
 // ult:1 = ultime (barre pleine requise), ub:1 = ne peut pas être bloqué, multi = touche plusieurs fois
@@ -133,13 +133,10 @@ const MAPS = [
 function rollMap(r) { let m; do { m = Math.random() * MAPS.length | 0; } while (m === r.mi); r.mi = m; }
 
 const atks = f => (f.form > 0 && CH[f.c].alt) || CH[f.c].atk;
-const nf = (c, i, inp, ult, tm, slot) => ({ c, tm: tm ?? i, slot: slot || 0, dead: 0, x: ((tm ?? i) ? W - 250 : 250) + ((tm ?? i) ? 1 : -1) * (slot ? 110 : 0), y: G, vx: 0, vy: 0, hp: CH[c].hp, face: (tm ?? i) ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
+const nf = (c, i, inp, ult) => ({ c, x: i ? W - 250 : 250, y: G, vx: 0, vy: 0, hp: CH[c].hp, face: i ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
   block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, portal: null, lz: 0, lzcd: 0, lzd: null, hist: [], frozen: 0, stored: 0, fzm: 1, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
 
 const sz = f => f.sz || 1;
-// Équipes : tm = numéro d'équipe (1v1 : tm = index ; 2v2 : 0,0,1,1). enemies = adversaires en vie, foe = le plus proche
-const enemies = (r, i) => r.f.filter(g => g.tm !== r.f[i].tm && !g.dead);
-const foe = (r, i) => { const m = r.f[i], all = r.f.filter(g => g.tm !== m.tm), al = all.filter(g => !g.dead), pool = al.length ? al : all; return pool.reduce((b, g) => !b || Math.abs(g.x - m.x) < Math.abs(b.x - m.x) ? g : b, null); };
 const clampX = (v, z) => Math.max(BW * z / 2, Math.min(W - BW * z / 2, v));
 const box = (f, d) => {
   const z = sz(f), y1 = f.y - BH * z * (d.by ?? .85);
@@ -191,8 +188,7 @@ function burn(t, dmg) {
 }
 
 function step(r, i) {
-  const f = r.f[i], o = foe(r, i), c = CH[f.c], k = f.inp, dm = f.buff > 0 ? 1.25 : 1, M = MAPS[r.mi];
-  if (f.dead) return;
+  const f = r.f[i], o = r.f[1 - i], c = CH[f.c], k = f.inp, dm = f.buff > 0 ? 1.25 : 1, M = MAPS[r.mi];
   if (f.frozen > 0) { // temps arrêté : figé, les dégâts reçus sont mis de côté puis infligés d'un coup à la reprise
     if (--f.frozen === 0 && f.stored > 0) { f.hp -= f.stored; f.stored = 0; f.fl = 8; f.stun = 25; f.atk = null; f.vx = (f.x < o.x ? -1 : 1) * 8; }
     return;
@@ -242,7 +238,7 @@ function step(r, i) {
       else if (d.type === 'form') f.form = d.dur;
       else if (d.type === 'fly') f.fly = d.dur;
       else if (d.type === 'echo') r.fx.push({ k: 'echo', x: o.x, y: o.y - BH * sz(o) / 2, t: 0, o: i, d });
-      else if (d.type === 'timestop') { enemies(r, i).forEach(t => { t.frozen = d.dur; t.stored = 0; t.fzm = d.mult; }); }
+      else if (d.type === 'timestop') { o.frozen = d.dur; o.stored = 0; o.fzm = d.mult; }
       else if (d.type === 'rewind') {
         const hs = f.hist[0];
         if (hs) {
@@ -331,22 +327,18 @@ function step(r, i) {
     a.b = act && mel ? box(f, d) : null;
     if (d.type === 'cut' && act) { // coupe les projectiles adverses, sans dégâts
       const bb = a.b = box(f, d);
-      r.pj = r.pj.filter(p => r.f[p.o].tm === f.tm || p.x + p.r < bb[0] || p.x - p.r > bb[1] || p.y + p.r < bb[2] || p.y - p.r > bb[3]);
+      r.pj = r.pj.filter(p => p.o === i || p.x + p.r < bb[0] || p.x - p.r > bb[1] || p.y + p.r < bb[2] || p.y - p.r > bb[3]);
     }
     if (d.type === 'jam') {
       if (a.f === d.su + 1) { f.vy = -d.jv; f.vx = f.face * d.jx; a.air = 1; }
       else if (a.air && f.y >= G && a.f > d.su + 3) {
         a.air = 0; a.land = a.f; a.lb = 6; f.vx = 0;
-        enemies(r, i).forEach(t => { if (hit([f.x - d.aoe, f.x + d.aoe, G - 70, G], t)) hurt(t, d.dmg * dm, d.kb, d.st, d.lift, f.x, d.ub, f); });
+        if (hit([f.x - d.aoe, f.x + d.aoe, G - 70, G], o)) hurt(o, d.dmg * dm, d.kb, d.st, d.lift, f.x, d.ub, f);
       }
       if (a.lb > 0) { a.lb--; a.b = [f.x - d.aoe, f.x + d.aoe, G - 70, G]; }
     }
     if (a.b && d.multi && a.f % d.multi === 0) a.hit = 0;
-    if (a.b && d.type !== 'cut') r.f.forEach((t, j) => { // une même frappe peut toucher plusieurs adversaires (a.hit = masque des cibles déjà touchées)
-      if (t.tm === f.tm || t.dead || (a.hit & (1 << j)) || (d.air && !(t.y < G - 15)) || !hit(a.b, t)) return;
-      a.hit |= 1 << j;
-      hurt(t, d.pct ? CH[t.c].hp * d.pct : (a.fin ? d.fin : d.dmg) * dm, a.fin ? 22 : d.kb, a.fin ? 36 : d.st, d.lift, f.x, d.ub, f);
-    });
+    if (a.b && !a.hit && d.type !== 'cut' && (!d.air || o.y < G - 15) && hit(a.b, o)) { a.hit = 1; hurt(o, d.pct ? CH[o.c].hp * d.pct : (a.fin ? d.fin : d.dmg) * dm, a.fin ? 22 : d.kb, a.fin ? 36 : d.st, d.lift, f.x, d.ub, f); }
     if (f.atk && (d.type === 'jam' ? (a.land && a.f >= a.land + d.rc) || a.f > 150 : a.f >= s0 + d.ac + d.rc)) f.atk = null;
   } else {
     f.face = o.x >= f.x ? 1 : -1;
@@ -370,26 +362,22 @@ function step(r, i) {
 }
 
 function sep(r) {
-  const L = r.f.filter(g => !g.dead && !g.ghost);
-  for (let p = 0; p < L.length; p++) for (let q = p + 1; q < L.length; q++) {
-    const a = L[p], b = L[q], w = BW * (sz(a) + sz(b)) / 2, hh = BH * Math.max(sz(a), sz(b)) * .8;
-    if (Math.abs(a.x - b.x) < w && Math.abs(a.y - b.y) < hh) {
-      const m = (w - Math.abs(a.x - b.x)) / 2, sg = a.x < b.x ? -1 : 1;
-      a.x += sg * m; b.x -= sg * m;
-    }
+  const [a, b] = r.f;
+  if (a.ghost || b.ghost) return;
+  const w = BW * (sz(a) + sz(b)) / 2, hh = BH * Math.max(sz(a), sz(b)) * .8;
+  if (Math.abs(a.x - b.x) < w && Math.abs(a.y - b.y) < hh) {
+    const m = (w - Math.abs(a.x - b.x)) / 2, s = a.x < b.x ? -1 : 1;
+    a.x += s * m; b.x -= s * m;
   }
 }
 
 function projs(r) {
   r.pj = r.pj.filter(p => {
-    const ow = r.f[p.o];
-    if (ow.frozen > 0) return true; // projectile figé avec son lanceur
+    if (r.f[p.o].frozen > 0) return true; // projectile figé avec son lanceur
     p.x += p.vx; p.y += p.vy; if (p.d.grav) p.vy += p.d.grav;
-    for (const t of enemies(r, p.o)) {
-      const tz = sz(t);
-      if (Math.abs(p.x - t.x) < BW * tz / 2 + p.r && p.y > t.y - BH * tz - p.r && p.y < t.y + p.r) {
-        hurt(t, p.d.dmg * (ow.buff > 0 ? 1.25 : 1), p.d.kb, p.d.st, 0, p.d.pull ? t.x + Math.sign(p.vx) * 50 : p.x - p.vx * 3, p.d.ub, ow); return false;
-      }
+    const t = r.f[1 - p.o], ow = r.f[p.o], tz = sz(t);
+    if (Math.abs(p.x - t.x) < BW * tz / 2 + p.r && p.y > t.y - BH * tz - p.r && p.y < t.y + p.r) {
+      hurt(t, p.d.dmg * (ow.buff > 0 ? 1.25 : 1), p.d.kb, p.d.st, 0, p.d.pull ? t.x + Math.sign(p.vx) * 50 : p.x - p.vx * 3, p.d.ub, ow); return false;
     }
     return p.x > -50 && p.x < W + 50 && p.y < G + 25;
   });
@@ -401,33 +389,41 @@ function fxs(r) {
     if (e.o != null && r.f[e.o].frozen > 0) return true; // les effets d'un combattant figé sont figés aussi
     e.t++;
     if (e.k === 'cos') return e.t <= e.life;
-    const d = e.d, ow = r.f[e.o], dm = ow.buff > 0 ? 1.25 : 1, en = enemies(r, e.o);
+    const d = e.d, t = r.f[1 - e.o], ow = r.f[e.o], dm = ow.buff > 0 ? 1.25 : 1, tz = sz(t);
     if (e.k === 'fire') {
-      if (e.t % 12 === 0) en.forEach(t => { if (t.y >= G - 2 && Math.abs(t.x - e.x) < e.w / 2 + 14 * sz(t)) burn(t, d.tick * dm); });
+      if (t.y >= G - 2 && Math.abs(t.x - e.x) < e.w / 2 + 14 * tz && e.t % 12 === 0) burn(t, d.tick * dm);
       return e.t <= d.life;
     }
     if (e.k === 'echo') { // écho : la zone marquée explose après "warn" frames
-      if (e.t === d.warn && !e.hit) { e.hit = 1; en.forEach(t => { const tz = sz(t); if (Math.hypot(t.x - e.x, t.y - BH * tz / 2 - e.y) < d.rad + 14 * tz) hurt(t, d.dmg * dm, d.kb, d.st, -4, e.x, d.ub, ow); }); }
+      if (e.t === d.warn && !e.hit) {
+        e.hit = 1;
+        if (Math.hypot(t.x - e.x, t.y - BH * tz / 2 - e.y) < d.rad + 14 * tz) hurt(t, d.dmg * dm, d.kb, d.st, -4, e.x, d.ub, ow);
+      }
       return e.t <= d.warn + 8;
     }
     if (e.k === 'beam') { // gros laser : visée affichée pendant "warn" frames, puis rayon épais
-      if (e.t === d.warn && !e.hit) { e.hit = 1; en.forEach(t => { const tz = sz(t); if (segDist(e.x, e.y, e.x + (e.tx - e.x) * 4, e.y + (e.ty - e.y) * 4, t.x, t.y - BH * tz / 2) < d.wd / 2 + 14 * tz) hurt(t, d.dmg * dm, d.kb, d.st, 0, e.x, d.ub, ow); }); }
+      if (e.t === d.warn && !e.hit) {
+        e.hit = 1;
+        if (segDist(e.x, e.y, e.x + (e.tx - e.x) * 4, e.y + (e.ty - e.y) * 4, t.x, t.y - BH * tz / 2) < d.wd / 2 + 14 * tz) hurt(t, d.dmg * dm, d.kb, d.st, 0, e.x, d.ub, ow);
+      }
       return e.t <= d.warn + d.life;
     }
-    if (e.k === 'por') { // le portail vise l'ennemi le plus proche à son ouverture, puis tire après "warn" frames
-      if (e.t === 0) { const t0 = en.reduce((b, g) => !b || Math.abs(g.x - e.x) < Math.abs(b.x - e.x) ? g : b, null) || ow; e.tx = t0.x; e.ty = t0.y - BH * sz(t0) / 2; }
-      if (e.t === d.warn && !e.hit) { e.hit = 1; en.forEach(t => { if (segDist(e.x, e.y, e.x + (e.tx - e.x) * 3, e.y + (e.ty - e.y) * 3, t.x, t.y - BH * sz(t) / 2) < 28 * sz(t)) hurt(t, d.dmg * dm, d.kb, d.st, 0, e.x, d.ub, ow); }); }
+    if (e.k === 'por') { // le portail vise la position de l'ennemi à son ouverture, puis tire après "warn" frames
+      if (e.t === 0) { e.tx = t.x; e.ty = t.y - BH * tz / 2; }
+      if (e.t === d.warn && !e.hit) {
+        e.hit = 1;
+        if (segDist(e.x, e.y, e.x + (e.tx - e.x) * 3, e.y + (e.ty - e.y) * 3, t.x, t.y - BH * tz / 2) < 28 * tz) hurt(t, d.dmg * dm, d.kb, d.st, 0, e.x, d.ub, ow);
+      }
       return e.t <= d.warn + 6;
     }
-    if (e.t > d.warn && e.t <= d.warn + d.strike) en.forEach(t => { // foudre : touche chaque adversaire une seule fois
-      const j = r.f.indexOf(t); e.hs = e.hs || [];
-      if (!e.hs.includes(j) && Math.abs(t.x - e.x) < 45 * sz(t)) { e.hs.push(j); hurt(t, d.dmg * dm, d.kb, d.st, -8, e.x, d.ub, ow); }
-    });
+    if (e.t > d.warn && e.t <= d.warn + d.strike && !e.hit && Math.abs(t.x - e.x) < 45 * tz) {
+      e.hit = 1; hurt(t, d.dmg * dm, d.kb, d.st, -8, e.x, d.ub, ow);
+    }
     return e.t <= d.warn + d.strike;
   });
 }
 
-function start(r) { r.f = r.sel.map((c, i) => nf(c, i, null, 0, r.tg ? r.tg[i] : i, r.tg ? i % 2 : 0)); r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 150; r.tm = ROUND; r.msg = ''; }
+function start(r) { r.f = [nf(r.sel[0], 0), nf(r.sel[1], 1)]; r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 150; r.tm = ROUND; r.msg = ''; }
 
 function startTraining(r, characterIndex, skin) {
   r.training = true;
@@ -457,13 +453,8 @@ const BOT = [
   { act: 1, blk: .32, jmp: .035, lazy: 0, ult: 18, noise: 8, punish: 0 },
   { act: 1, blk: .65, jmp: .06, lazy: 0, ult: 30, noise: 3, punish: 1 }];
 function thinkBot(r) {
-  if (!r.bots.length || r.ph !== 'fight') return;
-  r.bots.forEach(bi => botThink(r, bi));
-}
-function botThink(r, bi) {
-  const f = r.f[bi], o = foe(r, bi);
-  if (!f || !o || f.dead) return;
-  const c = CH[f.c];
+  if (!r.bot || r.ph !== 'fight' || !r.f[1] || !r.f[0]) return;
+  const f = r.f[1], o = r.f[0], c = CH[f.c];
   const dx = o.x - f.x, dist = Math.abs(dx), dy = o.y - f.y;
   const input = { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] }, P = BOT[r.lvl ?? 1];
   const attacks = atks(f);
@@ -527,27 +518,24 @@ function tick(r) {
   else if (r.ph === 'cd') { if (--r.t <= 0) r.ph = 'fight'; }
   else if (r.ph === 'fight') {
     thinkBot(r);
-    r.f.forEach((q, i) => step(r, i)); sep(r); projs(r); fxs(r); r.tm--;
-    r.f.forEach(q => { if (q.hp <= 0 && !q.dead) { q.dead = 1; q.atk = null; r.fx.push({ k: 'cos', x: q.x, y: q.y - 45, t: 0, life: 18 }); } }); // K.O. : le combattant sort du round
-    const alive = [0, 1].map(m => r.f.some(q => q.tm === m && q.hp > 0));
-    if (!alive[0] || !alive[1] || r.tm <= 0) {
-      const sum = m => r.f.reduce((t, q) => t + (q.tm === m ? Math.max(0, q.hp) : 0), 0), ha = sum(0), hb = sum(1);
-      const w = ha === hb ? -1 : ha > hb ? 0 : 1;
+    step(r, 0); step(r, 1); sep(r); projs(r); fxs(r); r.tm--;
+    const [a, b] = r.f;
+    if (a.hp <= 0 || b.hp <= 0 || r.tm <= 0) {
+      const w = a.hp === b.hp ? -1 : a.hp > b.hp ? 0 : 1;
       if (w >= 0) r.wins[w]++;
-      const nm = m => r.v2 ? (m ? 'L’équipe rouge' : 'L’équipe bleue') : CH[r.f.find(q => q.tm === m).c].name;
-      r.msg = w < 0 ? 'Égalité !' : nm(w) + ' gagne la manche !';
+      r.msg = w < 0 ? 'Égalité !' : CH[r.f[w].c].name + ' gagne la manche !';
       r.ph = 'rend'; r.t = 150;
-      if (r.wins[0] >= 2 || r.wins[1] >= 2) { r.ph = 'end'; r.msg = '🏆 ' + nm(w) + ' remporte le match !'; r.again = r.sel.map((_, q) => r.bots.includes(q) ? 1 : 0); r.co = [0, 1].map(q => r.wins[q] * 10 + (r.wins[q] >= 2 ? 30 : 10)); }
+      if (r.wins[0] >= 2 || r.wins[1] >= 2) { r.ph = 'end'; r.msg = '🏆 ' + CH[r.f[w].c].name + ' remporte le match !'; r.again = r.bot ? [0, 1] : [0, 0]; r.co = [0, 1].map(q => r.wins[q] * 10 + (r.wins[q] >= 2 ? 30 : 10)); }
     }
   }
   else if (r.ph === 'rend') {
-    if (--r.t <= 0) { r.f = r.f.map((f, i) => nf(f.c, i, f.inp, f.ult, f.tm, f.slot)); r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 120; r.tm = ROUND; r.msg = ''; }
+    if (--r.t <= 0) { r.f = r.f.map((f, i) => nf(f.c, i, f.inp, f.ult)); r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 120; r.tm = ROUND; r.msg = ''; }
   }
   else if (r.ph === 'end') {
-    if (r.again.every(Boolean)) { r.ph = 'select'; r.sel = r.sel.map((_, q) => r.bots.includes(q) ? (Math.random() * CH.length | 0) : null); r.wins = [0, 0]; r.msg = ''; r.f = []; }
+    if (r.again[0] && r.again[1]) { r.ph = 'select'; r.sel = [null, r.bot ? (Math.random() * CH.length | 0) : null]; r.wins = [0, 0]; r.msg = ''; r.f = []; }
   }
   const live = r.ph !== 'wait' && r.ph !== 'select';
-  const s = { t: 's', p: r.ph, training: !!r.training, bot: r.bots.length > 0, tg: r.v2 ? r.tg : null,
+  const s = { t: 's', p: r.ph, training: !!r.training, bot: !!r.bot,
     damage: r.training ? Math.round(r.f[1].totalDamage) : 0,
     hits: r.training ? r.f[1].hitCount : 0,
     lastDamage: r.training ? r.f[1].lastDamage : 0,
@@ -558,7 +546,7 @@ function tick(r) {
         ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0, lz: f.lz > 0 ? 1 : 0, fz: f.frozen > 0 ? 1 : 0, sd: Math.round(f.stored), vx: Math.round(f.vx * 10) / 10, vy: Math.round(f.vy * 10) / 10, pt: f.portal ? [Math.round(f.portal.x), Math.round(f.portal.y)] : null,
         hk: f.hook ? [Math.round(f.hook.x), Math.round(f.hook.y)] : f.hf ? [Math.round(f.hf.x), Math.round(f.hf.y)] : null,
         ad: f.atk && f.atk.dx !== undefined ? [Math.round(f.atk.dx * 10) / 10, Math.round((f.atk.dy || 0) * 10) / 10] : null,
-        ak: f.atk ? f.atk.k : -1, ap: d ? (f.atk.f <= d.su + (d.dsh || 0) ? 0 : f.atk.f <= d.su + (d.dsh || 0) + d.ac ? 1 : 2) : -1, pp: d ? atkPP(f) : 0, dd: f.dead ? 1 : 0,
+        ak: f.atk ? f.atk.k : -1, ap: d ? (f.atk.f <= d.su + (d.dsh || 0) ? 0 : f.atk.f <= d.su + (d.dsh || 0) + d.ac ? 1 : 2) : -1, pp: d ? atkPP(f) : 0,
         b: f.atk && f.atk.b ? f.atk.b.map(Math.round) : null };
     }) : [],
     pj: live ? r.pj.map(p => ({ x: Math.round(p.x), y: Math.round(p.y), r: p.r, o: p.o, k: p.d.vis || 0, v: Math.sign(p.vx) })) : [],
@@ -582,26 +570,9 @@ function registerProfile(me) {
   clearTimeout(ptimer); ptimer = setTimeout(() => fs.writeFile(PFILE, JSON.stringify(profiles), () => {}), 1000);
 }
 const tx = (ws, o) => ws.readyState === 1 && ws.send(JSON.stringify(o));
-const rooms = new Map(), queue = [], q2 = [];
+const rooms = new Map(), queue = [];
 const newCode = () => { let c; do { c = Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.random() * 24 | 0]).join(''); } while (rooms.has(c)); return c; };
 const join = ws => tx(ws, { t: 'room', code: ws.room.code, idx: ws.idx, chars: CHARS, maps: MAPS.map(({ n, note }) => ({ n, note })) });
-
-// ===== 2v2 aléatoire : 4 joueurs max ; au bout de 15 s, les places vides sont remplies par des bots =====
-// Équipe 0 = combattants 0 et 1, équipe 1 = combattants 2 et 3. Les joueurs remplissent d'abord l'équipe 0 (alliés bots si besoin), les suivants l'équipe 1.
-const Q2_WAIT = 15000;
-function startV2(hs) {
-  const r = { code: newCode(), ps: [], ph: 'select', sel: [null, null, null, null], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', '', '', ''], again: [0, 0, 0, 0], co: [0, 0], bots: [], lvl: 1, v2: true, tg: [0, 0, 1, 1] };
-  [0, 1, 2, 3].forEach(i => { const w = hs[i]; if (w) { r.ps.push(w); w.room = r; w.idx = i; } else { r.bots.push(i); r.sel[i] = Math.random() * CH.length | 0; r.again[i] = 1; } });
-  rooms.set(r.code, r); r.ps.forEach(w => join(w));
-}
-function tickQ2() {
-  for (let i = q2.length - 1; i >= 0; i--) if (q2[i].readyState !== 1 || q2[i].room) q2.splice(i, 1);
-  if (!q2.length) return;
-  const rem = Math.max(0, Q2_WAIT - (Date.now() - q2[0].q2t));
-  if (q2.length >= 4) return startV2(q2.splice(0, 4));
-  if (rem <= 0) return startV2(q2.splice(0, q2.length));
-  q2.forEach(w => tx(w, { t: 'queued2', n: q2.length, rem }));
-}
 
 wss.on('connection', ws => {
   ws.on('message', raw => {
@@ -616,7 +587,7 @@ wss.on('connection', ws => {
       tx(ws, { t: 'chars', chars: CHARS });
     } else if (m.t === 'train' && !ws.room && CH[m.c]) {
       const roomCode = 'TRAIN_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-      const r = { code: roomCode, ps: [ws], ph: 'training', sel: [m.c, 0], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: 0, sk: ['', ''], again: [0, 0], co: [0, 0], training: true, bots: [] };
+      const r = { code: roomCode, ps: [ws], ph: 'training', sel: [m.c, 0], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: 0, sk: ['', ''], again: [0, 0], co: [0, 0], training: true };
       rooms.set(r.code, r);
       ws.room = r; ws.idx = 0;
       startTraining(r, m.c, m.sk);
@@ -625,27 +596,25 @@ wss.on('connection', ws => {
       const r = ws.room;
       if (r && r.training && ws.idx === 0) startTraining(r, r.sel[0], r.sk[0]);
     } else if (m.t === 'bot' && !ws.room) {
-      const r = { code: newCode(), ps: [ws], ph: 'select', sel: [null, Math.random() * CH.length | 0], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 1], co: [0, 0], bots: [1], lvl: [0, 1, 2].includes(+m.lvl) ? +m.lvl : 1 };
+      const r = { code: newCode(), ps: [ws], ph: 'select', sel: [null, Math.random() * CH.length | 0], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 1], co: [0, 0], bot: true, lvl: [0, 1, 2].includes(+m.lvl) ? +m.lvl : 1 };
       rooms.set(r.code, r); ws.room = r; ws.idx = 0; join(ws);
     } else if (m.t === 'create' && !ws.room) {
-      const r = { code: newCode(), ps: [ws], ph: 'wait', sel: [null, null], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 0], co: [0, 0], bots: [] };
+      const r = { code: newCode(), ps: [ws], ph: 'wait', sel: [null, null], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 0], co: [0, 0] };
       rooms.set(r.code, r); ws.room = r; ws.idx = 0; join(ws);
     } else if (m.t === 'queue' && !ws.room && !queue.includes(ws)) {
       while (queue.length && queue[0].readyState !== 1) queue.shift();
       const other = queue.shift();
       if (other) {
-        const r = { code: newCode(), ps: [other, ws], ph: 'select', sel: [null, null], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 0], co: [0, 0], bots: [] };
+        const r = { code: newCode(), ps: [other, ws], ph: 'select', sel: [null, null], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 0], co: [0, 0] };
         rooms.set(r.code, r); other.room = r; other.idx = 0; ws.room = r; ws.idx = 1; join(other); join(ws);
       } else { queue.push(ws); tx(ws, { t: 'queued' }); }
-    } else if (m.t === 'queue2' && !ws.room && !q2.includes(ws)) {
-      ws.q2t = Date.now(); q2.push(ws); tickQ2();
     } else if (m.t === 'join' && !ws.room) {
       const r = rooms.get(String(m.code || '').toUpperCase().trim());
-      if (!r || r.v2 || r.ps.length > 1) return tx(ws, { t: 'err', m: 'Code invalide ou partie pleine' });
+      if (!r || r.ps.length > 1) return tx(ws, { t: 'err', m: 'Code invalide ou partie pleine' });
       r.ps.push(ws); ws.room = r; ws.idx = 1; r.ph = 'select'; join(ws); tx(r.ps[0], { t: 'room', code: r.code, idx: 0, chars: CHARS, maps: MAPS.map(({ n, note }) => ({ n, note })) });
     } else if (m.t === 'pick') {
       const r = ws.room;
-      if (r && r.ph === 'select' && CH[m.c]) { r.sel[ws.idx] = m.c; r.sk[ws.idx] = String(m.sk || '').slice(0, 40); if (r.sel.every(v => v != null)) { r.wins = [0, 0]; start(r); } }
+      if (r && r.ph === 'select' && CH[m.c]) { r.sel[ws.idx] = m.c; r.sk[ws.idx] = String(m.sk || '').slice(0, 40); if (r.sel[0] != null && r.sel[1] != null) { r.wins = [0, 0]; start(r); } }
     } else if (m.t === 'again') {
       const r = ws.room; if (r && r.ph === 'end') r.again[ws.idx] = 1;
     } else if (m.t === 'in') {
@@ -655,21 +624,12 @@ wss.on('connection', ws => {
   });
   ws.on('close', () => {
     const qi = queue.indexOf(ws); if (qi >= 0) queue.splice(qi, 1);
-    const q2i = q2.indexOf(ws); if (q2i >= 0) q2.splice(q2i, 1);
     const r = ws.room; if (!r) return;
-    if (r.v2) { // 2v2 : un joueur qui part est remplacé par un bot, la partie continue tant qu'il reste un humain
-      r.ps = r.ps.filter(p => p !== ws); r.bots.push(ws.idx); r.again[ws.idx] = 1;
-      if (r.sel[ws.idx] == null) r.sel[ws.idx] = Math.random() * CH.length | 0;
-      if (!r.ps.length) rooms.delete(r.code);
-      else if (r.ph === 'select' && r.sel.every(v => v != null)) { r.wins = [0, 0]; start(r); }
-      return;
-    }
     rooms.delete(r.code);
     r.ps.forEach(p => { if (p !== ws) { tx(p, { t: 'err', m: 'Adversaire déconnecté' }); p.room = null; } });
   });
 });
 
 setInterval(() => rooms.forEach(tick), 1000 / 60);
-setInterval(tickQ2, 1000);
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log('Duel Arena sur http://localhost:' + PORT));
