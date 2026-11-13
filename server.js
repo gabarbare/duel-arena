@@ -132,7 +132,7 @@ const MAPS = [
 function rollMap(r) { let m; do { m = Math.random() * MAPS.length | 0; } while (m === r.mi); r.mi = m; }
 
 const atks = f => (f.form > 0 && CH[f.c].alt) || CH[f.c].atk;
-const nf = (c, i, inp, ult) => ({ c, x: i ? 650 : 250, y: G, vx: 0, vy: 0, hp: CH[c].hp, face: i ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
+const nf = (c, i, inp, ult, team2) => ({ c, x: team2 ? [190, 310, 590, 710][i] : (i ? 650 : 250), y: G, vx: 0, vy: 0, hp: CH[c].hp, face: team2 ? (i < 2 ? 1 : -1) : (i ? -1 : 1), team: team2 ? (i < 2 ? 0 : 1) : i, stun: 0, atk: null, cds: [0, 0, 0, 0],
   block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, portal: null, lz: 0, lzcd: 0, lzd: null, hist: [], frozen: 0, stored: 0, fzm: 1, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
 
 const sz = f => f.sz || 1;
@@ -151,6 +151,13 @@ const hit = (b, t) => { const z = sz(t); return b[0] < t.x + BW * z / 2 && b[1] 
 const segDist = (x1, y1, x2, y2, px, py) => {
   const dx = x2 - x1, dy = y2 - y1, L = dx * dx + dy * dy || 1, u = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / L));
   return Math.hypot(px - x1 - u * dx, py - y1 - u * dy);
+};
+// 2v2 : ennemis = combattants de l'autre équipe (en 1v1, team = index, donc l'adversaire seul) ; cible = ennemi le plus proche
+const foes = (r, f) => r.f.filter(q => q.team !== f.team);
+const nearestFoe = (r, f) => {
+  let b = null, bd = 1e9;
+  for (const q of r.f) { if (q.team === f.team) continue; const d = Math.abs(q.x - f.x) + Math.abs(q.y - f.y) * .3; if (d < bd) { bd = d; b = q; } }
+  return b;
 };
 
 // Statistiques du mannequin en mode entraînement.
@@ -187,7 +194,8 @@ function burn(t, dmg) {
 }
 
 function step(r, i) {
-  const f = r.f[i], o = r.f[1 - i], c = CH[f.c], k = f.inp, dm = f.buff > 0 ? 1.25 : 1, M = MAPS[r.mi];
+  const f = r.f[i], o = nearestFoe(r, f) || f, c = CH[f.c], k = f.inp, dm = f.buff > 0 ? 1.25 : 1, M = MAPS[r.mi];
+  if (f.hp <= 0) { f.vx *= .8; return; } // éliminé : immobile jusqu'à la fin de la manche
   if (f.frozen > 0) { // temps arrêté : figé, les dégâts reçus sont mis de côté puis infligés d'un coup à la reprise
     if (--f.frozen === 0 && f.stored > 0) { f.hp -= f.stored; f.stored = 0; f.fl = 8; f.stun = 25; f.atk = null; f.vx = (f.x < o.x ? -1 : 1) * 8; }
     return;
@@ -217,7 +225,7 @@ function step(r, i) {
     f.lz--; f.inv = 1; f.ghost = 1; f.atk = null; f.stun = 0; f.block = 0;
     if (L) { f.vx = dx0 / L * d.spd; f.vy = dy0 / L * d.spd; } else { f.vx *= .85; f.vy *= .85; }
     if (f.lzcd > 0) f.lzcd--;
-    if (!f.lzcd && hit([f.x - 34, f.x + 34, f.y - 66, f.y + 8], o)) { hurt(o, d.dmg * dm, d.kb, d.st, d.lift, f.x, d.ub, f); f.lzcd = d.tick; }
+    if (!f.lzcd) for (const t of foes(r, f)) if (hit([f.x - 34, f.x + 34, f.y - 66, f.y + 8], t)) { hurt(t, d.dmg * dm, d.kb, d.st, d.lift, f.x, d.ub, f); f.lzcd = d.tick; break; }
   }
   else if (f.stun > 0) { f.stun--; f.vx *= .9 + (1 - M.acc) * .08; }
   else if (f.atk) {
@@ -237,7 +245,7 @@ function step(r, i) {
       else if (d.type === 'form') f.form = d.dur;
       else if (d.type === 'fly') f.fly = d.dur;
       else if (d.type === 'echo') r.fx.push({ k: 'echo', x: o.x, y: o.y - BH * sz(o) / 2, t: 0, o: i, d });
-      else if (d.type === 'timestop') { o.frozen = d.dur; o.stored = 0; o.fzm = d.mult; }
+      else if (d.type === 'timestop') foes(r, f).forEach(t => { t.frozen = d.dur; t.stored = 0; t.fzm = d.mult; });
       else if (d.type === 'rewind') {
         const hs = f.hist[0];
         if (hs) {
@@ -323,12 +331,15 @@ function step(r, i) {
       if (a.f === d.su + 1) { f.vy = -d.jv; f.vx = f.face * d.jx; a.air = 1; }
       else if (a.air && f.y >= G && a.f > d.su + 3) {
         a.air = 0; a.land = a.f; a.lb = 6; f.vx = 0;
-        if (hit([f.x - d.aoe, f.x + d.aoe, G - 70, G], o)) hurt(o, d.dmg * dm, d.kb, d.st, d.lift, f.x, d.ub, f);
+        for (const t of foes(r, f)) if (hit([f.x - d.aoe, f.x + d.aoe, G - 70, G], t)) hurt(t, d.dmg * dm, d.kb, d.st, d.lift, f.x, d.ub, f);
       }
       if (a.lb > 0) { a.lb--; a.b = [f.x - d.aoe, f.x + d.aoe, G - 70, G]; }
     }
     if (a.b && d.multi && a.f % d.multi === 0) a.hit = 0;
-    if (a.b && !a.hit && d.type !== 'cut' && (!d.air || o.y < G - 15) && hit(a.b, o)) { a.hit = 1; hurt(o, d.pct ? CH[o.c].hp * d.pct : (a.fin ? d.fin : d.dmg) * dm, a.fin ? 22 : d.kb, a.fin ? 36 : d.st, d.lift, f.x, d.ub, f); }
+    if (a.b && !a.hit && d.type !== 'cut') for (const t of foes(r, f)) {
+      if (d.air && t.y >= G - 15) continue;
+      if (hit(a.b, t)) { a.hit = 1; hurt(t, d.pct ? CH[t.c].hp * d.pct : (a.fin ? d.fin : d.dmg) * dm, a.fin ? 22 : d.kb, a.fin ? 36 : d.st, d.lift, f.x, d.ub, f); break; }
+    }
     if (f.atk && (d.type === 'jam' ? (a.land && a.f >= a.land + d.rc) || a.f > 150 : a.f >= s0 + d.ac + d.rc)) f.atk = null;
   } else {
     f.face = o.x >= f.x ? 1 : -1;
@@ -352,12 +363,14 @@ function step(r, i) {
 }
 
 function sep(r) {
-  const [a, b] = r.f;
-  if (a.ghost || b.ghost) return;
-  const w = BW * (sz(a) + sz(b)) / 2, hh = BH * Math.max(sz(a), sz(b)) * .8;
-  if (Math.abs(a.x - b.x) < w && Math.abs(a.y - b.y) < hh) {
-    const m = (w - Math.abs(a.x - b.x)) / 2, s = a.x < b.x ? -1 : 1;
-    a.x += s * m; b.x -= s * m;
+  for (let a = 0; a < r.f.length; a++) for (let b = a + 1; b < r.f.length; b++) {
+    const A = r.f[a], B = r.f[b];
+    if (A.ghost || B.ghost) continue;
+    const w = BW * (sz(A) + sz(B)) / 2, hh = BH * Math.max(sz(A), sz(B)) * .8;
+    if (Math.abs(A.x - B.x) < w && Math.abs(A.y - B.y) < hh) {
+      const m = (w - Math.abs(A.x - B.x)) / 2, s = A.x < B.x ? -1 : 1;
+      A.x += s * m; B.x -= s * m;
+    }
   }
 }
 
@@ -365,9 +378,12 @@ function projs(r) {
   r.pj = r.pj.filter(p => {
     if (r.f[p.o].frozen > 0) return true; // projectile figé avec son lanceur
     p.x += p.vx; p.y += p.vy; if (p.d.grav) p.vy += p.d.grav;
-    const t = r.f[1 - p.o], ow = r.f[p.o], tz = sz(t);
-    if (Math.abs(p.x - t.x) < BW * tz / 2 + p.r && p.y > t.y - BH * tz - p.r && p.y < t.y + p.r) {
-      hurt(t, p.d.dmg * (ow.buff > 0 ? 1.25 : 1), p.d.kb, p.d.st, 0, p.d.pull ? t.x + Math.sign(p.vx) * 50 : p.x - p.vx * 3, p.d.ub, ow); return false;
+    const ow = r.f[p.o];
+    for (const t of foes(r, ow)) {
+      const tz = sz(t);
+      if (Math.abs(p.x - t.x) < BW * tz / 2 + p.r && p.y > t.y - BH * tz - p.r && p.y < t.y + p.r) {
+        hurt(t, p.d.dmg * (ow.buff > 0 ? 1.25 : 1), p.d.kb, p.d.st, 0, p.d.pull ? t.x + Math.sign(p.vx) * 50 : p.x - p.vx * 3, p.d.ub, ow); return false;
+      }
     }
     return p.x > -50 && p.x < W + 50 && p.y < G + 25;
   });
@@ -379,41 +395,43 @@ function fxs(r) {
     if (e.o != null && r.f[e.o].frozen > 0) return true; // les effets d'un combattant figé sont figés aussi
     e.t++;
     if (e.k === 'cos') return e.t <= e.life;
-    const d = e.d, t = r.f[1 - e.o], ow = r.f[e.o], dm = ow.buff > 0 ? 1.25 : 1, tz = sz(t);
+    const d = e.d, en = foes(r, r.f[e.o]), ow = r.f[e.o], dm = ow.buff > 0 ? 1.25 : 1;
     if (e.k === 'fire') {
-      if (t.y >= G - 2 && Math.abs(t.x - e.x) < e.w / 2 + 14 * tz && e.t % 12 === 0) burn(t, d.tick * dm);
+      for (const t of en) { const tz = sz(t); if (t.y >= G - 2 && Math.abs(t.x - e.x) < e.w / 2 + 14 * tz && e.t % 12 === 0) burn(t, d.tick * dm); }
       return e.t <= d.life;
     }
     if (e.k === 'echo') { // écho : la zone marquée explose après "warn" frames
       if (e.t === d.warn && !e.hit) {
         e.hit = 1;
-        if (Math.hypot(t.x - e.x, t.y - BH * tz / 2 - e.y) < d.rad + 14 * tz) hurt(t, d.dmg * dm, d.kb, d.st, -4, e.x, d.ub, ow);
+        for (const t of en) { const tz = sz(t); if (Math.hypot(t.x - e.x, t.y - BH * tz / 2 - e.y) < d.rad + 14 * tz) hurt(t, d.dmg * dm, d.kb, d.st, -4, e.x, d.ub, ow); }
       }
       return e.t <= d.warn + 8;
     }
     if (e.k === 'beam') { // gros laser : visée affichée pendant "warn" frames, puis rayon épais
       if (e.t === d.warn && !e.hit) {
         e.hit = 1;
-        if (segDist(e.x, e.y, e.x + (e.tx - e.x) * 4, e.y + (e.ty - e.y) * 4, t.x, t.y - BH * tz / 2) < d.wd / 2 + 14 * tz) hurt(t, d.dmg * dm, d.kb, d.st, 0, e.x, d.ub, ow);
+        for (const t of en) { const tz = sz(t); if (segDist(e.x, e.y, e.x + (e.tx - e.x) * 4, e.y + (e.ty - e.y) * 4, t.x, t.y - BH * tz / 2) < d.wd / 2 + 14 * tz) hurt(t, d.dmg * dm, d.kb, d.st, 0, e.x, d.ub, ow); }
       }
       return e.t <= d.warn + d.life;
     }
     if (e.k === 'por') { // le portail vise la position de l'ennemi à son ouverture, puis tire après "warn" frames
-      if (e.t === 0) { e.tx = t.x; e.ty = t.y - BH * tz / 2; }
+      if (e.t === 0 && en[0]) { e.tx = en[0].x; e.ty = en[0].y - BH * sz(en[0]) / 2; }
       if (e.t === d.warn && !e.hit) {
         e.hit = 1;
-        if (segDist(e.x, e.y, e.x + (e.tx - e.x) * 3, e.y + (e.ty - e.y) * 3, t.x, t.y - BH * tz / 2) < 28 * tz) hurt(t, d.dmg * dm, d.kb, d.st, 0, e.x, d.ub, ow);
+        for (const t of en) { const tz = sz(t); if (segDist(e.x, e.y, e.x + (e.tx - e.x) * 3, e.y + (e.ty - e.y) * 3, t.x, t.y - BH * tz / 2) < 28 * tz) hurt(t, d.dmg * dm, d.kb, d.st, 0, e.x, d.ub, ow); }
       }
       return e.t <= d.warn + 6;
     }
-    if (e.t > d.warn && e.t <= d.warn + d.strike && !e.hit && Math.abs(t.x - e.x) < 45 * tz) {
-      e.hit = 1; hurt(t, d.dmg * dm, d.kb, d.st, -8, e.x, d.ub, ow);
+    if (e.t > d.warn && e.t <= d.warn + d.strike && !e.hit) {
+      for (const t of en) { const tz = sz(t); if (Math.abs(t.x - e.x) < 45 * tz) { e.hit = 1; hurt(t, d.dmg * dm, d.kb, d.st, -8, e.x, d.ub, ow); break; } }
     }
     return e.t <= d.warn + d.strike;
   });
 }
-
-function start(r) { r.f = [nf(r.sel[0], 0), nf(r.sel[1], 1)]; r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 150; r.tm = ROUND; r.msg = ''; }
+function start(r) {
+  if (r.team) r.sel = r.sel.map((c, i) => c == null ? (Math.random() * CH.length | 0) : c); // les bots choisissent un perso au hasard
+  r.f = r.sel.map((c, i) => nf(c, i, null, 0, r.team)); r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 150; r.tm = ROUND; r.msg = '';
+}
 
 function startTraining(r, characterIndex, skin) {
   r.training = true;
@@ -442,9 +460,9 @@ const BOT = [
   { act: .05, blk: .06, jmp: .01, lazy: .4, ult: -25, noise: 40, punish: 0 },
   { act: 1, blk: .32, jmp: .035, lazy: 0, ult: 18, noise: 8, punish: 0 },
   { act: 1, blk: .65, jmp: .06, lazy: 0, ult: 30, noise: 3, punish: 1 }];
-function thinkBot(r) {
-  if (!r.bot || r.ph !== 'fight' || !r.f[1] || !r.f[0]) return;
-  const f = r.f[1], o = r.f[0], c = CH[f.c];
+function thinkBot(r, i) {
+  const f = r.f[i]; if (!f || f.hp <= 0 || r.ph !== 'fight') return;
+  const o = nearestFoe(r, f) || f, c = CH[f.c];
   const dx = o.x - f.x, dist = Math.abs(dx), dy = o.y - f.y;
   const input = { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] }, P = BOT[r.lvl ?? 1];
   const attacks = atks(f);
@@ -480,6 +498,7 @@ function thinkBot(r) {
 }
 
 function tick(r) {
+  if (r.team && (r.ph === 'twait' || r.ph === 'tqueue')) return; // salon d'équipe en attente : rien à simuler
   if (r.ph === 'training') {
     // L'ultime reste disponible pour tester librement toutes les capacités.
     r.f[0].ult = 100;
@@ -506,32 +525,45 @@ function tick(r) {
   }
   else if (r.ph === 'cd') { if (--r.t <= 0) r.ph = 'fight'; }
   else if (r.ph === 'fight') {
-    thinkBot(r);
-    step(r, 0); step(r, 1); sep(r); projs(r); fxs(r); r.tm--;
-    const [a, b] = r.f;
-    if (a.hp <= 0 || b.hp <= 0 || r.tm <= 0) {
-      const w = a.hp === b.hp ? -1 : a.hp > b.hp ? 0 : 1;
+    r.f.forEach((f, i) => { if (!r.ps[i]) thinkBot(r, i); }); // les slots sans joueur (bots) réfléchissent
+    r.f.forEach((f, i) => step(r, i)); sep(r); projs(r); fxs(r); r.tm--;
+    const dead = tm => r.f.filter(q => q.team === tm).every(q => q.hp <= 0), hpT = tm => r.f.filter(q => q.team === tm).reduce((sm, q) => sm + Math.max(0, q.hp), 0);
+    if (dead(0) || dead(1) || r.tm <= 0) {
+      let w = dead(1) && !dead(0) ? 0 : dead(0) && !dead(1) ? 1 : -1;
+      if (w < 0) w = hpT(0) === hpT(1) ? -1 : hpT(0) > hpT(1) ? 0 : 1;
       if (w >= 0) r.wins[w]++;
-      r.msg = w < 0 ? 'Égalité !' : CH[r.f[w].c].name + ' gagne la manche !';
+      const wn = w < 0 ? null : CH[r.f.find(q => q.team === w).c].name;
+      r.msg = w < 0 ? 'Égalité !' : (r.team ? "L'équipe de " : '') + wn + ' gagne la manche !';
       r.ph = 'rend'; r.t = 150;
-      if (r.wins[0] >= 2 || r.wins[1] >= 2) { r.ph = 'end'; r.msg = '🏆 ' + CH[r.f[w].c].name + ' remporte le match !'; r.again = r.bot ? [0, 1] : [0, 0]; r.co = [0, 1].map(q => r.wins[q] * 10 + (r.wins[q] >= 2 ? 30 : 10)); }
+      if (r.wins[0] >= 2 || r.wins[1] >= 2) {
+        r.ph = 'end';
+        const wt = r.wins[0] >= 2 ? 0 : 1, wn2 = CH[r.f.find(q => q.team === wt).c].name;
+        r.msg = '🏆 ' + (r.team ? "L'équipe de " : '') + wn2 + ' remporte le match !';
+        r.again = r.f.map((f, i) => r.ps[i] ? 0 : 1); // les bots demandent la revanche tout seuls
+        r.co = r.f.map(f => r.wins[f.team] * 10 + (r.wins[f.team] >= 2 ? 30 : 10));
+      }
     }
   }
   else if (r.ph === 'rend') {
-    if (--r.t <= 0) { r.f = r.f.map((f, i) => nf(f.c, i, f.inp, f.ult)); r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 120; r.tm = ROUND; r.msg = ''; }
+    if (--r.t <= 0) { r.f = r.f.map((f, i) => nf(f.c, i, f.inp, f.ult, r.team)); r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 120; r.tm = ROUND; r.msg = ''; }
   }
   else if (r.ph === 'end') {
-    if (r.again[0] && r.again[1]) { r.ph = 'select'; r.sel = [null, r.bot ? (Math.random() * CH.length | 0) : null]; r.wins = [0, 0]; r.msg = ''; r.f = []; }
+    const ready = r.team ? r.again.every((q, i) => q || !r.ps[i]) : (r.again[0] && r.again[1]);
+    if (ready) {
+      r.ph = 'select'; r.wins = [0, 0]; r.msg = ''; r.f = [];
+      if (r.team) { r.sel = r.ps.map((q, i) => q ? null : (Math.random() * CH.length | 0)); r.sk = ['', '', '', '']; }
+      else r.sel = [null, r.bot ? (Math.random() * CH.length | 0) : null];
+    }
   }
   const live = r.ph !== 'wait' && r.ph !== 'select';
-  const s = { t: 's', p: r.ph, training: !!r.training, bot: !!r.bot,
+  const s = { t: 's', p: r.ph, training: !!r.training, bot: !!r.bot, team: !!r.team,
     damage: r.training ? Math.round(r.f[1].totalDamage) : 0,
     hits: r.training ? r.f[1].hitCount : 0,
     lastDamage: r.training ? r.f[1].lastDamage : 0,
     n: Math.ceil(r.t / 60), tm: Math.ceil(r.tm / 60), w: r.wins, m: r.msg, sel: r.sel, mp: r.mi, co: r.ph === 'end' ? r.co : null, ag: r.again,
     f: live ? r.f.map((f, q) => {
       const d = f.atk && f.atk.d;
-      return { c: f.c, sk: r.sk[q], x: Math.round(f.x), y: Math.round(f.y), hp: Math.max(0, Math.round(f.hp)), fc: f.face, bl: f.block, fl: f.fl > 0 ? 1 : 0,
+      return { c: f.c, tm: f.team, sk: r.sk[q], x: Math.round(f.x), y: Math.round(f.y), hp: Math.max(0, Math.round(f.hp)), fc: f.face, bl: f.block, fl: f.fl > 0 ? 1 : 0,
         ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0, lz: f.lz > 0 ? 1 : 0, fz: f.frozen > 0 ? 1 : 0, sd: Math.round(f.stored), vx: Math.round(f.vx * 10) / 10, vy: Math.round(f.vy * 10) / 10, pt: f.portal ? [Math.round(f.portal.x), Math.round(f.portal.y)] : null,
         hk: f.hook ? [Math.round(f.hook.x), Math.round(f.hook.y)] : f.hf ? [Math.round(f.hf.x), Math.round(f.hf.y)] : null,
         ad: f.atk && f.atk.dx !== undefined ? [Math.round(f.atk.dx * 10) / 10, Math.round((f.atk.dy || 0) * 10) / 10] : null,
@@ -545,7 +577,7 @@ function tick(r) {
       : e.k === 'beam' ? { p: e.t >= e.d.warn ? 4 : 3, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: Math.min(1, e.t / e.d.warn), wd: e.d.wd, np: e.np }
       : e.k === 'por' ? { p: e.t >= e.d.warn ? 4 : 3, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: Math.min(1, e.t / e.d.warn) }
       : { p: e.t > e.d.warn ? 1 : 0, x: Math.round(e.x) }) : [] };
-  r.ps.forEach(p => tx(p, s));
+  r.ps.forEach(p => p && tx(p, s));
 }
 
 // ===== AMIS : profils publics (pseudo, icône, niveau, perso le plus joué), sauvegardés dans profiles.json =====
@@ -559,14 +591,59 @@ function registerProfile(me) {
   clearTimeout(ptimer); ptimer = setTimeout(() => fs.writeFile(PFILE, JSON.stringify(profiles), () => {}), 1000);
 }
 const tx = (ws, o) => ws.readyState === 1 && ws.send(JSON.stringify(o));
-const rooms = new Map(), queue = [];
+const rooms = new Map(), queue = [], teamQueue = [], soloQueue = [];
 const newCode = () => { let c; do { c = Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.random() * 24 | 0]).join(''); } while (rooms.has(c)); return c; };
 const join = ws => tx(ws, { t: 'room', code: ws.room.code, idx: ws.idx, chars: CHARS, maps: MAPS.map(({ n, note }) => ({ n, note })) });
+
+// ===== MODE 2v2 : salon d'équipe (code + lien), matchmaking par équipes, remplissage par des bots =====
+const sendTeam = (ws, r) => tx(ws, { t: 'team', code: r.code, idx: r.ps.indexOf(ws), ph: r.ph, players: r.ps.map(q => q ? (q.pub ? { name: q.pub.name, icon: q.pub.icon, lvl: q.pub.lvl } : { name: 'Joueur', icon: '🥷', lvl: 1 }) : null) });
+function makeTeamRoom(ps) {
+  const r = { code: newCode(), ps, ph: 'twait', team: true, sel: [null, null, null, null], wins: [0, 0], sk: ['', '', '', ''], again: [0, 0, 0, 0], co: [0, 0, 0, 0], qt: 0, lvl: 1, f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1 };
+  rooms.set(r.code, r);
+  ps.forEach((q, i) => { if (q) { q.room = r; q.idx = i; } });
+  return r;
+}
+function teamEnqueue(r) {
+  while (teamQueue.length && (teamQueue[0].ph !== 'tqueue' || !teamQueue[0].ps.some(q => q))) { const x = teamQueue.shift(); if (!x.ps.some(q => q)) rooms.delete(x.code); }
+  const other = teamQueue.shift();
+  if (other && other !== r) { startTeamMatch(r, other); return true; }
+  if (r.ph !== 'tqueue') teamQueue.push(r);
+  return false;
+}
+function startTeamMatch(ta, tb) { // tb null = match contre une équipe de bots
+  ta.ps = tb ? [...ta.ps, ...tb.ps] : [...ta.ps, null, null];
+  ta.sel = ta.ps.map((q, i) => q ? null : (Math.random() * CH.length | 0));
+  ta.sk = ['', '', '', '']; ta.wins = [0, 0]; ta.again = [0, 0, 0, 0]; ta.co = [0, 0, 0, 0];
+  ta.ph = 'select'; ta.msg = ''; ta.qt = 0;
+  ta.ps.forEach((q, i) => { if (q) { q.room = ta; q.idx = i; join(q); } });
+  if (tb) { tb.ps.forEach(q => { if (q) q.room = ta; }); rooms.delete(tb.code); }
+}
+function matchTick() { // exécuté à 60 FPS : associe les solos, chronomètre les files (15 s), puis bots
+  for (let i = soloQueue.length - 1; i >= 0; i--) {
+    const ws = soloQueue[i];
+    if (ws.readyState !== 1) { soloQueue.splice(i, 1); continue; }
+    if (++ws.qt > 900) { soloQueue.splice(i, 1); startTeamMatch(makeTeamRoom([ws, null]), null); }
+  }
+  for (let i = teamQueue.length - 1; i >= 0; i--) {
+    const r = teamQueue[i];
+    if (!r.ps.some(q => q)) { teamQueue.splice(i, 1); rooms.delete(r.code); continue; }
+    if (r.ph !== 'tqueue') { teamQueue.splice(i, 1); continue; }
+    if (++r.qt > 900) { teamQueue.splice(i, 1); startTeamMatch(r, null); }
+  }
+  while (soloQueue.length >= 2) {
+    const a = soloQueue.shift(), b = soloQueue.shift();
+    if (!a || !b || a.readyState !== 1 || b.readyState !== 1) continue;
+    const r = makeTeamRoom([a, b]);
+    if (!teamEnqueue(r)) { r.ph = 'tqueue'; r.qt = 0; r.ps.forEach(q => q && sendTeam(q, r)); }
+  }
+}
 
 wss.on('connection', ws => {
   ws.on('message', raw => {
     let m; try { m = JSON.parse(raw); } catch { return; }
     if (m.t === 'hello' || m.t === 'friends') { // amis : enregistre le profil public, renvoie les profils demandés
+      const me = m.me || {};
+      ws.pub = { name: clean(me.name, 14) || 'Joueur', icon: clean(me.icon, 8) || '🥷', lvl: Math.max(1, Math.min(20, +me.lvl || 1)) };
       registerProfile(m.me);
       if (m.t === 'hello') return;
       const codes = (Array.isArray(m.list) ? m.list : []).slice(0, 50).map(c => String(c).toUpperCase());
@@ -601,9 +678,37 @@ wss.on('connection', ws => {
       const r = rooms.get(String(m.code || '').toUpperCase().trim());
       if (!r || r.ps.length > 1) return tx(ws, { t: 'err', m: 'Code invalide ou partie pleine' });
       r.ps.push(ws); ws.room = r; ws.idx = 1; r.ph = 'select'; join(ws); tx(r.ps[0], { t: 'room', code: r.code, idx: 0, chars: CHARS, maps: MAPS.map(({ n, note }) => ({ n, note })) });
+    } else if (m.t === 'tcreate' && !ws.room) {
+      const r = makeTeamRoom([ws, null]);
+      sendTeam(ws, r);
+    } else if (m.t === 'tjoin' && !ws.room) {
+      const r = rooms.get(String(m.code || '').toUpperCase().trim());
+      if (!r || !r.team || r.ph !== 'twait' || !r.ps.includes(null)) return tx(ws, { t: 'err', m: 'Équipe introuvable ou complète' });
+      const i = r.ps.indexOf(null);
+      r.ps[i] = ws; ws.room = r; ws.idx = i;
+      r.ps.forEach(q => q && sendTeam(q, r));
+    } else if (m.t === 'tqueue') {
+      const r = ws.room;
+      if (r && r.team && (r.ph === 'twait' || r.ph === 'tqueue') && !teamEnqueue(r)) { r.ph = 'tqueue'; r.qt = 0; r.ps.forEach(q => q && sendTeam(q, r)); }
+    } else if (m.t === 'queue2' && !ws.room && !soloQueue.includes(ws)) {
+      soloQueue.push(ws); ws.qt = 0; tx(ws, { t: 'queued2' });
+    } else if (m.t === 'tleave') {
+      const r = ws.room;
+      if (r && r.team) {
+        const i = r.ps.indexOf(ws);
+        if (i >= 0) r.ps[i] = null;
+        ws.room = null; ws.idx = -1;
+        if (!r.ps.some(q => q)) rooms.delete(r.code);
+        else r.ps.forEach(q => q && sendTeam(q, r));
+        tx(ws, { t: 'left' });
+      }
     } else if (m.t === 'pick') {
       const r = ws.room;
-      if (r && r.ph === 'select' && CH[m.c]) { r.sel[ws.idx] = m.c; r.sk[ws.idx] = String(m.sk || '').slice(0, 40); if (r.sel[0] != null && r.sel[1] != null) { r.wins = [0, 0]; start(r); } }
+      if (r && r.ph === 'select' && CH[m.c]) {
+        r.sel[ws.idx] = m.c; r.sk[ws.idx] = String(m.sk || '').slice(0, 40);
+        const ready = r.team ? r.ps.every((q, i) => !q || r.sel[i] != null) : (r.sel[0] != null && r.sel[1] != null);
+        if (ready) { r.wins = [0, 0]; start(r); }
+      }
     } else if (m.t === 'again') {
       const r = ws.room; if (r && r.ph === 'end') r.again[ws.idx] = 1;
     } else if (m.t === 'in') {
@@ -613,12 +718,21 @@ wss.on('connection', ws => {
   });
   ws.on('close', () => {
     const qi = queue.indexOf(ws); if (qi >= 0) queue.splice(qi, 1);
+    const si = soloQueue.indexOf(ws); if (si >= 0) soloQueue.splice(si, 1);
     const r = ws.room; if (!r) return;
+    if (r.team) { // en équipe : le partenaire absent est remplacé par un bot, la partie continue
+      const i = r.ps.indexOf(ws); if (i >= 0) r.ps[i] = null;
+      ws.room = null;
+      if (!r.ps.some(q => q)) { rooms.delete(r.code); return; }
+      if (r.ph === 'select') { r.sel[i] = Math.random() * CH.length | 0; if (r.ps.every((q, j) => !q || r.sel[j] != null)) start(r); }
+      r.ps.forEach(q => q && (tx(q, { t: 'note', m: 'Un joueur est parti, un bot le remplace' }), sendTeam(q, r)));
+      return;
+    }
     rooms.delete(r.code);
     r.ps.forEach(p => { if (p !== ws) { tx(p, { t: 'err', m: 'Adversaire déconnecté' }); p.room = null; } });
   });
 });
 
-setInterval(() => rooms.forEach(tick), 1000 / 60);
+setInterval(() => { rooms.forEach(tick); matchTick(); }, 1000 / 60);
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log('Duel Arena sur http://localhost:' + PORT));
