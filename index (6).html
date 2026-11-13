@@ -8,7 +8,7 @@
 <title>Duel Arena</title>
 <style>
 body{margin:0;background:#111;color:#fff;font-family:system-ui,sans-serif;display:flex;justify-content:center;min-height:100vh;align-items:center}
-#wrap{position:relative;width:100%;max-width:min(100vw,150vh)}
+#wrap{position:relative;width:100%;max-width:min(100vw,200vh)}
 canvas{width:100%;display:block;background:#222}
 #ov{overflow:auto;position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(0,0,0,.8);text-align:center;padding:10px;box-sizing:border-box}
 
@@ -199,13 +199,13 @@ html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 #tmenu button{width:40px;height:40px;font-size:18px}
 #rot{display:none;position:absolute;top:0;left:0;right:0;background:#e67e22;color:#fff;text-align:center;padding:5px;font-size:13px;z-index:6}
 @media (pointer:coarse) and (orientation:portrait){#rot{display:block}}
-@media (pointer:coarse) and (orientation:landscape){#wrap{width:auto}canvas{width:min(100vw,150vh);height:auto}}
+@media (pointer:coarse) and (orientation:landscape){#wrap{width:auto}canvas{width:min(100vw,200vh);height:auto}}
 </style>
 </head>
 <body>
 <div id="wrap">
 	<div id="rot">📱 Tourne ton téléphone en mode paysage pour mieux jouer</div>
-	<canvas id="c" width="1800" height="1200"></canvas>
+	<canvas id="c" width="2400" height="1200"></canvas>
 	<div id="ov"></div>
 	<div id="cfx"></div>
 	<div id="splash">
@@ -1378,12 +1378,12 @@ function hud() {
     x.fillText('Coups réussis : ' + S.hits, 28, 80);
     x.fillText('Dernier coup : ' + S.lastDamage + ' dégâts', 28, 100);
     x.textAlign = 'right';
-    x.fillText('R : Réinitialiser  ·  Échap : Quitter', 885, 28);
-    x.fillText('Ultime toujours disponible', 885, 50);
+    x.fillText('R : Réinitialiser  ·  Échap : Quitter', WW - 15, 28);
+    x.fillText('Ultime toujours disponible', WW - 15, 50);
     return;
   }
   S.f.forEach((f, i) => {
-    const c = chars[f.c], w = 380, xx = i ? 900 - 20 - w : 20, pw = w * f.hp / c.hp, uw = w * f.ul / 100, rdy = f.ul >= 100;
+    const c = chars[f.c], w = 380, xx = i ? WW - 20 - w : 20, pw = w * f.hp / c.hp, uw = w * f.ul / 100, rdy = f.ul >= 100;
     if (f.sh > 0) { x.fillStyle = '#000'; x.fillRect(xx, 12, w, 6); x.fillStyle = '#7fd4ff'; const sw = w * f.sh / 60; x.fillRect(i ? xx + w - sw : xx, 12, sw, 6); }
     x.fillStyle = '#000'; x.fillRect(xx, 20, w, 22);
     x.fillStyle = c.color; x.fillRect(i ? xx + w - pw : xx, 20, pw, 22);
@@ -1397,13 +1397,18 @@ function hud() {
       x.arc(i ? xx + w - 8 - k * 20 : xx + 8 + k * 20, 90, 6, 0, 7); x.fill();
     }
   });
-  x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = 'bold 28px sans-serif'; x.fillText(fmt(S.tm), 450, 42);
-  if (S.p === 'cd' && maps[S.mp]) { x.font = '14px sans-serif'; x.fillStyle = '#ddd'; x.fillText('🗺 ' + maps[S.mp].n + (maps[S.mp].note ? ' · ' + maps[S.mp].note : ''), 450, 62); }
+  x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = 'bold 28px sans-serif'; x.fillText(fmt(S.tm), WW / 2, 42);
+  if (S.p === 'cd' && maps[S.mp]) { x.font = '14px sans-serif'; x.fillStyle = '#ddd'; x.fillText('🗺 ' + maps[S.mp].n + (maps[S.mp].note ? ' · ' + maps[S.mp].note : ''), WW / 2, 62); }
   const t = S.p === 'cd' ? S.n : (S.p === 'rend' || S.p === 'end') ? S.m : '';
-  x.font = 'bold 44px sans-serif'; x.lineWidth = 5; x.strokeStyle = '#000'; x.strokeText(t, 450, 210); x.fillText(t, 450, 210);
+  x.font = 'bold 44px sans-serif'; x.lineWidth = 5; x.strokeStyle = '#000'; x.strokeText(t, WW / 2, 210); x.fillText(t, WW / 2, 210);
 }
 
 const OFF = 80; // décalage visuel : le sol est abaissé de 80 px, le bas de l'écran est entièrement couvert par le sol
+function drawMapWide(m) { // décor de 900 px au centre, prolongé de chaque côté par son reflet pour remplir l'arène élargie
+  x.save(); x.translate(MOFF, 0); x.scale(-1, 1); drawMap(m); x.restore();
+  x.save(); x.translate(MOFF + 1800, 0); x.scale(-1, 1); drawMap(m); x.restore();
+  x.save(); x.translate(MOFF, 0); drawMap(m); x.restore();
+}
 function drawMap(m) {
   const t = Date.now() / 1000, rnd = k => ((k * 9301 + 49297) % 233280) / 233280;
   const grad = (a, b) => { const g = x.createLinearGradient(0, -OFF, 0, 380); g.addColorStop(0, a); g.addColorStop(1, b); x.fillStyle = g; x.fillRect(0, -OFF, 900, OFF + 450); };
@@ -1532,8 +1537,8 @@ function gpMenu(c) {
 }
 
 // ===== ÉCRAN AGRANDI : le jeu occupe toute la fenêtre (rapport 3:2), canvas en haute résolution et menus agrandis =====
-const KRES = 2, wrapEl = document.getElementById('wrap');
-function fitScreen() { const k = Math.max(1, wrapEl.clientWidth / 900); ov.style.zoom = k; document.getElementById('cfx').style.zoom = k; }
+const WW = 1200, MOFF = (WW - 900) / 2, KRES = 2, wrapEl = document.getElementById('wrap');
+function fitScreen() { const k = Math.max(1, wrapEl.clientHeight / 600); ov.style.zoom = k; document.getElementById('cfx').style.zoom = k; }
 new ResizeObserver(fitScreen).observe(wrapEl); fitScreen();
 function draw() {
   x.setTransform(KRES, 0, 0, KRES, 0, 0);
@@ -1543,8 +1548,8 @@ function draw() {
   if (inGame !== touchOn) { touchOn = inGame; tc.style.display = inGame ? 'flex' : 'none'; if (!inGame) ['l', 'r', 'u', 'd', 0, 1, 2, 3].forEach(k => { keys[k] = false; }); }
   const tr = inGame && S.p === 'training';
   if (tr !== trOn) { trOn = tr; tm.style.display = tr ? 'flex' : 'none'; }
-  PAL = null; FL = 0; x.save(); x.translate(0, OFF); drawMap(S && S.f.length ? S.mp : -1);
-  const gg = x.createLinearGradient(0, 380, 0, 540); gg.addColorStop(0, 'rgba(0,0,0,0)'); gg.addColorStop(1, 'rgba(0,0,0,.55)'); x.fillStyle = gg; x.fillRect(0, 380, 900, 260);
+  PAL = null; FL = 0; x.save(); x.translate(0, OFF); drawMapWide(S && S.f.length ? S.mp : -1);
+  const gg = x.createLinearGradient(0, 380, 0, 540); gg.addColorStop(0, 'rgba(0,0,0,0)'); gg.addColorStop(1, 'rgba(0,0,0,.55)'); x.fillStyle = gg; x.fillRect(0, 380, WW, 260);
   if (S && S.f.length) {
     S.fx.forEach(e => {
       if (e.p === 1) {
@@ -1564,7 +1569,7 @@ function draw() {
     drawWaves();
     S.f.forEach(f => { if (f.lz) return; const z = f.sz || 1, k = Math.min(1, (380 - f.y) / 250); x.fillStyle = 'rgba(0,0,0,' + (.35 * (1 - k)) + ')'; x.beginPath(); x.ellipse(f.x, 380, 34 * z * (1 - .4 * k), 7 * z, 0, 0, 7); x.fill(); });
     S.f.forEach(fighter);
-    if (S.f.some(q => q.fz)) { x.fillStyle = 'rgba(110,130,210,.22)'; x.fillRect(0, -OFF, 900, 600); }
+    if (S.f.some(q => q.fz)) { x.fillStyle = 'rgba(110,130,210,.22)'; x.fillRect(0, -OFF, WW, 600); }
     if (S.p === 'training') {
       x.fillStyle = '#fff'; x.font = 'bold 14px sans-serif'; x.textAlign = 'center';
       x.fillText('MANNEQUIN', S.f[1].x, S.f[1].y - 150);
