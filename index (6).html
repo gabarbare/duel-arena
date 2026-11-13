@@ -171,6 +171,21 @@ button:disabled{opacity:.4;cursor:default}
 .cf-open .cf-glow{animation:cfglow .9s forwards}.cf-open .cf-lid{transform:rotate(-75deg)}
 @keyframes cfglow{to{opacity:1;transform:scale(1.3)}}
 .cf-pop{animation:cfpop .6s cubic-bezier(.2,1.6,.4,1)}@keyframes cfpop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+/* écran d'accueil */
+#splash{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;background:#12061f;text-align:center}
+#splash svg.bg{position:absolute;inset:0;width:100%;height:100%}
+#splash .sun{transform-origin:450px 330px;animation:sunp 4s ease-in-out infinite}
+@keyframes sunp{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.06);opacity:1}}
+#splash .fg{animation:fgbob 2.2s ease-in-out infinite}#splash .fg.r{animation-delay:-1.1s}
+@keyframes fgbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+#splash .ttl{position:relative;margin:7% 0 0;font-size:clamp(38px,9.5vw,86px);font-weight:900;font-style:italic;letter-spacing:.04em;line-height:1;background:linear-gradient(180deg,#fff7c2,#ffb347 55%,#ff5e3a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #3b0d1e) drop-shadow(0 0 18px rgba(255,120,50,.6))}
+#splash .sub{position:relative;margin:10px 0 0;color:#ffe6c7;font-size:clamp(13px,2.4vw,20px);letter-spacing:.18em;text-transform:uppercase;text-shadow:0 2px 6px #000}
+#splash .play{position:relative;margin-top:auto;margin-bottom:9%;padding:14px 56px;font-size:clamp(20px,3.6vw,30px);font-weight:900;letter-spacing:.12em;color:#fff;background:linear-gradient(180deg,#ff8a3d,#e0431f);border:3px solid #ffd9a0;border-radius:14px;cursor:pointer;box-shadow:0 0 0 4px rgba(0,0,0,.35),0 10px 30px rgba(255,90,30,.5);animation:playp 1.4s ease-in-out infinite}
+#splash .play:hover{filter:brightness(1.15)}
+@keyframes playp{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+#splash .hint{position:absolute;bottom:3%;left:0;right:0;color:#cdb8e0;font-size:12px;opacity:.85}
+#splash i{position:absolute;bottom:-10px;width:5px;height:5px;border-radius:50%;background:#ffb347;box-shadow:0 0 8px #ff7a1a;opacity:0;animation:ember linear infinite}
+@keyframes ember{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-620px) translateX(30px);opacity:0}}
 /* Contrôles tactiles : visibles uniquement sur mobile / tablette, et seulement pendant un combat */
 html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 #touch{display:none;position:absolute;left:0;right:0;bottom:0;padding:0 10px 10px;justify-content:space-between;align-items:flex-end;pointer-events:none;z-index:5;user-select:none;-webkit-user-select:none;touch-action:none}
@@ -193,6 +208,27 @@ html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 	<canvas id="c" width="900" height="600"></canvas>
 	<div id="ov"></div>
 	<div id="cfx"></div>
+	<div id="splash">
+		<svg class="bg" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid slice">
+			<defs>
+				<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12061f"/><stop offset=".55" stop-color="#5b1a4a"/><stop offset=".85" stop-color="#e8623a"/><stop offset="1" stop-color="#ffb347"/></linearGradient>
+				<radialGradient id="sg" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff3b0"/><stop offset=".6" stop-color="#ffb347"/><stop offset="1" stop-color="#ff6a2a" stop-opacity="0"/></radialGradient>
+			</defs>
+			<rect width="900" height="600" fill="url(#sky)"/>
+			<g fill="#fff" opacity=".7"><circle cx="90" cy="70" r="1.6"/><circle cx="210" cy="140" r="1.2"/><circle cx="330" cy="50" r="1.8"/><circle cx="560" cy="90" r="1.4"/><circle cx="700" cy="40" r="1.8"/><circle cx="820" cy="130" r="1.3"/><circle cx="760" cy="200" r="1.1"/><circle cx="130" cy="220" r="1.1"/></g>
+			<circle class="sun" cx="450" cy="330" r="190" fill="url(#sg)"/>
+			<path d="M0 470 L120 360 L210 430 L330 320 L450 440 L580 340 L700 430 L800 350 L900 440 V600 H0Z" fill="#2a0d33"/>
+			<path d="M0 510 L150 430 L260 490 L400 420 L520 500 L660 430 L780 500 L900 450 V600 H0Z" fill="#190722"/>
+			<path d="M120 0 L330 600 M700 0 L560 600" stroke="rgba(255,220,160,.07)" stroke-width="60"/>
+			<rect y="526" width="900" height="74" fill="#07030f"/><rect y="526" width="900" height="3" fill="#ff8a3d" opacity=".7"/>
+			<g class="fg" fill="#07030f"><circle cx="250" cy="372" r="22"/><path d="M228 396 H272 L278 480 H222Z"/><rect x="230" y="476" width="17" height="52"/><rect x="253" y="476" width="17" height="52"/><path d="M268 410 L352 372 L360 382 L276 426Z"/><path d="M228 360 L238 336 L246 352 L254 332 L262 354 L272 340 L270 362Z"/></g>
+			<g class="fg r" fill="#07030f" transform="translate(900,0) scale(-1,1)"><circle cx="250" cy="372" r="22"/><path d="M228 396 H272 L278 480 H222Z"/><rect x="230" y="476" width="17" height="52"/><rect x="253" y="476" width="17" height="52"/><path d="M268 410 L352 372 L360 382 L276 426Z"/><path d="M226 356 Q250 330 274 356 L268 346 L250 338 L232 346Z"/></g>
+		</svg>
+		<h1 class="ttl">⚔️ DUEL ARENA</h1>
+		<p class="sub">Le combat commence ici</p>
+		<button class="play" id="playbtn">▶ JOUER</button>
+		<div class="hint">Clique, ou appuie sur Entrée / ✕ (A) pour commencer</div>
+	</div>
 	<div id="touch">
 		<div class="pad"><button data-k="u">▲</button><div class="row"><button data-k="l">◀</button><button data-k="d">▼</button><button data-k="r">▶</button></div></div>
 		<div class="acts"><button data-k="0">J</button><button data-k="1">K</button><button data-k="2">L</button><button data-k="3" class="ult">U</button></div>
@@ -370,6 +406,12 @@ const LOGOS = {
 const iconHtml = (id, n) => LOGOS[id] ? `<svg viewBox="0 0 40 40" width="${n}" height="${n}" style="vertical-align:middle">${LOGOS[id].s}</svg>` : `<span style="font-size:${n - 4}px">${esc(id)}</span>`;
 const allIcons = () => [...ICONS, ...save.icons];
 // ===== COFFRETS : s'ouvrent automatiquement (hors combat) avec une animation. 45 % icône, 40 % pièces (10-60), 15 % cristaux (3-10) =====
+// ===== ÉCRAN D'ACCUEIL =====
+let splashOn = true;
+const startGame = () => { if (!splashOn) return; splashOn = false; document.getElementById('splash').style.display = 'none'; };
+document.getElementById('playbtn').addEventListener('click', startGame);
+addEventListener('keydown', e => { if (splashOn && (e.code === 'Enter' || e.code === 'Space')) { e.preventDefault(); startGame(); } });
+for (let q = 0; q < 22; q++) { const e = document.createElement('i'); e.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + Math.random() * 6) + 's;animation-delay:-' + (Math.random() * 10) + 's'; document.getElementById('splash').appendChild(e); }
 let cfPhase = 0;
 const cfEl = () => document.getElementById('cfx');
 const CF_SVG = '<svg viewBox="0 0 80 64" width="170" height="136"><rect x="8" y="28" width="64" height="32" rx="4" fill="#8d5524"/><rect x="8" y="40" width="64" height="4" fill="#5d3a18"/><g class="cf-lid" style="transform-origin:8px 28px;transition:transform .5s"><path d="M8 28V20a14 14 0 0 1 14-14h36a14 14 0 0 1 14 14v8z" fill="#a8682e"/><rect x="8" y="22" width="64" height="4" fill="#f1c40f"/></g><rect x="34" y="30" width="12" height="13" rx="2" fill="#f1c40f"/></svg>';
@@ -1448,6 +1490,7 @@ function gpPoll() {
   const B = i => !!(p.buttons[i] && (p.buttons[i].pressed || p.buttons[i].value > .5)), ax = p.axes[0] || 0, ay = p.axes[1] || 0;
   const cur = { l: ax < -.45 || B(14), r: ax > .45 || B(15), u: ay < -.45 || B(12), d: ay > .45 || B(13) || B(4), 0: B(0), 1: B(2), 2: B(3), 3: B(1), st: B(9), bk: B(8), a: B(0), b: B(1), nu: ay < -.45 || B(12), nd: ay > .45 || B(13) }; // nu/nd : navigation des menus (sans A ni LB, qui servent au saut et au blocage en combat)
   if (cur.l || cur.r || cur.u || cur.d || cur[0] || cur[1] || cur[2] || cur[3] || cur.st || cur.bk) gpNav.active = true;
+  if (splashOn) { if ((cur.a && !gpPrev.a) || (cur.st && !gpPrev.st)) startGame(); gpPrev.a = cur.a; gpPrev.st = cur.st; gpPrev.b = cur.b; return; }
   if (cfPhase) { if (cur.a && !gpPrev.a) cfClose(); gpPrev.a = cur.a; gpPrev.b = cur.b; return; }
   const fight = me >= 0 && !!S && !!S.f && S.f.length > 0 && S.p !== 'end';
   if (fight) {
@@ -1490,7 +1533,7 @@ function gpMenu(c) {
 
 function draw() {
   gpPoll();
-  if (!cfPhase && (save.chests || 0) > 0 && !searching && (me < 0 || (S && S.p === 'end'))) cfStart();
+  if (!splashOn && !cfPhase && (save.chests || 0) > 0 && !searching && (me < 0 || (S && S.p === 'end'))) cfStart();
   const inGame = isTouch && me >= 0 && !!S && !!S.f && S.f.length > 0 && S.p !== 'end';
   if (inGame !== touchOn) { touchOn = inGame; tc.style.display = inGame ? 'flex' : 'none'; if (!inGame) ['l', 'r', 'u', 'd', 0, 1, 2, 3].forEach(k => { keys[k] = false; }); }
   const tr = inGame && S.p === 'training';
