@@ -311,7 +311,7 @@ function setSkin(name, id, i) { save.skin[name] = id; persist(); if (S && S.p ==
 const CR = { perso_luffy: 30, perso_naruto: 30, perso_deku: 30, perso_koro: 50, perso_shinra: 50, perso_eren: 50, perso_gojo: 80, perso_yugo: 80, perso_denji: 80, perso_ichigo: 50 };
 const MAPN = ['Dojo', 'Volcan', 'Ville de nuit', 'Banquise', 'Lune'];
 const ALLN = ['Bruno', 'Zéphyr', 'Kaze', 'Viking', 'Chevalier', 'Kairos', 'Luffy', 'Naruto', 'Gojo', 'Deku', 'Denji', 'Yugo', 'Shinra', 'Eren', 'Koro', 'Ichigo'];
-// ===== PROFIL & NIVEAUX (max 10) : niveaux 1-4 = 100 XP chacun, niveaux 5-9 = 200 XP chacun (x2 tous les 5 niveaux) =====
+// ===== PROFIL & NIVEAUX (max 20) : coût XP doublé tous les 5 niveaux =====
 // ===== AMIS : code ami personnel, profil public envoyé au serveur =====
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function myCode() {
@@ -391,8 +391,8 @@ const ICONS = ['🥷', '🧙', '⚔️', '🛡️', '🐉', '🦊', '🐺', '�
 const xpNeed = L => 100 * 2 ** Math.floor(L / 5);
 function lvlInfo() {
   let xp = save.xp || 0, L = 1;
-  while (L < 10 && xp >= xpNeed(L)) { xp -= xpNeed(L); L++; }
-  return L >= 10 ? { L, xp: 0, need: 0 } : { L, xp, need: xpNeed(L) };
+  while (L < 20 && xp >= xpNeed(L)) { xp -= xpNeed(L); L++; }
+  return L >= 20 ? { L, xp: 0, need: 0 } : { L, xp, need: xpNeed(L) };
 }
 function addXp(n) {
   const before = lvlInfo().L; save.xp = (save.xp || 0) + n;
