@@ -24,10 +24,10 @@ const CH = [
     { n: 'Lancer de kunai', type: 'p', su: 5, ac: 1, rc: 10, cd: 80, dmg: 5, vx: 14, r: 6, kb: 4, st: 5, vis: 21 },
     { n: 'Danse des lames', ult: 1, ub: 1, type: 'm', su: 8, ac: 24, rc: 14, cd: 0, dmg: 8, rng: 80, h: 90, kb: 3, st: 11, both: 1, multi: 6 }] },
   { name: 'Viking', desc: 'Tank, lent mais puissant', hp: 150, spd: 3.0, jmp: 11.9, color: '#f39c12', atk: [
-    { n: 'Poing', type: 'm', su: 10, ac: 5, rc: 16, cd: 10, dmg: 9, rng: 98, h: 60, kb: 8, st: 18 },
+    { n: 'Coup de hache', type: 'm', su: 10, ac: 5, rc: 16, cd: 10, dmg: 9, rng: 98, h: 60, kb: 8, st: 18 },
     { n: 'Écrasement', type: 'm', su: 18, ac: 6, rc: 28, cd: 90, dmg: 26, rng: 90, h: 100, kb: 12, st: 28, both: 1 },
     { n: 'Vague de séisme', type: 'p', su: 14, ac: 1, rc: 24, cd: 120, dmg: 15, vx: 5, r: 20, kb: 11, st: 26, low: 1, vis: 22 },
-    { n: 'Poing du Géant', ult: 1, ub: 1, type: 'm', su: 22, ac: 6, rc: 34, cd: 0, dmg: 45, rng: 105, h: 120, kb: 20, st: 44, lift: -8 }] },
+    { n: 'Hache du Géant', ult: 1, ub: 1, type: 'm', su: 22, ac: 6, rc: 34, cd: 0, dmg: 45, rng: 105, h: 120, kb: 20, st: 44, lift: -8 }] },
   { name: 'Chevalier', desc: 'Épée et bouclier, défense solide (blocage renforcé)', hp: 130, spd: 3.2, jmp: 12, color: '#aab7c4', blk: 0.05, atk: [
     { n: 'Estoc', type: 'm', su: 7, ac: 4, rc: 12, cd: 8, dmg: 8, rng: 88, h: 26, kb: 6, st: 15 },
     { n: 'Coup de bouclier', type: 'm', su: 10, ac: 4, rc: 16, cd: 20, dmg: 9, rng: 50, h: 85, kb: 18, st: 30 },
