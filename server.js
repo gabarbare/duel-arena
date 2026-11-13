@@ -14,9 +14,9 @@ const CH = [
     { n: 'Uppercut', type: 'm', su: 12, ac: 6, rc: 24, cd: 100, dmg: 24, rng: 55, h: 80, kb: 12, st: 32, lift: -11 },
     { n: 'Charge rageuse', ult: 1, ub: 1, type: 'd', su: 10, ac: 14, rc: 20, cd: 0, dmg: 30, rng: 50, h: 90, kb: 18, st: 50, lift: -9, spd: 18 }] },
   { name: 'Zéphyr', desc: 'Mage, attaques à distance', hp: 90, spd: 3.6, jmp: 13, color: '#9b59b6', atk: [
-    { n: 'Éclair', type: 'p', su: 6, ac: 1, rc: 8, cd: 23, dmg: 5, vx: 12, r: 7, kb: 3, st: 12 },
-    { n: 'Boule de feu', type: 'p', su: 12, ac: 1, rc: 36, cd: 70, dmg: 14, vx: 7, r: 16, kb: 10, st: 24 },
-    { n: 'Rafale (x3)', type: 'p', su: 10, ac: 1, rc: 34, cd: 110, dmg: 6, vx: 9, r: 8, kb: 5, st: 14, cnt: 3 },
+    { n: 'Éclair', type: 'p', su: 6, ac: 1, rc: 8, cd: 23, dmg: 5, vx: 12, r: 7, kb: 3, st: 12, vis: 18 },
+    { n: 'Boule de feu', type: 'p', su: 12, ac: 1, rc: 36, cd: 70, dmg: 14, vx: 7, r: 16, kb: 10, st: 24, vis: 19 },
+    { n: 'Orbes de vent (x3)', type: 'p', su: 10, ac: 1, rc: 34, cd: 110, dmg: 6, vx: 9, r: 8, kb: 5, st: 14, cnt: 3, vis: 20 },
     { n: 'Foudre céleste', ult: 1, ub: 1, type: 'sky', su: 20, ac: 1, rc: 22, cd: 0, dmg: 36, kb: 12, st: 36, warn: 28, strike: 8 }] },
   { name: 'Kaze', desc: 'Ninja, rapide avec dash', hp: 85, spd: 5.6, jmp: 14.5, color: '#2ecc71', atk: [
     { n: 'Lame', type: 'm', su: 3, ac: 3, rc: 6, cd: 4, dmg: 4, rng: 55, h: 35, kb: 3, st: 11 },
