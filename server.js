@@ -19,14 +19,14 @@ const CH = [
     { n: 'Orbes de vent (x3)', type: 'p', su: 10, ac: 1, rc: 34, cd: 110, dmg: 6, vx: 9, r: 8, kb: 5, st: 14, cnt: 3, vis: 20 },
     { n: 'Foudre céleste', ult: 1, ub: 1, type: 'sky', su: 20, ac: 1, rc: 22, cd: 0, dmg: 36, kb: 12, st: 36, warn: 28, strike: 8 }] },
   { name: 'Kaze', desc: 'Ninja, rapide avec dash', hp: 85, spd: 5.6, jmp: 14.5, color: '#2ecc71', atk: [
-    { n: 'Lame', type: 'm', su: 3, ac: 3, rc: 6, cd: 4, dmg: 4, rng: 55, h: 35, kb: 3, st: 11 },
+    { n: 'Kunai au corps à corps', type: 'm', su: 3, ac: 3, rc: 6, cd: 4, dmg: 4, rng: 55, h: 35, kb: 3, st: 11 },
     { n: 'Dash', type: 'd', su: 4, ac: 10, rc: 14, cd: 60, dmg: 11, rng: 34, h: 60, kb: 10, st: 22, spd: 15 },
-    { n: 'Kunaï', type: 'p', su: 5, ac: 1, rc: 10, cd: 80, dmg: 5, vx: 14, r: 6, kb: 4, st: 5 },
+    { n: 'Lancer de kunai', type: 'p', su: 5, ac: 1, rc: 10, cd: 80, dmg: 5, vx: 14, r: 6, kb: 4, st: 5, vis: 21 },
     { n: 'Danse des lames', ult: 1, ub: 1, type: 'm', su: 8, ac: 24, rc: 14, cd: 0, dmg: 8, rng: 80, h: 90, kb: 3, st: 11, both: 1, multi: 6 }] },
   { name: 'Viking', desc: 'Tank, lent mais puissant', hp: 150, spd: 3.0, jmp: 11.9, color: '#f39c12', atk: [
     { n: 'Poing', type: 'm', su: 10, ac: 5, rc: 16, cd: 10, dmg: 9, rng: 98, h: 60, kb: 8, st: 18 },
     { n: 'Écrasement', type: 'm', su: 18, ac: 6, rc: 28, cd: 90, dmg: 26, rng: 90, h: 100, kb: 12, st: 28, both: 1 },
-    { n: 'Séisme (au sol)', type: 'p', su: 14, ac: 1, rc: 24, cd: 120, dmg: 15, vx: 5, r: 20, kb: 11, st: 26, low: 1 },
+    { n: 'Vague de séisme', type: 'p', su: 14, ac: 1, rc: 24, cd: 120, dmg: 15, vx: 5, r: 20, kb: 11, st: 26, low: 1, vis: 22 },
     { n: 'Poing du Géant', ult: 1, ub: 1, type: 'm', su: 22, ac: 6, rc: 34, cd: 0, dmg: 45, rng: 105, h: 120, kb: 20, st: 44, lift: -8 }] },
   { name: 'Chevalier', desc: 'Épée et bouclier, défense solide (blocage renforcé)', hp: 130, spd: 3.2, jmp: 12, color: '#aab7c4', blk: 0.05, atk: [
     { n: 'Estoc', type: 'm', su: 7, ac: 4, rc: 12, cd: 8, dmg: 8, rng: 88, h: 26, kb: 6, st: 15 },
