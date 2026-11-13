@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -144,6 +145,13 @@ input{text-transform:uppercase;width:90px;text-align:center}
 .chip.on{background:#3498db}
 button:disabled{opacity:.4;cursor:default}
 .gp{outline:3px solid #f1c40f !important;outline-offset:2px}
+#cfx{position:absolute;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.86);text-align:center}
+.cf-chest{position:relative;z-index:1}.cf-shake{animation:cfshake .9s ease-in-out}
+@keyframes cfshake{0%,100%{transform:rotate(0)}15%{transform:rotate(-9deg) scale(1.06)}30%{transform:rotate(8deg) scale(1.08)}45%{transform:rotate(-7deg) scale(1.1)}60%{transform:rotate(6deg) scale(1.1)}80%{transform:rotate(-3deg) scale(1.12)}}
+.cf-glow{position:absolute;top:50%;left:50%;width:320px;height:320px;margin:-210px 0 0 -160px;border-radius:50%;background:radial-gradient(circle,rgba(255,230,120,.95),rgba(255,200,50,0) 70%);opacity:0;transform:scale(.2)}
+.cf-open .cf-glow{animation:cfglow .9s forwards}.cf-open .cf-lid{transform:rotate(-75deg)}
+@keyframes cfglow{to{opacity:1;transform:scale(1.3)}}
+.cf-pop{animation:cfpop .6s cubic-bezier(.2,1.6,.4,1)}@keyframes cfpop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 /* Contrôles tactiles : visibles uniquement sur mobile / tablette, et seulement pendant un combat */
 html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 #touch{display:none;position:absolute;left:0;right:0;bottom:0;padding:0 10px 10px;justify-content:space-between;align-items:flex-end;pointer-events:none;z-index:5;user-select:none;-webkit-user-select:none;touch-action:none}
@@ -165,6 +173,7 @@ html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 	<div id="rot">📱 Tourne ton téléphone en mode paysage pour mieux jouer</div>
 	<canvas id="c" width="900" height="600"></canvas>
 	<div id="ov"></div>
+	<div id="cfx"></div>
 	<div id="touch">
 		<div class="pad"><button data-k="u">▲</button><div class="row"><button data-k="l">◀</button><button data-k="d">▼</button><button data-k="r">▶</button></div></div>
 		<div class="acts"><button data-k="0">J</button><button data-k="1">K</button><button data-k="2">L</button><button data-k="3" class="ult">U</button></div>
@@ -331,16 +340,23 @@ const LOGOS = {
 };
 const iconHtml = (id, n) => LOGOS[id] ? `<svg viewBox="0 0 40 40" width="${n}" height="${n}" style="vertical-align:middle">${LOGOS[id].s}</svg>` : `<span style="font-size:${n - 4}px">${esc(id)}</span>`;
 const allIcons = () => [...ICONS, ...save.icons];
-function openChest() { // 45 % icône (si il en reste), 40 % pièces (10-60), 15 % cristaux (1-5)
-  chestErr = ''; chestNew = null; chestGain = '';
-  if ((save.chests || 0) < 1) { ui(); return; }
-  const pool = Object.keys(LOGOS).filter(id => !save.icons.includes(id)), r = Math.random();
-  if (pool.length && r < .45) { chestNew = pool[Math.random() * pool.length | 0]; save.icons.push(chestNew); }
-  else if (r > .85) { const n = 1 + Math.random() * 5 | 0; save.crystals += n; chestGain = '💎 +' + n + (n > 1 ? ' cristaux' : ' cristal'); }
-  else { const n = 10 + Math.random() * 51 | 0; save.coins += n; chestGain = '🪙 +' + n + ' pièces'; }
-  save.chests--; persist(); ui();
+// ===== COFFRETS : s'ouvrent automatiquement (hors combat) avec une animation. 45 % icône, 40 % pièces (10-60), 15 % cristaux (3-10) =====
+let cfPhase = 0;
+const cfEl = () => document.getElementById('cfx');
+const CF_SVG = '<svg viewBox="0 0 80 64" width="170" height="136"><rect x="8" y="28" width="64" height="32" rx="4" fill="#8d5524"/><rect x="8" y="40" width="64" height="4" fill="#5d3a18"/><g class="cf-lid" style="transform-origin:8px 28px;transition:transform .5s"><path d="M8 28V20a14 14 0 0 1 14-14h36a14 14 0 0 1 14 14v8z" fill="#a8682e"/><rect x="8" y="22" width="64" height="4" fill="#f1c40f"/></g><rect x="34" y="30" width="12" height="13" rx="2" fill="#f1c40f"/></svg>';
+function cfStart() {
+  const pool = Object.keys(LOGOS).filter(id => !save.icons.includes(id)), r = Math.random(); let html;
+  if (pool.length && r < .45) { const id = pool[Math.random() * pool.length | 0]; save.icons.push(id); html = iconHtml(id, 90) + '<br><b>Nouvelle icône !</b><br>' + LOGOS[id].n; }
+  else if (r > .85) { const n = 3 + Math.random() * 8 | 0; save.crystals += n; html = '<span style="font-size:70px">💎</span><br><b>+' + n + ' cristaux</b>'; }
+  else { const n = 10 + Math.random() * 51 | 0; save.coins += n; html = '<span style="font-size:70px">🪙</span><br><b>+' + n + ' pièces</b>'; }
+  save.chests--; persist();
+  cfPhase = 1; const el = cfEl(); el.classList.remove('cf-open'); el.style.display = 'flex';
+  el.innerHTML = '<h2 style="margin:0 0 6px;position:relative;z-index:1">🎁 Coffret de quête !</h2><div class="cf-glow"></div><div class="cf-chest cf-shake">' + CF_SVG + '</div><div id="cfr" style="min-height:150px;position:relative;z-index:1"></div>';
+  setTimeout(() => { el.classList.add('cf-open'); const c = el.querySelector('.cf-chest'); if (c) c.classList.remove('cf-shake'); }, 900);
+  setTimeout(() => { const o = el.querySelector('#cfr'); if (o) o.innerHTML = '<div class="cf-pop" style="font-size:18px">' + html + '<br><button onclick="cfClose()" style="margin-top:10px">Continuer</button></div>'; cfPhase = 2; }, 1500);
 }
-const chestHtml = () => `<div style="border:1px solid #66552a;border-radius:10px;padding:8px 12px;max-width:300px">🎁 Coffrets : <b>${save.chests || 0}</b> · Icônes : ${save.icons.length}/${Object.keys(LOGOS).length}<br><small>Icône, pièces ou cristaux (plus rare)</small><br><button onclick="openChest()" ${(save.chests || 0) > 0 ? '' : 'disabled'}>Ouvrir un coffret</button>${chestErr ? `<br><small>${chestErr}</small>` : ''}${chestGain ? `<br>🎉 ${chestGain}` : ''}${chestNew ? `<br>🎉 Nouvelle icône : <b>${LOGOS[chestNew].n}</b><br>${iconHtml(chestNew, 56)}` : ''}</div>`;
+function cfClose() { if (cfPhase !== 2) return; cfPhase = 0; const el = cfEl(); el.style.display = 'none'; el.classList.remove('cf-open'); ui(); }
+addEventListener('keydown', e => { if (cfPhase === 2 && (e.code === 'Enter' || e.code === 'Space')) { e.preventDefault(); cfClose(); } });
 const botLvlHtml = () => `<h2>🤖 Niveau du bot</h2><p>Choisis la difficulté, puis ton personnage</p>
   <button onclick="go({t:'bot',lvl:0})" style="background:#27ae60">😊 Facile<br><small>Lent, hésitant, bloque rarement</small></button>
   <button onclick="go({t:'bot',lvl:1})" style="background:#e67e22">😐 Moyen<br><small>Comportement classique</small></button>
@@ -376,9 +392,9 @@ function saveProfile() {
 const profileHtml = () => `<h2>${save.profile ? '👤 Mon profil' : '👤 Crée ton profil'}</h2>${pErr ? `<p style="color:#f66">${pErr}</p>` : ''}
   <input maxlength="14" placeholder="Pseudo" value="${pName.replace(/"/g, '')}" oninput="pName=this.value" style="width:200px;text-transform:none">
   <div class="cards">${allIcons().map((ic, i) => `<div class="card ${pIcon === ic ? 'sel' : ''}" style="width:46px;text-align:center;font-size:26px" onclick="setIcon(${i})">${iconHtml(ic, 30)}</div>`).join('')}</div>
-  ${save.profile ? `<div style="width:260px"><b>Niveau ${lvlInfo().L}</b>${xpBar()}</div>${chestHtml()}${titleHtml()}<p>🆔 Code ami : <b>${myCode()}</b> · ⭐ Perso le plus joué : <b>${topChar()}</b></p><p style="font-size:12px;opacity:.8">+20 XP par partie, +30 XP par victoire, +40 XP par quête</p>` : ''}
+  ${save.profile ? `<div style="width:260px"><b>Niveau ${lvlInfo().L}</b>${xpBar()}</div><p>🖼️ Icônes débloquées : ${save.icons.length}/${Object.keys(LOGOS).length}</p>${titleHtml()}<p>🆔 Code ami : <b>${myCode()}</b> · ⭐ Perso le plus joué : <b>${topChar()}</b></p><p style="font-size:12px;opacity:.8">+20 XP par partie, +30 XP par victoire, +40 XP par quête</p>` : ''}
   <button onclick="saveProfile()">✔ ${save.profile ? 'Enregistrer' : 'Créer mon profil'}</button>${save.profile ? `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : ''}`;
-const bank = () => `🪙 ${save.coins} pièces · 💎 ${save.crystals} cristaux · 🎁 ${save.chests || 0} coffrets`;
+const bank = () => `🪙 ${save.coins} pièces · 💎 ${save.crystals} cristaux`;
 const shuf = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 // boutique de skins : 3 skins au hasard par jour (pièces), renouvelés à minuit
 function dailyIds() {
@@ -1054,7 +1070,7 @@ document.getElementById('tr').addEventListener('click', () => { if (ws && ws.rea
 document.getElementById('tq').addEventListener('click', () => leave());
 
 // ===== MANETTE (Xbox / PlayStation, mapping standard du navigateur) =====
-// Combat : stick gauche ou croix = bouger / sauter / bloquer · A(✕) = saut · X(▢) = J · Y(△) = K · B(○) = L · RB/RT (R1/R2) = ultime · LB (L1) = blocage
+// Combat : stick gauche ou croix = bouger / sauter (haut) / bloquer (bas ou LB-L1) · ✕(A) = attaque 1 · ▢(X) = attaque 2 · △(Y) = attaque 3 · ○(B) = ultime
 //          Start = réinitialiser (entraînement) · Select/Back = quitter l'entraînement
 // Menus : croix ou stick = naviguer · A(✕) = valider · B(○) = retour
 const gpPrev = {}, gpNav = { i: 0, t: 0, dir: '', active: false };
@@ -1064,8 +1080,9 @@ function gpPoll() {
   let p = null; for (const q of pads) if (q && q.connected) { p = q; break; }
   if (!p) return;
   const B = i => !!(p.buttons[i] && (p.buttons[i].pressed || p.buttons[i].value > .5)), ax = p.axes[0] || 0, ay = p.axes[1] || 0;
-  const cur = { l: ax < -.45 || B(14), r: ax > .45 || B(15), u: ay < -.45 || B(12) || B(0), d: ay > .45 || B(13) || B(4), 0: B(2), 1: B(3), 2: B(1), 3: B(5) || B(7), st: B(9), bk: B(8), a: B(0), b: B(1), nu: ay < -.45 || B(12), nd: ay > .45 || B(13) }; // nu/nd : navigation des menus (sans A ni LB, qui servent au saut et au blocage en combat)
+  const cur = { l: ax < -.45 || B(14), r: ax > .45 || B(15), u: ay < -.45 || B(12), d: ay > .45 || B(13) || B(4), 0: B(0), 1: B(2), 2: B(3), 3: B(1), st: B(9), bk: B(8), a: B(0), b: B(1), nu: ay < -.45 || B(12), nd: ay > .45 || B(13) }; // nu/nd : navigation des menus (sans A ni LB, qui servent au saut et au blocage en combat)
   if (cur.l || cur.r || cur.u || cur.d || cur[0] || cur[1] || cur[2] || cur[3] || cur.st || cur.bk) gpNav.active = true;
+  if (cfPhase) { if (cur.a && !gpPrev.a) cfClose(); gpPrev.a = cur.a; gpPrev.b = cur.b; return; }
   const fight = me >= 0 && !!S && !!S.f && S.f.length > 0 && S.p !== 'end';
   if (fight) {
     ['l', 'r', 'u', 'd', 0, 1, 2, 3].forEach(k => { if (!!gpPrev[k] !== cur[k]) { gpPrev[k] = cur[k]; press(k, cur[k]); } });
@@ -1107,6 +1124,7 @@ function gpMenu(c) {
 
 function draw() {
   gpPoll();
+  if (!cfPhase && (save.chests || 0) > 0 && !searching && (me < 0 || (S && S.p === 'end'))) cfStart();
   const inGame = isTouch && me >= 0 && !!S && !!S.f && S.f.length > 0 && S.p !== 'end';
   if (inGame !== touchOn) { touchOn = inGame; tc.style.display = inGame ? 'flex' : 'none'; if (!inGame) ['l', 'r', 'u', 'd', 0, 1, 2, 3].forEach(k => { keys[k] = false; }); }
   const tr = inGame && S.p === 'training';
