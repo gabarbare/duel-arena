@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -12,40 +13,60 @@ body{margin:0;background:#111;color:#fff;font-family:system-ui,sans-serif;displa
 canvas{width:100%;display:block;background:#222}
 #ov{overflow:auto;position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(0,0,0,.8);text-align:center;padding:10px;box-sizing:border-box}
 
-/* Amélioration de l'écran de sélection */
+/* Sélection des combattants : petites cases carrées avec portrait + nom */
 #ov.select{
-	justify-content:flex-start;
-	padding:14px 12px;
-	overflow-y:auto;
+  justify-content:flex-start;
+  padding:12px 10px;
+  overflow-y:auto;
+  gap:8px;
 }
 #ov.select .cards{
-	display:grid;
-	grid-template-columns:repeat(auto-fit,minmax(135px,1fr));
-	gap:8px;
-	width:min(100%,780px);
-	max-height:285px;
-	overflow-y:auto;
-	align-content:start;
-	padding:4px;
-	box-sizing:border-box;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(76px,1fr));
+  gap:7px;
+  width:min(100%,690px);
+  max-height:245px;
+  overflow-y:auto;
+  align-content:start;
+  padding:4px;
+  box-sizing:border-box;
 }
-#ov.select .card{
-	width:auto;
-	min-width:0;
-	font-size:12px;
+#ov.select .card.sm{
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  min-height:78px;
+  aspect-ratio:1 / 1;
+  padding:6px 3px 5px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  border-width:2px;
+  border-radius:9px;
+  background:linear-gradient(155deg,#292929,#171717);
+  text-align:center;
+  line-height:1.1;
+  font-size:10px;
+  overflow:hidden;
 }
+#ov.select .card.sm.sel{background:linear-gradient(155deg,#494949,#292929);box-shadow:0 0 0 2px #f1c40f,0 0 12px #f1c40f66}
+#ov.select .card.sm .portrait{
+  width:39px;height:39px;flex:none;display:block;
+  filter:drop-shadow(0 2px 2px #0009);
+}
+#ov.select .card.sm .char-name{
+  display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-weight:800;font-size:10px;
+}
+#ov.select .card.sm .lock-mark{font-size:9px;line-height:1}
 @media(max-width:600px){
-	#ov.select{
-		padding:8px 6px;
-		gap:6px;
-	}
-	#ov.select .cards{
-		grid-template-columns:repeat(auto-fit,minmax(115px,1fr));
-		max-height:260px;
-	}
-	#ov.select .card{
-		font-size:11px;
-	}
+  #ov.select{padding:7px 5px;gap:6px}
+  #ov.select .cards{grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:5px;max-height:220px}
+  #ov.select .card.sm{min-height:70px;padding:4px 2px;font-size:9px}
+  #ov.select .card.sm .portrait{width:34px;height:34px}
+  #ov.select .card.sm .char-name{font-size:9px}
 }
 
 button,input{font:inherit;padding:10px 18px;border-radius:8px;border:0}
@@ -477,6 +498,19 @@ function statsHtml() {
 }
 const quitBtn = '<button onclick="leave()" style="background:#7f8c8d">Retour au menu</button>';
 
+// Petit portrait de tête pour les cases de sélection (palette cohérente avec le sprite du jeu).
+function selectPortrait(c) {
+  const hair = ({Bruno:'#1a1a1a', 'Zéphyr':'#cfd8dc', Kaze:'#1c1c28', Viking:'#d35400', Chevalier:'#aab7c4', Kairos:'#cfd3da', Luffy:'#6d3b1f', Naruto:'#f4a62a', Gojo:'#e8edf5', Deku:'#245c2b', Denji:'#e8c9a8', Yugo:'#c9a35a', Shinra:'#15151c', Eren:'#5d4037', Koro:'#111111', Ichigo:'#f28c28'})[c.name] || c.color;
+  const face = c.name === 'Koro' ? '#f4d03f' : (c.name === 'Viking' ? '#e0ac69' : '#f5cba7');
+  const extra = c.name === 'Viking'
+    ? '<path d="M8 19 Q0 8 5 6 L13 13 M32 19 Q40 8 35 6 L27 13" fill="#95a5a6" stroke="#cfd8dc" stroke-width="2"/>'
+    : c.name === 'Koro' ? '<path d="M7 13 Q20 -1 33 13" fill="none" stroke="#111" stroke-width="5"/><path d="M11 26 Q20 34 29 26" fill="none" stroke="#111" stroke-width="2"/>'
+    : c.name === 'Luffy' ? '<path d="M5 12 Q20 -2 35 12 L32 15 L8 15Z" fill="#f1c40f"/><path d="M7 14 H33" stroke="#c0392b" stroke-width="3"/>'
+    : c.name === 'Gojo' ? '<path d="M7 17 Q20 10 33 17" fill="none" stroke="#111" stroke-width="4"/>'
+    : '';
+  return `<svg class="portrait" viewBox="0 0 40 40" aria-hidden="true"><path d="M5 39 Q5 27 13 26 L27 26 Q35 27 35 39Z" fill="${c.color}"/><path d="M9 20 Q7 5 20 5 Q33 5 31 20 L29 28 Q20 35 11 28Z" fill="${face}"/><path d="M8 20 Q4 8 14 5 Q25 0 32 9 L32 20 Q27 13 22 12 Q15 17 8 20Z" fill="${hair}"/>${extra}<circle cx="15" cy="21" r="1.6" fill="#171717"/><circle cx="25" cy="21" r="1.6" fill="#171717"/><path d="M16 27 Q20 30 24 27" fill="none" stroke="#713d32" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+}
+
 function ui() {
   let h = '';
   ov.className = me >= 0 && S && S.p === 'end' ? 'end' : (me < 0 && !searching && view === 'menu' ? 'menu-screen' : '');
@@ -514,7 +548,7 @@ function ui() {
   else if (S.p === 'select') {
     const ii = pre != null ? pre : infoIdx != null ? infoIdx : (S.sel[me] != null ? S.sel[me] : 0), ic = chars[ii];
     const sks = SHOP.filter(q => q.type === 'skin' && q.char === ic.name && owns(q.id)), cur = save.skin[ic.name] || '';
-    h = `<h2 style="margin:2px">Choisis ton combattant</h2><div class="cards">${chars.map((c, i) => `<div class="card sm ${S.sel[me] === i || pre === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})"><b style="color:${c.color}">${c.name}</b>${locked(c.name) ? '<br>🔒' : ''}</div>`).join('')}</div>
+    h = `<h2 style="margin:2px">Choisis ton combattant</h2><div class="cards">${chars.map((c, i) => `<div class="card sm ${S.sel[me] === i || pre === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})">${selectPortrait(c)}<span class="char-name" style="color:${c.color}">${c.name}</span>${locked(c.name) ? '<span class="lock-mark">🔒</span>' : ''}</div>`).join('')}</div>
     <div class="panel"><b style="color:${ic.color};font-size:15px">${ic.name}</b>${locked(ic.name) ? ' 🔒 à débloquer dans la boutique' : ''} · ${ic.desc} · PV ${ic.hp}<br>${ic.atk.map((a, j) => 'JKLU'[j] + ' : ' + a).join(' &nbsp;·&nbsp; ')}${ic.alt ? '<br>✨ Forme : ' + ic.alt.join(' / ') : ''}${sks.length ? '<br>' + [{ id: '', name: 'Normal' }, ...sks].map(q => `<span class="chip ${cur === q.id ? 'on' : ''}" onclick="event.stopPropagation();setSkin('${ic.name}','${q.id}',${ii})">${q.name}</span>`).join('') : ''}</div>
     <button onclick="confirmPick()" ${pre == null || S.sel[me] != null ? 'disabled' : ''}>✔ Valider ${pre != null ? chars[pre].name : ''}</button>
     <p style="margin:2px">${pre == null && S.sel[me] == null ? 'Clique sur un perso, choisis ton skin, puis valide' : ''}${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.sel[1 - me] != null ? (S.bot ? '· Bot prêt 🤖' : '· Adversaire prêt ✔') : ''}</p>
