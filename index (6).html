@@ -230,6 +230,7 @@ const SHOP = [
   { id: 'skin_naruto_hermite', type: 'skin', char: 'Naruto', name: 'Naruto Mode Hermite', price: 150, look: 'sage', pal: { '#ff7f27': '#d0451b', '#2c5fa8': '#222', '#2c3e50': '#111' } },
   { id: 'skin_koro_blanc', type: 'skin', char: 'Koro', name: 'Koro-sensei blanc', price: 150, look: 'white', pal: { '#f4d03f': '#f5f5f1', '#e6b800': '#dcdcd5', '#f1c40f': '#e8e8e2' } },
   { id: 'skin_shinra_banshoman', type: 'skin', char: 'Shinra', name: 'Shinra Banshoman', price: 250, look: 'banshoman', pal: { '#f5cba7': '#b8402f', '#23232f': '#a63a2f', '#1b1b24': '#7a2a22', '#bdc3c7': '#a63a2f', '#111': '#3a1410', '#15151c': '#e9e9e9', '#000': '#fff' } },
+  { id: 'skin_ichigo_bloodchains', type: 'skin', char: 'Ichigo', name: 'Ichigo Blood Chains', price: 250, look: 'bloodchains', desc: 'Forme ultime de Bleach TYBW : semi-Hollowfication, deux cornes et chaînes de reiatsu rouge sang', pal: { '#15151c': '#1b0b12', '#1b1b26': '#250c14', '#16161d': '#190910', '#101015': '#22070d', '#0e0e14': '#16070b', '#ecf0f1': '#8e1726', '#cfd8dc': '#c02b39' } },
   { id: 'skin_kairos_azur', type: 'skin', char: 'Kairos', name: 'Kairos azur', price: 150, pal: { '#3b2a5a': '#174b63', '#2b1f3d': '#102f45', '#2a2038': '#163b50', '#d9b84a': '#55d6d2', '#f5ecd0': '#d9ffff' } },
 ];
 let tNew = '', chestGain = '', chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
@@ -1244,6 +1245,38 @@ function fighter(f, i) {
     }
     // Blackwhip : filaments sombres et verts lors des phases de mouvement rapide / ultime avancé
     if (lk === 'dark' && (f.ak === 3 || f.bf)) for(let q=0;q<4;q++){const w=Math.sin(t/120+q*1.7)*13; x.strokeStyle='rgba(12,24,18,.9)'; x.lineWidth=3; x.beginPath(); x.moveTo(-s*12,-78+q*9); x.quadraticCurveTo(-s*(52+q*8),-112+w,-s*(78+q*13),-65+q*20); x.stroke(); x.strokeStyle='rgba(90,255,130,.7)'; x.lineWidth=1; x.stroke();}
+  }
+  if (n === 'Ichigo' && lk === 'bloodchains') { // Blood Chains Ichigo : semi-Hollowfication + Bankai
+    const pulse = .72 + .28 * Math.sin(t / 95);
+    // Pression spirituelle rouge sombre autour du corps.
+    x.save(); x.globalCompositeOperation = 'lighter';
+    const aura = x.createRadialGradient(0, -70, 18, 0, -70, 100);
+    aura.addColorStop(0, 'rgba(160,12,32,.04)'); aura.addColorStop(.65, 'rgba(180,12,35,.14)'); aura.addColorStop(1, 'rgba(180,12,35,0)');
+    x.fillStyle = aura; x.beginPath(); x.ellipse(0, -70, 88, 112, 0, 0, 7); x.fill();
+    // Les deux cornes osseuses caractéristiques de cette forme.
+    x.lineCap = 'round'; x.lineJoin = 'round';
+    [[-8,-119,-18,-137,-31,-145], [8,-119,18,-137,31,-145]].forEach((a,j) => {
+      x.strokeStyle = 'rgba(255,35,55,.45)'; x.lineWidth = 9; x.beginPath(); x.moveTo(a[0],a[1]); x.quadraticCurveTo(a[2],a[3],a[4],a[5]); x.stroke();
+      x.strokeStyle = '#211116'; x.lineWidth = 7; x.beginPath(); x.moveTo(a[0],a[1]); x.quadraticCurveTo(a[2],a[3],a[4],a[5]); x.stroke();
+      x.strokeStyle = j ? '#f0e6dc' : '#d9d0c7'; x.lineWidth = 4.2; x.beginPath(); x.moveTo(a[0],a[1]); x.quadraticCurveTo(a[2],a[3],a[4],a[5]); x.stroke();
+      x.strokeStyle = '#fff4e9'; x.lineWidth = 1; x.beginPath(); x.moveTo(a[0]+1,a[1]); x.quadraticCurveTo(a[2]+1,a[3],a[4],a[5]); x.stroke();
+    });
+    // Chaînes rouges avec lueur, maillons visibles : cou, bras et jambes.
+    const chain = (pts,w=3) => {
+      x.lineCap='round'; x.lineJoin='round';
+      x.strokeStyle='rgba(255,20,48,'+(.28+pulse*.22)+')'; x.lineWidth=w+5; x.beginPath(); pts.forEach((p,j)=>j?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke();
+      x.strokeStyle='#4b0713'; x.lineWidth=w+1.5; x.beginPath(); pts.forEach((p,j)=>j?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke();
+      x.strokeStyle='#e52b42'; x.lineWidth=w; x.beginPath(); pts.forEach((p,j)=>j?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke();
+      for(let j=0;j<pts.length-1;j++){const [ax,ay]=pts[j],[bx,by]=pts[j+1],len=Math.hypot(bx-ax,by-ay),count=Math.max(1,Math.floor(len/8));for(let k=0;k<=count;k++){const u=k/count,xx=ax+(bx-ax)*u,yy=ay+(by-ay)*u;x.save();x.translate(xx,yy);x.rotate(Math.atan2(by-ay,bx-ax)+Math.PI/2);x.strokeStyle='#ff8791';x.lineWidth=1.15;x.beginPath();x.ellipse(0,0,2.2,3.2,0,0,7);x.stroke();x.restore();}}
+    };
+    chain([[-13,-111],[-18,-101],[-10,-92],[0,-96],[10,-91],[18,-101],[13,-111]],3);
+    chain([[-19,-83],[-28,-75],[-23,-65],[-29,-55],[-23,-46],[-28,-35]],3);
+    chain([[19,-83],[28,-75],[23,-65],[29,-55],[23,-46],[28,-35]],3);
+    chain([[-10,-28],[-15,-19],[-10,-10],[-14,-2]],2.8); chain([[10,-28],[15,-19],[10,-10],[14,-2]],2.8);
+    // Marques sombres de Hollow sur les côtés du visage et du cou.
+    x.strokeStyle='rgba(34,5,12,.95)'; x.lineWidth=3.2; x.beginPath(); x.moveTo(-9,-108); x.quadraticCurveTo(-13,-101,-9,-96); x.moveTo(9,-108); x.quadraticCurveTo(13,-101,9,-96); x.stroke();
+    for(let q=0;q<7;q++){const a=t/240+q*6.283/7,rr=35+(q%3)*12;x.fillStyle='rgba(255,90,105,'+(.45+.45*pulse)+')';x.beginPath();x.arc(Math.cos(a)*rr,-65+Math.sin(a)*rr*1.1,1.2+(q%2),0,7);x.fill();}
+    x.restore();
   }
   x.restore(); PAL = null;
   if (f.hk) { // grappin : câble et crochet
