@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -677,9 +676,12 @@ function fighter(f, i) {
   if (f.ak === 3 || f.bf || (gn && f.ak === 2) || (n === 'Denji' && f.fm) || (n === 'Shinra' && f.fm) || (n === 'Ichigo' && f.fm)) {
     x.fillStyle = gn && f.ak === 2 ? 'rgba(120,255,170,.3)' : f.ak === 3 && !dk ? 'rgba(255,230,80,.35)' : n === 'Shinra' ? 'rgba(255,240,170,.3)' : n === 'Ichigo' ? 'rgba(40,10,25,.45)' : dk ? 'rgba(90,255,120,.28)' : 'rgba(255,90,90,.3)';
     x.beginPath(); x.arc(0, -55, 75, 0, 7); x.fill();
-    if (dk && (f.bf || f.ak === 3)) { // revêtement One For All : contour lumineux et éclairs verts
-      x.strokeStyle = 'rgba(100,255,140,.55)'; x.lineWidth = 4; x.strokeRect(-25, -118, 50, 118);
-      bolt(0, -55, 38, 62, f.ak === 3 ? 22 : 14, f.ak === 3);
+    if (dk && (f.bf || f.ak === 3)) { // Full Cowl : aura verte, arcs électriques et flux de puissance
+      const pulse = .5 + .5 * Math.sin(t / 75);
+      x.strokeStyle = 'rgba(100,255,140,' + (.3 + pulse * .3) + ')'; x.lineWidth = 3 + pulse * 2;
+      x.beginPath(); x.ellipse(0, -57, 34 + pulse * 8, 66 + pulse * 5, 0, 0, 7); x.stroke();
+      bolt(0, -55, 38, 62, f.ak === 3 ? 30 : 18, f.ak === 3);
+      for (let q = 0; q < 7; q++) { const a = t / 230 + q * 6.283 / 7; const rr = 43 + 5 * Math.sin(t / 90 + q); C('rgba(180,255,190,.8)', Math.cos(a) * rr, -55 + Math.sin(a) * rr * 1.25, 1.5 + pulse); }
     }
   }
   if (f.sh > 0) {
@@ -797,6 +799,15 @@ function fighter(f, i) {
     R('#fff', s > 0 ? 1 : -9, -107, 8, 7); R('#1b5e20', s > 0 ? 4 : -6, -106, 4, 6);
     [-9, 9].forEach(d => { C('#b5651d', d, -101, 1); C('#b5651d', d, -98, 1); });
     R('#b0bec5', -9, -96, 18, 8); [-5, 0, 5].forEach(q => LN('#78909c', 1, q, -96, q, -88));
+    // Détails du costume héros : coutures, renforts, attaches et semelles rouges
+    LN('#8bcf86', 1.5, -18, -84, -11, -78); LN('#8bcf86', 1.5, 18, -84, 11, -78);
+    LN('#174c22', 2, -15, -72, 15, -72); LN('#174c22', 2, -15, -48, 15, -48);
+    R('#c0392b', -5, -55, 10, 7); R('#f4d6a0', -2, -53, 4, 3); // attache centrale de la ceinture
+    [-1,1].forEach(d=>{R('#b0bec5',d*17-3,-31,6,13); LN('#e4edf0',1.2,d*17,-29,d*17,-22);});
+    [-1,1].forEach(d=>{LN('#f3f3f3',2,d*12,-8,d*15,-5); LN('#7f1d1d',1.5,d*15,-12,d*18,-12);});
+    // Mèches plus découpées et reflets verts caractéristiques, sans changer sa silhouette chibi
+    Y('#245c2b',[[-13,-113],[-21,-126],[-10,-119]]); Y('#347d3d',[[-5,-114],[-8,-130],[1,-117]]); Y('#1b5e20',[[5,-114],[13,-128],[12,-114]]);
+    LN('rgba(170,255,170,.75)',1.2,-11,-119,-8,-112); LN('rgba(170,255,170,.75)',1.2,4,-120,7,-113);
     if (lk === 'dark') { // Dark Deku (saison 6) : costume vert sali, écharpe jaune déchirée, capuche + masque couvrant tout le visage, yeux verts brillants, Blackwhip
       const w = Math.sin(t / 110) * 5;
       [[-14, -70], [8, -55], [-8, -36], [12, -82]].forEach(p => R('#1f3d22', p[0], p[1], 7, 5)); R('#5a1a1a', -4, -62, 5, 4);
@@ -1091,6 +1102,40 @@ function fighter(f, i) {
     LN('#16161d', 8, 0, -68, -s * 22, -50); C('#16161d', -s * 22, -50, 10);
   } else hand(s * 24, -50);
   if (f.bl && n !== 'Chevalier') { x.fillStyle = 'rgba(120,200,255,.6)'; x.fillRect(s * 24 - 5, -95, 10, 85); }
+  if (dk) {
+    // Full Cowl : filaments verts qui parcourent les bras et les jambes, même hors attaque
+    if (f.bf) {
+      const pulse = .55 + .45 * Math.sin(t / 65);
+      x.strokeStyle = 'rgba(115,255,145,' + (.55 + pulse * .35) + ')'; x.lineWidth = 2.2;
+      [[-12,-82,-17,-28], [12,-82,17,-28], [-12,-22,-13,-5], [12,-22,13,-5]].forEach(a => { x.beginPath(); x.moveTo(a[0],a[1]); x.lineTo(a[0]+(a[2]-a[0])*.55-3,a[1]+(a[3]-a[1])*.55); x.lineTo(a[2],a[3]); x.stroke(); });
+      for (let q=0;q<4;q++) { const yy=-24-((t/18+q*24)%105); C('rgba(190,255,200,.85)', Math.sin(t/90+q*2)*25, yy, 1.5); }
+    }
+    // Coup de poing : compression de l'air et rémanence directionnelle
+    if (f.ak === 0 && f.ap >= 0) {
+      const u = f.ap === 0 ? .35 : f.ap === 1 ? 1 : .55;
+      for (let q=0;q<4;q++) { const xx=s*(30+q*13); LN('rgba(110,255,145,'+(u*.55)+')', 3-q*.4, xx, -68-q*3, xx+s*(18+q*7), -68-q*3); }
+      if (f.ap === 1) { x.strokeStyle='rgba(225,255,230,.9)'; x.lineWidth=2; x.beginPath(); x.arc(s*54,-66,18,t/90,t/90+4.7); x.stroke(); }
+    }
+    // Ultime Detroit Smash 100% : charge, impact blanc-vert, puis onde de choc persistante
+    if (f.ak === 3) {
+      const phase=f.ap, pulse=.5+.5*Math.sin(t/42);
+      if (phase === 0) {
+        x.fillStyle='rgba(75,255,115,'+(0.10+pulse*.13)+')'; x.beginPath(); x.arc(0,-58,68+pulse*15,0,7); x.fill();
+        x.strokeStyle='rgba(190,255,200,.85)'; x.lineWidth=3; x.beginPath(); x.ellipse(0,-58,48+pulse*9,74+pulse*7,t/500,0,7); x.stroke();
+        for(let q=0;q<8;q++){const a=t/180+q*Math.PI/4; LN('rgba(190,255,205,.8)',2,Math.cos(a)*38,-58+Math.sin(a)*48,Math.cos(a)*75,-58+Math.sin(a)*95);}
+        bolt(0,-60,42,65,34,true);
+      } else if (phase === 1) {
+        x.fillStyle='rgba(220,255,225,.42)'; x.beginPath(); x.arc(s*48,-66,58,0,7); x.fill();
+        x.strokeStyle='rgba(170,255,185,.95)'; x.lineWidth=7; x.beginPath(); x.arc(s*48,-66,48,0,7); x.stroke();
+        for(let q=0;q<12;q++){const a=q*Math.PI/6+t/90, r=48+(q%3)*8; LN('rgba(220,255,225,.95)',3, s*48+Math.cos(a)*r,-66+Math.sin(a)*r,s*48+Math.cos(a)*(r+24),-66+Math.sin(a)*(r+24));}
+      } else {
+        const rr=72+((t/8)%42); x.strokeStyle='rgba(120,255,155,'+(1-((t/8)%42)/42)+')'; x.lineWidth=5; x.beginPath(); x.ellipse(s*68,-50,rr,rr*.42,0,0,7); x.stroke();
+        x.strokeStyle='rgba(225,255,230,.65)'; x.lineWidth=2; x.beginPath(); x.ellipse(s*68,-50,rr*.72,rr*.3,0,0,7); x.stroke();
+      }
+    }
+    // Blackwhip : filaments sombres et verts lors des phases de mouvement rapide / ultime avancé
+    if (lk === 'dark' && (f.ak === 3 || f.bf)) for(let q=0;q<4;q++){const w=Math.sin(t/120+q*1.7)*13; x.strokeStyle='rgba(12,24,18,.9)'; x.lineWidth=3; x.beginPath(); x.moveTo(-s*12,-78+q*9); x.quadraticCurveTo(-s*(52+q*8),-112+w,-s*(78+q*13),-65+q*20); x.stroke(); x.strokeStyle='rgba(90,255,130,.7)'; x.lineWidth=1; x.stroke();}
+  }
   x.restore(); PAL = null;
   if (f.hk) { // grappin : câble et crochet
     x.strokeStyle = 'rgba(225,225,225,.9)'; x.lineWidth = 2; x.beginPath(); x.moveTo(f.x, f.y - 60 * (f.sz || 1)); x.lineTo(f.hk[0], f.hk[1]); x.stroke();
@@ -1351,9 +1396,14 @@ function draw() {
         x.strokeStyle = 'rgba(60,200,255,.6)'; x.lineWidth = 9; x.beginPath(); x.moveTo(-48, 0); x.lineTo(6, 0); x.stroke();
         x.strokeStyle = '#e6fbff'; x.lineWidth = 3; x.beginPath(); x.moveTo(-48, 0); x.lineTo(6, 0); x.stroke(); x.restore();
       }
-      else if (p.k === 6) {
-        x.save(); x.translate(p.x, p.y); x.scale(p.v, 1); x.strokeStyle = 'rgba(255,255,255,.85)'; x.lineWidth = 3;
-        for (let q = 0; q < 3; q++) { x.beginPath(); x.arc(-q * 9, 0, p.r + q * 5, -1.1, 1.1); x.stroke(); }
+      else if (p.k === 6) { // Delaware Smash Air Force : projectile d'air comprimé vert et blanc
+        x.save(); x.translate(p.x, p.y); x.scale(p.v, 1);
+        const pulse=.5+.5*Math.sin(Date.now()/35);
+        x.fillStyle='rgba(100,255,145,.18)'; x.beginPath(); x.ellipse(0,0,p.r*1.7,p.r*.95,0,0,7); x.fill();
+        x.strokeStyle='rgba(115,255,150,.9)'; x.lineWidth=3; x.beginPath(); x.ellipse(0,0,p.r*1.45,p.r*.78,0,0,7); x.stroke();
+        x.strokeStyle='rgba(235,255,240,.95)'; x.lineWidth=2.5;
+        for (let q = 0; q < 4; q++) { x.beginPath(); x.arc(-q * 10, 0, p.r*.55 + q*4 + pulse*3, -1.15, 1.15); x.stroke(); }
+        for(let q=0;q<5;q++){const yy=(q-2)*p.r*.34; LN('rgba(150,255,175,.8)',1.5,-p.r*1.8,yy,p.r*(.9+q*.06),yy*.25);}
         x.restore();
       }
       else if (p.k === 3) {
