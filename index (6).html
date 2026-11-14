@@ -844,6 +844,7 @@ const gojoHeal = (px, py, phase = 1) => {
 };
 
 // ===== Denji : onde de choc à l'atterrissage du Saut écrasant =====
+const mixv = (a, b, u) => a + (b - a) * u, eoz = u => 1 - (1 - u) * (1 - u), smz = u => u * u * (3 - 2 * u); // courbes d'animation
 const WAVES = [], prevAir = [false, false], vkPrev = [-1, -1];
 function drawWaves() {
   const now = Date.now();
@@ -1039,6 +1040,8 @@ function fighter(f, i) {
   if (n === 'Denji' && f.fm && f.ak === 1 && f.ap === 1) x.rotate(s * .16); // charge : buste penché en avant
   if (n === 'Kaze' && f.ak === 3 && f.ad && f.ad[1] === 0) x.rotate(s * .22); // Kaze fonce sur l'ennemi
   if (n === 'Viking' && f.ak >= 0) x.rotate(s * (f.ap === 1 ? .08 : f.ap === 0 ? -.04 : .03 * (1 - (f.pp || 0)))); // le buste suit chaque coup
+  if (n === 'Shinra' && (f.ak === 1 || f.ak === 3) && f.ad && f.ap === 1) x.rotate(f.ad[0] * .22); // penché dans le sens du coup de pied
+  if (n === 'Eren' && !f.fm && f.ak === 1 && f.ad && f.ap === 1) x.rotate(s * .3); // dash grappin en vrille
   if ((n === 'Bruno' || n === 'Chevalier' || n === 'Kairos' || n === 'Frieren') && f.ak >= 0) { const ps = atkPose(n, f, brAlt[i] || 0); x.translate(s * ps.dx, 0); x.rotate(s * ps.rot); if (ps.sy !== 1) x.scale(1, ps.sy); }
   const gn = n === 'Gojo', dk = n === 'Deku';
   if (f.ak === 3 || f.bf || (gn && f.ak === 2) || (n === 'Denji' && f.fm) || (n === 'Shinra' && f.fm) || (n === 'Ichigo' && f.fm)) {
@@ -1413,15 +1416,37 @@ function fighter(f, i) {
     x.strokeStyle = 'rgba(255,255,255,.85)'; x.lineWidth = 2; x.beginPath();
     x.moveTo(-26, -60); x.lineTo(0, -96); x.lineTo(26, -50); x.moveTo(-10, 0); x.lineTo(0, -60); x.lineTo(14, 0); x.stroke();
   }
-  if (n === 'Shinra' && (f.fy || f.ak >= 0 || f.fm)) { // flammes aux pieds, jambe enflammée pendant le coup de pied
+  if (n === 'Shinra' && (f.fy || f.ak >= 0 || f.fm)) { // flammes aux pieds, jambe enflammée, sillage et éclat d'impact
     [-9, 9].forEach(q => { Y('#ff7a1a', [[q - 8, 0], [q + 8, 0], [q, 18 + Math.sin(t / 60 + q) * 6]]); Y('#ffe066', [[q - 4, 0], [q + 4, 0], [q, 9 + Math.sin(t / 50 + q) * 3]]); });
-    if (f.ak === 1 && f.ad) { LN('#23232f', 9, 0, -30, f.ad[0] * 52, -30 + f.ad[1] * 52); C('#ff7a1a', f.ad[0] * 52, -30 + f.ad[1] * 52, 11); }
+    if ((f.ak === 1 || f.ak === 3) && f.ad) {
+      const ux = f.ad[0], uy = f.ad[1], ex = ux * 52, ey = -30 + uy * 52, fl = Math.sin(t / 40);
+      if (f.ap === 1) {
+        for (let q = 1; q <= 5; q++) { x.fillStyle = 'rgba(255,' + (150 + q * 20) + ',40,' + (.5 - q * .08) + ')'; x.beginPath(); x.arc(-ux * q * 18, -45 - uy * q * 18, 24 - q * 3, 0, 7); x.fill(); } // sillage de flammes
+        LN('rgba(255,120,30,.7)', 14, -ux * 90, -45 - uy * 90, ex, ey); LN('rgba(255,230,120,.9)', 6, -ux * 60, -45 - uy * 60, ex, ey);
+      }
+      LN('#23232f', 9, 0, -30, ex, ey);
+      Y('#ff7a1a', [[ex - uy * 12 - ux * 4, ey + ux * 12 - uy * 4], [ex + uy * 12 - ux * 4, ey - ux * 12 - uy * 4], [ex + ux * (22 + fl * 5), ey + uy * (22 + fl * 5)]]); // semelle enflammée
+      C('#ffd54f', ex, ey, 7);
+      if ((f.ap === 1 && (f.pp || 0) > .5) || f.ap === 2) { const sz = f.ap === 2 ? 20 * (1 - (f.pp || 0)) + 6 : 14, px0 = ex + ux * 16, py0 = ey + uy * 16; Y('#fff3a0', [[px0, py0 - sz], [px0 + 3, py0 - 3], [px0 + sz, py0], [px0 + 3, py0 + 3], [px0, py0 + sz], [px0 - 3, py0 + 3], [px0 - sz, py0], [px0 - 3, py0 - 3]]); } // éclat d'impact
+    }
   }
-  if (n === 'Shinra' && f.ak === 2 && f.ap >= 1) { // explosion de flammes
-    x.fillStyle = 'rgba(255,140,30,' + (f.ap === 1 ? .5 : .18) + ')'; x.beginPath(); x.arc(0, -45, 125, 0, 7); x.fill();
-    x.strokeStyle = 'rgba(255,230,120,.9)'; x.lineWidth = 5; x.stroke();
+  if (n === 'Shinra' && f.ak === 2) { // explosion de flammes : concentration, déflagration, retombée
+    const pp = f.pp || 0;
+    if (f.ap === 0) {
+      x.fillStyle = 'rgba(255,170,50,' + (.12 + .35 * pp) + ')'; x.beginPath(); x.arc(0, -55, 18 + 22 * pp, 0, 7); x.fill();
+      for (let q = 0; q < 10; q++) { const u = (t / 220 + q / 10) % 1, an = q * 2.1 + t / 300, rr = 70 * (1 - u); C('rgba(255,' + (190 + q * 5) + ',80,' + u + ')', Math.cos(an) * rr, -55 + Math.sin(an) * rr * .8, 2.2); } // braises aspirées vers le torse
+    } else {
+      const a = f.ap === 1 ? 1 : 1 - pp, R0 = 40 + 95 * Math.min(1, (f.ap === 1 ? pp : 1) * 1.2);
+      x.fillStyle = 'rgba(255,230,160,' + a * .55 + ')'; x.beginPath(); x.arc(0, -55, R0 * .55, 0, 7); x.fill();
+      x.fillStyle = 'rgba(255,120,30,' + a * .35 + ')'; x.beginPath(); x.arc(0, -55, R0, 0, 7); x.fill();
+      x.strokeStyle = 'rgba(255,240,170,' + a + ')'; x.lineWidth = 6 * a + 1; x.beginPath(); x.arc(0, -55, R0, 0, 7); x.stroke();
+      x.strokeStyle = 'rgba(255,150,40,' + a * .8 + ')'; x.lineWidth = 3; x.beginPath(); x.arc(0, -55, R0 * 1.18, 0, 7); x.stroke();
+      for (let q = 0; q < 12; q++) { const an = q * .5236 + .2, r1 = R0 * .8, r2 = R0 * (1.15 + .25 * Math.abs(Math.sin(t / 60 + q))); Y('rgba(255,170,50,' + a * .85 + ')', [[Math.cos(an - .09) * r1, -55 + Math.sin(an - .09) * r1], [Math.cos(an) * r2, -55 + Math.sin(an) * r2], [Math.cos(an + .09) * r1, -55 + Math.sin(an + .09) * r1]]); } // langues de feu
+      for (let q = -3; q <= 3; q++) Y('rgba(255,100,20,' + a * .8 + ')', [[q * 28 - 10, 0], [q * 28 + 10, 0], [q * 28, -30 - 30 * Math.abs(Math.sin(t / 70 + q))]]); // colonnes de flammes au sol
+    }
   }
   if (n === 'Shinra' && f.ak === 3 && f.ad) LN('rgba(255,150,40,.6)', 16, 0, -45, -f.ad[0] * 70, -45 - f.ad[1] * 70); // traînée du Pas du Diable
+  if (n === 'Eren' && f.fm) for (let q = 0; q < 6; q++) { const u = (t / 600 + q / 6) % 1; C('rgba(255,255,255,' + .35 * (1 - u) + ')', Math.sin(q * 2.3 + t / 400) * 22, -96 - u * 60, 6 + u * 10); } // vapeur du Titan
   if (n === 'Kairos' && f.ak >= 2) kairosFx(f, t);
   if (f.bd) { // lié par Sorganeil : deux cercles magiques croisés
     const rt = t / 600;
@@ -1641,6 +1666,40 @@ function fighter(f, i) {
       const cx = tp[0] + s * 12, r = ap === 0 ? 8 + 26 * pp : ap === 1 ? 34 : 34 * (1 - pp), al = ap === 2 ? 1 - pp : .95;
       x.save(); x.translate(cx, tp[1]); x.scale(.42, 1); mCircle(0, 0, r, al, t / 150); mCircle(0, 0, r * .6, al * .8, -t / 110, '255,250,200'); x.restore();
       C('rgba(255,245,190,' + (ap === 1 ? .55 : .25) + ')', cx, tp[1], 12 + r * .5);
+    }
+  } else if (n === 'Shinra' && f.ak >= 0) { // poings serrés pendant les coups de pied, bras grands ouverts pendant l'explosion
+    const pp = f.pp || 0;
+    if (f.ak === 2) {
+      const sp = f.ap === 0 ? pp * .35 : f.ap === 1 ? .35 + .65 * pp : 1 - .5 * pp;
+      [1, -1].forEach(d => { const hx = d * (14 + 34 * sp), hy = -62 - 52 * sp; LN(sleeve, 9, 0, -68, hx, hy); hand(hx, hy); if (f.ap < 2) C('rgba(255,200,80,.6)', hx, hy, 8 + 6 * sp); });
+    } else { LN(sleeve, 9, 0, -68, s * 8, -58); hand(s * 8, -58); LN(sleeve, 9, 0, -68, -s * 10, -56); hand(-s * 10, -56); }
+  } else if (n === 'Eren' && f.ak >= 0) { // animations d'attaque d'Eren : repos -> préparation -> frappe -> retour (pp)
+    const k = f.ak, ap = f.ap, pp = f.pp || 0, fist = f.fm ? '#8a4a35' : '#ecf0f1', ph = (a, b, c) => ap === 0 ? mixv(a, b, eoz(pp)) : ap === 1 ? mixv(b, c, eoz(pp)) : mixv(c, a, smz(pp));
+    const blade = (hx, hy, len) => { const L = Math.hypot(hx, hy + 68) || 1, ux = hx / L, uy = (hy + 68) / L; LN('#7f8c8d', 6, hx, hy, hx + ux * 10, hy + uy * 10); LN('#dfe6e9', 4, hx + ux * 8, hy + uy * 8, hx + ux * len, hy + uy * len); return [hx + ux * len, hy + uy * len]; };
+    if (f.fm) {
+      if (k === 0) { // coup de pied : jambe qui balance en arc
+        const fx = s * ph(14, -34, 96), fy = ph(-6, -30, -52), px0 = s * mixv(-34, 96, Math.max(0, pp - .3)), py0 = mixv(-30, -52, Math.max(0, pp - .3));
+        LN('#8a4a35', 18, 0, -30, fx, fy); C('#8a4a35', fx, fy, 15); if (ap === 1) LN('rgba(255,255,255,.4)', 12, px0, py0, fx, fy);
+        LN(sleeve, 11, 0, -68, s * 20, -56); C(fist, s * 20, -56, 11);
+      } else if (k === 1) { // poing anti-air : uppercut en arc
+        const hx = s * ph(24, -14, 58), hy = ph(-50, -24, -178);
+        if (ap === 1) LN('rgba(255,255,255,.45)', 14, s * mixv(-14, 58, Math.max(0, pp - .3)), mixv(-24, -178, Math.max(0, pp - .3)), hx, hy);
+        LN(sleeve, 11, 0, -68, hx, hy); C(fist, hx, hy, 13); LN(sleeve, 11, 0, -68, -s * 10, -52); C(fist, -s * 10, -52, 11);
+      } else { LN(sleeve, 11, 0, -68, s * 14, -84); C(fist, s * 14, -84, 11); LN(sleeve, 11, 0, -68, -s * 14, -84); C(fist, -s * 14, -84, 11); } // cristallisation : bras croisés
+    } else if (k === 0) { // grappin : bras tendu et jets de gaz aux hanches
+      const hx = s * ph(24, 12, 40), hy = ph(-50, -78, -84); LN(sleeve, 8, 0, -68, hx, hy); C(fist, hx, hy, 6);
+      if (ap >= 1) for (let q = 0; q < 4; q++) C('rgba(235,240,250,' + (.6 - pp * .4 - q * .08) + ')', s * (28 + q * 6), -44 - q * 5, 4 + q * 2 + pp * 4);
+    } else if (k === 1 && f.ad) { // dash vers le grappin : lame en avant, jets de gaz dans le dos
+      const hx = s * 30, hy = -64; LN(sleeve, 8, 0, -68, hx, hy); C(fist, hx, hy, 6); LN(sleeve, 8, 0, -68, s * 22, -60); C(fist, s * 22, -60, 6);
+      LN('#dfe6e9', 4, hx, hy, hx + s * 44, hy - 6); for (let q = 0; q < 4; q++) C('rgba(230,240,255,' + (.5 - q * .1) + ')', -s * (18 + q * 12), -48 + Math.sin(t / 60 + q) * 5, 6 + q * 2);
+      if (ap === 1) { LN('rgba(255,255,255,.7)', 3, s * 40, -95, s * 78, -64); LN('rgba(255,255,255,.7)', 3, s * 78, -64, s * 45, -32); }
+    } else if (k === 1) { // épée : levée dans le dos puis grand coup en arc
+      const hx = s * ph(24, -8, 46), hy = ph(-50, -100, -56), tip = blade(hx, hy, 44);
+      LN(sleeve, 8, 0, -68, hx, hy); C(fist, hx, hy, 6); blade(hx, hy, 44);
+      if (ap === 1) { const q2 = Math.max(0, pp - .35), h2x = s * mixv(-8, 46, q2), h2y = mixv(-100, -56, q2), L2 = Math.hypot(h2x, h2y + 68) || 1; LN('rgba(255,255,255,.5)', 10, h2x + h2x / L2 * 44, h2y + (h2y + 68) / L2 * 44, tip[0], tip[1]); }
+    } else if (k === 2) { // coupe-projectiles : double entaille en X
+      const hx = s * ph(24, 10, 40), hy = ph(-52, -92, -56); LN(sleeve, 8, 0, -68, hx, hy); C(fist, hx, hy, 6); blade(hx, hy, 44); LN(sleeve, 8, 0, -68, s * 18, -70); C(fist, s * 18, -70, 6);
+      if (ap === 1) { const a = 1 - pp; LN('rgba(255,255,255,' + a + ')', 4, s * 20, -112, s * 88, -22); LN('rgba(255,255,255,' + a + ')', 4, s * 88, -112, s * 20, -22); }
     }
   } else if (f.ak >= 0) {
     let Lx = f.ap === 1 ? 62 : f.ap === 0 ? 12 : 37;
