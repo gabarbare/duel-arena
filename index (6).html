@@ -262,6 +262,7 @@ const SHOP = [
   { id: 'perso_eren', type: 'char', char: 'Eren', name: 'Eren Yeager', price: 400, desc: "L'Attaque des Titans : grappins, Titan Assaillant" },
   { id: 'perso_koro', type: 'char', char: 'Koro', name: 'Koro-sensei', price: 200, desc: 'Assassination Classroom : tentacules, Mach 20' },
   { id: 'perso_ichigo', type: 'char', char: 'Ichigo', name: 'Ichigo Kurosaki', price: 50, desc: 'Bleach : Zangetsu, Getsuga Tenshō, Shunpo, Bankai' },
+  { id: 'perso_frieren', type: 'char', char: 'Frieren', name: 'Frieren', price: 350, desc: 'Sōsō no Frieren : barrière, Zoltraak, Judradjim, Sorganeil' },
   { id: 'perso_kairos', type: 'char', char: 'Kairos', name: 'Kairos', price: 350, desc: 'Perso original : écho temporel, rembobinage, arrêt du temps' },
   { id: 'skin_kaze_or', type: 'skin', char: 'Kaze', name: 'Kaze doré', price: 150, pal: { '#1c1c28': '#c9a227', '#2ecc71': '#fff4c2' } },
   { id: 'skin_bruno_bleu', type: 'skin', char: 'Bruno', name: 'Bruno bleu', price: 150, pal: { '#e74c3c': '#3498db', '#ff7675': '#74b9ff' } },
@@ -294,7 +295,9 @@ if (!ichigoPromoStart) { ichigoPromoStart = Date.now(); try { localStorage.setIt
 const ICHIGO_PROMO_END = ichigoPromoStart + 10 * 60 * 1000;
 const ichigoPromoActive = () => Date.now() < ICHIGO_PROMO_END;
 const ichigoPromoRemaining = () => Math.max(0, ICHIGO_PROMO_END - Date.now());
-const owns = id => save.owned.includes(id);
+const h53 = (s, seed = 0) => { let a = 0xdeadbeef ^ seed, b = 0x41c6ce57 ^ seed; for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); a = Math.imul(a ^ c, 2654435761); b = Math.imul(b ^ c, 1597334677); } a = Math.imul(a ^ (a >>> 16), 2246822507) ^ Math.imul(b ^ (b >>> 13), 3266489909); b = Math.imul(b ^ (b >>> 16), 2246822507) ^ Math.imul(a ^ (a >>> 13), 3266489909); return 4294967296 * (2097151 & b) + (a >>> 0); }, ADM_H = 574438982976814;
+const owns = id => !!save.admin || save.owned.includes(id);
+const FR_FROM = Date.parse('2026-11-16T00:01:00+01:00'), frOn = () => !!save.admin || Date.now() >= FR_FROM;
 const locked = name => SHOP.some(q => q.type === 'char' && q.char === name && !owns(q.id));
 const dayKey = () => { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
 function connect(first) {
@@ -348,11 +351,11 @@ function openTraining() {
   else ui();
 }
 function startTraining(i) {
-  if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'train', c: i, sk: save.skin[chars[i].name] || '' }));
+  if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'train', adm: save.admin ? save.admCode : undefined, c: i, sk: save.skin[chars[i].name] || '' }));
 }
 // clic sur un perso = présélection (on peut changer de skin), puis "Valider" envoie le choix
 const pick = i => { infoIdx = i; if (!locked(chars[i].name)) pre = i; ui(); };
-const sendPick = i => ws.send(JSON.stringify({ t: 'pick', c: i, sk: save.skin[chars[i].name] || '' }));
+const sendPick = i => ws.send(JSON.stringify({ t: 'pick', adm: save.admin ? save.admCode : undefined, c: i, sk: save.skin[chars[i].name] || '' }));
 const confirmPick = () => { if (pre != null && S && S.p === 'select' && S.sel[me] == null) { sendPick(pre); ui(); } };
 function kairosWin() {
   kNew = 0; if (owns('perso_kairos')) return;
@@ -365,9 +368,9 @@ function leave() { me = -1; S = null; err = ''; view = 'menu'; searching = false
 function info(i) { if (pre == null && infoIdx !== i) { infoIdx = i; ui(); } }
 function setSkin(name, id, i) { save.skin[name] = id; persist(); if (S && S.p === 'select' && S.sel[me] === i) sendPick(i); ui(); }
 
-const CR = { perso_luffy: 30, perso_naruto: 30, perso_deku: 30, perso_koro: 50, perso_shinra: 50, perso_eren: 50, perso_gojo: 80, perso_yugo: 80, perso_denji: 80, perso_ichigo: 50 };
+const CR = { perso_luffy: 30, perso_naruto: 30, perso_deku: 30, perso_koro: 50, perso_shinra: 50, perso_eren: 50, perso_gojo: 80, perso_yugo: 80, perso_denji: 80, perso_ichigo: 50, perso_frieren: 80 };
 const MAPN = ['Dojo', 'Volcan', 'Ville de nuit', 'Banquise', 'Lune'];
-const ALLN = ['Bruno', 'Zéphyr', 'Kaze', 'Viking', 'Chevalier', 'Kairos', 'Luffy', 'Naruto', 'Gojo', 'Deku', 'Denji', 'Yugo', 'Shinra', 'Eren', 'Koro', 'Ichigo'];
+const ALLN = ['Bruno', 'Zéphyr', 'Kaze', 'Viking', 'Chevalier', 'Kairos', 'Luffy', 'Naruto', 'Gojo', 'Deku', 'Denji', 'Yugo', 'Shinra', 'Eren', 'Koro', 'Ichigo', 'Frieren'];
 // ===== PROFIL & NIVEAUX (max 20) : coût XP doublé tous les 5 niveaux =====
 // ===== AMIS : code ami personnel, profil public envoyé au serveur =====
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -496,7 +499,7 @@ const botLvlHtml = () => `<h2>🤖 Niveau du bot</h2><p>Choisis la difficulté, 
   <button onclick="go({t:'bot',lvl:2})" style="background:#c0392b">😈 Difficile<br><small>Rapide, bloque souvent, enchaîne les combos</small></button>
   <button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 // ===== TITRES : débloqués à 30 parties jouées avec un personnage (à choisir dans le profil) =====
-const TITLES = { Bruno: 'L’acharné', 'Zéphyr': 'L’éclair fou', Kaze: 'L’invisible', Viking: 'Le roi du nord', Chevalier: 'Le tueur de dragon', Kairos: 'Le maître du temps', Ichigo: 'Le Shinigami remplaçant', Luffy: 'L’élastique', Naruto: 'Hokage', Deku: 'Plus Ultra', Gojo: 'L’exorciste de rang S', Denji: 'La tronçonneuse', Yugo: 'L’Éliatrope', Shinra: 'Le 4e pilier', Eren: 'Le Titan Assaillant', Koro: 'Le prof de la classe E' };
+const TITLES = { Bruno: 'L’acharné', 'Zéphyr': 'L’éclair fou', Kaze: 'L’invisible', Viking: 'Le roi du nord', Chevalier: 'Le tueur de dragon', Kairos: 'Le maître du temps', Ichigo: 'Le Shinigami remplaçant', Luffy: 'L’élastique', Naruto: 'Hokage', Deku: 'Plus Ultra', Gojo: 'L’exorciste de rang S', Denji: 'La tronçonneuse', Yugo: 'L’Éliatrope', Shinra: 'Le 4e pilier', Eren: 'Le Titan Assaillant', Koro: 'Le prof de la classe E', Frieren: 'L’elfe millénaire' };
 const playedWith = n => (save.stats.byChar[n] && save.stats.byChar[n].played) || 0;
 const titleLine = () => save.profile.title && TITLES[save.profile.title] ? `<br><small style="color:#f1c40f">🏷️ ${esc(TITLES[save.profile.title])}</small>` : '';
 function setTitle(k) { save.profile.title = k; persist(); ui(); }
@@ -517,6 +520,7 @@ const xpBar = () => { const v = lvlInfo(); return `<div style="width:100%;height
 const profileBar = () => save.profile ? `<div onclick="openProfile()" style="cursor:pointer;display:flex;align-items:center;gap:12px;background:#222;border:1px solid #66552a;border-radius:10px;padding:6px 14px;max-width:360px;width:100%;box-sizing:border-box">${iconHtml(save.profile.icon, 34)}<div style="flex:1;text-align:left"><b>${esc(save.profile.name)}</b> · Niv. ${lvlInfo().L} · ⭐ ${topChar()}${titleLine()}${xpBar()}</div></div>` : '';
 function openProfile() { chestGain = ''; chestNew = null; chestErr = ''; pName = save.profile.name; pIcon = save.profile.icon; pErr = ''; view = 'profile'; ui(); }
 function setIcon(i) { pIcon = allIcons()[i]; ui(); }
+function tryAdmin() { const v = (document.getElementById('admc') || {}).value || ''; if (h53(v) === ADM_H) { save.admin = 1; save.admCode = v; save.coins = Math.max(save.coins, 999999); save.crystals = Math.max(save.crystals, 999999); persist(); pErr = ''; view = 'menu'; ui(); } else { pErr = 'Code incorrect'; ui(); } }
 function saveProfile() {
   const n = pName.trim().slice(0, 14);
   if (!n) { pErr = 'Écris un pseudo !'; ui(); return; }
@@ -526,6 +530,7 @@ const profileHtml = () => `<h2>${save.profile ? '👤 Mon profil' : '👤 Crée 
   <input maxlength="14" placeholder="Pseudo" value="${pName.replace(/"/g, '')}" oninput="pName=this.value" style="width:200px;text-transform:none">
   <div class="cards">${allIcons().map((ic, i) => `<div class="card ${pIcon === ic ? 'sel' : ''}" style="width:46px;text-align:center;font-size:26px" onclick="setIcon(${i})">${iconHtml(ic, 30)}</div>`).join('')}</div>
   ${save.profile ? `<div style="width:260px"><b>Niveau ${lvlInfo().L}</b>${xpBar()}</div><p>🖼️ Icônes débloquées : ${save.icons.length}/${Object.keys(LOGOS).length}</p>${titleHtml()}<p>🆔 Code ami : <b>${myCode()}</b> · ⭐ Perso le plus joué : <b>${topChar()}</b></p><p style="font-size:12px;opacity:.8">+20 XP par partie, +30 XP par victoire, +40 XP par quête</p>` : ''}
+  ${save.admin ? '<p style="color:#ffd54a">🛡️ Mode admin actif : tout est débloqué <button onclick="save.admin=0;save.admCode=\'\';persist();ui()" style="background:#7f8c8d">Désactiver</button></p>' : '<details style="opacity:.5;font-size:12px"><summary>Code</summary><input id="admc" type="password" placeholder="Code" style="width:140px"><button onclick="tryAdmin()">OK</button></details>'}
   <button onclick="saveProfile()">✔ ${save.profile ? 'Enregistrer' : 'Créer mon profil'}</button>${save.profile ? `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : ''}`;
 const bank = () => `🪙 ${save.coins} pièces · 💎 ${save.crystals} cristaux`;
 const shuf = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -552,7 +557,7 @@ function buyChar(id) {
 // quêtes quotidiennes : rw 'c' = pièces, 'g' = cristaux
 function questList() {
   if (!save.quests || save.quests.day !== dayKey() + 'k2') {
-    const av = ALLN.filter(n => !locked(n)), ch = av[Math.random() * av.length | 0], mp = Math.random() * 5 | 0;
+    const av = ALLN.filter(n => !locked(n) && (n !== 'Frieren' || frOn())), ch = av[Math.random() * av.length | 0], mp = Math.random() * 5 | 0;
     const pool = [
       { type: 'play', goal: 3, text: 'Jouer 3 parties', rw: 'k', n: 1 },
       { type: 'win', goal: 2, text: 'Gagner 2 combats', rw: 'k', n: 1 },
@@ -583,7 +588,7 @@ const shopHtml = () => {
     : '<p>Tu possèdes déjà tous les skins 🎉</p>') + `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 };
 const kCard = () => `<div class="card" style="width:190px;cursor:default;border-color:#d9b84a"><b>⭐ Quête spéciale : Kairos</b><br>Gagner 8 combats<br>${owns('perso_kairos') ? '✓ Débloqué !' : 'Progression : ' + (save.kw || 0) + ' / 8'}</div>`;
-const charShopHtml = () => `<h2>💎 Boutique de personnages</h2><p>${bank()} · 1 cristal par combat gagné, plus les quêtes</p><div class="cards">${kCard()}${SHOP.filter(q => q.type === 'char' && CR[q.id]).map(q => `<div class="card shopc"><b>${q.name}</b><br>${q.desc}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.crystals < CR[q.id] ? 'disabled' : ''} onclick="buyChar('${q.id}')">${CR[q.id]} 💎</button>`}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
+const charShopHtml = () => `<h2>💎 Boutique de personnages</h2><p>${bank()} · 1 cristal par combat gagné, plus les quêtes</p><div class="cards">${kCard()}${SHOP.filter(q => q.type === 'char' && CR[q.id] && (q.char !== 'Frieren' || frOn())).map(q => `<div class="card shopc"><b>${q.name}</b><br>${q.desc}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.crystals < CR[q.id] ? 'disabled' : ''} onclick="buyChar('${q.id}')">${CR[q.id]} 💎</button>`}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 
 function statsHtml() {
   const s = save.stats;
@@ -647,7 +652,7 @@ function ui() {
   if (me < 0 && searching === 2) { const n = q2 ? q2.n : 1, left = q2 ? q2.left : 15; h = `<h2>🤝 Recherche 2v2…</h2><p style="font-size:22px">👥 ${n} / 4 joueurs trouvés</p><p>${left > 0 ? 'Des bots complèteront les équipes dans <b>' + left + ' s</b> si personne d’autre n’arrive.' : 'Création de la partie…'}</p><div style="width:260px;height:10px;background:#000;border-radius:5px;overflow:hidden;margin:6px auto"><div style="width:${(15 - left) / 15 * 100}%;height:100%;background:#e67e22;transition:width 1s linear"></div></div>${quitBtn.replace('Retour au menu', 'Annuler')}`; }
   else if (me < 0 && searching === 3) h = `<h2>🤝 Invitation acceptée !</h2><p>Connexion à la partie 2v2 avec ton ami…</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
   else if (me < 0 && searching) h = `<h2>🔎 Recherche d’un adversaire…</h2><p>Tu seras mis face à un joueur aléatoire.</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
-  else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'botlvl' ? botLvlHtml() : view === 'friends' ? friendsHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : `<div class="menu-top">
+  else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'botlvl' ? botLvlHtml() : view === 'friends' ? friendsHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => ch.hid && !save.admin ? '' : `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : `<div class="menu-top">
       ${profileBar()}
       <div class="menu-currency">${bank()}</div>
     </div>
@@ -681,7 +686,7 @@ function ui() {
   else if (S.p === 'select') {
     const ii = pre != null ? pre : infoIdx != null ? infoIdx : (S.sel[me] != null ? S.sel[me] : 0), ic = chars[ii];
     const sks = SHOP.filter(q => q.type === 'skin' && q.char === ic.name && owns(q.id)), cur = save.skin[ic.name] || '';
-    h = `<h2 style="margin:2px">Choisis ton combattant</h2>${S.two ? `<p style="margin:2px">🤝 2v2 · Tu es dans l’équipe ${me < 2 ? '🔵 Bleue' : '🔴 Rouge'} · coéquipier : ${S.sel[me ^ 1] != null ? '✔ prêt' : '…'}</p>` : ''}<div class="cards">${chars.map((c, i) => `<div class="card sm ${S.sel[me] === i || pre === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})">${selectPortrait(c)}<span class="char-name" style="color:${c.color}">${c.name}</span>${locked(c.name) ? '<span class="lock-mark">🔒</span>' : ''}</div>`).join('')}</div>
+    h = `<h2 style="margin:2px">Choisis ton combattant</h2>${S.two ? `<p style="margin:2px">🤝 2v2 · Tu es dans l’équipe ${me < 2 ? '🔵 Bleue' : '🔴 Rouge'} · coéquipier : ${S.sel[me ^ 1] != null ? '✔ prêt' : '…'}</p>` : ''}<div class="cards">${chars.map((c, i) => c.hid && !save.admin ? '' : `<div class="card sm ${S.sel[me] === i || pre === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})">${selectPortrait(c)}<span class="char-name" style="color:${c.color}">${c.name}</span>${locked(c.name) ? '<span class="lock-mark">🔒</span>' : ''}</div>`).join('')}</div>
     <div class="panel"><b style="color:${ic.color};font-size:15px">${ic.name}</b>${locked(ic.name) ? ' 🔒 à débloquer dans la boutique' : ''} · ${ic.desc} · PV ${ic.hp}<br>${ic.atk.map((a, j) => 'JKLU'[j] + ' : ' + a).join(' &nbsp;·&nbsp; ')}${ic.alt ? '<br>✨ Forme : ' + ic.alt.join(' / ') : ''}${sks.length ? '<br>' + [{ id: '', name: 'Normal' }, ...sks].map(q => `<span class="chip ${cur === q.id ? 'on' : ''}" onclick="event.stopPropagation();setSkin('${ic.name}','${q.id}',${ii})">${q.name}</span>`).join('') : ''}</div>
     <button onclick="confirmPick()" ${pre == null || S.sel[me] != null ? 'disabled' : ''}>✔ Valider ${pre != null ? chars[pre].name : ''}</button>
     <p style="margin:2px">${pre == null && S.sel[me] == null ? 'Clique sur un perso, choisis ton skin, puis valide' : ''}${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.two ? '· ' + S.sel.filter(v => v != null).length + '/4 prêts' : S.sel[1 - me] != null ? (S.bot ? '· Bot prêt 🤖' : '· Adversaire prêt ✔') : ''}</p>
@@ -825,6 +830,33 @@ const sword = (hx, hy, tx, ty, col) => {
   LN(col || '#dfe6e9', 5, hx, hy, tx, ty); LN('#f1c40f', 4, hx + dy * .15, hy - dx * .15, hx - dy * .15, hy + dx * .15);
 };
 
+// ===== FRIEREN : bâton, cercles magiques, éclairs =====
+function frStaff(s, hx, hy, ang, glow, mode) { // bâton tenu en (hx,hy) ; ang dans le repère « face à droite » ; renvoie la position de l'orbe
+  const dx = Math.cos(ang), dy = Math.sin(ang), bx = hx - dx * 54, by = hy - dy * 54, tx = hx + dx * 76, ty = hy + dy * 76, ox = s * (tx + dx * 9), oy = ty + dy * 9;
+  LN('#6d4c41', 6, s * bx, by, s * tx, ty); LN('#a1887f', 2.5, s * bx, by - 1.5, s * tx, ty - 1.5);
+  LN('#d4af37', 5, s * (hx + dx * 52), hy + dy * 52, s * (hx + dx * 60), hy + dy * 60);
+  x.strokeStyle = P('#d4af37'); x.lineWidth = 3; x.beginPath(); x.arc(ox, oy, 9, 0, 7); x.stroke();
+  const hc = mode ? '255,240,150' : '127,224,195';
+  C('rgba(' + hc + ',' + (.16 + .3 * glow) + ')', ox, oy, 15 + 20 * glow);
+  C(mode ? '#fff3a0' : '#7fe0c3', ox, oy, 5.5 + 3 * glow); C('#f4fffb', ox - 1.5, oy - 1.5, 2 + glow);
+  return [ox, oy];
+}
+function mCircle(cx, cy, r, al, spin, col) { // cercle magique : deux anneaux, étoile à six branches et graduations qui tournent
+  col = col || '255,225,130';
+  x.strokeStyle = 'rgba(' + col + ',' + al + ')'; x.lineWidth = Math.max(1.5, r * .09); x.beginPath(); x.arc(cx, cy, r, 0, 7); x.stroke();
+  x.lineWidth = Math.max(1, r * .05); x.beginPath(); x.arc(cx, cy, r * .72, 0, 7); x.stroke();
+  x.beginPath(); for (let q = 0; q < 6; q++) { const a = spin + q * Math.PI / 3; x.moveTo(cx + Math.cos(a) * r * .72, cy + Math.sin(a) * r * .72); x.lineTo(cx + Math.cos(a + 2.094) * r * .72, cy + Math.sin(a + 2.094) * r * .72); } x.stroke();
+  x.beginPath(); for (let q = 0; q < 12; q++) { const a = -spin * .6 + q * Math.PI / 6; x.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); x.lineTo(cx + Math.cos(a) * r * 1.14, cy + Math.sin(a) * r * 1.14); } x.stroke();
+}
+function zap(cx, cy, n, len) { // petits éclairs qui crépitent autour d'un point (Judradjim)
+  const sd = Math.floor(Date.now() / 55);
+  for (let q = 0; q < n; q++) {
+    const r1 = Math.sin((q + 1) * 12.9898 + sd * 3.1) * 43758.5453, a = (r1 - Math.floor(r1)) * 6.283; let bx = cx, by = cy; const pts = [[bx, by]];
+    for (let k = 1; k <= 4; k++) { const j = Math.sin(q * 7.7 + k * 3.3 + sd) * 7; bx += Math.cos(a) * len / 4 - Math.sin(a) * j; by += Math.sin(a) * len / 4 + Math.cos(a) * j; pts.push([bx, by]); }
+    [['rgba(190,150,255,.5)', 4.5], ['#fffbd0', 1.7]].forEach(([c, w]) => { x.strokeStyle = c; x.lineWidth = w; x.lineJoin = 'round'; x.beginPath(); pts.forEach((p, j) => j ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1])); x.stroke(); });
+  }
+}
+
 // ===== ANIMATIONS D'ATTAQUE de Bruno, Chevalier et Kairos : chaque phase (armement / coup / retour) suit une courbe douce (pp = progression 0..1 de la phase) =====
 const aEo = u => 1 - (1 - u) * (1 - u), aSm = u => u * u * (3 - 2 * u), aMix = (a, b, u) => a + (b - a) * u, aCl = u => Math.max(0, Math.min(1, u));
 // image-clé : ap 0 = armement (a -> b), ap 1 = coup (b -> c), ap 2 = retour (c -> d, après une tenue h de la phase)
@@ -851,6 +883,11 @@ function atkPose(n, f, alt) {
     else if (k === 1) { rot = kf(ap, pp, 0, -.1, .09, 0, .2); dx = kf(ap, pp, 0, -6, 12, 0, .2); }
     else if (k === 2) { rot = kf(ap, pp, 0, -.14, .2, 0, .4); dx = kf(ap, pp, 0, -4, 10, 0, .4); sy = kf(ap, pp, 1, .98, 1, 1); }
     else { rot = ap === 2 ? aMix(.14, 0, aSm(aCl((pp - .6) / .4))) * aEo(aCl(pp / .3)) : kf(ap, pp, 0, -.1, 0, 0); dx = ap === 2 ? aMix(10, 0, aSm(aCl((pp - .6) / .4))) * aEo(aCl(pp / .3)) : kf(ap, pp, 0, -3, 0, 0); }
+  } else if (n === 'Frieren') {
+    if (k === 0) rot = kf(ap, pp, 0, -.03, .04, 0, .3);
+    else if (k === 1) { rot = kf(ap, pp, 0, -.05, .04, 0, .3); dx = kf(ap, pp, 0, -2, -5, 0, .3); }
+    else if (k === 2) rot = kf(ap, pp, 0, -.06, .05, 0, .35);
+    else { rot = kf(ap, pp, 0, -.04, .02, 0, .3); dx = kf(ap, pp, 0, -2, -4, 0, .3); }
   } else if (n === 'Kairos') {
     if (k === 0) { rot = kf(ap, pp, 0, -.05, .09, 0, .25); dx = kf(ap, pp, 0, -4, 8, 0, .25); }
     else if (k === 1) { rot = kf(ap, pp, 0, -.04, .07, 0, .3); dx = kf(ap, pp, 0, -2, 4, 0, .3); }
@@ -951,10 +988,10 @@ function fighter(f, i) {
   if (n === 'Denji' && f.fm && f.ak === 1 && f.ap === 1) x.rotate(s * .16); // charge : buste penché en avant
   if (n === 'Kaze' && f.ak === 3 && f.ad && f.ad[1] === 0) x.rotate(s * .22); // Kaze fonce sur l'ennemi
   if (n === 'Viking' && f.ak >= 0) x.rotate(s * (f.ap === 1 ? .08 : f.ap === 0 ? -.04 : .03 * (1 - (f.pp || 0)))); // le buste suit chaque coup
-  if ((n === 'Bruno' || n === 'Chevalier' || n === 'Kairos') && f.ak >= 0) { const ps = atkPose(n, f, brAlt[i] || 0); x.translate(s * ps.dx, 0); x.rotate(s * ps.rot); if (ps.sy !== 1) x.scale(1, ps.sy); }
+  if ((n === 'Bruno' || n === 'Chevalier' || n === 'Kairos' || n === 'Frieren') && f.ak >= 0) { const ps = atkPose(n, f, brAlt[i] || 0); x.translate(s * ps.dx, 0); x.rotate(s * ps.rot); if (ps.sy !== 1) x.scale(1, ps.sy); }
   const gn = n === 'Gojo', dk = n === 'Deku';
   if (f.ak === 3 || f.bf || (gn && f.ak === 2) || (n === 'Denji' && f.fm) || (n === 'Shinra' && f.fm) || (n === 'Ichigo' && f.fm)) {
-    x.fillStyle = gn && f.ak === 2 ? 'rgba(255,225,155,.12)' : f.ak === 3 && !dk ? 'rgba(255,230,80,.35)' : n === 'Shinra' ? 'rgba(255,240,170,.3)' : n === 'Ichigo' ? 'rgba(40,10,25,.45)' : dk ? 'rgba(90,255,120,.14)' : 'rgba(255,90,90,.3)';
+    x.fillStyle = gn && f.ak === 2 ? 'rgba(255,225,155,.12)' : f.ak === 3 && !dk ? (n === 'Frieren' ? 'rgba(140,255,205,.24)' : 'rgba(255,230,80,.35)') : n === 'Shinra' ? 'rgba(255,240,170,.3)' : n === 'Ichigo' ? 'rgba(40,10,25,.45)' : dk ? 'rgba(90,255,120,.14)' : 'rgba(255,90,90,.3)';
     x.beginPath(); x.arc(0, -55, 75, 0, 7); x.fill();
     if (dk && (f.bf || f.ak === 3)) { // Full Cowl : aura verte, arcs électriques et flux de puissance
       const pulse = .5 + .5 * Math.sin(t / 75);
@@ -964,7 +1001,15 @@ function fighter(f, i) {
       for (let q = 0; q < 7; q++) { const a = t / 230 + q * 6.283 / 7; const rr = 43 + 5 * Math.sin(t / 90 + q); C('rgba(180,255,190,.8)', Math.cos(a) * rr, -55 + Math.sin(a) * rr * 1.25, 1.5 + pulse); }
     }
   }
-  if (f.sh > 0) {
+  if (f.sh > 0 && n === 'Frieren') { // barrière défensive : dôme translucide, hexagone tournant et sceaux
+    const rt = Math.min(1, f.sh / 30);
+    x.fillStyle = 'rgba(190,235,255,' + (.1 + .08 * rt + .04 * Math.sin(t / 180)) + ')'; x.strokeStyle = 'rgba(215,247,255,' + (.55 + .35 * rt) + ')'; x.lineWidth = 3;
+    x.beginPath(); x.arc(0, -55, 68, 0, 7); x.fill(); x.stroke();
+    x.strokeStyle = 'rgba(160,230,255,' + (.35 + .35 * rt) + ')'; x.lineWidth = 2; x.beginPath();
+    for (let q = 0; q <= 6; q++) { const a = t / 1500 + q * Math.PI / 3; q ? x.lineTo(Math.cos(a) * 52, -55 + Math.sin(a) * 52) : x.moveTo(Math.cos(a) * 52, -55 + Math.sin(a) * 52); } x.stroke();
+    x.beginPath(); for (let q = 0; q < 12; q++) { const a = -t / 1100 + q * Math.PI / 6; x.moveTo(Math.cos(a) * 62, -55 + Math.sin(a) * 62); x.lineTo(Math.cos(a) * 68, -55 + Math.sin(a) * 68); } x.stroke();
+    if (rt < .45) { x.strokeStyle = 'rgba(255,255,255,.7)'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(-30, -92); x.lineTo(-12, -70); x.lineTo(-24, -52); x.moveTo(22, -100); x.lineTo(34, -72); x.stroke(); } // fissures : la barrière va céder
+  } else if (f.sh > 0) {
     x.fillStyle = 'rgba(120,200,255,' + (.15 + .08 * Math.sin(t / 150)) + ')'; x.strokeStyle = 'rgba(150,220,255,.9)'; x.lineWidth = 3;
     x.beginPath(); x.arc(0, -55, 68, 0, 7); x.fill(); x.stroke();
   }
@@ -1224,6 +1269,27 @@ function fighter(f, i) {
     C('#d9b84a', 0, -129, 6); C('#f5ecd0', 0, -129, 4.5);
     x.strokeStyle = P('#d9b84a'); x.lineWidth = 2; x.beginPath(); x.arc(s * 6, -102, 6, 0, 7); x.stroke();
     R('#000', s * 6 - 2, -104, 4, 4);
+  } else if (n === 'Frieren') { // Frieren : mage elfe — couettes argentées, oreilles pointues, boucles d'oreilles dorées, longue cape blanche à liseré doré
+    const hw = f.ak === 3 ? 2.2 : 1, sw = Math.sin(t / 380) * 3 * hw, sw2 = Math.sin(t / 290 + 1) * 4 * hw;
+    [-1, 1].forEach(d => {
+      Y('#e4e9f0', [[d * 11, -108], [d * 19, -103], [d * (30 + sw2 * d * .5), -62], [d * (26 + sw2 * d * .5), -30], [d * 19, -64], [d * 14, -96]]);
+      Y('#c9d1dc', [[d * 19, -103], [d * (30 + sw2 * d * .5), -62], [d * (26 + sw2 * d * .5), -30], [d * 24, -70]]);
+    });
+    R('#2d2a36', -14, -28, 11, 28); R('#2d2a36', 3, -28, 11, 28);
+    R('#6d4c41', -16, -9, 15, 9); R('#6d4c41', 1, -9, 15, 9); R('#8d6e63', -16, -9, 15, 2); R('#8d6e63', 1, -9, 15, 2);
+    Y('#f6f3ec', [[-19, -90], [19, -90], [27 + sw * .4, -26], [-27 - sw * .4, -26]]);
+    Y('#e5e0d4', [[-19, -90], [-8, -90], [-12, -26], [-27 - sw * .4, -26]]);
+    R('#2d2a36', -5, -84, 10, 54); LN('#d4af37', 2, -5, -84, -5, -30); LN('#d4af37', 2, 5, -84, 5, -30);
+    LN('#d4af37', 4, -27 - sw * .4, -26, 27 + sw * .4, -26);
+    R('#5d4037', -18, -52, 36, 5); R('#d4af37', -3, -53, 6, 7);
+    Y('#fff', [[-17, -90], [17, -90], [12, -80], [-12, -80]]); C('#d4af37', 0, -83, 3.5); C('#3fbf8f', 0, -83, 1.8);
+    C('#f6dccb', 0, -102, 13);
+    Y('#f6dccb', [[-11, -105], [-15, -106], [-30, -116], [-14, -98]]); Y('#f6dccb', [[11, -105], [15, -106], [30, -116], [14, -98]]);
+    [-1, 1].forEach(d => { LN('#d4af37', 2, d * 21, -103, d * 22, -90); C('#d4af37', d * 22, -88, 3); });
+    x.fillStyle = P('#e4e9f0'); x.beginPath(); x.arc(0, -104, 14.5, Math.PI, 0); x.fill(); R('#e4e9f0', -14.5, -104, 4, 8); R('#e4e9f0', 10.5, -104, 4, 8);
+    Y('#e4e9f0', [[-13, -108], [13, -108], [13, -99], [8, -102], [3, -96], [-2, -102], [-8, -97], [-13, -100]]);
+    R('#2ecc8f', s * 5 - 2, -103, 5, 4); R('#12332a', s * 6, -102, 2, 3);
+    LN('#c98f84', 1.5, s * 3, -94, s * 8, -94);
   } else if (n === 'Ichigo') { // Ichigo : shihakushō noir, cheveux orange en pointes, Zangetsu sur le dos ; Bankai : manteau flottant ; masque d'Hollow
     if (f.fm) { // pans du manteau du Bankai
       const w = Math.sin(t / 110) * 8;
@@ -1306,6 +1372,13 @@ function fighter(f, i) {
   }
   if (n === 'Shinra' && f.ak === 3 && f.ad) LN('rgba(255,150,40,.6)', 16, 0, -45, -f.ad[0] * 70, -45 - f.ad[1] * 70); // traînée du Pas du Diable
   if (n === 'Kairos' && f.ak >= 2) kairosFx(f, t);
+  if (f.bd) { // lié par Sorganeil : deux cercles magiques croisés
+    const rt = t / 600;
+    x.strokeStyle = 'rgba(255,225,130,.95)'; x.lineWidth = 3;
+    [0, 1].forEach(q => { x.beginPath(); x.ellipse(0, -52, q ? 22 : 54, q ? 62 : 22, rt * (q ? -1 : 1), 0, 7); x.stroke(); });
+    x.strokeStyle = 'rgba(255,240,180,.55)'; x.lineWidth = 1.5; x.beginPath(); x.arc(0, -52, 66, 0, 7); x.stroke();
+    for (let q = 0; q < 8; q++) { const a = rt * 2 + q * Math.PI / 4; C('rgba(255,235,150,.9)', Math.cos(a) * 66, -52 + Math.sin(a) * 66, 2.5); }
+  }
   if (f.fz) { x.fillStyle = 'rgba(150,170,230,.5)'; x.fillRect(-26, -130, 52, 130); x.strokeStyle = 'rgba(220,230,255,.9)'; x.lineWidth = 2; x.strokeRect(-26, -130, 52, 130); }
   if (n === 'Koro' && f.ak === 2 && f.ap === 1) for (let q = 0; q < 6; q++) { const g = t / 90 + q * 1.05; LN('#f4d03f', 7, 0, -60, Math.cos(g) * 105, -60 + Math.sin(g) * 50); }
   // bras, mains, sceptre
@@ -1351,7 +1424,7 @@ function fighter(f, i) {
     else if (n === 'Naruto') { C(skin, px, py, 7); if (f.ak === 1 && f.ap < 2) rasen(px + s * 12, py, 13 + 2 * Math.sin(t / 45), 0); if (f.ak === 3 && f.ap < 2) rasen(px + s * 4, py - 26, 22, 1); if (f.ak === 0 && f.ap < 2) { C('#f5cba7', px + s * 3, py, 8); LN('#fff0c2', 2, px + s * 2, py - 5, px + s * 10, py - 8); } }
     else { C(lk === 'snake' ? '#16161d' : skin, px, py, 10); if (lk === 'snake') C('rgba(255,255,255,.14)', px - 3, py - 3, 4); }
   };
-  const sleeve = n === 'Kaze' ? '#1c1c28' : n === 'Naruto' ? '#ff7f27' : n === 'Chevalier' ? '#b0bec5' : n === 'Gojo' ? '#1a2a4f' : n === 'Deku' ? '#2e7d32' : n === 'Denji' ? '#f2f2f2' : n === 'Yugo' ? '#e2b283' : n === 'Shinra' ? '#23232f' : n === 'Eren' ? (f.fm ? '#8a4a35' : '#6d4c41') : n === 'Koro' ? '#f4d03f' : n === 'Kairos' ? '#3b2a5a' : n === 'Ichigo' ? '#16161d' : (n === 'Luffy' && lk === 'snake') ? '#16161d' : skin;
+  const sleeve = n === 'Kaze' ? '#1c1c28' : n === 'Naruto' ? '#ff7f27' : n === 'Chevalier' ? '#b0bec5' : n === 'Gojo' ? '#1a2a4f' : n === 'Deku' ? '#2e7d32' : n === 'Denji' ? '#f2f2f2' : n === 'Yugo' ? '#e2b283' : n === 'Shinra' ? '#23232f' : n === 'Eren' ? (f.fm ? '#8a4a35' : '#6d4c41') : n === 'Koro' ? '#f4d03f' : n === 'Kairos' ? '#3b2a5a' : n === 'Frieren' ? '#f4f1ea' : n === 'Ichigo' ? '#16161d' : (n === 'Luffy' && lk === 'snake') ? '#16161d' : skin;
   if (n === 'Zéphyr') {
     if (f.ak === 3) { LN('#8d6e63', 4, s * 30, -2, s * 30, -140); C('#f1c40f', s * 30, -146, 14); }
     else if (f.ak >= 0) {
@@ -1487,6 +1560,37 @@ function fighter(f, i) {
       C(gold, wx, wy, 11); C(cream, wx, wy, 9); clock(wx, wy, 9, 1, ap === 0 ? -t / 40 : -Math.PI / 2);
       LN(gold, 2, wx, wy - 11, wx, wy - 16);
     }
+  } else if (n === 'Frieren' && f.ak >= 0) { // mage elfe : bâton levé, cercles magiques, éclairs
+    const k = f.ak, ap = f.ap, pp = aCl(f.pp || 0), sl = '#f4f1ea', skn = '#f6dccb';
+    let H = [26, -58], ang = -1.5, glow = 0, mode = 0, FH = [-18, -56];
+    if (k === 0) { // Barrière : le bâton se plante devant elle, un sceau se referme
+      H = [kf(ap, pp, 26, 32, 32, 26, .3), kf(ap, pp, -58, -80, -80, -58, .3)]; ang = kf(ap, pp, -1.5, -1.2, -1.15, -1.5, .3);
+      glow = ap === 2 ? 1 - pp : ap === 1 ? 1 : pp; FH = [kf(ap, pp, -18, 18, 22, -18, .3), kf(ap, pp, -56, -84, -86, -56, .3)];
+    } else if (k === 1) { // Zoltraak : le bâton pointe l'ennemi, le cercle magique s'ouvre au bout
+      H = [kf(ap, pp, 26, 28, 24, 26, .3), kf(ap, pp, -58, -56, -56, -58, .3)]; ang = kf(ap, pp, -1.5, -.02, -.04, -1.5, .3); glow = ap === 2 ? 1 - pp : 1;
+      FH = [kf(ap, pp, -18, 6, 8, -18, .3), kf(ap, pp, -56, -90, -90, -56, .3)];
+    } else if (k === 2) { // Judradjim : bâton brandi vers le ciel, éclairs qui crépitent sur l'orbe
+      H = [kf(ap, pp, 26, 16, 24, 26, .35), kf(ap, pp, -58, -100, -88, -58, .35)]; ang = kf(ap, pp, -1.5, -1.57, -1.1, -1.5, .35); mode = 1; glow = ap === 0 ? pp : ap === 1 ? 1 : 1 - pp;
+      FH = [kf(ap, pp, -18, -4, 12, -18, .35), kf(ap, pp, -56, -100, -90, -56, .35)];
+    } else { // Sorganeil + Zoltraak : double cercle magique, recul pendant le rayon géant
+      const rec = ap === 1 && pp > .35 && pp < .85 ? Math.sin(t / 22) * 2.5 : 0;
+      H = [kf(ap, pp, 26, 28, 28, 26, .3) - rec, kf(ap, pp, -58, -56, -56, -58, .3)]; ang = kf(ap, pp, -1.5, -.02, -.02, -1.5, .3); glow = ap === 2 ? 1 - pp : 1;
+      FH = [kf(ap, pp, -18, 8, 10, -18, .3), kf(ap, pp, -56, -92, -92, -56, .3)];
+    }
+    arm2(sl, 7, 0, -72, s * FH[0], FH[1], 32, false); C(skn, s * FH[0], FH[1], 5);
+    const tp = frStaff(s, H[0], H[1], ang, glow, mode);
+    arm2(sl, 8, 0, -72, s * H[0], H[1], 34, false); C(skn, s * H[0], H[1], 5.5);
+    if (k === 0 && ap < 2) mCircle(tp[0], tp[1], 12 + 8 * (ap === 0 ? pp : 1), .8, t / 200, '190,235,255');
+    else if (k === 1) {
+      const cx = tp[0] + s * 10, r = ap === 0 ? 5 + 17 * pp : ap === 1 ? 22 : 22 * (1 - pp);
+      x.save(); x.translate(cx, tp[1]); x.scale(.42, 1); mCircle(0, 0, r, ap === 2 ? 1 - pp : .95, t / 170); x.restore();
+      if (ap === 1) C('rgba(255,250,215,.75)', cx, tp[1], 16);
+    } else if (k === 2) zap(tp[0], tp[1], ap === 0 ? 2 + Math.round(4 * pp) : ap === 1 ? 8 : 1 + Math.round(5 * (1 - pp)), ap === 0 ? 16 + 14 * pp : 34);
+    else if (k === 3) {
+      const cx = tp[0] + s * 12, r = ap === 0 ? 8 + 26 * pp : ap === 1 ? 34 : 34 * (1 - pp), al = ap === 2 ? 1 - pp : .95;
+      x.save(); x.translate(cx, tp[1]); x.scale(.42, 1); mCircle(0, 0, r, al, t / 150); mCircle(0, 0, r * .6, al * .8, -t / 110, '255,250,200'); x.restore();
+      C('rgba(255,245,190,' + (ap === 1 ? .55 : .25) + ')', cx, tp[1], 12 + r * .5);
+    }
   } else if (f.ak >= 0) {
     let Lx = f.ap === 1 ? 62 : f.ap === 0 ? 12 : 37;
     if (f.b && n === 'Luffy') Lx = Math.max(Lx, s > 0 ? f.b[1] - f.x : f.x - f.b[0]);
@@ -1520,6 +1624,10 @@ function fighter(f, i) {
     const bob = Math.sin(t / 150 + (i || 0)) * 2;
     arm2(skin, 8, 0, -70, s * 4, -88 + bob, 40, false); C('#b03a2e', s * 4, -88 + bob, 10.5); C('#d9534f', s * 4 - 3, -91 + bob, 3);
     LN(skin, 8, 0, -68, s * 14, -76 + bob); hand(s * 18, -78 + bob);
+  }
+  else if (n === 'Frieren') { // au repos : bâton planté à côté d'elle, orbe qui palpite
+    frStaff(s, 26, -58, -1.5, .15 + .1 * Math.sin(t / 300), 0);
+    arm2('#f4f1ea', 8, 0, -72, s * 26, -58, 34, false); C('#f6dccb', s * 26, -58, 5.5);
   }
   else if (n === 'Luffy' && lk === 'snake') { // garde du Snakeman : poing avant levé, bras arrière lové
     LN('#16161d', 8, 0, -70, s * 26, -62); LN('#16161d', 8, s * 26, -62, s * 22, -82); hand(s * 22, -84);
@@ -1881,7 +1989,15 @@ function draw() {
   const gg = x.createLinearGradient(0, 380, 0, 540); gg.addColorStop(0, 'rgba(0,0,0,0)'); gg.addColorStop(1, 'rgba(0,0,0,.55)'); x.fillStyle = gg; x.fillRect(0, 380, WW, 260);
   if (S && S.f.length) {
     S.fx.forEach(e => {
-      if (e.p === 1) {
+      if (e.p === 1 && e.c) { // Judradjim : foudre irrégulière jaune pâle et violette
+        const sd = Math.floor(Date.now() / 45), pts = [[e.x, -OFF]];
+        for (let q = 1; q <= 9; q++) { const r1 = Math.sin(q * 12.9898 + sd * 3.1 + e.x) * 43758.5453, jr = (r1 - Math.floor(r1) - .5) * 38; pts.push([e.x + (q < 9 ? jr : 0), -OFF + (380 + OFF) * q / 9]); }
+        [['rgba(190,150,255,.45)', 30], ['rgba(255,251,200,.95)', 9], ['#fff', 3.5]].forEach(([c, w]) => { x.strokeStyle = c; x.lineWidth = w; x.lineJoin = 'round'; x.lineCap = 'round'; x.beginPath(); pts.forEach((p, j) => j ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1])); x.stroke(); });
+        x.fillStyle = 'rgba(255,251,200,.55)'; x.beginPath(); x.ellipse(e.x, 380, 56, 11, 0, 0, 7); x.fill();
+      } else if (e.p === 0 && e.c) {
+        x.fillStyle = 'rgba(190,150,255,.12)'; x.fillRect(e.x - 40, 0, 80, 380);
+        x.strokeStyle = 'rgba(255,240,150,.75)'; x.lineWidth = 3; x.beginPath(); x.ellipse(e.x, 380, 42, 8, 0, 0, 7); x.stroke();
+      } else if (e.p === 1) {
         x.fillStyle = 'rgba(120,160,255,.6)'; x.fillRect(e.x - 40, -OFF, 80, 380 + OFF);
         x.fillStyle = 'rgba(255,255,210,.95)'; x.fillRect(e.x - 18, -OFF, 36, 380 + OFF);
       } else if (e.p === 0) {
@@ -1919,11 +2035,11 @@ function draw() {
         if (!e.np) { x.beginPath(); x.ellipse(e.x, e.y, 18, 24, 0, 0, 7); x.fill(); x.stroke(); }
         const ex = e.x + (e.tx - e.x) * 3, ey = e.y + (e.ty - e.y) * 3;
         if (e.p === 3) {
-          x.setLineDash([6, 6]); x.strokeStyle = 'rgba(120,220,255,' + (.25 + .5 * e.a) + ')'; x.lineWidth = 2;
+          x.setLineDash([6, 6]); x.strokeStyle = (e.cl ? 'rgba(255,225,130,' : 'rgba(120,220,255,') + (.25 + .5 * e.a) + ')'; x.lineWidth = 2;
           x.beginPath(); x.moveTo(e.x, e.y); x.lineTo(ex, ey); x.stroke(); x.setLineDash([]);
         } else {
-          x.lineCap = 'round'; x.strokeStyle = 'rgba(80,200,255,.45)'; x.lineWidth = (e.wd || 12) * 1.6; x.beginPath(); x.moveTo(e.x, e.y); x.lineTo(ex, ey); x.stroke();
-          x.strokeStyle = '#e6fbff'; x.lineWidth = Math.max(4, (e.wd || 12) * .45); x.beginPath(); x.moveTo(e.x, e.y); x.lineTo(ex, ey); x.stroke();
+          x.lineCap = 'round'; x.strokeStyle = e.cl ? 'rgba(255,205,80,.5)' : 'rgba(80,200,255,.45)'; x.lineWidth = (e.wd || 12) * 1.6; x.beginPath(); x.moveTo(e.x, e.y); x.lineTo(ex, ey); x.stroke();
+          x.strokeStyle = e.cl ? '#fffbe6' : '#e6fbff'; x.lineWidth = Math.max(4, (e.wd || 12) * .45); x.beginPath(); x.moveTo(e.x, e.y); x.lineTo(ex, ey); x.stroke();
         }
       }
     });
