@@ -52,7 +52,7 @@ canvas{width:100%;display:block;background:#222}
 }
 #ov.select .card.sm.sel{background:linear-gradient(155deg,#494949,#292929);box-shadow:0 0 0 2px #f1c40f,0 0 12px #f1c40f66}
 #ov.select .card.sm .portrait{
-  width:39px;height:39px;flex:none;display:block;
+  width:46px;height:46px;flex:none;display:block;
   filter:drop-shadow(0 2px 2px #0009);
 }
 #ov.select .card.sm .char-name{
@@ -192,6 +192,13 @@ html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 #touch button,#tmenu button{pointer-events:auto;touch-action:none;border:0;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;font-size:20px;font-weight:bold;width:clamp(46px,9vw,68px);height:clamp(46px,9vw,68px);padding:0;margin:3px;-webkit-user-select:none;user-select:none}
 #touch button.on{background:rgba(52,152,219,.7)}
 #touch .pad{display:flex;flex-direction:column;align-items:center}
+/* Joystick analogique : pousse à gauche/droite pour avancer, en haut pour sauter, en bas pour bloquer */
+#joy{position:relative;pointer-events:auto;touch-action:none;width:clamp(104px,36vh,156px);height:clamp(104px,36vh,156px);margin:4px 8px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.07) 0,rgba(255,255,255,.16) 100%);border:2px solid rgba(255,255,255,.35);box-shadow:inset 0 0 18px rgba(0,0,0,.35);-webkit-user-select:none;user-select:none}
+#joy i{position:absolute;font-style:normal;font-size:11px;color:rgba(255,255,255,.5);line-height:1}
+#joy .ju{top:7%;left:50%;transform:translateX(-50%)}#joy .jd{bottom:7%;left:50%;transform:translateX(-50%)}
+#joy .jl{left:8%;top:50%;transform:translateY(-50%)}#joy .jr{right:8%;top:50%;transform:translateY(-50%)}
+#joyk{position:absolute;left:50%;top:50%;width:42%;height:42%;margin:-21% 0 0 -21%;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.75),rgba(200,210,230,.45));border:2px solid rgba(255,255,255,.7);box-shadow:0 3px 10px rgba(0,0,0,.5);pointer-events:none;will-change:transform}
+#joy.on{background:radial-gradient(circle,rgba(52,152,219,.12) 0,rgba(52,152,219,.3) 100%);border-color:rgba(120,190,255,.8)}
 #touch .row{display:flex}
 #touch .acts{display:grid;grid-template-columns:auto auto}
 #touch .ult{background:rgba(241,196,15,.45)}
@@ -230,13 +237,14 @@ html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 		<div class="hint">Clique, ou appuie sur Entrée / ✕ (A) pour commencer</div>
 	</div>
 	<div id="touch">
-		<div class="pad"><button data-k="u">▲</button><div class="row"><button data-k="l">◀</button><button data-k="d">▼</button><button data-k="r">▶</button></div></div>
+		<div class="pad"><div id="joy"><i class="ju">▲</i><i class="jd">▼</i><i class="jl">◀</i><i class="jr">▶</i><div id="joyk"></div></div></div>
 		<div class="acts"><button data-k="0">J</button><button data-k="1">K</button><button data-k="2">L</button><button data-k="3" class="ult">U</button></div>
 	</div>
 	<div id="tmenu"><button id="tr">↺</button><button id="tq">✕</button></div>
 </div>
 <script>
-const cv = document.getElementById('c'), x = cv.getContext('2d'), ov = document.getElementById('ov');
+const cv = document.getElementById('c'), ov = document.getElementById('ov');
+let x = cv.getContext('2d'); // let : remplacé temporairement par un canvas hors écran pour fabriquer les portraits
 let ws, me = -1, chars = [], S = null, code = '', err = '', last = '';
 const keys = {};
 
@@ -270,7 +278,7 @@ const SHOP = [
   { id: 'skin_kairos_azur', type: 'skin', char: 'Kairos', name: 'Kairos azur', price: 150, pal: { '#3b2a5a': '#174b63', '#2b1f3d': '#102f45', '#2a2038': '#163b50', '#d9b84a': '#55d6d2', '#f5ecd0': '#d9ffff' } },
 ];
 let tNew = '', chestGain = '', chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
-let save = { coins: 0, crystals: 0, xp: 0, chests: 0, icons: [], profile: null, friends: [], fid: null, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null, q2 = null;
+let save = { coins: 0, crystals: 0, xp: 0, chests: 0, icons: [], profile: null, friends: [], fid: null, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
 if (!save.stats || typeof save.stats !== 'object') save.stats = { played: 0, wins: 0, losses: 0, byChar: {} };
 if (!save.stats.byChar || typeof save.stats.byChar !== 'object') save.stats.byChar = {};
 save.stats.played = Number(save.stats.played) || 0;
@@ -300,19 +308,19 @@ function connect(first) {
       fList = m.list;
       if (fAdd) { if (m.missing.includes(fAdd)) fErr = 'Code introuvable'; else { save.friends.push(fAdd); persist(); fDraft = ''; } fAdd = null; }
     }
-    else if (m.t === 'queued2') { q2 = { n: m.n, end: Date.now() + m.rem }; }
+    else if (m.t === 'queued2') { q2 = m; }
     else if (m.t === 'room') { me = m.idx; chars = m.chars; maps = m.maps; code = m.code; searching = false; q2 = null; }
-    else if (m.t === 'err') { err = m.m; me = -1; S = null; searching = false; q2 = null; w.close(); }
+    else if (m.t === 'err') { err = m.m; me = -1; S = null; searching = false; w.close(); }
     else if (m.t === 's') {
-      S = m; const mt = m.tg ? m.tg[me] : me; if (m.p !== 'select') pre = null; if (m.w) { if (m.w[mt] > rw) qTrack('rm', 1, m.mp); rw = m.w[mt]; }
+      S = m; if (m.p !== 'select') pre = null; if (m.w) { if (m.w[me] > rw) qTrack('rm', 1, m.mp); rw = m.w[me]; }
       if (m.p === 'end' && m.co) {
         if (!paid) {
           paid = 1;
-          earned = m.co[mt];
+          earned = m.co[me];
           save.coins += earned;
           const charIndex = m.f && m.f[me] ? m.f[me].c : null;
           const charName = charIndex != null && chars[charIndex] ? chars[charIndex].name : 'Inconnu';
-          const won = Number(m.co[mt]) > Number(m.co[1 - mt]);
+          const won = Number(m.co[me]) > Number(m.co[m.two ? (me < 2 ? 2 : 0) : 1 - me]);
           save.stats.played++;
           if (won) save.stats.wins++; else save.stats.losses++;
           if (!save.stats.byChar[charName]) save.stats.byChar[charName] = { played: 0, wins: 0, losses: 0 };
@@ -331,8 +339,9 @@ function connect(first) {
   w.onclose = () => { if (w === ws && me >= 0) { err = 'Connexion perdue'; me = -1; S = null; ui(); } };
 }
 const go = o => { err = ''; connect(o); };
+let q2 = null; // état de la file 2v2 : { n joueurs en attente, left secondes avant les bots }
+const search2 = () => { err = ''; searching = 2; q2 = null; connect({ t: 'queue2' }); ui(); };
 const search = () => { err = ''; searching = true; connect({ t: 'queue' }); ui(); };
-const search2 = () => { err = ''; searching = true; q2 = { n: 1, end: Date.now() + 15000 }; connect({ t: 'queue2' }); ui(); };
 function openTraining() {
   view = 'training';
   if (!chars.length || !ws || ws.readyState !== 1) connect({ t: 'training_list' });
@@ -352,7 +361,7 @@ function kairosWin() {
   persist();
 }
 const again = () => ws.send(JSON.stringify({ t: 'again' }));
-function leave() { me = -1; S = null; err = ''; view = 'menu'; searching = false; q2 = null; try { ws.close(); } catch (e) {} ui(); }
+function leave() { me = -1; S = null; err = ''; view = 'menu'; searching = false; try { ws.close(); } catch (e) {} ui(); }
 function info(i) { if (pre == null && infoIdx !== i) { infoIdx = i; ui(); } }
 function setSkin(name, id, i) { save.skin[name] = id; persist(); if (S && S.p === 'select' && S.sel[me] === i) sendPick(i); ui(); }
 
@@ -371,6 +380,57 @@ function topChar() {
   return e ? e[0] : '—';
 }
 const myPub = () => ({ code: myCode(), name: save.profile.name, icon: save.profile.icon, lvl: lvlInfo().L, top: topChar(), ttl: save.profile.title || '' });
+// ===== INVITATIONS D'AMIS : un socket de présence reste ouvert pour recevoir/envoyer les invitations 2v2 =====
+let pws = null, invIn = null, invOut = null, invMsg = null;
+const pSend = o => { if (pws && pws.readyState === 1) { pws.send(JSON.stringify(o)); return true; } return false; };
+function presenceConnect() {
+  if (!save.profile || (pws && pws.readyState <= 1)) return;
+  const w = pws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host);
+  w.onopen = () => w.send(JSON.stringify({ t: 'hello', pres: 1, me: myPub() }));
+  w.onmessage = e => { let m; try { m = JSON.parse(e.data); } catch (er) { return; } if (w === pws) presenceMsg(m); };
+  w.onclose = () => { if (pws === w) { pws = null; invOut = null; invIn = null; renderInv(); } };
+}
+function presenceMsg(m) {
+  if (m.t === 'friends') { fList = m.list; if (view === 'friends' && me < 0) ui(); }
+  else if (m.t === 'invited') {
+    if (me >= 0 || searching || splashOn) { pSend({ t: 'invite_answer', id: m.id, yes: 0, busy: 1 }); return; } // déjà occupé (partie, recherche…)
+    invIn = { id: m.id, name: m.name, icon: m.icon, exp: Date.now() + 30000 }; renderInv();
+  }
+  else if (m.t === 'invite_end') { if (invIn && invIn.id === m.id) { invIn = null; renderInv(); } }
+  else if (m.t === 'invite_res') {
+    if (m.ok) invOut = { id: m.id, name: m.to, exp: Date.now() + 30000 };
+    else { invOut = null; flashInv(m.m || 'Invitation refusée'); }
+    renderInv();
+  }
+  else if (m.t === 'invite_go') { // l'ami a accepté : les deux joueurs rejoignent la même partie 2v2
+    invIn = null; invOut = null; renderInv();
+    if (me >= 0) return;
+    searching = 3; err = ''; connect({ t: 'duo', token: m.token }); ui();
+  }
+}
+function inviteFriend(code) {
+  if (!pSend({ t: 'invite', to: code })) { fErr = 'Connexion aux invitations indisponible, réessaie dans un instant'; ui(); return; }
+  fErr = ''; invMsg = null; ui();
+}
+function answerInv(yes) { if (!invIn) return; pSend({ t: 'invite_answer', id: invIn.id, yes: yes ? 1 : 0 }); invIn = null; renderInv(); }
+function cancelInv() { if (invOut) pSend({ t: 'invite_cancel', id: invOut.id }); invOut = null; renderInv(); }
+function flashInv(t) { invMsg = { t, exp: Date.now() + 4500 }; renderInv(); }
+function renderInv() {
+  let el = document.getElementById('invbox');
+  if (!el) { el = document.createElement('div'); el.id = 'invbox'; el.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:99999;background:#1c1f26;color:#fff;border:2px solid #f1c40f;border-radius:12px;padding:10px 16px;font:15px sans-serif;box-shadow:0 6px 24px #000a;display:none;text-align:center;max-width:92vw'; document.body.appendChild(el); }
+  const now = Date.now();
+  if (invMsg && invMsg.exp < now) invMsg = null;
+  if (invIn && invIn.exp < now) invIn = null;
+  if (invOut && invOut.exp < now) invOut = null;
+  let h = '';
+  const bs = 'margin:4px 3px 0;padding:6px 14px;border:0;border-radius:8px;color:#fff;font:bold 14px sans-serif;cursor:pointer;';
+  if (invIn) h = `${iconHtml(invIn.icon, 24)} <b>${esc(invIn.name)}</b> t’invite à jouer en <b>2v2</b> !<br><button onclick="answerInv(1)" style="${bs}background:#27ae60">✔ Accepter</button><button onclick="answerInv(0)" style="${bs}background:#c0392b">✖ Refuser</button> <small>(${Math.max(0, Math.ceil((invIn.exp - now) / 1000))} s)</small>`;
+  else if (invOut) h = `⏳ Invitation envoyée à <b>${esc(invOut.name)}</b>… <small>(${Math.max(0, Math.ceil((invOut.exp - now) / 1000))} s)</small><br><button onclick="cancelInv()" style="${bs}background:#7f8c8d">Annuler</button>`;
+  else if (invMsg) h = esc(invMsg.t);
+  el.innerHTML = h; el.style.display = h ? 'block' : 'none';
+}
+setInterval(presenceConnect, 3000); setInterval(renderInv, 500);
+setInterval(() => { if (view === 'friends' && me < 0 && save.profile && !fAdd) pSend({ t: 'friends', list: save.friends }); }, 4000); // pastilles « en ligne » à jour
 function syncFriends(add) {
   fErr = ''; fAdd = add || null;
   const list = save.friends.slice(); if (add && !list.includes(add)) list.push(add);
@@ -390,7 +450,7 @@ const friendsHtml = () => `<h2>👥 Amis</h2>${fErr ? `<p style="color:#f66">${f
   <p>Ton code ami : <b style="font-size:22px">${myCode()}</b><br><small>Donne-le à tes amis pour qu’ils t’ajoutent</small></p>
   <div><input maxlength="6" placeholder="CODE" value="${esc(fDraft)}" oninput="fDraft=this.value"> <button onclick="addFriend()">➕ Ajouter</button></div>
   <div class="cards">${save.friends.length ? save.friends.map(c => { const p = fList.find(q => q.code === c), rm = `<button onclick="removeFriend('${esc(c)}')" style="background:#7f8c8d;padding:4px 10px">Retirer</button>`;
-    return p ? `<div class="card" style="width:190px;cursor:default">${iconHtml(p.icon, 30)} <b>${esc(p.name)}</b><br>Niveau ${+p.lvl}<br>⭐ ${esc(p.top)}<br>${TITLES[p.ttl] ? '🏷️ ' + esc(TITLES[p.ttl]) + '<br>' : ''}${rm}</div>` : `<div class="card" style="width:190px;cursor:default">${esc(c)}<br>Profil introuvable<br>${rm}</div>`; }).join('') : '<p>Aucun ami pour le moment</p>'}</div>
+    return p ? `<div class="card" style="width:190px;cursor:default">${iconHtml(p.icon, 30)} <b>${esc(p.name)}</b> <span title="${p.on ? 'En ligne' : 'Hors ligne'}" style="color:${p.on ? '#2ecc71' : '#777'}">●</span><br>${p.on ? `<button onclick="inviteFriend('${esc(c)}')" style="background:#d35400;padding:4px 10px;margin:3px 0">⚔️ Inviter en 2v2</button><br>` : '<small style="opacity:.7">Hors ligne</small><br>'}Niveau ${+p.lvl}<br>⭐ ${esc(p.top)}<br>${TITLES[p.ttl] ? '🏷️ ' + esc(TITLES[p.ttl]) + '<br>' : ''}${rm}</div>` : `<div class="card" style="width:190px;cursor:default">${esc(c)}<br>Profil introuvable<br>${rm}</div>`; }).join('') : '<p>Aucun ami pour le moment</p>'}</div>
   <button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 // ===== ICÔNES DE PROFIL DÉBLOQUABLES (coffrets) : emblèmes inspirés des séries, dessinés en SVG. L'id (3 lettres) est ce qui est enregistré / envoyé aux amis =====
 const LOGOS = {
@@ -557,7 +617,7 @@ function statsHtml() {
 const quitBtn = '<button onclick="leave()" style="background:#7f8c8d">Retour au menu</button>';
 
 // Portraits détaillés calqués sur les silhouettes, coiffures et costumes dessinés en combat.
-function selectPortrait(c) {
+function selectPortraitSvg(c) {
   const commonFace = `<ellipse cx="32" cy="27" rx="11" ry="13" fill="${c.name === 'Viking' ? '#e0ac69' : c.name === 'Bruno' ? '#e8b48a' : c.name === 'Koro' ? '#f4d03f' : '#f5cba7'}"/>`;
   const portraits = {
     Bruno: `<path d="M8 64 Q10 43 21 42 L43 42 Q55 43 57 64Z" fill="#e74c3c"/><path d="M20 46 H44 V52 H20Z" fill="#fff"/><path d="M20 8 Q32 -1 44 8 L43 18 H21Z" fill="#171717"/><path d="M19 16 H45 V20 H19Z" fill="#e74c3c"/>${commonFace}<path d="M21 36 Q32 45 43 36" fill="none" stroke="#171717" stroke-width="3"/><circle cx="27" cy="27" r="1.7"/><circle cx="37" cy="27" r="1.7"/>`,
@@ -584,7 +644,8 @@ function selectPortrait(c) {
 function ui() {
   let h = '';
   ov.className = me >= 0 && S && S.p === 'end' ? 'end' : (me < 0 && !searching && view === 'menu' ? 'menu-screen' : '');
-  if (me < 0 && searching && q2) h = `<h2>👥 Recherche 2v2…</h2><p>Joueurs trouvés : <b id="q2n">${q2.n}</b> / 4</p><p>Les places vides seront remplies par des bots dans <b id="q2t">${Math.max(0, Math.ceil((q2.end - Date.now()) / 1000))}</b> s</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
+  if (me < 0 && searching === 2) { const n = q2 ? q2.n : 1, left = q2 ? q2.left : 15; h = `<h2>🤝 Recherche 2v2…</h2><p style="font-size:22px">👥 ${n} / 4 joueurs trouvés</p><p>${left > 0 ? 'Des bots complèteront les équipes dans <b>' + left + ' s</b> si personne d’autre n’arrive.' : 'Création de la partie…'}</p><div style="width:260px;height:10px;background:#000;border-radius:5px;overflow:hidden;margin:6px auto"><div style="width:${(15 - left) / 15 * 100}%;height:100%;background:#e67e22;transition:width 1s linear"></div></div>${quitBtn.replace('Retour au menu', 'Annuler')}`; }
+  else if (me < 0 && searching === 3) h = `<h2>🤝 Invitation acceptée !</h2><p>Connexion à la partie 2v2 avec ton ami…</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
   else if (me < 0 && searching) h = `<h2>🔎 Recherche d’un adversaire…</h2><p>Tu seras mis face à un joueur aléatoire.</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
   else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'botlvl' ? botLvlHtml() : view === 'friends' ? friendsHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : `<div class="menu-top">
       ${profileBar()}
@@ -600,7 +661,7 @@ function ui() {
       <section class="menu-group menu-combat">
         <h2>⚔️ Combats</h2>
         <button onclick="search()" style="background:#e67e22">🎲 Matchmaking</button>
-        <button onclick="search2()" style="background:#d35400">👥 Matchmaking 2v2</button>
+        <button onclick="search2()" style="background:#d35400">🤝 2v2 aléatoire<br><small>Bots si personne après 15 s</small></button>
         <button onclick="go({t:'create'})">🌐 Créer une partie</button>
         <button onclick="view='botlvl';ui()" style="background:#16a085">🤖 Jouer contre un bot</button>
         <div class="menu-join">
@@ -620,10 +681,10 @@ function ui() {
   else if (S.p === 'select') {
     const ii = pre != null ? pre : infoIdx != null ? infoIdx : (S.sel[me] != null ? S.sel[me] : 0), ic = chars[ii];
     const sks = SHOP.filter(q => q.type === 'skin' && q.char === ic.name && owns(q.id)), cur = save.skin[ic.name] || '';
-    h = `<h2 style="margin:2px">Choisis ton combattant${S.tg ? ' · ' + (S.tg[me] ? '🔴 Équipe rouge' : '🔵 Équipe bleue') : ''}</h2><div class="cards">${chars.map((c, i) => `<div class="card sm ${S.sel[me] === i || pre === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})">${selectPortrait(c)}<span class="char-name" style="color:${c.color}">${c.name}</span>${locked(c.name) ? '<span class="lock-mark">🔒</span>' : ''}</div>`).join('')}</div>
+    h = `<h2 style="margin:2px">Choisis ton combattant</h2>${S.two ? `<p style="margin:2px">🤝 2v2 · Tu es dans l’équipe ${me < 2 ? '🔵 Bleue' : '🔴 Rouge'} · coéquipier : ${S.sel[me ^ 1] != null ? '✔ prêt' : '…'}</p>` : ''}<div class="cards">${chars.map((c, i) => `<div class="card sm ${S.sel[me] === i || pre === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})">${selectPortrait(c)}<span class="char-name" style="color:${c.color}">${c.name}</span>${locked(c.name) ? '<span class="lock-mark">🔒</span>' : ''}</div>`).join('')}</div>
     <div class="panel"><b style="color:${ic.color};font-size:15px">${ic.name}</b>${locked(ic.name) ? ' 🔒 à débloquer dans la boutique' : ''} · ${ic.desc} · PV ${ic.hp}<br>${ic.atk.map((a, j) => 'JKLU'[j] + ' : ' + a).join(' &nbsp;·&nbsp; ')}${ic.alt ? '<br>✨ Forme : ' + ic.alt.join(' / ') : ''}${sks.length ? '<br>' + [{ id: '', name: 'Normal' }, ...sks].map(q => `<span class="chip ${cur === q.id ? 'on' : ''}" onclick="event.stopPropagation();setSkin('${ic.name}','${q.id}',${ii})">${q.name}</span>`).join('') : ''}</div>
     <button onclick="confirmPick()" ${pre == null || S.sel[me] != null ? 'disabled' : ''}>✔ Valider ${pre != null ? chars[pre].name : ''}</button>
-    <p style="margin:2px">${pre == null && S.sel[me] == null ? 'Clique sur un perso, choisis ton skin, puis valide' : ''}${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.tg ? '· Prêts : ' + S.sel.filter(v => v != null).length + '/4' : S.sel[1 - me] != null ? (S.bot ? '· Bot prêt 🤖' : '· Adversaire prêt ✔') : ''}</p>
+    <p style="margin:2px">${pre == null && S.sel[me] == null ? 'Clique sur un perso, choisis ton skin, puis valide' : ''}${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.two ? '· ' + S.sel.filter(v => v != null).length + '/4 prêts' : S.sel[1 - me] != null ? (S.bot ? '· Bot prêt 🤖' : '· Adversaire prêt ✔') : ''}</p>
     <p style="font-size:12px;opacity:.8;margin:2px">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques · U ou Espace : ultime (barre pleine)</p>${quitBtn}`;
   }
   else if (S.p === 'training') { ov.style.display = 'none'; last = ''; return; }
@@ -764,6 +825,30 @@ const sword = (hx, hy, tx, ty, col) => {
   LN(col || '#dfe6e9', 5, hx, hy, tx, ty); LN('#f1c40f', 4, hx + dy * .15, hy - dx * .15, hx - dy * .15, hy + dx * .15);
 };
 
+// ===== Portraits de sélection : le vrai sprite de combat (fighter) dessiné hors écran, avec le skin équipé =====
+const PORT_CACHE = {}; let PORT_ON = false;
+function portraitURL(c) {
+  const sk = save.skin[c.name] || '', key = c.name + '|' + sk;
+  if (PORT_CACHE[key]) return PORT_CACHE[key];
+  const cp = document.createElement('canvas'); cp.width = cp.height = 192;
+  const px = cp.getContext('2d'), mainX = x; let ok = false;
+  try {
+    x = px; PORT_ON = true;
+    px.save(); px.beginPath(); px.roundRect(2, 2, 188, 188, 18); px.clip();
+    const bg = px.createLinearGradient(0, 0, 0, 192); bg.addColorStop(0, '#2b313b'); bg.addColorStop(1, '#171a20'); px.fillStyle = bg; px.fillRect(0, 0, 192, 192);
+    const k = 192 / 120; px.scale(k, k); px.translate(60, 126 - 380); // zone montrée : 120 x 120 px (du haut du crâne jusqu'aux genoux)
+    fighter({ c: chars.indexOf(c), sk, x: 0, y: 380, fc: 1, fl: 0, iv: 0, sz: 1, ak: -1, ap: -1, pp: 0, bf: 0, fm: 0, sh: 0, lz: 0, fz: 0, sd: 0, pt: null, b: null, ad: null, vx: 0, vy: 0, bl: 0, cr: 0, fy: 0, hp: c.hp, ul: 0, dd: 0, te: 0, bo: 0, hk: null }, -5);
+    px.restore(); px.strokeStyle = c.color; px.lineWidth = 4; px.beginPath(); px.roundRect(2, 2, 188, 188, 18); px.stroke();
+    ok = true;
+  } catch (e) { console.warn('portrait', c.name, e); }
+  finally { x = mainX; PORT_ON = false; PAL = null; FL = 0; }
+  return ok ? (PORT_CACHE[key] = cp.toDataURL()) : null;
+}
+function selectPortrait(c) {
+  const u = portraitURL(c);
+  return u ? `<img class="portrait" style="width:100%;height:auto;display:block" src="${u}" alt="Portrait de ${c.name}">` : selectPortraitSvg(c);
+}
+
 function fighter(f, i) {
   const c = chars[f.c], s = f.fc, n = c.name, t = Date.now();
   FL = f.fl;
@@ -798,7 +883,7 @@ function fighter(f, i) {
     x.fillStyle = 'rgba(120,230,255,.8)'; x.beginPath(); x.ellipse(0, 0, 52, 11, 0, 0, 7); x.fill();
     x.fillStyle = '#fff'; x.beginPath(); x.ellipse(4, 0, 40, 5, 0, 0, 7); x.fill();
     x.restore(); x.restore(); PAL = null;
-    if (i === me) { x.fillStyle = '#fff'; x.font = '12px sans-serif'; x.textAlign = 'center'; x.fillText('▼ TOI', f.x, f.y - 120); }
+    teamTag(f, i, 120);
     return;
   }
   const skin = n === 'Viking' ? '#e0ac69' : n === 'Bruno' ? '#e8b48a' : '#f5cba7';
@@ -1368,10 +1453,37 @@ function fighter(f, i) {
     x.beginPath(); x.ellipse(f.pt[0], f.pt[1] - 45, 18, 28, 0, 0, 7); x.fill(); x.stroke();
   }
   if (f.b) { x.fillStyle = 'rgba(255,255,255,.3)'; x.fillRect(f.b[0], f.b[2], f.b[1] - f.b[0], f.b[3] - f.b[2]); }
-  if (S && S.tg) { x.fillStyle = S.tg[i] ? '#ff6b5b' : '#5dade2'; x.font = '14px sans-serif'; x.textAlign = 'center'; x.fillText('▼', f.x, f.y - 160 * (f.sz || 1)); if (i === me) { x.fillStyle = '#fff'; x.font = '12px sans-serif'; x.fillText('TOI', f.x, f.y - 175 * (f.sz || 1)); } }
-  else if (i === me) { x.fillStyle = '#fff'; x.font = '12px sans-serif'; x.textAlign = 'center'; x.fillText('▼ TOI', f.x, f.y - 168 * (f.sz || 1)); }
+  teamTag(f, i, 168 * (f.sz || 1));
 }
 
+function teamTag(f, i, dy) {
+  if (PORT_ON) return; // marqueur au-dessus du combattant : « ▼ TOI », ou la couleur d'équipe en 2v2
+  x.textAlign = 'center';
+  if (S.two) { x.fillStyle = f.te ? '#ff5a5a' : '#5aa0ff'; x.font = 'bold 13px sans-serif'; x.fillText(i === me ? '▼ TOI' : f.bo ? '▼ 🤖' : '▼', f.x, f.y - dy); }
+  else if (i === me) { x.fillStyle = '#fff'; x.font = '12px sans-serif'; x.fillText('▼ TOI', f.x, f.y - dy); }
+}
+function hud2() { // HUD 2v2 : deux barres empilées par équipe (gauche = bleus, droite = rouges)
+  const w = 300;
+  S.f.forEach((f, i) => {
+    const c = chars[f.c], side = i >> 1, row = i & 1, xx = side ? WW - 20 - w : 20, y0 = 8 + row * 50, pw = w * f.hp / c.hp, uw = w * f.ul / 100, rdy = f.ul >= 100 && !f.dd;
+    x.globalAlpha = f.dd ? .4 : 1;
+    if (f.sh > 0) { x.fillStyle = '#000'; x.fillRect(xx, y0, w, 4); x.fillStyle = '#7fd4ff'; const sw = w * f.sh / 60; x.fillRect(side ? xx + w - sw : xx, y0, sw, 4); }
+    x.fillStyle = '#000'; x.fillRect(xx, y0 + 5, w, 16);
+    x.fillStyle = f.dd ? '#666' : c.color; x.fillRect(side ? xx + w - pw : xx, y0 + 5, pw, 16);
+    x.fillStyle = side ? '#ff5a5a' : '#5aa0ff'; x.fillRect(side ? xx + w : xx - 5, y0 + 5, 5, 16);
+    x.fillStyle = '#000'; x.fillRect(xx, y0 + 23, w, 6);
+    x.fillStyle = rdy && ((Date.now() / 150) | 0) % 2 ? '#fff' : '#f1c40f'; x.fillRect(side ? xx + w - uw : xx, y0 + 23, uw, 6);
+    x.fillStyle = '#fff'; x.font = 'bold 12px sans-serif'; x.textAlign = side ? 'right' : 'left';
+    x.fillText((f.dd ? '✖ ' : '') + c.name + (i === me ? ' (toi)' : '') + (f.bo ? ' 🤖' : ''), side ? xx + w : xx, y0 + 42);
+    if (rdy) { x.fillStyle = '#f1c40f'; x.textAlign = side ? 'left' : 'right'; x.fillText(i === me ? '⚡ ULTIME : U' : '⚡ PRÊT', side ? xx : xx + w, y0 + 42); }
+    x.globalAlpha = 1;
+  });
+  for (let side = 0; side < 2; side++) for (let k = 0; k < 2; k++) {
+    const xx = side ? WW - 20 - 300 : 20;
+    x.fillStyle = k < S.w[side * 2] ? '#f1c40f' : '#555'; x.beginPath();
+    x.arc(side ? xx + 300 - 8 - k * 20 : xx + 8 + k * 20, 112, 6, 0, 7); x.fill();
+  }
+}
 function hud() {
   if (S.p === 'training') {
     const f = S.f[0], c = chars[f.c];
@@ -1387,22 +1499,20 @@ function hud() {
     x.fillText('Ultime toujours disponible', WW - 15, 50);
     return;
   }
-  S.f.forEach((f, i) => {
-    const tm = S.tg ? S.tg[i] : i, sl = S.tg ? i % 2 : 0, c = chars[f.c], w = sl ? 300 : 380, yo = sl * 82, xx = tm ? WW - 20 - w : 20, pw = Math.max(0, w * f.hp / c.hp), uw = w * f.ul / 100, rdy = f.ul >= 100;
-    x.globalAlpha = f.dd ? .45 : 1;
-    if (f.sh > 0) { x.fillStyle = '#000'; x.fillRect(xx, 12 + yo, w, 6); x.fillStyle = '#7fd4ff'; const sw = w * f.sh / 60; x.fillRect(tm ? xx + w - sw : xx, 12 + yo, sw, 6); }
-    x.fillStyle = '#000'; x.fillRect(xx, 20 + yo, w, 22);
-    x.fillStyle = c.color; x.fillRect(tm ? xx + w - pw : xx, 20 + yo, pw, 22);
-    if (S.tg) { x.fillStyle = tm ? '#e74c3c' : '#3498db'; x.fillRect(tm ? xx + w : xx - 5, 20 + yo, 5, 35); }
-    x.fillStyle = '#000'; x.fillRect(xx, 46 + yo, w, 9);
-    x.fillStyle = rdy && ((Date.now() / 150) | 0) % 2 ? '#fff' : '#f1c40f'; x.fillRect(tm ? xx + w - uw : xx, 46 + yo, uw, 9);
-    x.fillStyle = '#fff'; x.font = 'bold 14px sans-serif'; x.textAlign = tm ? 'right' : 'left';
-    x.fillText(c.name + (i === me ? ' (toi)' : '') + (f.dd ? ' ✖ K.O.' : ''), tm ? xx + w : xx, 74 + yo);
-    if (rdy && !f.dd) { x.fillStyle = '#f1c40f'; x.textAlign = tm ? 'left' : 'right'; x.fillText(i === me ? '⚡ ULTIME PRÊT : U' : '⚡ ULTIME PRÊT', tm ? xx : xx + w, 74 + yo); }
-    x.globalAlpha = 1;
-    if (!sl) for (let k = 0; k < 2; k++) {
-      x.fillStyle = k < S.w[tm] ? '#f1c40f' : '#555'; x.beginPath();
-      x.arc(tm ? xx + w - 8 - k * 20 : xx + 8 + k * 20, 90, 6, 0, 7); x.fill();
+  if (S.two) hud2();
+  (S.two ? [] : S.f).forEach((f, i) => {
+    const c = chars[f.c], w = 380, xx = i ? WW - 20 - w : 20, pw = w * f.hp / c.hp, uw = w * f.ul / 100, rdy = f.ul >= 100;
+    if (f.sh > 0) { x.fillStyle = '#000'; x.fillRect(xx, 12, w, 6); x.fillStyle = '#7fd4ff'; const sw = w * f.sh / 60; x.fillRect(i ? xx + w - sw : xx, 12, sw, 6); }
+    x.fillStyle = '#000'; x.fillRect(xx, 20, w, 22);
+    x.fillStyle = c.color; x.fillRect(i ? xx + w - pw : xx, 20, pw, 22);
+    x.fillStyle = '#000'; x.fillRect(xx, 46, w, 9);
+    x.fillStyle = rdy && ((Date.now() / 150) | 0) % 2 ? '#fff' : '#f1c40f'; x.fillRect(i ? xx + w - uw : xx, 46, uw, 9);
+    x.fillStyle = '#fff'; x.font = 'bold 14px sans-serif'; x.textAlign = i ? 'right' : 'left';
+    x.fillText(c.name + (i === me ? ' (toi)' : ''), i ? xx + w : xx, 74);
+    if (rdy) { x.fillStyle = '#f1c40f'; x.textAlign = i ? 'left' : 'right'; x.fillText(i === me ? '⚡ ULTIME PRÊT : U' : '⚡ ULTIME PRÊT', i ? xx : xx + w, 74); }
+    for (let k = 0; k < 2; k++) {
+      x.fillStyle = k < S.w[i] ? '#f1c40f' : '#555'; x.beginPath();
+      x.arc(i ? xx + w - 8 - k * 20 : xx + 8 + k * 20, 90, 6, 0, 7); x.fill();
     }
   });
   x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = 'bold 28px sans-serif'; x.fillText(fmt(S.tm), WW / 2, 42);
@@ -1487,6 +1597,23 @@ tc.querySelectorAll('button').forEach(b => {
   b.addEventListener('pointerdown', down); b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('lostpointercapture', up);
   b.addEventListener('contextmenu', e => e.preventDefault());
 });
+// ===== JOYSTICK TACTILE : le déplacement analogique remplace la croix directionnelle =====
+const joy = document.getElementById('joy'), joyK = document.getElementById('joyk');
+let joyId = null;
+function joyReset() { joyId = null; joy.classList.remove('on'); joyK.style.transform = ''; ['l', 'r', 'u', 'd'].forEach(k => press(k, false)); }
+function joyMove(e) { // coordonnées toutes en pixels écran (compatibles avec le zoom CSS de l'overlay)
+  const r = joy.getBoundingClientRect(), R = r.width / 2, loc = r.width / (joy.offsetWidth || r.width), maxd = R * .6;
+  let dx = e.clientX - (r.left + R), dy = e.clientY - (r.top + R); const L = Math.hypot(dx, dy) || 1;
+  if (L > maxd) { dx *= maxd / L; dy *= maxd / L; }
+  joyK.style.transform = 'translate(' + dx / loc + 'px,' + dy / loc + 'px)';
+  const nx = dx / maxd, ny = dy / maxd, dead = Math.hypot(nx, ny) < .25;
+  press('l', !dead && nx < -.4); press('r', !dead && nx > .4); press('u', !dead && ny < -.55); press('d', !dead && ny > .55);
+}
+joy.addEventListener('pointerdown', e => { e.preventDefault(); if (joyId !== null) return; joyId = e.pointerId; try { joy.setPointerCapture(e.pointerId); } catch (er) {} joy.classList.add('on'); joyMove(e); });
+joy.addEventListener('pointermove', e => { if (e.pointerId === joyId) { e.preventDefault(); joyMove(e); } });
+['pointerup', 'pointercancel'].forEach(n => joy.addEventListener(n, e => { if (e.pointerId === joyId) joyReset(); }));
+joy.addEventListener('lostpointercapture', e => { if (e.pointerId === joyId) joyReset(); });
+joy.addEventListener('contextmenu', e => e.preventDefault());
 document.getElementById('tr').addEventListener('click', () => { if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'training_reset' })); });
 document.getElementById('tq').addEventListener('click', () => leave());
 
@@ -1553,7 +1680,7 @@ function draw() {
   gpPoll();
   if (!splashOn && !cfPhase && (save.chests || 0) > 0 && !searching && (me < 0 || (S && S.p === 'end'))) cfStart();
   const inGame = isTouch && me >= 0 && !!S && !!S.f && S.f.length > 0 && S.p !== 'end';
-  if (inGame !== touchOn) { touchOn = inGame; tc.style.display = inGame ? 'flex' : 'none'; if (!inGame) ['l', 'r', 'u', 'd', 0, 1, 2, 3].forEach(k => { keys[k] = false; }); }
+  if (inGame !== touchOn) { touchOn = inGame; tc.style.display = inGame ? 'flex' : 'none'; if (!inGame) { ['l', 'r', 'u', 'd', 0, 1, 2, 3].forEach(k => { keys[k] = false; }); joyId = null; joy.classList.remove('on'); joyK.style.transform = ''; } }
   const tr = inGame && S.p === 'training';
   if (tr !== trOn) { trOn = tr; tm.style.display = tr ? 'flex' : 'none'; }
   PAL = null; FL = 0; x.save(); x.translate(0, OFF); drawMapWide(S && S.f.length ? S.mp : -1);
