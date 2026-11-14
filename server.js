@@ -117,10 +117,23 @@ const CH = [
     { n: 'Bankai : Tensa Zangetsu', ult: 1, type: 'form', su: 20, ac: 1, rc: 20, cd: 0, dur: 600 }], alt: [
     { n: 'Tensa Zangetsu (katana rapide)', type: 'm', su: 4, ac: 4, rc: 7, cd: 6, dmg: 8, rng: 84, h: 34, kb: 5, st: 12 },
     { n: 'Getsuga noir (Kuroi)', type: 'p', su: 10, ac: 1, rc: 14, cd: 55, dmg: 19, vx: 16, r: 24, kb: 14, st: 26, vis: 10 },
-    { n: 'Masque d’Hollow (bonus)', type: 'buff', su: 8, ac: 1, rc: 10, cd: 420, dur: 300 }] }
+    { n: 'Masque d’Hollow (bonus)', type: 'buff', su: 8, ac: 1, rc: 10, cd: 420, dur: 300 }] },
+  // Frieren (Sōsō no Frieren) : barrière défensive (ttl = durée) | Zoltraak = rayon qui perce toute défense (ub:2 ignore blocage, Infini et cristallisation)
+  // storm = Judradjim, tempête de foudre (cnt éclairs à des décalages offs, espacés de gap frames) | sorg = Sorganeil : lie l'ennemi (bind frames) puis Zoltraak géant (bd = paramètres du rayon, dl = délai)
+  { name: 'Frieren', desc: 'Mage elfe millénaire : barrière, Zoltraak, Judradjim, Sorganeil', hp: 95, spd: 4.0, jmp: 13, color: '#7dcfb6', atk: [
+    { n: 'Barrière défensive', type: 'shield', su: 6, ac: 1, rc: 10, cd: 300, val: 30, ttl: 240 },
+    { n: 'Zoltraak (perce toute défense)', type: 'beam', ub: 2, cl: 1, su: 8, ac: 1, rc: 16, cd: 50, dmg: 13, kb: 10, st: 22, warn: 10, life: 6, wd: 16, ox: 106 },
+    { n: 'Judradjim (tempête de foudre)', type: 'storm', su: 12, ac: 1, rc: 22, cd: 140, offs: [0, 62, -62, 0], gap: 11, dmg: 8, kb: 5, st: 14, warn: 20, strike: 6, cl: 1 },
+    { n: 'Sorganeil + Zoltraak', ult: 1, ub: 2, type: 'sorg', su: 14, ac: 40, rc: 20, cd: 0, bind: 62, dl: 10, bd: { dmg: 38, kb: 18, st: 40, warn: 14, life: 10, wd: 44, ub: 2, cl: 1, ox: 106 } }] }
   // Kairos (perso original) : echo = frappe différée sur la position marquée | rewind = retour 2 s en arrière (rend une partie des PV perdus) | timestop = fige l'ennemi, ses dégâts sont mis de côté puis infligés d'un coup
 ];
-const CHARS = CH.map(({ name, desc, hp, color, atk, alt }) => ({ name, desc, hp, color, atk: atk.map(a => a.n), alt: alt ? alt.map(a => a.n) : null }));
+// Événement Frieren : dispo du dimanche soir à 00h01 (heure de Paris, soit lundi 16/11/2026 00:01) ensuite définitivement. Modifier FRIEREN_FROM pour changer la date.
+const FRIEREN_FROM = Date.parse('2026-11-16T00:01:00+01:00');
+const h53 = (s, seed = 0) => { let a = 0xdeadbeef ^ seed, b = 0x41c6ce57 ^ seed; for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); a = Math.imul(a ^ c, 2654435761); b = Math.imul(b ^ c, 1597334677); } a = Math.imul(a ^ (a >>> 16), 2246822507) ^ Math.imul(b ^ (b >>> 13), 3266489909); b = Math.imul(b ^ (b >>> 16), 2246822507) ^ Math.imul(a ^ (a >>> 13), 3266489909); return 4294967296 * (2097151 & b) + (a >>> 0); }, ADM_H = 574438982976814;
+const avail = (c, adm) => adm || !CH[c] || CH[c].name !== 'Frieren' || (Date.now() >= FRIEREN_FROM);
+const admOk = (ws, m) => (m.adm && h53(String(m.adm)) === ADM_H && (ws.adm = 1), !!ws.adm);
+const rndC = () => { const ok = CH.map((_, i) => i).filter(avail); return ok[Math.random() * ok.length | 0]; };
+const getChars = () => CH.map(({ name, desc, hp, color, atk, alt }, i) => ({ name, desc, hp, color, atk: atk.map(a => a.n), alt: alt ? alt.map(a => a.n) : null, hid: avail(i) ? 0 : 1 }));
 
 // gr = gravité, acc = adhérence du sol (1 = normal, petit = glissant)
 const MAPS = [
@@ -175,15 +188,15 @@ function hurt(t, dmg, kb, st, lift, srcX, ub, a) {
   const dir = srcX < t.x ? 1 : -1;
   if (t.inv) return;
   if (t.frozen > 0) { t.stored += dmg * (t.fzm || 1); t.fl = 3; recordTrainingHit(t, dmg); return; }
-  if (t.shield > 0) { // Infini : la 2e barre de vie absorbe tout, sans recul ni étourdissement
+  if (t.shield > 0 && ub !== 2) { // Infini : la 2e barre de vie absorbe tout, sans recul ni étourdissement
     t.shield = Math.max(0, t.shield - dmg); t.fl = 3;
     if (a && !ub) a.ult = Math.min(100, a.ult + dmg * .75);
     return;
   }
-  if (t.crys > 0) dmg *= .4; // cristallisation
+  if (t.crys > 0 && ub !== 2) dmg *= .4; // cristallisation
   if (!ub && t.block && t.stun <= 0 && t.y >= G) { t.hp -= dmg * (CH[t.c].blk ?? .15); t.vx = dir * kb * .3; t.fl = 4; return; }
   recordTrainingHit(t, dmg);
-  t.hp -= dmg; t.stun = st; t.vx = dir * kb; if (lift) t.vy = lift; t.atk = null; t.fl = 6; t.fly = 0; t.hf = null; t.hook = null;
+  t.hp -= dmg; t.stun = st; t.bound = 0; t.vx = dir * kb; if (lift) t.vy = lift; t.atk = null; t.fl = 6; t.fly = 0; t.hf = null; t.hook = null;
   if (!ub) { t.ult = Math.min(100, t.ult + dmg * 1.2); if (a) a.ult = Math.min(100, a.ult + dmg * 1.5); }
 }
 // brûlure : dégâts sans étourdissement
@@ -210,6 +223,8 @@ function step(r, i) {
   if (f.fly > 0) f.fly--;
   if (f.crys > 0) f.crys--;
   if (f.hook && --f.hkt <= 0) f.hook = null;
+  if (f.sht > 0 && --f.sht === 0) f.shield = 0; // la barrière de Frieren se dissipe
+  if (f.bound > 0) f.bound--;
   if (f.portal && --f.portal.t <= 0) f.portal = null;
   f.inv = 0; f.ghost = 0; f.sz = (f.form > 0 && c.big) || 1;
   f.ult = Math.min(100, f.ult + 0.008);
@@ -242,8 +257,13 @@ function step(r, i) {
         for (let j = 0; j < (d.cnt || 1); j++)
           r.pj.push({ x: f.x + f.face * (30 - (d.clone ? j * 45 : 0)), y: f.y - (d.cy || (d.low ? 18 : BH * .6)), vx: f.face * d.vx, vy: d.vy0 || (d.cnt && !d.clone ? (j - 1) * 1.8 : 0), r: d.r, o: i, d });
       } else if (d.type === 'sky') r.fx.push({ x: o.x, t: 0, o: i, d });
+      else if (d.type === 'storm') { // Judradjim : plusieurs éclairs successifs autour de l'ennemi
+        d.offs.forEach((off, j) => r.fx.push({ x: clampX(o.x + off, 1), t: -j * d.gap, o: i, d }));
+      } else if (d.type === 'sorg') { // Sorganeil : les ennemis sont immobilisés
+        for (const e of enemies(r, i)) { e.stun = Math.max(e.stun, d.bind); e.atk = null; e.vx = 0; e.fly = 0; e.hf = null; e.hook = null; e.bound = d.bind; }
+      }
       else if (d.type === 'buff') f.buff = d.dur;
-      else if (d.type === 'shield') f.shield = d.val;
+      else if (d.type === 'shield') { f.shield = d.val; f.sht = d.ttl || 0; }
       else if (d.type === 'form') f.form = d.dur;
       else if (d.type === 'fly') f.fly = d.dur;
       else if (d.type === 'echo') r.fx.push({ k: 'echo', x: o.x, y: o.y - BH * sz(o) / 2, t: 0, o: i, d });
@@ -258,7 +278,7 @@ function step(r, i) {
       }
       else if (d.type === 'laserform') { f.lz = d.dur; f.lzd = d; }
       else if (d.type === 'beam') { // gros laser : part du portail s'il existe, sinon de Yugo, vers la position actuelle de l'ennemi
-        r.fx.push({ k: 'beam', o: i, d, np: f.portal ? 0 : 1, x: f.portal ? f.portal.x : f.x + f.face * 18, y: f.portal ? f.portal.y - 45 : f.y - BH * z * .6, tx: o.x, ty: o.y - BH * sz(o) / 2, t: 0 });
+        r.fx.push({ k: 'beam', o: i, d, np: f.portal ? 0 : 1, x: f.portal ? f.portal.x : f.x + f.face * Math.min(d.ox || 18, Math.max(18, Math.abs(o.x - f.x) - 24)), y: f.portal ? f.portal.y - 45 : f.y - BH * z * .6, tx: o.x, ty: o.y - BH * sz(o) / 2, t: 0 });
       } else if (d.type === 'portal') {
         if (f.portal) { // un portail existe : on s'y téléporte
           r.fx.push({ k: 'cos', x: f.x, y: f.y - 45, t: 0, life: 14 });
@@ -303,6 +323,9 @@ function step(r, i) {
         const L = Math.hypot(ux, uy); a.dx = ux / L; a.dy = uy / L;
       } else if (d.type === 'sd') a.dx = dx0 || f.face;
       else if (d.type === 'zz') a.dir = f.face;
+    }
+    if (d.type === 'sorg' && a.f === d.su + 1 + d.dl) { // ... puis le Zoltraak géant part sur chaque ennemi lié
+      for (const e of enemies(r, i)) if (e.bound > 0) r.fx.push({ k: 'beam', o: i, d: d.bd, np: 1, x: f.x + f.face * Math.min(d.bd.ox || 18, Math.max(18, Math.abs(e.x - f.x) - 24)), y: f.y - BH * z * .6, tx: e.x, ty: e.y - BH * sz(e) / 2, t: 0 });
     }
     if (d.type === 'dk' && a.f > d.su && a.f <= d.su + d.ac) { f.vx = a.dx * d.spd; f.vy = a.dy * d.spd; }
     if (d.type === 'sd' && a.f > d.su && a.f <= d.su + d.ac) { f.vx = a.dx * d.spd; f.inv = 1; f.ghost = 1; }
@@ -490,10 +513,12 @@ function thinkOne(r, i) {
       const a = attacks[j];
       if (!a || f.cds[j] > 0 || (a.ult && f.ult < 100)) continue;
       let score = 0;
-      if (a.type === 'buff' || a.type === 'shield' || a.type === 'form' || a.type === 'crys' || a.type === 'heal' || a.type === 'laserform') {
+      if (a.type === 'buff' || (a.type === 'shield' && !a.ttl) || a.type === 'form' || a.type === 'crys' || a.type === 'heal' || a.type === 'laserform') {
         score = (f.hp < c.hp * .72 || f.buff <= 0 || f.shield <= 0 || f.form <= 0) ? 75 : -10;
       } else if (a.type === 'rewind') score = f.hp < c.hp * .6 ? 70 : -10;
       else if (a.type === 'p') score = (dist < 520 ? 55 : 10) - Math.abs(dist - 260) * .04;
+      else if (a.type === 'shield' && a.ttl) score = f.shield <= 0 && ((o.atk && dist < 300) || f.hp < c.hp * .6) ? 72 : -10; // barrière : quand l'ennemi attaque
+      else if (a.type === 'storm' || a.type === 'sorg') score = dist < 520 ? 58 : 8;
       else if (a.type === 'kunai6' || a.type === 'sky' || a.type === 'portals' || a.type === 'fire' || a.type === 'beam' || a.type === 'rush' || a.type === 'echo' || a.type === 'timestop') score = dist < 420 ? 58 : 5;
       else if (a.type === 'tp' || a.type === 'grap' || a.type === 'portal') score = dist > 180 ? 38 : 5;
       else score = dist < (a.rng || 75) + 45 ? 65 : -5;
@@ -564,10 +589,10 @@ function tick(r) {
     if (--r.t <= 0) { r.f = r.f.map((f, i) => nf(f.c, i, f.inp, f.ult, !!r.two)); r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 120; r.tm = ROUND; r.msg = ''; }
   }
   else if (r.ph === 'end') {
-    if (r.again.every(Boolean)) { r.ph = 'select'; r.sel = r.two ? r.bots.map(b => b ? (Math.random() * CH.length | 0) : null) : [null, r.bot ? (Math.random() * CH.length | 0) : null]; r.wins = [0, 0]; r.msg = ''; r.f = []; r.selT = 0; }
+    if (r.again.every(Boolean)) { r.ph = 'select'; r.sel = r.two ? r.bots.map(b => b ? (rndC()) : null) : [null, r.bot ? (rndC()) : null]; r.wins = [0, 0]; r.msg = ''; r.f = []; r.selT = 0; }
   }
   else if (r.ph === 'select' && r.two) { // 2v2 : tout le monde a choisi (bots inclus) -> début ; au bout de 40 s, choix aléatoire pour les indécis
-    if (++r.selT > 2400) r.sel.forEach((v, q) => { if (v == null) r.sel[q] = Math.random() * CH.length | 0; });
+    if (++r.selT > 2400) r.sel.forEach((v, q) => { if (v == null) r.sel[q] = rndC(); });
     if (r.sel.every(v => v != null)) { r.wins = [0, 0]; start(r); }
   }
   const live = r.ph !== 'wait' && r.ph !== 'select';
@@ -579,19 +604,19 @@ function tick(r) {
     f: live ? r.f.map((f, q) => {
       const d = f.atk && f.atk.d;
       return { c: f.c, sk: r.sk[q], te: f.tm, dd: f.dead ? 1 : 0, bo: r.bots && r.bots[q] ? 1 : 0, x: Math.round(f.x), y: Math.round(f.y), hp: Math.max(0, Math.round(f.hp)), fc: f.face, bl: f.block, fl: f.fl > 0 ? 1 : 0,
-        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0, lz: f.lz > 0 ? 1 : 0, fz: f.frozen > 0 ? 1 : 0, sd: Math.round(f.stored), vx: Math.round(f.vx * 10) / 10, vy: Math.round(f.vy * 10) / 10, pt: f.portal ? [Math.round(f.portal.x), Math.round(f.portal.y)] : null,
+        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0, lz: f.lz > 0 ? 1 : 0, fz: f.frozen > 0 ? 1 : 0, bd: f.bound > 0 ? 1 : 0, sd: Math.round(f.stored), vx: Math.round(f.vx * 10) / 10, vy: Math.round(f.vy * 10) / 10, pt: f.portal ? [Math.round(f.portal.x), Math.round(f.portal.y)] : null,
         hk: f.hook ? [Math.round(f.hook.x), Math.round(f.hook.y)] : f.hf ? [Math.round(f.hf.x), Math.round(f.hf.y)] : null,
         ad: f.atk && f.atk.dx !== undefined ? [Math.round(f.atk.dx * 10) / 10, Math.round((f.atk.dy || 0) * 10) / 10] : null,
         ak: f.atk ? f.atk.k : -1, ap: d ? (f.atk.f <= d.su + (d.dsh || 0) ? 0 : f.atk.f <= d.su + (d.dsh || 0) + d.ac ? 1 : 2) : -1, pp: d ? atkPP(f) : 0,
         b: f.atk && f.atk.b ? f.atk.b.map(Math.round) : null };
     }) : [],
     pj: live ? r.pj.map(p => ({ x: Math.round(p.x), y: Math.round(p.y), r: p.r, o: p.o, k: p.d.vis || 0, v: Math.sign(p.vx) })) : [],
-    fx: live ? r.fx.filter(e => e.k !== 'por' || e.t >= 0).map(e => e.k === 'cos' ? { p: 2, x: Math.round(e.x), y: Math.round(e.y), a: e.t / e.life }
+    fx: live ? r.fx.filter(e => e.t >= 0).map(e => e.k === 'cos' ? { p: 2, x: Math.round(e.x), y: Math.round(e.y), a: e.t / e.life }
       : e.k === 'fire' ? { p: 5, x: Math.round(e.x), w: e.w, a: e.t / e.d.life }
       : e.k === 'echo' ? { p: 6, x: Math.round(e.x), y: Math.round(e.y), a: Math.min(1, e.t / e.d.warn), r: e.d.rad, h: e.t >= e.d.warn ? 1 : 0 }
-      : e.k === 'beam' ? { p: e.t >= e.d.warn ? 4 : 3, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: Math.min(1, e.t / e.d.warn), wd: e.d.wd, np: e.np }
+      : e.k === 'beam' ? { p: e.t >= e.d.warn ? 4 : 3, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: Math.min(1, e.t / e.d.warn), wd: e.d.wd, np: e.np, cl: e.d.cl || 0 }
       : e.k === 'por' ? { p: e.t >= e.d.warn ? 4 : 3, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: Math.min(1, e.t / e.d.warn) }
-      : { p: e.t > e.d.warn ? 1 : 0, x: Math.round(e.x) }) : [] };
+      : { p: e.t > e.d.warn ? 1 : 0, x: Math.round(e.x), c: e.d.cl || 0 }) : [] };
   r.ps.forEach(p => tx(p, s));
 }
 
@@ -613,7 +638,7 @@ const INV_TTL = 30000, DUO_TTL = 12000;
 const rid = () => Math.random().toString(36).slice(2, 10);
 const Q2_WAIT = 15000; // 2v2 : attente max (ms) avant de compléter avec des bots
 const newCode = () => { let c; do { c = Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.random() * 24 | 0]).join(''); } while (rooms.has(c)); return c; };
-const join = ws => tx(ws, { t: 'room', code: ws.room.code, idx: ws.idx, chars: CHARS, maps: MAPS.map(({ n, note }) => ({ n, note })), two: ws.room.two ? 1 : 0 });
+const join = ws => tx(ws, { t: 'room', code: ws.room.code, idx: ws.idx, chars: getChars(), maps: MAPS.map(({ n, note }) => ({ n, note })), two: ws.room.two ? 1 : 0 });
 
 wss.on('connection', ws => {
   ws.on('message', raw => {
@@ -665,8 +690,8 @@ wss.on('connection', ws => {
       return tx(ws, { t: 'friends', list: codes.filter(c => profiles[c]).map(c => ({ ...profiles[c], on: !!(presence.get(c) && presence.get(c).readyState === 1) })), missing: codes.filter(c => !profiles[c]) });
     }
     if (m.t === 'training_list' && !ws.room) {
-      tx(ws, { t: 'chars', chars: CHARS });
-    } else if (m.t === 'train' && !ws.room && CH[m.c]) {
+      tx(ws, { t: 'chars', chars: getChars() });
+    } else if (m.t === 'train' && !ws.room && CH[m.c] && avail(m.c, admOk(ws, m))) {
       const roomCode = 'TRAIN_' + Date.now() + '_' + Math.random().toString(36).slice(2);
       const r = { code: roomCode, ps: [ws], ph: 'training', sel: [m.c, 0], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: 0, sk: ['', ''], again: [0, 0], co: [0, 0], training: true };
       rooms.set(r.code, r);
@@ -677,7 +702,7 @@ wss.on('connection', ws => {
       const r = ws.room;
       if (r && r.training && ws.idx === 0) startTraining(r, r.sel[0], r.sk[0]);
     } else if (m.t === 'bot' && !ws.room) {
-      const r = { code: newCode(), ps: [ws], ph: 'select', sel: [null, Math.random() * CH.length | 0], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 1], co: [0, 0], bot: true, bots: [false, true], lvl: [0, 1, 2].includes(+m.lvl) ? +m.lvl : 1 };
+      const r = { code: newCode(), ps: [ws], ph: 'select', sel: [null, rndC()], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 1], co: [0, 0], bot: true, bots: [false, true], lvl: [0, 1, 2].includes(+m.lvl) ? +m.lvl : 1 };
       rooms.set(r.code, r); ws.room = r; ws.idx = 0; join(ws);
     } else if (m.t === 'create' && !ws.room) {
       const r = { code: newCode(), ps: [ws], ph: 'wait', sel: [null, null], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 0], co: [0, 0] };
@@ -694,10 +719,10 @@ wss.on('connection', ws => {
     } else if (m.t === 'join' && !ws.room) {
       const r = rooms.get(String(m.code || '').toUpperCase().trim());
       if (!r || r.ps.length > 1) return tx(ws, { t: 'err', m: 'Code invalide ou partie pleine' });
-      r.ps.push(ws); ws.room = r; ws.idx = 1; r.ph = 'select'; join(ws); tx(r.ps[0], { t: 'room', code: r.code, idx: 0, chars: CHARS, maps: MAPS.map(({ n, note }) => ({ n, note })) });
+      r.ps.push(ws); ws.room = r; ws.idx = 1; r.ph = 'select'; join(ws); tx(r.ps[0], { t: 'room', code: r.code, idx: 0, chars: getChars(), maps: MAPS.map(({ n, note }) => ({ n, note })) });
     } else if (m.t === 'pick') {
       const r = ws.room;
-      if (r && r.ph === 'select' && CH[m.c]) { r.sel[ws.idx] = m.c; r.sk[ws.idx] = String(m.sk || '').slice(0, 40); if (r.sel.every(v => v != null)) { r.wins = [0, 0]; start(r); } }
+      if (r && r.ph === 'select' && CH[m.c] && avail(m.c, admOk(ws, m))) { r.sel[ws.idx] = m.c; r.sk[ws.idx] = String(m.sk || '').slice(0, 40); if (r.sel.every(v => v != null)) { r.wins = [0, 0]; start(r); } }
     } else if (m.t === 'again') {
       const r = ws.room; if (r && r.ph === 'end') r.again[ws.idx] = 1;
     } else if (m.t === 'in') {
@@ -717,7 +742,7 @@ wss.on('connection', ws => {
     const r = ws.room; if (!r) return;
     if (r.two) { // 2v2 : le joueur qui part est remplacé par un bot, la partie continue pour les autres
       r.ps = r.ps.filter(p => p !== ws); r.bots[ws.idx] = true; r.again[ws.idx] = 1;
-      if (r.sel[ws.idx] == null) r.sel[ws.idx] = Math.random() * CH.length | 0;
+      if (r.sel[ws.idx] == null) r.sel[ws.idx] = rndC();
       if (!r.ps.length) rooms.delete(r.code);
       return;
     }
@@ -729,7 +754,7 @@ wss.on('connection', ws => {
 // ===== MATCHMAKING 2v2 : 4 joueurs -> départ immédiat ; sinon, après 15 s d'attente, les places libres sont prises par des bots =====
 function makeRoom2(humans, fixed) {
   if (!fixed) for (let k = humans.length - 1; k > 0; k--) { const j = Math.random() * (k + 1) | 0; [humans[k], humans[j]] = [humans[j], humans[k]]; } // équipes au hasard
-  const bots = [true, true, true, true], sel = [0, 1, 2, 3].map(() => Math.random() * CH.length | 0);
+  const bots = [true, true, true, true], sel = [0, 1, 2, 3].map(() => rndC());
   humans.forEach((w, k) => { bots[k] = false; sel[k] = null; w.idx = k; }); // 1-2 joueurs : même équipe (bleue) contre 2 bots
   const r = { code: newCode(), ps: humans.slice(), two: true, bots, ph: 'select', sel, wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', '', '', ''], again: bots.map(b => b ? 1 : 0), co: [0, 0, 0, 0], lvl: 1, selT: 0 };
   rooms.set(r.code, r);
