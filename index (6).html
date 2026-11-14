@@ -207,6 +207,7 @@ html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 #rot{display:none;position:absolute;top:0;left:0;right:0;background:#e67e22;color:#fff;text-align:center;padding:5px;font-size:13px;z-index:6}
 @media (pointer:coarse) and (orientation:portrait){#rot{display:block}}
 @media (pointer:coarse) and (orientation:landscape){#wrap{width:auto}canvas{width:min(100vw,200vh);height:auto}}
+.pcell{width:84px;min-height:74px;box-sizing:border-box;border-radius:8px;padding:6px 4px;font-size:12px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}
 </style>
 </head>
 <body>
@@ -278,7 +279,7 @@ const SHOP = [
   { id: 'skin_ichigo_bloodchains', type: 'skin', char: 'Ichigo', name: 'Ichigo - Sauveur de Rukia', price: 250, look: 'bloodchains', desc: 'Ichigo à Soul Society : grand manteau beige à capuche pointue, tunique noire, bandages, obi blanc et Zangetsu au ruban blanc', pal: {} },
   { id: 'skin_kairos_azur', type: 'skin', char: 'Kairos', name: 'Kairos azur', price: 150, pal: { '#3b2a5a': '#174b63', '#2b1f3d': '#102f45', '#2a2038': '#163b50', '#d9b84a': '#55d6d2', '#f5ecd0': '#d9ffff' } },
 ];
-let tNew = '', chestGain = '', chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
+let passGain = 0, tNew = '', chestGain = '', chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
 let save = { coins: 0, crystals: 0, xp: 0, chests: 0, icons: [], profile: null, friends: [], fid: null, kw: 0, quests: null, daily2: null, owned: [], skin: {}, daily: null, stats: { played: 0, wins: 0, losses: 0, byChar: {} } }, view = 'menu', earned = 0, paid = 0, maps = [], searching = false, infoIdx = null;
 if (!save.stats || typeof save.stats !== 'object') save.stats = { played: 0, wins: 0, losses: 0, byChar: {} };
 if (!save.stats.byChar || typeof save.stats.byChar !== 'object') save.stats.byChar = {};
@@ -331,7 +332,7 @@ function connect(first) {
           cs.played++;
           if (won) cs.wins++; else cs.losses++;
           if (cs.played === 30 && TITLES[charName]) { tNew = TITLES[charName]; if (save.profile && !save.profile.title) save.profile.title = charName; }
-          earnedCr = won ? 1 : 0; save.crystals += earnedCr; earnedXp = 20 + (won ? 30 : 0); addXp(earnedXp);
+          earnedCr = won ? 1 : 0; save.crystals += earnedCr; earnedXp = 20 + (won ? 30 : 0); addXp(earnedXp); passGain = passXp(PASS_XP.play + (won ? PASS_XP.win : 0));
           qTrack('play', 1); qTrack('char', 1, charName); qTrack('earn', earned); if (won) { qTrack('win', 1); kairosWin(); }
           persist();
         }
@@ -453,7 +454,7 @@ const friendsHtml = () => `<h2>👥 Amis</h2>${fErr ? `<p style="color:#f66">${f
   <p>Ton code ami : <b style="font-size:22px">${myCode()}</b><br><small>Donne-le à tes amis pour qu’ils t’ajoutent</small></p>
   <div><input maxlength="6" placeholder="CODE" value="${esc(fDraft)}" oninput="fDraft=this.value"> <button onclick="addFriend()">➕ Ajouter</button></div>
   <div class="cards">${save.friends.length ? save.friends.map(c => { const p = fList.find(q => q.code === c), rm = `<button onclick="removeFriend('${esc(c)}')" style="background:#7f8c8d;padding:4px 10px">Retirer</button>`;
-    return p ? `<div class="card" style="width:190px;cursor:default">${iconHtml(p.icon, 30)} <b>${esc(p.name)}</b> <span title="${p.on ? 'En ligne' : 'Hors ligne'}" style="color:${p.on ? '#2ecc71' : '#777'}">●</span><br>${p.on ? `<button onclick="inviteFriend('${esc(c)}')" style="background:#d35400;padding:4px 10px;margin:3px 0">⚔️ Inviter en 2v2</button><br>` : '<small style="opacity:.7">Hors ligne</small><br>'}Niveau ${+p.lvl}<br>⭐ ${esc(p.top)}<br>${TITLES[p.ttl] ? '🏷️ ' + esc(TITLES[p.ttl]) + '<br>' : ''}${rm}</div>` : `<div class="card" style="width:190px;cursor:default">${esc(c)}<br>Profil introuvable<br>${rm}</div>`; }).join('') : '<p>Aucun ami pour le moment</p>'}</div>
+    return p ? `<div class="card" style="width:190px;cursor:default">${iconHtml(p.icon, 30)} <b>${esc(p.name)}</b> <span title="${p.on ? 'En ligne' : 'Hors ligne'}" style="color:${p.on ? '#2ecc71' : '#777'}">●</span><br>${p.on ? `<button onclick="inviteFriend('${esc(c)}')" style="background:#d35400;padding:4px 10px;margin:3px 0">⚔️ Inviter en 2v2</button><br>` : '<small style="opacity:.7">Hors ligne</small><br>'}Niveau ${+p.lvl}<br>⭐ ${esc(p.top)}<br>${ttlName(p.ttl) ? '🏷️ ' + esc(ttlName(p.ttl)) + '<br>' : ''}${rm}</div>` : `<div class="card" style="width:190px;cursor:default">${esc(c)}<br>Profil introuvable<br>${rm}</div>`; }).join('') : '<p>Aucun ami pour le moment</p>'}</div>
   <button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 // ===== ICÔNES DE PROFIL DÉBLOQUABLES (coffrets) : emblèmes inspirés des séries, dessinés en SVG. L'id (3 lettres) est ce qui est enregistré / envoyé aux amis =====
 const LOGOS = {
@@ -466,6 +467,7 @@ const LOGOS = {
   ffc: { n: 'Fire Force (Brigade 8)', s: '<rect width="40" height="40" rx="8" fill="#1b1b24"/><path d="M20 4c3 6 10 9 10 18a10 10 0 01-20 0c0-4 2-7 5-9 0 3 1 4 2 4 0-5-1-8 3-13z" fill="#ff5722"/><path d="M20 16c2 4 6 6 6 10a6 6 0 01-12 0c0-4 4-6 6-10z" fill="#ffd54f"/><text x="20" y="31" font-size="11" font-weight="900" text-anchor="middle" fill="#7a2a00" font-family="Arial">8</text>' },
   acl: { n: 'Assassination Classroom', s: '<rect width="40" height="40" rx="8" fill="#2a6f3e"/><circle cx="20" cy="23" r="13" fill="#f4d03f"/><circle cx="15" cy="20" r="1.8" fill="#111"/><circle cx="25" cy="20" r="1.8" fill="#111"/><path d="M13 26q7 8 14 0" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"/><path d="M8 11h24l-12-6z" fill="#111"/><rect x="14" y="11" width="12" height="4" fill="#111"/>' },
   wkf: { n: 'Wakfu (Éliatrope)', s: '<rect width="40" height="40" rx="8" fill="#0b3d91"/><ellipse cx="20" cy="21" rx="11" ry="14" fill="#27c4ff"/><ellipse cx="20" cy="21" rx="5" ry="7.5" fill="#e6fbff"/>' },
+  zlt: { n: 'Zoltraak (Frieren)', pass: 1, s: '<rect width="40" height="40" rx="8" fill="#1b1233"/><circle cx="20" cy="20" r="15" fill="none" stroke="#f1d37a" stroke-width="1.8"/><circle cx="20" cy="20" r="11" fill="none" stroke="#f1d37a" stroke-width="1" stroke-dasharray="2 2"/><path d="M20 6L32 27H8z" fill="none" stroke="#7dcfb6" stroke-width="1.8" stroke-linejoin="round"/><path d="M20 34L8 13h24z" fill="none" stroke="#7dcfb6" stroke-width="1.8" stroke-linejoin="round"/><circle cx="20" cy="20" r="3" fill="#fffbe6"/><path d="M23 20h13" stroke="#fffbe6" stroke-width="2.2" stroke-linecap="round"/>' },
   krs: { n: 'Kairos (horloger)', s: '<rect width="40" height="40" rx="8" fill="#2b1f3d"/><circle cx="20" cy="20" r="13" fill="#f5ecd0" stroke="#d9b84a" stroke-width="3"/><path d="M20 20V11M20 20l7 4" stroke="#222" stroke-width="2.2" stroke-linecap="round"/>' }
 };
 const iconHtml = (id, n) => LOGOS[id] ? `<svg viewBox="0 0 40 40" width="${n}" height="${n}" style="vertical-align:middle">${LOGOS[id].s}</svg>` : `<span style="font-size:${n - 4}px">${esc(id)}</span>`;
@@ -481,11 +483,11 @@ let cfPhase = 0;
 const cfEl = () => document.getElementById('cfx');
 const CF_SVG = '<svg viewBox="0 0 80 64" width="170" height="136"><rect x="8" y="28" width="64" height="32" rx="4" fill="#8d5524"/><rect x="8" y="40" width="64" height="4" fill="#5d3a18"/><g class="cf-lid" style="transform-origin:8px 28px;transition:transform .5s"><path d="M8 28V20a14 14 0 0 1 14-14h36a14 14 0 0 1 14 14v8z" fill="#a8682e"/><rect x="8" y="22" width="64" height="4" fill="#f1c40f"/></g><rect x="34" y="30" width="12" height="13" rx="2" fill="#f1c40f"/></svg>';
 function cfStart() {
-  const pool = Object.keys(LOGOS).filter(id => !save.icons.includes(id)), r = Math.random(); let html;
+  const pool = Object.keys(LOGOS).filter(id => !LOGOS[id].pass && !save.icons.includes(id)), r = Math.random(); let html;
   if (pool.length && r < .45) { const id = pool[Math.random() * pool.length | 0]; save.icons.push(id); html = iconHtml(id, 90) + '<br><b>Nouvelle icône !</b><br>' + LOGOS[id].n; }
   else if (r > .85) { const n = 3 + Math.random() * 8 | 0; save.crystals += n; html = '<span style="font-size:70px">💎</span><br><b>+' + n + ' cristaux</b>'; }
   else { const n = 10 + Math.random() * 51 | 0; save.coins += n; html = '<span style="font-size:70px">🪙</span><br><b>+' + n + ' pièces</b>'; }
-  save.chests--; persist();
+  save.chests--; passXp(PASS_XP.chest); persist();
   cfPhase = 1; const el = cfEl(); el.classList.remove('cf-open'); el.style.display = 'flex';
   el.innerHTML = '<h2 style="margin:0 0 6px;position:relative;z-index:1">🎁 Coffret de quête !</h2><div class="cf-glow"></div><div class="cf-chest cf-shake">' + CF_SVG + '</div><div id="cfr" style="min-height:150px;position:relative;z-index:1"></div>';
   setTimeout(() => { el.classList.add('cf-open'); const c = el.querySelector('.cf-chest'); if (c) c.classList.remove('cf-shake'); }, 900);
@@ -500,10 +502,54 @@ const botLvlHtml = () => `<h2>🤖 Niveau du bot</h2><p>Choisis la difficulté, 
   <button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 // ===== TITRES : débloqués à 30 parties jouées avec un personnage (à choisir dans le profil) =====
 const TITLES = { Bruno: 'L’acharné', 'Zéphyr': 'L’éclair fou', Kaze: 'L’invisible', Viking: 'Le roi du nord', Chevalier: 'Le tueur de dragon', Kairos: 'Le maître du temps', Ichigo: 'Le Shinigami remplaçant', Luffy: 'L’élastique', Naruto: 'Hokage', Deku: 'Plus Ultra', Gojo: 'L’exorciste de rang S', Denji: 'La tronçonneuse', Yugo: 'L’Éliatrope', Shinra: 'Le 4e pilier', Eren: 'Le Titan Assaillant', Koro: 'Le prof de la classe E', Frieren: 'L’elfe millénaire' };
+const SEASON_T = { S1: 'Frieren' };
+const ttlName = k => TITLES[k] || SEASON_T[k] || '';
 const playedWith = n => (save.stats.byChar[n] && save.stats.byChar[n].played) || 0;
-const titleLine = () => save.profile.title && TITLES[save.profile.title] ? `<br><small style="color:#f1c40f">🏷️ ${esc(TITLES[save.profile.title])}</small>` : '';
+const titleLine = () => save.profile.title && ttlName(save.profile.title) ? `<br><small style="color:#f1c40f">🏷️ ${esc(ttlName(save.profile.title))}</small>` : '';
 function setTitle(k) { save.profile.title = k; persist(); ui(); }
-const titleHtml = () => `<div style="max-width:340px"><b>🏷️ Titres</b> <small>(30 parties avec un perso)</small><div class="cards"><span class="chip ${!save.profile.title ? 'on' : ''}" onclick="setTitle('')">Aucun</span>${Object.keys(TITLES).map(k => playedWith(k) >= 30 ? `<span class="chip ${save.profile.title === k ? 'on' : ''}" onclick="setTitle('${k}')">${esc(TITLES[k])}</span>` : `<span class="chip" style="opacity:.45">🔒 ${k} ${playedWith(k)}/30</span>`).join('')}</div></div>`;
+const titleHtml = () => `<div style="max-width:340px"><b>🏷️ Titres</b> <small>(30 parties avec un perso)</small><div class="cards"><span class="chip ${!save.profile.title ? 'on' : ''}" onclick="setTitle('')">Aucun</span>${(save.sTitles || []).map(k => `<span class="chip ${save.profile.title === k ? 'on' : ''}" onclick="setTitle('${k}')">🏷️ ${esc(SEASON_T[k])}</span>`).join('') + Object.keys(TITLES).map(k => playedWith(k) >= 30 ? `<span class="chip ${save.profile.title === k ? 'on' : ''}" onclick="setTitle('${k}')">${esc(TITLES[k])}</span>` : `<span class="chip" style="opacity:.45">🔒 ${k} ${playedWith(k)}/30</span>`).join('')}</div></div>`;
+
+// ===== PASS DE SAISON « FRIEREN » : 20 paliers de 1000 XP. XP : combat (+150), victoire (+250 en plus), coffret ouvert (+200). Gratuit : 200 🪙, 10 💎, 3 coffrets, titre. Payant (1000 🪙) : +200 🪙, +10 💎, 2 coffrets, icône Zoltraak, Frieren au palier 20 =====
+const PASS_XP = { play: 150, win: 250, chest: 200 }, PASS_TIER_XP = 1000, PASS_PRICE = 1000;
+const PASS = (() => {
+  const t = Array.from({ length: 20 }, () => ({ f: null, p: null }));
+  const F = { 2: { co: 50 }, 4: { ch: 1 }, 5: { cr: 5 }, 7: { co: 50 }, 10: { ch: 1 }, 12: { co: 50 }, 15: { cr: 5 }, 16: { ch: 1 }, 17: { co: 50 }, 20: { title: 'S1' } };
+  const P = { 3: { co: 100 }, 6: { cr: 5 }, 9: { ch: 1 }, 10: { icon: 'zlt' }, 13: { co: 100 }, 15: { ch: 1 }, 18: { cr: 5 }, 20: { char: 'perso_frieren' } };
+  for (const k in F) t[k - 1].f = F[k]; for (const k in P) t[k - 1].p = P[k];
+  return t;
+})();
+const passDef = () => save.pass || (save.pass = { xp: 0, prem: 0, cl: {} });
+const passOn = () => frOn();
+const passTier = () => Math.min(PASS.length, Math.floor(passDef().xp / PASS_TIER_XP));
+function passXp(n) { if (!passOn() || !n) return 0; const p = passDef(); p.xp = Math.min(PASS.length * PASS_TIER_XP, p.xp + n); persist(); return n; }
+const passRdy = () => { const p = passDef(), T = passTier(); return PASS.some((t, i) => i < T && ((t.f && !p.cl['f' + i]) || (t.p && p.prem && !p.cl['p' + i]))); };
+function passGive(r) {
+  if (r.co) save.coins += r.co; if (r.cr) save.crystals += r.cr; if (r.ch) save.chests = (save.chests || 0) + r.ch;
+  if (r.title) { (save.sTitles = save.sTitles || []).includes(r.title) || save.sTitles.push(r.title); }
+  if (r.icon && !save.icons.includes(r.icon)) save.icons.push(r.icon);
+  if (r.char && !save.owned.includes(r.char)) save.owned.push(r.char);
+}
+function passClaim(i, k) {
+  const p = passDef(), t = PASS[i], r = t && t[k]; if (!r || i >= passTier() || p.cl[k + i] || (k === 'p' && !p.prem)) return;
+  p.cl[k + i] = 1; passGive(r); persist(); ui();
+}
+function passClaimAll() { PASS.forEach((_, i) => { passClaim(i, 'f'); passClaim(i, 'p'); }); }
+function passBuy() { const p = passDef(); if (p.prem || save.coins < PASS_PRICE) return; save.coins -= PASS_PRICE; p.prem = 1; persist(); ui(); }
+const passRw = r => !r ? '<span style="opacity:.3">—</span>' : [r.co ? '🪙 ' + r.co : '', r.cr ? '💎 ' + r.cr : '', r.ch ? '🎁 ×' + r.ch : '', r.title ? '🏷️ Titre<br>« ' + SEASON_T[r.title] + ' »' : '', r.icon ? iconHtml(r.icon, 30) + '<br>Icône' : '', r.char ? '🧙 Frieren<br>débloquée' : ''].filter(Boolean).join('<br>');
+function passHtml() {
+  const p = passDef(), T = passTier(), cur = p.xp - T * PASS_TIER_XP, full = T >= PASS.length;
+  const cell = (t, i, k) => { const r = t[k], got = p.cl[k + i], ok = r && i < T && !got && (k === 'f' || p.prem), lockP = r && k === 'p' && !p.prem;
+    return `<div class="pcell" style="${r ? '' : 'opacity:.35;'}background:${got ? '#1d3a2b' : ok ? '#4a3d10' : k === 'p' ? '#2a1f3d' : '#222'};border:1px solid ${ok ? '#f1c40f' : '#444'}">${passRw(r)}${r ? (got ? '<br><small style="color:#2ecc71">✓ Obtenu</small>' : ok ? `<br><button style="padding:3px 8px;font-size:12px" onclick="passClaim(${i},'${k}')">Réclamer</button>` : lockP ? '<br><small>🔒 Payant</small>' : '<br><small style="opacity:.6">Palier ' + (i + 1) + '</small>') : ''}</div>`; };
+  return `<h2 style="margin:2px">🎟️ Pass de saison — Frieren <small style="font-size:13px;font-weight:400">· ${bank()}</small></h2>
+  <div style="width:min(520px,92%);margin:auto"><b>Palier ${T}/${PASS.length}</b> · ${full ? 'Pass terminé !' : cur + ' / ' + PASS_TIER_XP + ' XP'}<div style="height:14px;background:#000;border-radius:7px;overflow:hidden;margin:4px 0"><div style="width:${full ? 100 : cur / PASS_TIER_XP * 100}%;height:100%;background:linear-gradient(90deg,#1f8a70,#7dcfb6)"></div></div>
+  <small style="font-size:11px">+${PASS_XP.play} XP/combat · +${PASS_XP.win} XP/victoire · +${PASS_XP.chest} XP/coffret · 1 palier = ${PASS_TIER_XP} XP</small></div>
+  <p style="margin:6px">${p.prem ? '✨ <b>Pass payant actif</b>' : `<button onclick="passBuy()" ${save.coins < PASS_PRICE ? 'disabled' : ''} style="background:#8e44ad">✨ Acheter le pass payant — ${PASS_PRICE} 🪙</button><small> &nbsp;+200 🪙, +10 💎, +2 coffrets, icône Zoltraak, Frieren au palier ${PASS.length}</small>`} ${passRdy() ? '<button onclick="passClaimAll()" style="background:#f39c12">🎁 Tout réclamer</button>' : ''}${save.admin ? ' <button onclick="passXp(1000);ui()" style="background:#c0392b">🛡️ +1000 XP (admin)</button>' : ''}</p>
+  <div style="overflow-x:auto;width:100%;max-width:100%;box-sizing:border-box;padding-bottom:4px"><div style="display:flex;gap:6px;width:max-content;padding:2px 10px;margin:0">
+    <div style="display:flex;flex-direction:column;gap:6px;text-align:right;font-size:12px"><div style="height:22px"></div><div class="pcell" style="width:auto;background:none;border:0;justify-content:center">Gratuit</div><div class="pcell" style="width:auto;background:none;border:0;justify-content:center">✨ Payant</div></div>
+    ${PASS.map((t, i) => `<div style="display:flex;flex-direction:column;gap:6px;align-items:center"><b style="height:22px;color:${i < T ? '#7dcfb6' : '#aaa'}">${i + 1}</b>${cell(t, i, 'f')}${cell(t, i, 'p')}</div>`).join('')}
+  </div></div>
+  <button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
+}
 const ICONS = ['🥷', '🧙', '⚔️', '🛡️', '🐉', '🦊', '🐺', '👑', '🔥', '⚡', '🏴‍☠️', '🤖'];
 const xpNeed = L => 100 * 2 ** Math.floor(L / 5);
 function lvlInfo() {
@@ -652,7 +698,7 @@ function ui() {
   if (me < 0 && searching === 2) { const n = q2 ? q2.n : 1, left = q2 ? q2.left : 15; h = `<h2>🤝 Recherche 2v2…</h2><p style="font-size:22px">👥 ${n} / 4 joueurs trouvés</p><p>${left > 0 ? 'Des bots complèteront les équipes dans <b>' + left + ' s</b> si personne d’autre n’arrive.' : 'Création de la partie…'}</p><div style="width:260px;height:10px;background:#000;border-radius:5px;overflow:hidden;margin:6px auto"><div style="width:${(15 - left) / 15 * 100}%;height:100%;background:#e67e22;transition:width 1s linear"></div></div>${quitBtn.replace('Retour au menu', 'Annuler')}`; }
   else if (me < 0 && searching === 3) h = `<h2>🤝 Invitation acceptée !</h2><p>Connexion à la partie 2v2 avec ton ami…</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
   else if (me < 0 && searching) h = `<h2>🔎 Recherche d’un adversaire…</h2><p>Tu seras mis face à un joueur aléatoire.</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
-  else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'botlvl' ? botLvlHtml() : view === 'friends' ? friendsHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => ch.hid && !save.admin ? '' : `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : `<div class="menu-top">
+  else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'botlvl' ? botLvlHtml() : view === 'friends' ? friendsHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => ch.hid && !save.admin ? '' : `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : view === 'pass' ? passHtml() : `<div class="menu-top">
       ${profileBar()}
       <div class="menu-currency">${bank()}</div>
     </div>
@@ -662,6 +708,7 @@ function ui() {
         <h2>🛍️ Boutiques</h2>
         <button onclick="view='chars';ui()" style="background:#8e44ad">💎 Boutique persos</button>
         <button onclick="view='shop';ui()" style="background:#8e44ad">🎨 Boutique skins</button>
+        ${frOn() ? `<button onclick="view='pass';ui()" style="background:#1f8a70">🎟️ Pass de saison Frieren<br><small>${passTier()}/${PASS.length} paliers${passRdy() ? ' · 🎁 à réclamer' : ''}</small></button>` : `<button disabled style="background:#555;opacity:.7;cursor:not-allowed">🎟️ Pass de saison Frieren<br><small>Bientôt</small></button>`}
       </section>
       <section class="menu-group menu-combat">
         <h2>⚔️ Combats</h2>
@@ -693,7 +740,7 @@ function ui() {
     <p style="font-size:12px;opacity:.8;margin:2px">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques · U ou Espace : ultime (barre pleine)</p>${quitBtn}`;
   }
   else if (S.p === 'training') { ov.style.display = 'none'; last = ''; return; }
-  else if (S.p === 'end') h = `${tNew ? '<p>🏷️ Titre débloqué : ' + tNew + ' !</p>' : ''}${lvUp ? '<p>⬆️ Niveau ' + lvUp + ' atteint !</p>' : ''}${kNew ? '<p>🔓 Kairos débloqué !</p>' : ''}<p style="font-size:18px">🪙 +${earned} pièces · 💎 +${earnedCr} cristal · ✨ +${earnedXp} XP (total : ${save.coins} 🪙 / ${save.crystals} 💎)</p>${S.ag[me] ? '<p>En attente de l’adversaire…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
+  else if (S.p === 'end') h = `${tNew ? '<p>🏷️ Titre débloqué : ' + tNew + ' !</p>' : ''}${lvUp ? '<p>⬆️ Niveau ' + lvUp + ' atteint !</p>' : ''}${kNew ? '<p>🔓 Kairos débloqué !</p>' : ''}<p style="font-size:18px">🪙 +${earned} pièces · 💎 +${earnedCr} cristal · ✨ +${earnedXp} XP${passGain ? ' · 🎟️ +' + passGain + ' XP de pass' : ''} (total : ${save.coins} 🪙 / ${save.crystals} 💎)</p>${S.ag[me] ? '<p>En attente de l’adversaire…</p>' : '<button onclick="again()">⚔️ Revanche</button>'} ${quitBtn}`;
   else { ov.style.display = 'none'; last = ''; return; }
   if (h !== last) { ov.innerHTML = h; last = h; }
   ov.style.display = 'flex';
