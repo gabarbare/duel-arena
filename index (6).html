@@ -1931,6 +1931,29 @@ function drawMap(m) {
     x.fillStyle = '#27ae60'; x.beginPath(); x.ellipse(700, 110, 24, 16, .5, 0, 7); x.fill(); x.beginPath(); x.ellipse(745, 140, 16, 12, 0, 0, 7); x.fill();
     floor('#8a8a96', '#c8c8d4');
     x.fillStyle = 'rgba(0,0,0,.25)'; [[150, 410], [430, 425], [700, 405]].forEach(p => { x.beginPath(); x.ellipse(p[0], p[1], 40, 8, 0, 0, 7); x.fill(); });
+  } else if (m === 5) { // Prairie d'Himmel (saison Frieren) : crépuscule, statue du héros, ruines et champ de fleurs
+    const g = x.createLinearGradient(0, -OFF, 0, 380); g.addColorStop(0, '#16284a'); g.addColorStop(.55, '#4a6fa0'); g.addColorStop(1, '#f3c999'); x.fillStyle = g; x.fillRect(0, -OFF, 900, OFF + 450);
+    for (let k = 0; k < 40; k++) { x.fillStyle = 'rgba(255,255,255,' + (.25 + .35 * Math.sin(t * 1.5 + k)) + ')'; x.fillRect(rnd(k) * 900, rnd(k + 40) * 190 - 30, 2, 2); }
+    x.fillStyle = 'rgba(255,240,200,.9)'; x.beginPath(); x.arc(110, 120, 22, 0, 7); x.fill(); x.fillStyle = '#16284a'; x.beginPath(); x.arc(120, 114, 20, 0, 7); x.fill();
+    x.fillStyle = '#5a6b94'; x.beginPath(); x.moveTo(0, 330); [[90, 250], [210, 310], [330, 235], [470, 305], [600, 245], [740, 310], [840, 260], [900, 320]].forEach(p => x.lineTo(p[0], p[1])); x.lineTo(900, 380); x.lineTo(0, 380); x.fill();
+    x.fillStyle = '#3d4d78'; x.beginPath(); x.moveTo(0, 360); [[120, 320], [260, 350], [400, 325], [560, 352], [700, 322], [820, 348], [900, 335]].forEach(p => x.lineTo(p[0], p[1])); x.lineTo(900, 380); x.lineTo(0, 380); x.fill();
+    // colonnes en ruine de part et d'autre
+    [[140, 150], [760, 130]].forEach(([cx, h], k) => { x.fillStyle = '#9aa0ad'; x.fillRect(cx - 18, 380 - h, 36, h); x.fillStyle = '#b4bac6'; x.fillRect(cx - 24, 380 - h - 8, 48, 10); x.fillRect(cx - 24, 374, 48, 8);
+      x.strokeStyle = 'rgba(40,50,70,.5)'; x.lineWidth = 1.5; for (let q = 0; q < 4; q++) { x.beginPath(); x.moveTo(cx - 12 + q * 8, 380 - h + 6); x.lineTo(cx - 12 + q * 8, 372); x.stroke(); }
+      x.strokeStyle = 'rgba(80,120,70,.8)'; x.lineWidth = 2; x.beginPath(); x.moveTo(cx - 10, 380); x.quadraticCurveTo(cx + 12, 380 - h * .5, cx - 4, 380 - h * .8); x.stroke(); });
+    // statue du héros Himmel : piédestal, cape et épée plantée
+    x.fillStyle = '#8b93a4'; x.fillRect(405, 330, 90, 50); x.fillStyle = '#a3abbb'; x.fillRect(398, 322, 104, 10); x.fillStyle = '#7b8396'; x.fillRect(418, 340, 64, 3);
+    x.fillStyle = '#b9c0cd'; x.beginPath(); x.moveTo(432, 322); x.lineTo(436, 268); x.lineTo(464, 268); x.lineTo(468, 322); x.fill(); // corps
+    x.fillStyle = '#9ea6b7'; x.beginPath(); x.moveTo(436, 272); x.lineTo(420, 322); x.lineTo(440, 322); x.fill(); // cape
+    x.fillStyle = '#c7cdd8'; x.beginPath(); x.arc(450, 258, 11, 0, 7); x.fill(); // tête
+    x.fillStyle = '#aab2c1'; x.fillRect(447, 205, 6, 60); x.fillRect(436, 232, 28, 5); // épée
+    x.fillStyle = 'rgba(255,240,190,' + (.12 + .06 * Math.sin(t * 2)) + ')'; x.beginPath(); x.ellipse(450, 280, 80, 70, 0, 0, 7); x.fill();
+    // lucioles / pétales qui flottent
+    for (let k = 0; k < 26; k++) { const px = (rnd(k) * 900 + t * (8 + k % 5) + Math.sin(t + k) * 14) % 900, py = 250 + rnd(k + 70) * 120 + Math.sin(t * 1.3 + k) * 10; x.fillStyle = k % 3 ? 'rgba(255,240,170,.85)' : 'rgba(255,190,220,.85)'; x.beginPath(); x.arc(px, py, k % 3 ? 1.6 : 2.2, 0, 7); x.fill(); }
+    floor('#4f7f4a', '#7fb36a');
+    x.fillStyle = '#3f6c3d'; for (let k = 0; k < 40; k++) { const gx = rnd(k + 5) * 900, gy = 392 + rnd(k + 9) * 48; x.fillRect(gx, gy, 2, 8); x.fillRect(gx + 4, gy + 2, 2, 6); }
+    // champ de fleurs (les fleurs de Frieren)
+    const cols = ['#ffffff', '#ffd1e6', '#cfe6ff', '#fff3a8']; for (let k = 0; k < 46; k++) { const fx = rnd(k + 17) * 900, fy = 392 + rnd(k + 33) * 54, sw = Math.sin(t * 1.4 + k) * 1.5; x.strokeStyle = '#2f5a30'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(fx, fy + 8); x.lineTo(fx + sw, fy); x.stroke(); x.fillStyle = cols[k % 4]; x.beginPath(); x.arc(fx + sw, fy, 3, 0, 7); x.fill(); x.fillStyle = '#e8b830'; x.beginPath(); x.arc(fx + sw, fy, 1, 0, 7); x.fill(); }
   } else { grad('#1b2a49', '#3b2a4a'); floor('#2c2c3a', '#444'); }
 }
 
