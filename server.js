@@ -141,9 +141,10 @@ const MAPS = [
   { n: 'Volcan', note: '', gr: GR, acc: 1 },
   { n: 'Ville de nuit', note: '', gr: GR, acc: 1 },
   { n: 'Banquise', note: 'sol glissant', gr: GR, acc: 0.1 },
-  { n: 'Lune', note: 'gravité réduite', gr: 0.42, acc: 1 }
+  { n: 'Lune', note: 'gravité réduite', gr: 0.42, acc: 1 },
+  { n: 'Prairie d’Himmel', note: 'saison Frieren', gr: GR, acc: 1 } // map de la saison Frieren : jouable à partir de FRIEREN_FROM
 ];
-function rollMap(r) { let m; do { m = Math.random() * MAPS.length | 0; } while (m === r.mi); r.mi = m; }
+function rollMap(r) { const lim = Date.now() >= FRIEREN_FROM ? MAPS.length : MAPS.length - 1; let m; do { m = Math.random() * lim | 0; } while (m === r.mi); r.mi = m; }
 
 const atks = f => (f.form > 0 && CH[f.c].alt) || CH[f.c].atk;
 const nf = (c, i, inp, ult, two) => ({ c, i, tm: two ? i >> 1 : i, dead: 0, x: two ? [170, 330, W - 330, W - 170][i] : (i ? W - 250 : 250), y: G, vx: 0, vy: 0, hp: CH[c].hp, face: (two ? i >> 1 : i) ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
