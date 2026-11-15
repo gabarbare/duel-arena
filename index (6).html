@@ -1121,6 +1121,7 @@ function fighter(f, i) {
   if (n === 'Denji' && f.fm && f.ak === 1 && f.ap === 1) x.rotate(s * .16); // charge : buste penché en avant
   if (n === 'Kaze' && f.ak === 3 && f.ad && f.ad[1] === 0) x.rotate(s * .22); // Kaze fonce sur l'ennemi
   if (n === 'Viking' && f.ak >= 0) x.rotate(s * (f.ap === 1 ? .08 : f.ap === 0 ? -.04 : .03 * (1 - (f.pp || 0)))); // le buste suit chaque coup
+  if (n === 'Viking' && lk === 'stark' && f.ak === 2) x.scale(1, f.ap === 0 ? 1 - .14 * (1 - Math.pow(1 - (f.pp || 0), 2)) : f.ap === 1 ? .86 + .14 * (f.pp || 0) : 1); // Stark s'accroupit pour la fente basse
   if ((n === 'Bruno' || n === 'Chevalier' || n === 'Kairos' || n === 'Frieren') && f.ak >= 0) { const ps = atkPose(n, f, brAlt[i] || 0); x.translate(s * ps.dx, 0); x.rotate(s * ps.rot); if (ps.sy !== 1) x.scale(1, ps.sy); }
   const gn = n === 'Gojo', dk = n === 'Deku';
   if (f.ak === 3 || f.bf || (gn && f.ak === 2) || (n === 'Denji' && f.fm) || (n === 'Shinra' && f.fm) || (n === 'Ichigo' && f.fm)) {
@@ -1851,8 +1852,8 @@ function fighter(f, i) {
     const k = f.ak, ap = f.ap, pp = aCl(f.pp || 0), key = k * 10 + ap, ei = u => u * u, sl = '#5b4636', st = '#c4cbd4';
     if (k >= 0 && key !== vkPrev[i] && ap === 1 && (k === 1 || k === 3)) WAVES.push({ x: f.x + s * (k === 3 ? 90 : 0), t: Date.now() });
     vkPrev[i] = k >= 0 ? key : -1;
-    const axe = (hx, hy, a, L, glow) => { // hallebarde-hache de Stark : long manche noir, culot gris, double fer sombre à tranchant argenté, pointe de lance
-      x.save(); x.translate(s * hx, hy); x.scale(s, 1); x.rotate(a);
+    const axe = (hx, hy, a, L, glow, fs = 1) => { // hallebarde-hache de Stark : long manche noir, culot gris, double fer sombre à tranchant argenté, pointe de lance
+      x.save(); x.translate(s * hx, hy); x.scale(s * fs, 1); x.rotate(a);
       LN('#1e1a20', 6, -22, 0, L, 0); LN('#3a3440', 2, -22, -1.8, L, -1.8); LN('#8a8f98', 8, -28, 0, -16, 0); LN('#a4a9b2', 8, -28, -.5, -26, -.5);
       LN('#8a8f98', 7, L - 12, 0, L - 5, 0);
       if (glow) { x.fillStyle = 'rgba(255,210,110,' + glow + ')'; x.beginPath(); x.arc(L + 6, 0, 40, 0, 7); x.fill(); }
@@ -1866,22 +1867,25 @@ function fighter(f, i) {
       x.restore();
     };
     const trail = (a1, a2, rad, cx, cy, al, col) => { if (al <= 0 || Math.abs(a2 - a1) < .03) return; x.save(); x.translate(s * cx, cy); x.scale(s, 1); for (let q = 0; q < 4; q++) { x.strokeStyle = col + (al * (.6 - q * .13)) + ')'; x.lineWidth = 12 - q * 3; x.lineCap = 'round'; x.beginPath(); x.arc(0, 0, rad - q * 3, Math.min(a1, a2), Math.max(a1, a2)); x.stroke(); } x.restore(); };
-    let hx = 14, hy = -64, a = -2.0, L = 62, two = false, glow = 0;
+    let hx = 14, hy = -64, a = -2.0, L = 62, two = false, glow = 0, fs = 1;
     if (k < 0) { const bob = Math.sin(Date.now() / 420 + (i || 0)) * 1.5; hx = 8; hy = -58 + bob; a = -2.75; }
-    else if (k === 0) { // balayage latéral bas → haut
-      hx = ap === 0 ? aMix(16, 2, aEo(pp)) : ap === 1 ? aMix(2, 36, aEo(pp)) : aMix(36, 16, aSm(pp)); hy = -66;
-      a = ap === 0 ? aMix(-.4, 2.5, aEo(pp)) : ap === 1 ? aMix(2.5, -.2, ei(pp)) : aMix(-.2, -.8, aSm(pp)); two = ap > 0;
-      if (ap === 1) trail(2.5, -.2 + (1 - pp) * 2.7, 80, hx - 8, hy, .8 * Math.sin(pp * 3.14), 'rgba(255,240,200,');
+    else if (k === 0) { // Coup horizontal d'Eisen : le buste pivote, la hache part de l'arrière et balaie l'avant à hauteur de taille (de profil, elle se raccourcit puis se redéploie)
+      const th = ap === 0 ? aMix(2.4, 3.0, aEo(pp)) : ap === 1 ? aMix(3.0, -.35, ei(pp)) : aMix(-.35, 1.1, aSm(pp)); // angle de balayage : π = derrière, 0 = devant
+      fs = Math.cos(th); a = 0; two = true;
+      hx = ap === 0 ? aMix(14, -4, aEo(pp)) : ap === 1 ? aMix(-4, 30, aEo(pp)) : aMix(30, 14, aSm(pp)); hy = ap === 0 ? aMix(-62, -56, aEo(pp)) : -58;
+      if (ap === 1) { x.save(); x.translate(s * hx, hy); x.scale(s, 1); for (let q = 0; q < 3; q++) { x.strokeStyle = 'rgba(255,240,200,' + (.8 * Math.sin(Math.min(1, pp * 1.1) * 3.14) * (.7 - q * .2)) + ')'; x.lineWidth = 10 - q * 3; x.lineCap = 'round'; x.beginPath(); x.ellipse(0, 0, 80 - q * 4, 14 - q, 0, th, Math.min(3.1, th + 2.3), false); x.stroke(); } x.restore(); }
     } else if (k === 1) { // Écrasement : coup du dessus à deux mains, la hache claque le sol et l'onde de choc part des deux côtés
       hx = ap === 0 ? aMix(14, 4, aEo(pp)) : ap === 1 ? aMix(4, 42, ei(pp)) : aMix(42, 14, aSm(pp));
       hy = ap === 0 ? aMix(-66, -112, aEo(pp)) : ap === 1 ? aMix(-112, -50, ei(pp)) : aMix(-50, -62, aSm(pp));
       a = ap === 0 ? aMix(-1.0, -1.95, aEo(pp)) : ap === 1 ? aMix(-1.95, 1.1, ei(pp)) : aMix(1.1, -1.0, aSm(pp)); two = true;
       if (ap === 1) trail(-1.95, a, 96, 14, -76, .75 * Math.sin(Math.min(1, pp * 1.1) * 3.14), 'rgba(255,240,200,');
       if (ap === 2 && pp < .5) { x.strokeStyle = 'rgba(255,230,170,' + (.7 * (1 - pp * 2)) + ')'; x.lineWidth = 3; x.beginPath(); x.ellipse(s * 56, -2, 26 + pp * 60, 7 + pp * 6, 0, 0, 7); x.stroke(); x.beginPath(); x.ellipse(-s * 20, -2, 20 + pp * 50, 6 + pp * 5, 0, 0, 7); x.stroke(); } // éclats de poussière de chaque côté
-    } else if (k === 2) { // Vague de séisme : hache levée à une main puis plantée dans le sol, la fissure file vers l'ennemi
-      hx = ap === 0 ? aMix(16, 12, aEo(pp)) : ap === 1 ? aMix(12, 48, ei(pp)) : aMix(48, 16, aSm(pp));
-      hy = ap === 0 ? aMix(-66, -106, aEo(pp)) : ap === 1 ? aMix(-106, -38, ei(pp)) : aMix(-38, -62, aSm(pp));
-      a = ap === 0 ? aMix(-1.0, -1.7, aEo(pp)) : ap === 1 ? aMix(-1.7, 1.25, ei(pp)) : aMix(1.25, -1.0, aSm(pp));
+    } else if (k === 2) { // Fente basse d'Eisen : accroupi, la hache racle le sol puis remonte en diagonale, la fissure file vers l'ennemi
+      hx = ap === 0 ? aMix(16, 6, aEo(pp)) : ap === 1 ? aMix(6, 52, aEo(pp)) : aMix(52, 16, aSm(pp));
+      hy = ap === 0 ? aMix(-66, -30, aEo(pp)) : ap === 1 ? aMix(-30, -112, ei(pp)) : aMix(-112, -62, aSm(pp));
+      a = ap === 0 ? aMix(-1.0, 2.9, aEo(pp)) : ap === 1 ? aMix(2.9, -1.35, ei(pp)) : aMix(-1.35, -1.0, aSm(pp)); two = true;
+      if (ap === 1) trail(2.9, a, 92, hx - 8, hy + 6, .85 * Math.sin(Math.min(1, pp * 1.1) * 3.14), 'rgba(255,240,200,');
+      if (ap === 0 && pp > .5 || (ap === 1 && pp < .4)) for (let q = 0; q < 5; q++) C('rgba(255,220,140,' + (.8 - q * .12) + ')', s * (30 + q * 9 + (Date.now() / 20 + q * 13) % 12), -3 - q * 2, 2.2); // étincelles de la hache qui racle le sol
       if (ap >= 1) { x.strokeStyle = 'rgba(30,15,10,' + (ap === 1 ? 1 : 1 - pp) + ')'; x.lineWidth = 3; x.beginPath(); x.moveTo(s * 60, -1); for (let q = 1; q <= 6; q++) x.lineTo(s * (60 + q * 16 * (ap === 1 ? pp : 1)), -1 + (q % 2 ? 4 : -2)); x.stroke(); }
     } else { // Poing du Géant → Frappe foudroyante d'Eisen (animation) : la technique d'Eisen, coup vertical fulgurant ; la hache se charge d'éclairs puis fend de haut en bas
       L = 84; two = true;
@@ -1892,6 +1896,8 @@ function fighter(f, i) {
       const hdx = hx + Math.cos(a) * (L + 14), hdy = hy + Math.sin(a) * (L + 14); // position du fer
       if (ap === 0) { x.fillStyle = 'rgba(150,170,255,' + (.1 + .22 * pp) + ')'; x.beginPath(); x.arc(s * hx, hy - 20, 30 + pp * 22, 0, 7); x.fill(); zap(s * hdx, hdy, 2 + Math.floor(pp * 5), 34 + pp * 26); }
       if (ap === 1) {
+        if (pp < .3) { const al = 1 - pp / .3; LN('rgba(170,190,255,' + al * .8 + ')', 26, s * (hx - 36), -196, s * (hx + 80), 2); LN('rgba(255,255,255,' + al + ')', 12, s * (hx - 36), -196, s * (hx + 80), 2); } // image rémanente : la frappe est instantanée
+        if (pp > .45) { const g = Math.min(1, (pp - .45) * 2), bx0 = s * (hx + 78); x.strokeStyle = 'rgba(30,15,10,' + (1 - pp * .6) + ')'; x.lineWidth = 3; [1, -1].forEach(d => { x.beginPath(); x.moveTo(bx0, -1); for (let q = 1; q <= 5; q++) x.lineTo(bx0 + d * s * q * (d > 0 ? 14 : 10) * g, -1 + (q % 2 ? 4 : -2)); x.stroke(); }); } // fissures à l'impact
         trail(-1.7, a, 120, 12, -80, .95, 'rgba(190,205,255,'); zap(s * hdx, hdy, 5, 56);
         x.fillStyle = 'rgba(200,215,255,' + (.28 * (1 - pp)) + ')'; x.fillRect(s > 0 ? 20 : -180, -170, 160, 190);
         if (pp > .35) { // la foudre suit la lame jusqu'au sol, devant lui
@@ -1909,9 +1915,9 @@ function fighter(f, i) {
       for (let q = 1; q <= 4; q++) { const u = .22 + q * .16, px = s * (kx + ux * u), py = ky + uy * u, nx = -uy / Ln * 5, ny = ux / Ln * 5; LN('#c9c6bc', 1.4, px - s * nx, py - ny, px + s * nx, py + ny); }
       C('#17171c', s * ex, ey, 6.5); };
     sArm(hx, hy, -70);
-    if (two) { const q2x = hx + Math.cos(a) * 26, q2y = hy + Math.sin(a) * 26; sArm(q2x, q2y, -68); }
-    axe(hx, hy, a, L, glow);
-    if (two) { const q2x = hx + Math.cos(a) * 26, q2y = hy + Math.sin(a) * 26; C('#17171c', s * q2x, q2y, 6.5); }
+    if (two) { const q2x = hx + Math.cos(a) * 26 * fs, q2y = hy + Math.sin(a) * 26; sArm(q2x, q2y, -68); }
+    axe(hx, hy, a, L, glow, fs);
+    if (two) { const q2x = hx + Math.cos(a) * 26 * fs, q2y = hy + Math.sin(a) * 26; C('#17171c', s * q2x, q2y, 6.5); }
   } else if (n === 'Viking' && f.ak >= 0) { // animations fluides du Viking : chaque phase suit une courbe douce (pp)
     const k = f.ak, ap = f.ap, pp = f.pp || 0, eo = u => 1 - (1 - u) * (1 - u), ei = u => u * u, sm = u => u * u * (3 - 2 * u), mix = (a, b, u) => a + (b - a) * u, key = k * 10 + ap;
     if (key !== vkPrev[i] && ap === 1 && (k === 1 || k === 3)) WAVES.push({ x: f.x + s * (k === 3 ? 90 : 0), t: Date.now() });
