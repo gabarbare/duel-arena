@@ -124,16 +124,127 @@ const CH = [
     { n: 'Barrière défensive', type: 'shield', su: 6, ac: 1, rc: 10, cd: 300, val: 30, ttl: 240 },
     { n: 'Zoltraak (perce toute défense)', type: 'beam', ub: 2, cl: 1, su: 8, ac: 1, rc: 16, cd: 50, dmg: 13, kb: 10, st: 22, warn: 10, life: 6, wd: 16, ox: 106 },
     { n: 'Judradjim (tempête de foudre)', type: 'storm', su: 12, ac: 1, rc: 22, cd: 140, offs: [0, 62, -62, 0], gap: 11, dmg: 8, kb: 5, st: 14, warn: 20, strike: 6, cl: 1 },
-    { n: 'Sorganeil + Zoltraak', ult: 1, ub: 2, type: 'sorg', su: 14, ac: 40, rc: 20, cd: 0, bind: 62, dl: 10, bd: { dmg: 38, kb: 18, st: 40, warn: 14, life: 10, wd: 44, ub: 2, cl: 1, ox: 106 } }] }
+    { n: 'Sorganeil + Zoltraak', ult: 1, ub: 2, type: 'sorg', su: 14, ac: 40, rc: 20, cd: 0, bind: 62, dl: 10, bd: { dmg: 38, kb: 18, st: 40, warn: 14, life: 10, wd: 44, ub: 2, cl: 1, ox: 106 } }] },
+  // ===== MODE AVENTURE : adversaires créés pour les histoires (adv: 1 = jamais sélectionnables, jamais tirés au hasard) =====
+  // Chapitre 1 (Bruno, « Le Poing de la Rue ») : 4 boxeurs, mêmes animations que Bruno (le client les dessine avec une palette à part)
+  { name: 'Tommy', adv: 1, desc: 'Sparring du port', hp: 85, spd: 3.9, jmp: 12.5, color: '#2e86de', atk: [
+    { n: 'Direct', type: 'm', su: 5, ac: 4, rc: 10, cd: 10, dmg: 7, rng: 64, h: 30, kb: 4, st: 13 },
+    { n: 'Crochet', type: 'm', su: 9, ac: 5, rc: 16, cd: 45, dmg: 11, rng: 70, h: 40, kb: 8, st: 18 },
+    { n: 'Uppercut', type: 'm', su: 13, ac: 6, rc: 26, cd: 120, dmg: 17, rng: 52, h: 80, kb: 10, st: 26, lift: -9 }] },
+  { name: 'La Machine', adv: 1, desc: 'Jabs mécaniques', hp: 115, spd: 3.5, jmp: 11.5, color: '#636e72', atk: [
+    { n: 'Jab éclair', type: 'm', su: 3, ac: 3, rc: 5, cd: 3, dmg: 6, rng: 66, h: 30, kb: 3, st: 11 },
+    { n: 'Rafale de jabs', type: 'm', su: 8, ac: 24, rc: 16, cd: 90, dmg: 4, rng: 70, h: 40, kb: 2, st: 9, multi: 6 },
+    { n: 'Uppercut piston', type: 'm', su: 14, ac: 6, rc: 26, cd: 130, dmg: 20, rng: 52, h: 80, kb: 12, st: 28, lift: -10 }] },
+  { name: 'Rosa', adv: 1, desc: 'Rosa « Tornade », reine de l’esquive', hp: 95, spd: 5.3, jmp: 14.5, color: '#e84393', atk: [
+    { n: 'Direct vif', type: 'm', su: 4, ac: 4, rc: 8, cd: 6, dmg: 7, rng: 66, h: 30, kb: 4, st: 13 },
+    { n: 'Crochet tournoyant', type: 'm', su: 7, ac: 5, rc: 13, cd: 40, dmg: 13, rng: 74, h: 40, kb: 9, st: 20 },
+    { n: 'Esquive', type: 'bd', su: 2, ac: 10, rc: 8, cd: 85, spd: 11 }] },
+  { name: 'El Fantasma', adv: 1, desc: 'Champion masqué de La Cage', hp: 140, spd: 4.5, jmp: 13.5, color: '#d4af37', atk: [
+    { n: 'Direct fantôme', type: 'm', su: 4, ac: 4, rc: 8, cd: 5, dmg: 9, rng: 70, h: 30, kb: 5, st: 14 },
+    { n: 'Crochet du masque', type: 'm', su: 8, ac: 5, rc: 14, cd: 35, dmg: 16, rng: 76, h: 40, kb: 10, st: 22 },
+    { n: 'Uppercut de la Cage', type: 'm', su: 12, ac: 6, rc: 22, cd: 95, dmg: 26, rng: 56, h: 80, kb: 13, st: 32, lift: -11 }] },
+  // Chapitre 2 (Zéphyr, « La Foudre Fêlée ») : bz = taille de base (1.3 = golem plus grand que les autres)
+  { name: 'Golem', adv: 1, desc: 'Golem de pierre, gardien de la forêt', hp: 150, spd: 2.3, jmp: 9.5, color: '#7f8c8d', bz: 1.3, atk: [
+    { n: 'Poing de pierre', type: 'm', su: 14, ac: 6, rc: 18, cd: 20, dmg: 13, rng: 78, h: 60, kb: 10, st: 22 },
+    { n: 'Balayage rocheux', type: 'm', both: 1, su: 18, ac: 7, rc: 24, cd: 80, dmg: 17, rng: 70, h: 70, kb: 13, st: 26 },
+    { n: 'Saut sismique', type: 'jam', su: 12, ac: 0, rc: 26, cd: 150, dmg: 16, jv: 10, jx: 2.5, aoe: 95, kb: 12, st: 28 }] },
+  { name: 'Morgane', adv: 1, desc: 'Sorcière du marais', hp: 95, spd: 3.7, jmp: 13, color: '#27ae60', atk: [
+    { n: 'Trait maudit', type: 'p', su: 7, ac: 1, rc: 10, cd: 30, dmg: 6, vx: 11, r: 8, kb: 4, st: 13, vis: 18 },
+    { n: 'Boule de feu verte', type: 'p', su: 12, ac: 1, rc: 30, cd: 80, dmg: 13, vx: 7, r: 16, kb: 10, st: 22, vis: 19 },
+    { n: 'Foudre des marais', type: 'sky', su: 14, ac: 1, rc: 22, cd: 160, dmg: 14, kb: 9, st: 26, warn: 34, strike: 8 }] },
+  { name: 'Lysandre', adv: 1, desc: 'Ancien élève de Zéphyr, mage en robe blanche', hp: 115, spd: 4.1, jmp: 13.5, color: '#ecf0f1', atk: [
+    { n: 'Lame de lumière', type: 'p', su: 8, ac: 1, rc: 12, cd: 40, dmg: 9, vx: 12, r: 18, kb: 8, st: 18, vis: 3 },
+    { n: 'Orbes de vent (x3)', type: 'p', su: 10, ac: 1, rc: 30, cd: 100, dmg: 6, vx: 9, r: 8, kb: 5, st: 14, cnt: 3, vis: 20 },
+    { n: 'Foudre blanche', type: 'sky', su: 14, ac: 1, rc: 20, cd: 140, dmg: 16, kb: 11, st: 30, warn: 28, strike: 8 },
+    { n: 'Tempête de l’élève', ult: 1, ub: 1, type: 'storm', su: 14, ac: 1, rc: 22, cd: 0, offs: [0, 70, -70, 0], gap: 10, dmg: 9, kb: 6, st: 16, warn: 22, strike: 6, cl: 1 }] },
+  // Chapitre 3 (Kaze, « L’Ombre du Clan ») : ninjas dessinés avec le corps de Kaze
+  { name: 'Garde Ren', adv: 1, desc: 'Garde du clan du Vent', hp: 80, spd: 4.4, jmp: 14, color: '#c0392b', atk: [
+    { n: 'Coup de sabre', type: 'm', su: 6, ac: 4, rc: 12, cd: 10, dmg: 8, rng: 78, h: 40, kb: 6, st: 15 },
+    { n: 'Charge', type: 'd', su: 6, ac: 10, rc: 16, cd: 80, dmg: 10, rng: 34, h: 60, kb: 10, st: 20, spd: 12 },
+    { n: 'Shuriken', type: 'p', su: 7, ac: 1, rc: 12, cd: 70, dmg: 5, vx: 12, r: 6, kb: 4, st: 8, vis: 21 }] },
+  { name: 'Garde Sora', adv: 1, desc: 'Garde des toits du clan du Vent', hp: 90, spd: 4.8, jmp: 14.5, color: '#2980b9', atk: [
+    { n: 'Coup de sabre', type: 'm', su: 5, ac: 4, rc: 10, cd: 8, dmg: 8, rng: 80, h: 40, kb: 6, st: 15 },
+    { n: 'Charge', type: 'd', su: 5, ac: 10, rc: 14, cd: 65, dmg: 11, rng: 34, h: 60, kb: 10, st: 21, spd: 14 },
+    { n: 'Shuriken (x2)', type: 'p', su: 6, ac: 1, rc: 12, cd: 60, dmg: 5, vx: 13, r: 6, kb: 4, st: 8, cnt: 2, vis: 21 }] },
+  { name: 'Hibana', adv: 1, desc: 'Kunoichi de feu, très rapide', hp: 85, spd: 6.0, jmp: 15, color: '#ff7a1a', atk: [
+    { n: 'Kunaï enflammé', type: 'm', su: 3, ac: 3, rc: 6, cd: 4, dmg: 5, rng: 56, h: 35, kb: 3, st: 11 },
+    { n: 'Ruée de flammes', type: 'd', su: 4, ac: 10, rc: 12, cd: 55, dmg: 12, rng: 34, h: 60, kb: 10, st: 22, spd: 17, trail: { tick: 1.2, life: 120, w: 120 } },
+    { n: 'Kunaï de feu (x3)', type: 'p', su: 8, ac: 1, rc: 20, cd: 90, dmg: 5, vx: 12, r: 8, kb: 5, st: 12, cnt: 3, vis: 19 }] },
+  { name: 'Renard masqué', adv: 1, desc: 'Le voleur du rouleau sacré', hp: 130, spd: 5.4, jmp: 14.5, color: '#e8e4da', atk: [
+    { n: 'Lame du renard', type: 'm', su: 4, ac: 4, rc: 8, cd: 6, dmg: 8, rng: 72, h: 40, kb: 6, st: 14 },
+    { n: 'Pas du renard (derrière toi)', type: 'tpb', su: 3, ac: 1, rc: 9, cd: 130 },
+    { n: 'Kunaï de l’ombre (x2)', type: 'p', su: 5, ac: 1, rc: 10, cd: 60, dmg: 7, vx: 15, r: 6, kb: 5, st: 10, cnt: 2, vis: 21 },
+    { n: 'Mille kunaï du renard', ult: 1, ub: 1, type: 'kunai6', su: 10, ac: 76, rc: 14, cd: 0, cnt: 5, gap: 8, vx: 22, r: 6, spd: 32, fin: 16, finKb: 14, finSt: 34, lift: -6, kd: { dmg: 6, kb: 4, st: 12, vis: 21, ub: 1 } }] },
+  // Chapitre 4 (Viking, « Le Dernier Drakkar ») : morts-vivants et géant dessinés avec le corps du Viking, louveteau dessiné à part
+  { name: 'Draugr', adv: 1, desc: 'Guerrier mort-vivant des tertres', hp: 95, spd: 3.2, jmp: 11.5, color: '#7f9c8a', atk: [
+    { n: 'Hache rouillée', type: 'm', su: 10, ac: 5, rc: 14, cd: 12, dmg: 11, rng: 85, h: 50, kb: 8, st: 18 },
+    { n: 'Coup de bouclier', type: 'm', su: 8, ac: 4, rc: 14, cd: 40, dmg: 8, rng: 50, h: 85, kb: 15, st: 26 },
+    { n: 'Charge d’outre-tombe', type: 'd', su: 10, ac: 12, rc: 18, cd: 110, dmg: 13, rng: 40, h: 70, kb: 12, st: 22, spd: 10 }] },
+  { name: 'Draugr hurleur', adv: 1, desc: 'Draugr qui glace le sang', hp: 105, spd: 3.6, jmp: 12, color: '#6a8fb0', atk: [
+    { n: 'Griffes gelées', type: 'm', su: 6, ac: 4, rc: 10, cd: 8, dmg: 9, rng: 70, h: 45, kb: 6, st: 15 },
+    { n: 'Hurlement (bonus)', type: 'buff', su: 12, ac: 1, rc: 14, cd: 400, dur: 240 },
+    { n: 'Saut d’outre-tombe', type: 'jam', su: 10, ac: 0, rc: 22, cd: 120, dmg: 15, jv: 12, jx: 3, aoe: 85, kb: 12, st: 26 }] },
+  { name: 'Louveteau géant', adv: 1, desc: 'Louveteau du géant, très rapide', hp: 90, spd: 6.6, jmp: 15, color: '#9aa7b4', atk: [
+    { n: 'Morsure', type: 'm', su: 4, ac: 4, rc: 8, cd: 6, dmg: 7, rng: 62, h: 40, by: .6, kb: 4, st: 12 },
+    { n: 'Bond', type: 'd', su: 5, ac: 12, rc: 14, cd: 50, dmg: 12, rng: 34, h: 60, kb: 10, st: 22, spd: 16 },
+    { n: 'Hurlement', type: 'buff', su: 10, ac: 1, rc: 14, cd: 400, dur: 300 }] },
+  { name: 'Géant de givre', adv: 1, desc: 'Voleur du cor sacré, deux fois plus grand', hp: 230, spd: 2.4, jmp: 9, color: '#7fc4e0', bz: 2, atk: [
+    { n: 'Poing de glace', type: 'm', su: 16, ac: 6, rc: 20, cd: 18, dmg: 16, rng: 70, h: 80, kb: 14, st: 26 },
+    { n: 'Balayage glacé', type: 'm', both: 1, su: 20, ac: 7, rc: 24, cd: 80, dmg: 18, rng: 80, h: 90, kb: 15, st: 28 },
+    { n: 'Piétinement', type: 'jam', su: 14, ac: 0, rc: 26, cd: 140, dmg: 18, jv: 8, jx: 1, aoe: 150, kb: 14, st: 30 }] },
+  // Chapitre 5 (Chevalier, « Le Serment Brisé ») : le dragon (dessiné à part) et le Chevalier Noir (corps du Chevalier)
+  { name: 'Dragon', adv: 1, desc: 'Dragon du pic, crache le feu', hp: 220, spd: 3.2, jmp: 12, color: '#c0392b', bz: 1.7, atk: [
+    { n: 'Morsure', type: 'm', su: 10, ac: 5, rc: 16, cd: 14, dmg: 13, rng: 70, h: 60, kb: 10, st: 20 },
+    { n: 'Boule de feu', type: 'p', su: 14, ac: 1, rc: 22, cd: 70, dmg: 14, vx: 7, r: 18, kb: 10, st: 22, vis: 19 },
+    { n: 'Souffle de flammes', type: 'fire', su: 16, ac: 1, rc: 24, cd: 170, w: 200, life: 150, tick: 2 },
+    { n: 'Envol', type: 'fly', su: 4, ac: 1, rc: 6, cd: 320, dur: 150 }] },
+  { name: 'Chevalier Noir', adv: 1, desc: 'Frère d’armes maudit', hp: 140, spd: 3.4, jmp: 12, color: '#5b2c6f', blk: 0.05, atk: [
+    { n: 'Estoc noir', type: 'm', su: 6, ac: 4, rc: 11, cd: 8, dmg: 9, rng: 88, h: 26, kb: 6, st: 15 },
+    { n: 'Coup de bouclier', type: 'm', su: 9, ac: 4, rc: 15, cd: 22, dmg: 10, rng: 50, h: 85, kb: 18, st: 30 },
+    { n: 'Taillade maudite', type: 'm', su: 13, ac: 5, rc: 22, cd: 70, dmg: 19, rng: 95, h: 110, kb: 11, st: 26 },
+    { n: 'Lame des ténèbres', ult: 1, ub: 1, type: 'p', su: 20, ac: 1, rc: 24, cd: 0, dmg: 32, vx: 13, r: 26, kb: 16, st: 34, vis: 3 }] }
   // Kairos (perso original) : echo = frappe différée sur la position marquée | rewind = retour 2 s en arrière (rend une partie des PV perdus) | timestop = fige l'ennemi, ses dégâts sont mis de côté puis infligés d'un coup
 ];
+// Chapitre 6 (Kairos, « Les Heures Perdues ») : les échos des cinq héros (copies figées dans le temps) et l'Horloger Noir (reflet de Kairos)
+[['Bruno', 'Écho de Bruno'], ['Zéphyr', 'Écho de Zéphyr'], ['Kaze', 'Écho de Kaze'], ['Viking', 'Écho du Viking'], ['Chevalier', 'Écho du Chevalier']].forEach(([nm, en]) => {
+  const c = CH.find(q => q.name === nm); CH.push({ ...c, name: en, adv: 1, desc: 'Souvenir de ' + nm + ', figé dans le temps', color: '#8fb8e8' });
+});
+CH.push({ ...CH.find(q => q.name === 'Kairos'), name: 'Horloger Noir', adv: 1, desc: 'Reflet de Kairos, maître des secondes volées', hp: 135, color: '#b0182a' });
 // Événement Frieren : dispo du dimanche soir à 00h01 (heure de Paris, soit lundi 16/11/2026 00:01) ensuite définitivement. Modifier FRIEREN_FROM pour changer la date.
 const FRIEREN_FROM = Date.parse('2026-11-16T00:01:00+01:00');
+// Mode aventure : visible tout de suite, jouable à partir du lundi 16/11/2026 00:01 (heure de Paris). Modifier ADV_FROM pour changer la date.
+const ADV_FROM = Date.parse('2026-11-16T00:01:00+01:00');
 const h53 = (s, seed = 0) => { let a = 0xdeadbeef ^ seed, b = 0x41c6ce57 ^ seed; for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); a = Math.imul(a ^ c, 2654435761); b = Math.imul(b ^ c, 1597334677); } a = Math.imul(a ^ (a >>> 16), 2246822507) ^ Math.imul(b ^ (b >>> 13), 3266489909); b = Math.imul(b ^ (b >>> 16), 2246822507) ^ Math.imul(a ^ (a >>> 13), 3266489909); return 4294967296 * (2097151 & b) + (a >>> 0); }, ADM_H = 574438982976814;
-const avail = (c, adm) => adm || !CH[c] || CH[c].name !== 'Frieren' || (Date.now() >= FRIEREN_FROM);
+const avail = (c, adm) => !CH[c] || (!CH[c].adv && (adm || CH[c].name !== 'Frieren' || (Date.now() >= FRIEREN_FROM)));
 const admOk = (ws, m) => (m.adm && h53(String(m.adm)) === ADM_H && (ws.adm = 1), !!ws.adm);
 const rndC = () => { const ok = CH.map((_, i) => i).filter(avail); return ok[Math.random() * ok.length | 0]; };
-const getChars = () => CH.map(({ name, desc, hp, color, atk, alt }, i) => ({ name, desc, hp, color, atk: atk.map(a => a.n), alt: alt ? alt.map(a => a.n) : null, hid: avail(i) ? 0 : 1 }));
+const getChars = () => CH.map(({ name, desc, hp, color, atk, alt }, i) => ({ name, desc, hp, color, atk: atk.map(a => a.n), alt: alt ? alt.map(a => a.n) : null, hid: avail(i) ? 0 : 1, adv: CH[i].adv ? 1 : 0 }));
+// ===== MODE AVENTURE : combats de l'histoire (p = héros, o = adversaire, lvl = niveau du bot, map = arène fixe, noUlt = ultimes désactivés, 1 seule manche) =====
+const ADV = {
+  b0: { p: 'Bruno', o: 'Tommy', lvl: 0, map: 0, noUlt: 1 },
+  b1: { p: 'Bruno', o: 'La Machine', lvl: 1, map: 2, noUlt: 1 },
+  b2: { p: 'Bruno', o: 'Rosa', lvl: 1, map: 2, noUlt: 1 },
+  b3: { p: 'Bruno', o: 'El Fantasma', lvl: 2, map: 2, noUlt: 1 },
+  z0: { p: 'Zéphyr', o: 'Golem', lvl: 0, map: 5, noUlt: 1 },
+  z1: { p: 'Zéphyr', o: 'Morgane', lvl: 1, map: 6, noUlt: 1 },
+  z2: { p: 'Zéphyr', o: 'Lysandre', lvl: 2, map: 7, noUlt: 0 },
+  k0: { p: 'Kaze', o: 'Garde Ren', lvl: 0, map: 2, noUlt: 1 },
+  k1: { p: 'Kaze', o: 'Garde Sora', lvl: 1, map: 2, noUlt: 1 },
+  k2: { p: 'Kaze', o: 'Hibana', lvl: 1, map: 8, noUlt: 1 },
+  k3: { p: 'Kaze', o: 'Renard masqué', lvl: 2, map: 9, noUlt: 0 },
+  v0: { p: 'Viking', o: 'Draugr', lvl: 0, map: 10, noUlt: 1 },
+  v1: { p: 'Viking', o: 'Draugr hurleur', lvl: 1, map: 3, noUlt: 1 },
+  v2: { p: 'Viking', o: 'Louveteau géant', lvl: 1, map: 10, noUlt: 1 },
+  v3: { p: 'Viking', o: 'Géant de givre', lvl: 2, map: 11, noUlt: 0 },
+  c0: { p: 'Chevalier', o: 'Dragon', lvl: 1, map: 12, noUlt: 1 },
+  c1: { p: 'Chevalier', o: 'Chevalier Noir', lvl: 2, map: 13, noUlt: 0 },
+  t0: { p: 'Kairos', o: 'Écho de Bruno', lvl: 1, map: 2, noUlt: 1 },
+  t1: { p: 'Kairos', o: 'Écho de Zéphyr', lvl: 1, map: 7, noUlt: 1 },
+  t2: { p: 'Kairos', o: 'Écho de Kaze', lvl: 1, map: 8, noUlt: 1 },
+  t3: { p: 'Kairos', o: 'Écho du Viking', lvl: 2, map: 10, noUlt: 1 },
+  t4: { p: 'Kairos', o: 'Écho du Chevalier', lvl: 2, map: 13, noUlt: 1 },
+  t5: { p: 'Kairos', o: 'Horloger Noir', lvl: 2, map: 14, noUlt: 0 } // duel final : deux arrêts du temps face à face // duel final : la Lame divine est autorisée // combat final : le Poing du Géant est autorisé // l'esprit renard donne sa force à Kaze : ultimes autorisés // l'orbe rechargé par la foudre : ultimes autorisés pour le combat final
+};
 
 // gr = gravité, acc = adhérence du sol (1 = normal, petit = glissant)
 const MAPS = [
@@ -142,9 +253,23 @@ const MAPS = [
   { n: 'Ville de nuit', note: '', gr: GR, acc: 1 },
   { n: 'Banquise', note: 'sol glissant', gr: GR, acc: 0.1 },
   { n: 'Lune', note: 'gravité réduite', gr: 0.42, acc: 1 },
-  { n: 'Prairie d’Himmel', note: 'saison Frieren', gr: GR, acc: 1 } // map de la saison Frieren : jouable à partir de FRIEREN_FROM
+  { n: 'Prairie d’Himmel', note: 'saison Frieren', gr: GR, acc: 1 }, // map de la saison Frieren : jouable à partir de FRIEREN_FROM
+  // arènes réservées au mode aventure (adv: 1 = jamais tirées au hasard)
+  { n: 'Marais brumeux', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Sommet de la Tour des Orages', note: 'gravité réduite', gr: .55, acc: 1, adv: 1 },
+  { n: 'Forêt de bambous', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Sanctuaire du renard', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Forêt enneigée', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Trône de givre', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Pic du dragon', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Salle du trône maudite', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Cœur de la Grande Horloge', note: 'aventure', gr: GR, acc: 1, adv: 1 }
 ];
-function rollMap(r) { const lim = Date.now() >= FRIEREN_FROM ? MAPS.length : MAPS.length - 1; let m; do { m = Math.random() * lim | 0; } while (m === r.mi); r.mi = m; }
+function rollMap(r) {
+  if (r.fixMap != null) { r.mi = r.fixMap; return; }
+  const ok = MAPS.map((_, i) => i).filter(i => !MAPS[i].adv && (i !== 5 || Date.now() >= FRIEREN_FROM)); let m;
+  do { m = ok[Math.random() * ok.length | 0]; } while (m === r.mi && ok.length > 1); r.mi = m;
+}
 
 const atks = f => (f.form > 0 && CH[f.c].alt) || CH[f.c].atk;
 const nf = (c, i, inp, ult, two) => ({ c, i, tm: two ? i >> 1 : i, dead: 0, x: two ? [170, 330, W - 330, W - 170][i] : (i ? W - 250 : 250), y: G, vx: 0, vy: 0, hp: CH[c].hp, face: (two ? i >> 1 : i) ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
@@ -227,7 +352,7 @@ function step(r, i) {
   if (f.sht > 0 && --f.sht === 0) f.shield = 0; // la barrière de Frieren se dissipe
   if (f.bound > 0) f.bound--;
   if (f.portal && --f.portal.t <= 0) f.portal = null;
-  f.inv = 0; f.ghost = 0; f.sz = (f.form > 0 && c.big) || 1;
+  f.inv = 0; f.ghost = 0; f.sz = (f.form > 0 && c.big) || c.bz || 1;
   f.ult = Math.min(100, f.ult + 0.008);
   const z = f.sz, dx0 = k.r - k.l, dy0 = k.d - k.u;
   if (f.hf) { // grappin en vol : s'accroche à l'ennemi ou aux bords de l'arène
@@ -561,7 +686,7 @@ function tick(r) {
   else if (r.ph === 'cd') { if (--r.t <= 0) r.ph = 'fight'; }
   else if (r.ph === 'fight') {
     thinkBot(r);
-    r.f.forEach((_, q) => step(r, q)); sep(r); projs(r); fxs(r); r.tm--;
+    r.f.forEach((_, q) => step(r, q)); if (r.noUlt) r.f.forEach(f => { f.ult = 0; }); sep(r); projs(r); fxs(r); r.tm--;
     let over, w;
     if (r.two) { // 2v2 : un combattant à 0 PV est éliminé ; la manche finit quand une équipe est éliminée (ou au temps : PV cumulés)
       r.f.forEach(f => { if (f.hp <= 0 && !f.dead) { f.hp = 0; f.dead = 1; f.atk = null; f.hf = null; f.hook = null; f.vx = 0; } });
@@ -579,7 +704,7 @@ function tick(r) {
       if (w >= 0) r.wins[w]++;
       r.msg = w < 0 ? 'Égalité !' : tn(w) + (r.two ? ' gagne la manche !' : ' gagne la manche !');
       r.ph = 'rend'; r.t = 150;
-      if (r.wins[0] >= 2 || r.wins[1] >= 2) {
+      if (r.wins[0] >= (r.need || 2) || r.wins[1] >= (r.need || 2)) {
         r.ph = 'end'; r.msg = '🏆 ' + tn(w) + ' remporte le match !';
         if (r.two) { r.again = r.bots.map(b => b ? 1 : 0); r.co = r.f.map(f => r.wins[f.tm] * 10 + (r.wins[f.tm] >= 2 ? 30 : 10)); }
         else { r.again = r.bot ? [0, 1] : [0, 0]; r.co = [0, 1].map(q => r.wins[q] * 10 + (r.wins[q] >= 2 ? 30 : 10)); }
@@ -597,7 +722,7 @@ function tick(r) {
     if (r.sel.every(v => v != null)) { r.wins = [0, 0]; start(r); }
   }
   const live = r.ph !== 'wait' && r.ph !== 'select';
-  const s = { t: 's', p: r.ph, training: !!r.training, bot: !!r.bot, two: r.two ? 1 : 0,
+  const s = { t: 's', p: r.ph, training: !!r.training, adv: r.adv ? 1 : 0, bot: !!r.bot, two: r.two ? 1 : 0,
     damage: r.training ? Math.round(r.f[1].totalDamage) : 0,
     hits: r.training ? r.f[1].hitCount : 0,
     lastDamage: r.training ? r.f[1].lastDamage : 0,
@@ -702,6 +827,12 @@ wss.on('connection', ws => {
     } else if (m.t === 'training_reset') {
       const r = ws.room;
       if (r && r.training && ws.idx === 0) startTraining(r, r.sel[0], r.sk[0]);
+    } else if (m.t === 'adv' && !ws.room) { // mode aventure : combat de l'histoire contre un bot, lancé directement
+      if (Date.now() < ADV_FROM && !admOk(ws, m)) return tx(ws, { t: 'err', m: 'Le mode aventure ouvre lundi à 00h01 !' });
+      const F = ADV[String(m.f || '')]; if (!F) return tx(ws, { t: 'err', m: 'Combat inconnu' });
+      const pc = CH.findIndex(c => c.name === F.p), oc = CH.findIndex(c => c.name === F.o);
+      const r = { code: newCode(), ps: [ws], ph: 'select', sel: [pc, oc], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: [String(m.sk || '').slice(0, 40), ''], again: [0, 1], co: [0, 0], bot: true, bots: [false, true], lvl: F.lvl, adv: 1, need: 1, noUlt: F.noUlt, fixMap: F.map };
+      rooms.set(r.code, r); ws.room = r; ws.idx = 0; join(ws); start(r);
     } else if (m.t === 'bot' && !ws.room) {
       const r = { code: newCode(), ps: [ws], ph: 'select', sel: [null, rndC()], wins: [0, 0], f: [], pj: [], fx: [], t: 0, tm: 0, msg: '', mi: -1, sk: ['', ''], again: [0, 1], co: [0, 0], bot: true, bots: [false, true], lvl: [0, 1, 2].includes(+m.lvl) ? +m.lvl : 1 };
       rooms.set(r.code, r); ws.room = r; ws.idx = 0; join(ws);
