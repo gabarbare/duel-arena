@@ -140,6 +140,8 @@ input{text-transform:uppercase;width:90px;text-align:center}
 .menu-join{display:flex;gap:5px;width:100%}
 .menu-join input{min-width:0;flex:1;width:50px;padding:8px 4px}
 .menu-join button{width:auto;flex:1}
+.menu-pair{display:flex;gap:6px;width:100%}
+.menu-pair button{width:auto;flex:1;min-width:0}
 .menu-error{margin:0;color:#ff7777}
 @media(max-width:700px){
   #ov.menu-screen{padding:12px 10px;gap:10px;justify-content:flex-start}
@@ -770,11 +772,13 @@ function ui() {
       </section>
       <section class="menu-group menu-combat">
         <h2>⚔️ Combats</h2>
-        <button onclick="search()" style="background:#e67e22">🎲 Matchmaking</button>
+        ${advOpen() ? `<button onclick="view='advmenu';ui()" style="background:#b9770e">📖 Mode aventure</button>` : `<button disabled style="background:#555;opacity:.75;cursor:not-allowed">📖 Mode aventure 🔒<br><small>Ouvre lundi à 00h01 · dans ${advLeft()}</small></button>`}
+        <div class="menu-pair">
+          <button onclick="search()" style="background:#e67e22">🎲 Matchmaking</button>
+          <button onclick="view='botlvl';ui()" style="background:#16a085">🤖 Jouer contre un bot</button>
+        </div>
         <button onclick="search2()" style="background:#d35400">🤝 2v2 aléatoire<br><small>Bots si personne après 15 s</small></button>
         <button onclick="go({t:'create'})">🌐 Créer une partie</button>
-        <button onclick="view='botlvl';ui()" style="background:#16a085">🤖 Jouer contre un bot</button>
-        ${advOpen() ? `<button onclick="view='advmenu';ui()" style="background:#b9770e">📖 Mode aventure</button>` : `<button disabled style="background:#555;opacity:.75;cursor:not-allowed">📖 Mode aventure 🔒<br><small>Ouvre lundi à 00h01 · dans ${advLeft()}</small></button>`}
         <div class="menu-join">
           <input id="cd" maxlength="4" placeholder="CODE" value="${location.hash.slice(1)}">
           <button onclick="go({t:'join',code:document.getElementById('cd').value})">Rejoindre</button>
