@@ -279,6 +279,7 @@ const SHOP = [
   { id: 'skin_ichigo_bloodchains', type: 'skin', char: 'Ichigo', name: 'Ichigo - Sauveur de Rukia', price: 250, look: 'bloodchains', desc: 'Ichigo à Soul Society : grand manteau beige à capuche pointue, tunique noire, bandages, obi blanc et Zangetsu au ruban blanc', pal: {} },
   { id: 'skin_zephyr_fern', type: 'skin', char: 'Zéphyr', name: 'Fern — apprentie de Frieren', price: 400, look: 'fern', season: 1, pal: {} },
   { id: 'skin_viking_stark', type: 'skin', char: 'Viking', name: 'Stark — guerrier à la hache', price: 400, look: 'stark', season: 1, pal: {} },
+  { id: 'skin_chevalier_himmel', type: 'skin', char: 'Chevalier', name: 'Himmel — le héros', price: 400, look: 'himmel', season: 1, pal: {} },
   { id: 'skin_bruno_fantasma', type: 'skin', char: 'Bruno', name: 'Bruno Fantasma (aventure)', price: 0, adv: 1, look: 'fantasma', pal: { '#e74c3c': '#1c1c1c', '#ff7675': '#4a4a4a', '#b03a2e': '#111', '#d9534f': '#3a3a3a', '#fff': '#d4af37' } },
   { id: 'skin_zephyr_archimage', type: 'skin', char: 'Zéphyr', name: 'Zéphyr Archimage (aventure)', price: 0, adv: 1, look: 'archimage', pal: { '#6c3483': '#14213d', '#5b2c6f': '#0b1430', '#4a235a': '#1d2b55', '#5dade2': '#9fd8ff', '#d6eaf8': '#ffffff' } },
   { id: 'skin_kaze_renard', type: 'skin', char: 'Kaze', name: 'Kaze Renard (aventure)', price: 0, adv: 1, look: 'fox', pal: { '#2ecc71': '#c0392b' } },
@@ -915,13 +916,24 @@ const bolt = (cx, cy, rx, ry, n, big) => {
     [['rgba(40,255,90,.35)', big ? 6 : 4.5], ['#c8ffc8', big ? 2.4 : 1.6]].forEach(([c, w]) => { x.strokeStyle = c; x.lineWidth = w; x.lineJoin = 'round'; x.beginPath(); pts.forEach((p, j) => j ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1])); x.stroke(); });
   }
 };
+let HIMMEL = false;
 const shield = (px, py, z) => {
+  if (HIMMEL) { // Himmel : petit écu bleu liseré de blanc, emblème d'argent
+    const pts = m => [[-11 * m, -20 * m], [11 * m, -20 * m], [11 * m, 4 * m], [0, 22 * m], [-11 * m, 4 * m]].map(q => [px + q[0] * z, py + q[1] * z]);
+    Y('#f1f1f4', pts(1)); Y('#3f6fb5', pts(.82)); Y('#cfd5de', [[px, py - 10 * z], [px + 5 * z, py + z], [px, py + 11 * z], [px - 5 * z, py + z]]); C('#f1f1f4', px, py + z, 1.8 * z); return;
+  }
   const pts = m => [[-12 * m, -22 * m], [12 * m, -22 * m], [12 * m, 6 * m], [0, 24 * m], [-12 * m, 6 * m]].map(q => [px + q[0] * z, py + q[1] * z]);
   Y('#f1c40f', pts(1)); Y('#2c5fa8', pts(.8));
   R('#f1c40f', px - 1.5 * z, py - 17 * z, 3 * z, 34 * z); R('#f1c40f', px - 9 * z, py - 6 * z, 18 * z, 3 * z);
 };
 const sword = (hx, hy, tx, ty, col) => {
   const dx = tx - hx, dy = ty - hy;
+  if (HIMMEL) { // l'Épée du héros : lame argentée large et droite, garde dorée, gemme bleue, pommeau d'or
+    const L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L, gx = hx + ux * 10, gy = hy + uy * 10;
+    LN('#aab3bf', 7, gx, gy, tx, ty); LN(col || '#eef3f8', 5, gx, gy, tx, ty); LN('#ffffff', 1.4, gx + uy * 1.2, gy - ux * 1.2, tx - ux * 6, ty - uy * 6);
+    LN('#d4af37', 5, gx + uy * 9, gy - ux * 9, gx - uy * 9, gy + ux * 9); LN('#d4af37', 7, hx, hy, gx, gy); C('#4aa3e8', gx, gy, 3); C('#d4af37', hx - ux * 3, hy - uy * 3, 4.5);
+    return;
+  }
   LN(col || '#dfe6e9', 5, hx, hy, tx, ty); LN('#f1c40f', 4, hx + dy * .15, hy - dx * .15, hx - dy * .15, hy + dx * .15);
 };
 
@@ -1093,7 +1105,7 @@ function fighter(f, i) {
   FL = f.fl;
   if (n === 'Bruno') { const bk = f.ak * 10 + f.ap; if (bk !== brPrev[i] && f.ak === 0 && f.ap === 0) brAlt[i] = (brAlt[i] || 0) ^ 1; brPrev[i] = bk; }
   const air = f.y < 378; if (n === 'Denji' && f.fm && f.ak === 2 && prevAir[i] && !air) WAVES.push({ x: f.x, t: Date.now() }); prevAir[i] = air; if (!(n === 'Viking' && f.ak >= 0)) vkPrev[i] = -1;
-  const sd = f.sk && SHOP.find(q => q.id === f.sk); PAL = (sd && sd.pal) || (AL && AL.pal) || null; const lk = (sd && sd.look) || (AL && AL.look);
+  const sd = f.sk && SHOP.find(q => q.id === f.sk); PAL = (sd && sd.pal) || (AL && AL.pal) || null; const lk = (sd && sd.look) || (AL && AL.look); HIMMEL = lk === 'himmel';
   x.save(); x.translate(f.x, f.y);
   if (f.iv) x.globalAlpha = .45;
   if (lk === 'echo') { x.globalAlpha *= .72; C('rgba(130,200,255,.16)', 0, -55, 64); } // écho figé dans le temps : translucide et bleuté
@@ -1294,6 +1306,24 @@ function fighter(f, i) {
       for (let q = 0; q < 3; q++) { const u = ((t / 800 + q / 3) % 1); C('rgba(220,245,255,' + (.5 * (1 - u)) + ')', s * (14 + u * 18), -92 - u * 6, 2 + u * 4); }
       x.fillStyle = 'rgba(160,220,255,.12)'; x.beginPath(); x.arc(0, -55, 62, 0, 7); x.fill();
     }
+  } else if (n === 'Chevalier' && lk === 'himmel') { // Himmel le héros (Frieren) : cheveux bleus à frange en M, yeux clairs, grain de beauté, tunique bleue à col haut, pantalon blanc, bottes noires, long manteau beige
+    const w = Math.sin(t / 380) * 3;
+    Y('#d9c9a6', [[-22, -94], [22, -94], [34 + w, -4], [-34 + w, -4]]); Y('#c7b78f', [[-22, -94], [-8, -94], [-14 + w, -4], [-34 + w, -4]]); // manteau beige dans le dos
+    R('#f3f3f6', -17, -42, 14, 38); R('#f3f3f6', 3, -42, 14, 38); // pantalon blanc
+    R('#17171c', -18, -26, 15, 26); R('#17171c', 3, -26, 15, 26); R('#f3f3f6', -18, -24, 15, 1.6); R('#f3f3f6', 3, -24, 15, 1.6); R('#f3f3f6', -3.5, -26, 1.2, 26); // bottes noires à liserés blancs
+    R('#3f6fb5', -22, -92, 44, 56); R('#365c99', -22, -44, 44, 8); R('#4a7cc4', -20, -90, 8, 40); // tunique bleue mi-longue
+    R('#365c99', -7, -97, 14, 7); R('#4a7cc4', -7, -97, 14, 2); // col haut
+    [-84, -76, -68, -60, -52].forEach(yy => { LN('#f3f3f6', 2, -5, yy, 5, yy); C('#f3f3f6', -5, yy, 1.5); C('#f3f3f6', 5, yy, 1.5); }); // fermetures blanches
+    R('#5d4a3a', -23, -40, 46, 8); R('#d4af37', -4, -41, 8, 10); LN('#5d4a3a', 4, -18, -92, 16, -42); // large ceinture + sangle en bandoulière
+    C('#3f6fb5', -24, -88, 10); C('#3f6fb5', 24, -88, 10);
+    C('#cfd5de', s * -20, -90, 4); C('#aab3bf', s * -20, -90, 2); // fermoir d'argent du manteau
+    Y('#d9c9a6', [[-26, -94], [-18, -94], [-24 + w, -6], [-34 + w, -6]]); Y('#d9c9a6', [[26, -94], [18, -94], [24 + w, -6], [34 + w, -6]]); // pans avant du manteau ouverts
+    Y('#c7b78f', [[-12, -98], [12, -98], [8, -90], [-8, -90]]); // capuche rabattue
+    C(skin, 0, -104, 14);
+    Y('#5aa2dc', [[-15, -102], [-15, -116], [-6, -122], [6, -122], [15, -116], [15, -102], [11, -108], [6, -104], [0, -111], [-6, -104], [-11, -108]]); // cheveux bleus, frange en « M »
+    Y('#7cbaea', [[-8, -121], [2, -122], [-2, -114]]); Y('#5aa2dc', [[-15, -104], [-18, -96], [-12, -100]]); Y('#5aa2dc', [[15, -104], [18, -96], [12, -100]]);
+    R('#7cc4f0', s * 6 - 2.5, -105, 5, 5.5); R('#fff', s * 7.2, -105, 1.5, 1.5); C('#6a4a3a', s * 9, -97, 1.1); // yeux bleu clair, grain de beauté
+    LN('#8a5a4a', 1.4, s * 2, -94, s * 7, -95);
   } else if (n === 'Chevalier') { // chevalier : armure d'acier, heaume à plumet, tabard bleu à croix dorée
     R('#78909c', -16, -28, 13, 28); R('#78909c', 3, -28, 13, 28);
     R('#455a64', -18, -9, 17, 9); R('#455a64', 1, -9, 17, 9);
@@ -1702,7 +1732,7 @@ function fighter(f, i) {
     else if (n === 'Naruto') { C(skin, px, py, 7); if (f.ak === 1 && f.ap < 2) rasen(px + s * 12, py, 13 + 2 * Math.sin(t / 45), 0); if (f.ak === 3 && f.ap < 2) rasen(px + s * 4, py - 26, 22, 1); if (f.ak === 0 && f.ap < 2) { C('#f5cba7', px + s * 3, py, 8); LN('#fff0c2', 2, px + s * 2, py - 5, px + s * 10, py - 8); } }
     else { C(lk === 'snake' ? '#16161d' : skin, px, py, 10); if (lk === 'snake') C('rgba(255,255,255,.14)', px - 3, py - 3, 4); }
   };
-  const sleeve = n === 'Golem' ? '#6d7377' : n === 'Kaze' ? '#1c1c28' : n === 'Naruto' ? '#ff7f27' : n === 'Chevalier' ? '#b0bec5' : n === 'Gojo' ? '#1a2a4f' : n === 'Deku' ? '#2e7d32' : n === 'Denji' ? '#f2f2f2' : n === 'Yugo' ? '#e2b283' : n === 'Shinra' ? '#23232f' : n === 'Eren' ? (f.fm ? '#8a4a35' : '#6d4c41') : n === 'Koro' ? '#f4d03f' : n === 'Kairos' ? '#3b2a5a' : n === 'Frieren' ? '#f4f1ea' : n === 'Ichigo' ? '#16161d' : (n === 'Luffy' && lk === 'snake') ? '#16161d' : skin;
+  const sleeve = n === 'Golem' ? '#6d7377' : n === 'Kaze' ? '#1c1c28' : n === 'Naruto' ? '#ff7f27' : n === 'Chevalier' ? (lk === 'himmel' ? '#3f6fb5' : '#b0bec5') : n === 'Gojo' ? '#1a2a4f' : n === 'Deku' ? '#2e7d32' : n === 'Denji' ? '#f2f2f2' : n === 'Yugo' ? '#e2b283' : n === 'Shinra' ? '#23232f' : n === 'Eren' ? (f.fm ? '#8a4a35' : '#6d4c41') : n === 'Koro' ? '#f4d03f' : n === 'Kairos' ? '#3b2a5a' : n === 'Frieren' ? '#f4f1ea' : n === 'Ichigo' ? '#16161d' : (n === 'Luffy' && lk === 'snake') ? '#16161d' : skin;
   if (n === 'Loup' || n === 'Dragon') { /* pas de bras : la gueule et les pattes sont dessinées avec le corps */ }
   else if (n === 'Zéphyr' && lk === 'fern') { // Fern : bâton tenu à deux mains, sorts Zoltraak à tir rapide (cercle doré au bout du bâton)
     const k = f.ak, ap = f.ap, pp = aCl(f.pp || 0), t = Date.now(), sl = '#34343a';
