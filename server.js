@@ -220,19 +220,20 @@ const admOk = (ws, m) => (m.adm && h53(String(m.adm)) === ADM_H && (ws.adm = 1),
 const rndC = () => { const ok = CH.map((_, i) => i).filter(avail); return ok[Math.random() * ok.length | 0]; };
 const getChars = () => CH.map(({ name, desc, hp, color, atk, alt }, i) => ({ name, desc, hp, color, atk: atk.map(a => a.n), alt: alt ? alt.map(a => a.n) : null, hid: avail(i) ? 0 : 1, adv: CH[i].adv ? 1 : 0 }));
 // ===== MODE AVENTURE : combats de l'histoire (p = héros, o = adversaire, lvl = niveau du bot, map = arène fixe, noUlt = ultimes désactivés, 1 seule manche) =====
+// lvl : 1 = moyen pour les combats d'histoire, 2 = difficile pour le boss de chaque chapitre (b3, z2, k3, v3, c1, t5)
 const ADV = {
-  b0: { p: 'Bruno', o: 'Tommy', lvl: 0, map: 0, noUlt: 1 },
+  b0: { p: 'Bruno', o: 'Tommy', lvl: 1, map: 0, noUlt: 1 },
   b1: { p: 'Bruno', o: 'La Machine', lvl: 1, map: 2, noUlt: 1 },
   b2: { p: 'Bruno', o: 'Rosa', lvl: 1, map: 2, noUlt: 1 },
   b3: { p: 'Bruno', o: 'El Fantasma', lvl: 2, map: 2, noUlt: 1 },
-  z0: { p: 'Zéphyr', o: 'Golem', lvl: 0, map: 5, noUlt: 1 },
+  z0: { p: 'Zéphyr', o: 'Golem', lvl: 1, map: 5, noUlt: 1 },
   z1: { p: 'Zéphyr', o: 'Morgane', lvl: 1, map: 6, noUlt: 1 },
   z2: { p: 'Zéphyr', o: 'Lysandre', lvl: 2, map: 7, noUlt: 0 },
-  k0: { p: 'Kaze', o: 'Garde Ren', lvl: 0, map: 2, noUlt: 1 },
+  k0: { p: 'Kaze', o: 'Garde Ren', lvl: 1, map: 2, noUlt: 1 },
   k1: { p: 'Kaze', o: 'Garde Sora', lvl: 1, map: 2, noUlt: 1 },
   k2: { p: 'Kaze', o: 'Hibana', lvl: 1, map: 8, noUlt: 1 },
   k3: { p: 'Kaze', o: 'Renard masqué', lvl: 2, map: 9, noUlt: 0 },
-  v0: { p: 'Viking', o: 'Draugr', lvl: 0, map: 10, noUlt: 1 },
+  v0: { p: 'Viking', o: 'Draugr', lvl: 1, map: 10, noUlt: 1 },
   v1: { p: 'Viking', o: 'Draugr hurleur', lvl: 1, map: 3, noUlt: 1 },
   v2: { p: 'Viking', o: 'Louveteau géant', lvl: 1, map: 10, noUlt: 1 },
   v3: { p: 'Viking', o: 'Géant de givre', lvl: 2, map: 11, noUlt: 0 },
@@ -241,9 +242,9 @@ const ADV = {
   t0: { p: 'Kairos', o: 'Écho de Bruno', lvl: 1, map: 2, noUlt: 1 },
   t1: { p: 'Kairos', o: 'Écho de Zéphyr', lvl: 1, map: 7, noUlt: 1 },
   t2: { p: 'Kairos', o: 'Écho de Kaze', lvl: 1, map: 8, noUlt: 1 },
-  t3: { p: 'Kairos', o: 'Écho du Viking', lvl: 2, map: 10, noUlt: 1 },
-  t4: { p: 'Kairos', o: 'Écho du Chevalier', lvl: 2, map: 13, noUlt: 1 },
-  t5: { p: 'Kairos', o: 'Horloger Noir', lvl: 2, map: 14, noUlt: 0 } // duel final : deux arrêts du temps face à face // duel final : la Lame divine est autorisée // combat final : le Poing du Géant est autorisé // l'esprit renard donne sa force à Kaze : ultimes autorisés // l'orbe rechargé par la foudre : ultimes autorisés pour le combat final
+  t3: { p: 'Kairos', o: 'Écho du Viking', lvl: 1, map: 10, noUlt: 1 },
+  t4: { p: 'Kairos', o: 'Écho du Chevalier', lvl: 1, map: 13, noUlt: 1 },
+  t5: { p: 'Kairos', o: 'Horloger Noir', lvl: 2, map: 14, noUlt: 0 } // boss final : duel de deux arrêts du temps
 };
 
 // gr = gravité, acc = adhérence du sol (1 = normal, petit = glissant)
