@@ -1119,29 +1119,36 @@ function fighter(f, i) {
     x.fillStyle = P('#4a235a'); x.beginPath(); x.ellipse(0, -112, 26, 6, 0, 0, 7); x.fill();
     Y('#5b2c6f', [[-15, -113], [15, -113], [s * 8, -154]]);
     R('#f1c40f', -14, -117, 28, 4); C('#f1c40f', s * 2, -134, 3);
-  } else if (n === 'Viking' && lk === 'stark') { // Stark (Frieren) : jeune guerrier, cheveux roux en pointes, tunique sombre, épaulière de cuir
-    R('#3a3530', -17, -28, 15, 28); R('#3a3530', 2, -28, 15, 28);
-    R('#2a211b', -19, -10, 18, 10); R('#2a211b', 1, -10, 18, 10); R('#6b5a49', -19, -12, 18, 3); R('#6b5a49', 1, -12, 18, 3);
-    R('#3f4b4a', -22, -92, 44, 64); R('#33403f', -22, -60, 44, 4);
-    LN('#2b1f17', 5, -20, -90, 16, -42); // bandoulière
-    R('#2b1f17', -23, -40, 46, 7); R('#c9a227', -5, -41, 10, 9); R('#2b1f17', -3, -39, 6, 5);
-    C('#7a5a3a', -24, -88, 12); C('#5e4329', -24, -88, 7); C('#7a5a3a', 24, -88, 12); C('#5e4329', 24, -88, 7); // épaulières de cuir
-    R('#d9d2c4', -9, -94, 18, 6); // col de chemise
+  } else if (n === 'Viking' && lk === 'stark') { // Stark (Frieren) : cheveux roux en pointes à racines noires, yeux orange, chemise noire sans manches à col, pantalon large noir, ceinture blanche, bandages aux bras
+    R('#1d1d22', -19, -30, 17, 30); R('#1d1d22', 2, -30, 17, 30); // pantalon large
+    R('#2a2a31', -19, -16, 17, 3); R('#2a2a31', 2, -16, 17, 3);
+    R('#111114', -20, -10, 19, 10); R('#111114', 1, -10, 19, 10); R('#2f2f36', -20, -10, 19, 2); R('#2f2f36', 1, -10, 19, 2); // bottes noires
+    R('#1c1c22', -22, -92, 44, 62); R('#26262e', -22, -66, 44, 2);
+    Y('#e9e6df', [[-5, -93], [5, -93], [0, -80]]); // fermeture blanche de la chemise
+    [-84, -75, -66].forEach(yy => C('#e9e6df', 0, yy, 1.6));
+    Y('#14141a', [[-14, -94], [-4, -94], [-8, -86]]); Y('#14141a', [[14, -94], [4, -94], [8, -86]]); // col
+    R('#ecebe5', -23, -40, 46, 9); R('#d4d2ca', -23, -33, 46, 2); Y('#ecebe5', [[8, -32], [16, -32], [14, -18], [9, -18]]); // large ceinture blanche, pan qui retombe
+    C('#1c1c22', -23, -88, 10); C('#1c1c22', 23, -88, 10); // épaules
+    LN('#3b2a1c', 3, -18, -92, 12, -46); // sangle de la hache dans le dos
     C(skin, 0, -104, 14);
-    Y('#a8442a', [[-15, -105], [-16, -118], [-9, -113], [-7, -127], [-1, -116], [5, -129], [9, -116], [16, -124], [15, -110], [16, -102], [10, -108], [0, -112], [-10, -108]]);
-    Y('#c4583a', [[-3, -116], [5, -129], [9, -116], [2, -113]]);
-    R('#26382e', s * 6 - 2, -106, 4, 4); LN('#6b2e1c', 2, s * 2, -112, s * 10, -110); // regard inquiet
+    Y('#2a1414', [[-15, -104], [-16, -116], [-8, -112], [-6, -125], [0, -114], [7, -126], [9, -114], [16, -118], [15, -103], [10, -108], [0, -111], [-10, -108]]); // racines noires
+    Y('#c9381f', [[-15, -108], [-17, -121], [-9, -116], [-7, -131], [-1, -119], [6, -133], [10, -119], [17, -124], [15, -108], [8, -113], [0, -116], [-9, -113]]); // pointes rouges
+    Y('#e0502f', [[-1, -119], [6, -133], [10, -119], [4, -116]]);
+    R('#f08a1e', s * 6 - 2, -106, 5, 5); R('#fff2d0', s * 7.5, -106, 1.5, 1.5); LN('#4a1c12', 2, s * 2, -111, s * 10, -109.5); // yeux orange, sourcils soucieux
   } else if (n === 'Zéphyr' && lk === 'fern') { // Fern (Frieren) : longs cheveux violet sombre, manteau noir à col blanc, yeux violets
     Y('#1f2030', [[-19, -90], [19, -90], [27, -4], [-27, -4]]);
     R('#c9a227', -27, -8, 54, 3); R('#c9a227', -1, -88, 2, 82);
     [-74, -58, -42].forEach(yy => C('#d9b84a', 0, yy, 2));
     Y('#f4f1ea', [[-10, -91], [10, -91], [0, -70]]); Y('#e0dcd2', [[-10, -91], [-4, -91], [0, -80]]);
     R('#2a2230', -16, -3, 12, 3); R('#2a2230', 4, -3, 12, 3);
-    Y('#3b2a5e', [[-15, -108], [15, -108], [20, -52], [-20, -52]]); // longs cheveux dans le dos
+    Y('#3d2d63', [[-14, -108], [14, -108], [19, -40], [-19, -40]]); // longs cheveux jusqu'à la taille
+    LN('#f4f1ea', 3, -13, -74, 13, -74); // petit ruban qui retient les cheveux
     C(skin, 0, -102, 13);
-    Y('#4d3a78', [[-14, -111], [14, -111], [15, -100], [9, -106], [0, -103], [-9, -106], [-15, -100]]); // frange
-    Y('#4d3a78', [[-14, -108], [-17, -80], [-11, -84], [-10, -104]]); Y('#4d3a78', [[14, -108], [17, -80], [11, -84], [10, -104]]);
-    R('#7b52d6', s * 6 - 2, -105, 5, 5); R('#e9dcff', s * 7, -105, 1.6, 1.6);
+    Y('#4d3a78', [[-14, -112], [14, -112], [15, -101], [11, -104], [0, -103], [-11, -104], [-15, -101]]); // frange droite (hime cut)
+    Y('#4d3a78', [[-14, -108], [-17, -66], [-10, -66], [-10, -103]]); Y('#4d3a78', [[14, -108], [17, -66], [10, -66], [10, -103]]); // mèches latérales jusqu'à la poitrine
+    R('#6a46c4', s * 5.5 - 2.5, -104, 6, 7); R('#a98cf0', s * 5.5 - 1, -104, 3.5, 3.5); R('#fff', s * 7, -103.5, 1.6, 1.6); // grands yeux violets
+    LN('#2b1d4a', 1.6, s * 2.5, -105.5, s * 10, -105.5);
+    LN('#c27a7a', 1.4, s * 3, -93, s * 7, -93);
   } else if (n === 'Viking') { // viking : casque à cornes, barbe rousse, épaulières, ceinture dorée
     R('#4e342e', -17, -28, 15, 28); R('#4e342e', 2, -28, 15, 28);
     R('#2d2d2d', -19, -9, 18, 9); R('#2d2d2d', 1, -9, 18, 9);
@@ -1589,7 +1596,7 @@ function fighter(f, i) {
     vkPrev[i] = k >= 0 ? key : -1;
     const axe = (hx, hy, a, L, glow) => { // hache de bataille : manche, sangle, large fer et pointe arrière ; a = angle du manche (repère face à droite)
       x.save(); x.translate(s * hx, hy); x.scale(s, 1); x.rotate(a);
-      LN('#6b4a2f', 6.5, -16, 0, L, 0); LN('#8a6a48', 2.2, -16, -1.8, L, -1.8); LN('#2b1f17', 6.8, 4, 0, 10, 0); LN('#2b1f17', 6.8, L - 24, 0, L - 18, 0);
+      LN('#3a2a1e', 6.5, -16, 0, L, 0); LN('#5a4332', 2.2, -16, -1.8, L, -1.8); LN('#2b1f17', 6.8, 4, 0, 10, 0); LN('#2b1f17', 6.8, L - 24, 0, L - 18, 0);
       if (glow) { x.fillStyle = 'rgba(255,210,110,' + glow + ')'; x.beginPath(); x.arc(L + 6, 18, 34, 0, 7); x.fill(); }
       x.fillStyle = '#9ea7b3'; x.strokeStyle = '#4f5864'; x.lineWidth = 2; x.beginPath();
       x.moveTo(L - 17, 3); x.quadraticCurveTo(L - 10, 40, L + 18, 44); x.quadraticCurveTo(L + 14, 20, L + 10, 3); x.closePath(); x.fill(); x.stroke();
@@ -1623,10 +1630,11 @@ function fighter(f, i) {
       if (ap === 0) { x.fillStyle = 'rgba(255,200,60,' + (.12 + .25 * pp) + ')'; x.beginPath(); x.arc(s * 12, -150, 26 + pp * 26, 0, 7); x.fill(); }
       if (ap === 1) { trail(-1.75, a, 118, 12, -80, .9, 'rgba(255,220,120,'); x.fillStyle = 'rgba(255,230,160,' + (.3 * (1 - pp)) + ')'; x.fillRect(s * 20 - 2, -170, s * 160, 190); }
     }
-    LN(sl, 11, 0, -70, s * hx, hy); C(skin, s * hx, hy, 6.5);
-    if (two) { const q2x = hx + Math.cos(a) * 26, q2y = hy + Math.sin(a) * 26; LN(sl, 11, 0, -68, s * q2x, q2y); C(skin, s * q2x, q2y, 6.5); }
+    const sArm = (ex, ey, sy) => { LN(skin, 10, 0, sy, s * ex, ey); const dx = ex, dy = ey - sy, L2 = Math.hypot(dx, dy) || 1; for (let q = 1; q <= 4; q++) { const u = .25 + q * .14, px = s * dx * u, py = sy + dy * u, nx = -dy / L2 * 6, ny = dx / L2 * 6; LN('#ecebe5', 3, px - s * nx, py - ny, px + s * nx, py + ny); } C('#17171c', s * ex, ey, 6.5); }; // bras bandés, gants noirs sans doigts
+    sArm(hx, hy, -70);
+    if (two) { const q2x = hx + Math.cos(a) * 26, q2y = hy + Math.sin(a) * 26; sArm(q2x, q2y, -68); }
     axe(hx, hy, a, L, glow);
-    if (two) { const q2x = hx + Math.cos(a) * 26, q2y = hy + Math.sin(a) * 26; C(skin, s * q2x, q2y, 6.5); }
+    if (two) { const q2x = hx + Math.cos(a) * 26, q2y = hy + Math.sin(a) * 26; C('#17171c', s * q2x, q2y, 6.5); }
   } else if (n === 'Viking' && f.ak >= 0) { // animations fluides du Viking : chaque phase suit une courbe douce (pp)
     const k = f.ak, ap = f.ap, pp = f.pp || 0, eo = u => 1 - (1 - u) * (1 - u), ei = u => u * u, sm = u => u * u * (3 - 2 * u), mix = (a, b, u) => a + (b - a) * u, key = k * 10 + ap;
     if (key !== vkPrev[i] && ap === 1 && (k === 1 || k === 3)) WAVES.push({ x: f.x + s * (k === 3 ? 90 : 0), t: Date.now() });
