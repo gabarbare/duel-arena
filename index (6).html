@@ -895,10 +895,10 @@ function frStaff(s, hx, hy, ang, glow, mode) { // bâton tenu en (hx,hy) ; ang d
   C(mode ? '#fff3a0' : '#7fe0c3', ox, oy, 5.5 + 3 * glow); C('#f4fffb', ox - 1.5, oy - 1.5, 2 + glow);
   return [ox, oy];
 }
-function fernStaff(s, hx, hy, ang, glow) { // le « balai » de Fern : manche sombre, poignées enroulées de violet, touffe de brindilles à l'arrière ; renvoie la pointe
+function fernStaff(s, hx, hy, ang, glow) { // bâton de Fern : manche sombre, poignées enroulées de violet, embout et pointe métalliques ; renvoie la pointe
   const dx = Math.cos(ang), dy = Math.sin(ang), nx = -dy, ny = dx, bx = hx - dx * 62, by = hy - dy * 62, tx = hx + dx * 78, ty = hy + dy * 78;
   LN('#4a3424', 5.5, s * bx, by, s * tx, ty); LN('#6a4a34', 2, s * bx, by - 1.2, s * tx, ty - 1.2);
-  x.fillStyle = '#9a7a52'; x.beginPath(); x.moveTo(s * (bx + dx * 4 + nx * 3), by + dy * 4 + ny * 3); x.quadraticCurveTo(s * (bx - dx * 20 + nx * 15), by - dy * 20 + ny * 15, s * (bx - dx * 30 + nx * 4), by - dy * 30 + ny * 4); x.lineTo(s * (bx - dx * 28 - nx * 8), by - dy * 28 - ny * 8); x.quadraticCurveTo(s * (bx - dx * 18 - nx * 14), by - dy * 18 - ny * 14, s * (bx + dx * 4 - nx * 3), by + dy * 4 - ny * 3); x.closePath(); x.fill();
+  LN('#8a8f98', 7.5, s * (bx - dx * 2), by - dy * 2, s * (bx + dx * 8), by + dy * 8); // embout métallique
   [[-4, 10], [26, 36], [56, 66]].forEach(([a, b]) => LN('#6b3fc4', 6.5, s * (hx + dx * a), hy + dy * a, s * (hx + dx * b), hy + dy * b));
   LN('#8a8f98', 7, s * (bx + dx * 8), by + dy * 8, s * (bx + dx * 14), by + dy * 14);
   Y('#8a8f98', [[s * (tx - dx * 4 + nx * 3), ty - dy * 4 + ny * 3], [s * (tx + dx * 14), ty + dy * 14], [s * (tx - dx * 4 - nx * 3), ty - dy * 4 - ny * 3]]);
@@ -1158,7 +1158,9 @@ function fighter(f, i) {
     R('#c9c8c0', -12, -66, 24, 4); // ceinture de la robe
     R('#202024', -18, -3, 14, 3); R('#202024', 4, -3, 14, 3); // bottines noires
     C('#f6e3d3', 0, -102, 13);
-    Y('#5a2d86', [[-14, -112], [14, -112], [15, -100], [-15, -100]]); // frange droite, coupe « hime »
+    x.fillStyle = P('#5a2d86'); x.beginPath(); x.arc(0, -102, 14.6, Math.PI, 0); x.lineTo(15, -100); x.lineTo(-15, -100); x.closePath(); x.fill(); // calotte de cheveux sur le crâne
+    Y('#5a2d86', [[-14.5, -108], [14.5, -108], [15, -100], [-15, -100]]); // frange droite, coupe « hime »
+    LN('#6e3da0', 2, -8, -113, 6, -115); // reflet
     LN('#4a2470', 1, -9, -111, -9, -100); LN('#4a2470', 1, 0, -111, 0, -100); LN('#4a2470', 1, 9, -111, 9, -100);
     Y('#5a2d86', [[-14, -108], [-18, -62], [-9, -62], [-10, -100]]); Y('#5a2d86', [[14, -108], [18, -62], [9, -62], [10, -100]]); // longues mèches devant les épaules
     R('#6b3fc4', s * 5.5 - 2.5, -103, 6, 8); R('#b79af2', s * 5.5 - 1, -103, 3.5, 4); R('#fff', s * 7, -102.5, 1.7, 1.7); // grands yeux violets
@@ -1613,13 +1615,18 @@ function fighter(f, i) {
       LN('#1e1a20', 6, -22, 0, L, 0); LN('#3a3440', 2, -22, -1.8, L, -1.8); LN('#8a8f98', 8, -28, 0, -16, 0); LN('#a4a9b2', 8, -28, -.5, -26, -.5);
       LN('#8a8f98', 7, L - 12, 0, L - 5, 0);
       if (glow) { x.fillStyle = 'rgba(255,210,110,' + glow + ')'; x.beginPath(); x.arc(L + 6, 0, 40, 0, 7); x.fill(); }
-      [1, -1].forEach(sg => { x.fillStyle = '#4b505b'; x.strokeStyle = '#c9ced6'; x.lineWidth = 2; x.beginPath(); x.moveTo(L - 14, 0); x.quadraticCurveTo(L - 8, sg * 34, L + 18, sg * 40); x.quadraticCurveTo(L + 14, sg * 16, L + 8, 0); x.closePath(); x.fill(); x.stroke(); x.fillStyle = '#2f333c'; x.beginPath(); x.moveTo(L - 6, 0); x.quadraticCurveTo(L - 2, sg * 22, L + 8, sg * 28); x.quadraticCurveTo(L + 8, sg * 12, L + 6, 0); x.fill(); });
-      x.fillStyle = '#a4a9b2'; x.beginPath(); x.moveTo(L + 6, -4); x.lineTo(L + 36, 0); x.lineTo(L + 6, 4); x.closePath(); x.fill();
+      [1, -1].forEach(sg => { // deux grands fers : lame large échancrée, tranchant argenté
+        x.fillStyle = '#4e5461'; x.strokeStyle = '#d3d8e0'; x.lineWidth = 2.4; x.lineJoin = 'round'; x.beginPath();
+        x.moveTo(L - 16, 0); x.lineTo(L - 14, sg * 12); x.lineTo(L - 30, sg * 38); x.quadraticCurveTo(L - 4, sg * 34, L + 8, sg * 46); x.lineTo(L + 30, sg * 40); x.quadraticCurveTo(L + 20, sg * 18, L + 14, 0); x.closePath(); x.fill(); x.stroke();
+        x.fillStyle = '#2d313a'; x.beginPath(); x.moveTo(L - 8, sg * 4); x.lineTo(L - 12, sg * 18); x.quadraticCurveTo(L + 4, sg * 22, L + 10, sg * 32); x.quadraticCurveTo(L + 12, sg * 14, L + 8, sg * 4); x.closePath(); x.fill();
+        LN('#9aa1ad', 1.6, L - 6, sg * 4, L - 22, sg * 30); });
+      x.fillStyle = '#8a8f98'; x.fillRect(L - 6, -5, 14, 10);
+      x.fillStyle = '#a4a9b2'; x.beginPath(); x.moveTo(L + 8, -4.5); x.lineTo(L + 42, 0); x.lineTo(L + 8, 4.5); x.closePath(); x.fill();
       x.restore();
     };
     const trail = (a1, a2, rad, cx, cy, al, col) => { if (al <= 0 || Math.abs(a2 - a1) < .03) return; x.save(); x.translate(s * cx, cy); x.scale(s, 1); for (let q = 0; q < 4; q++) { x.strokeStyle = col + (al * (.6 - q * .13)) + ')'; x.lineWidth = 12 - q * 3; x.lineCap = 'round'; x.beginPath(); x.arc(0, 0, rad - q * 3, Math.min(a1, a2), Math.max(a1, a2)); x.stroke(); } x.restore(); };
     let hx = 14, hy = -64, a = -2.0, L = 62, two = false, glow = 0;
-    if (k < 0) { const bob = Math.sin(Date.now() / 420 + (i || 0)) * 1.5; hx = 14; hy = -62 + bob; a = -2.05; }
+    if (k < 0) { const bob = Math.sin(Date.now() / 420 + (i || 0)) * 1.5; hx = 8; hy = -58 + bob; a = -2.75; }
     else if (k === 0) { // balayage latéral bas → haut
       hx = ap === 0 ? aMix(16, 2, aEo(pp)) : ap === 1 ? aMix(2, 36, aEo(pp)) : aMix(36, 16, aSm(pp)); hy = -66;
       a = ap === 0 ? aMix(-.4, 2.5, aEo(pp)) : ap === 1 ? aMix(2.5, -.2, ei(pp)) : aMix(-.2, -.8, aSm(pp)); two = ap > 0;
