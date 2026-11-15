@@ -895,6 +895,16 @@ function frStaff(s, hx, hy, ang, glow, mode) { // bâton tenu en (hx,hy) ; ang d
   C(mode ? '#fff3a0' : '#7fe0c3', ox, oy, 5.5 + 3 * glow); C('#f4fffb', ox - 1.5, oy - 1.5, 2 + glow);
   return [ox, oy];
 }
+function fernStaff(s, hx, hy, ang, glow) { // le « balai » de Fern : manche sombre, poignées enroulées de violet, touffe de brindilles à l'arrière ; renvoie la pointe
+  const dx = Math.cos(ang), dy = Math.sin(ang), nx = -dy, ny = dx, bx = hx - dx * 62, by = hy - dy * 62, tx = hx + dx * 78, ty = hy + dy * 78;
+  LN('#4a3424', 5.5, s * bx, by, s * tx, ty); LN('#6a4a34', 2, s * bx, by - 1.2, s * tx, ty - 1.2);
+  x.fillStyle = '#9a7a52'; x.beginPath(); x.moveTo(s * (bx + dx * 4 + nx * 3), by + dy * 4 + ny * 3); x.quadraticCurveTo(s * (bx - dx * 20 + nx * 15), by - dy * 20 + ny * 15, s * (bx - dx * 30 + nx * 4), by - dy * 30 + ny * 4); x.lineTo(s * (bx - dx * 28 - nx * 8), by - dy * 28 - ny * 8); x.quadraticCurveTo(s * (bx - dx * 18 - nx * 14), by - dy * 18 - ny * 14, s * (bx + dx * 4 - nx * 3), by + dy * 4 - ny * 3); x.closePath(); x.fill();
+  [[-4, 10], [26, 36], [56, 66]].forEach(([a, b]) => LN('#6b3fc4', 6.5, s * (hx + dx * a), hy + dy * a, s * (hx + dx * b), hy + dy * b));
+  LN('#8a8f98', 7, s * (bx + dx * 8), by + dy * 8, s * (bx + dx * 14), by + dy * 14);
+  Y('#8a8f98', [[s * (tx - dx * 4 + nx * 3), ty - dy * 4 + ny * 3], [s * (tx + dx * 14), ty + dy * 14], [s * (tx - dx * 4 - nx * 3), ty - dy * 4 - ny * 3]]);
+  const ox = s * (tx + dx * 4), oy = ty + dy * 4; if (glow > 0) C('rgba(255,240,170,' + (.12 + .3 * glow) + ')', ox, oy, 8 + 14 * glow);
+  return [ox, oy];
+}
 function mCircle(cx, cy, r, al, spin, col) { // cercle magique : deux anneaux, étoile à six branches et graduations qui tournent
   col = col || '255,225,130';
   x.strokeStyle = 'rgba(' + col + ',' + al + ')'; x.lineWidth = Math.max(1.5, r * .09); x.beginPath(); x.arc(cx, cy, r, 0, 7); x.stroke();
@@ -1119,36 +1129,40 @@ function fighter(f, i) {
     x.fillStyle = P('#4a235a'); x.beginPath(); x.ellipse(0, -112, 26, 6, 0, 0, 7); x.fill();
     Y('#5b2c6f', [[-15, -113], [15, -113], [s * 8, -154]]);
     R('#f1c40f', -14, -117, 28, 4); C('#f1c40f', s * 2, -134, 3);
-  } else if (n === 'Viking' && lk === 'stark') { // Stark (Frieren) : cheveux roux en pointes à racines noires, yeux orange, chemise noire sans manches à col, pantalon large noir, ceinture blanche, bandages aux bras
-    R('#1d1d22', -19, -30, 17, 30); R('#1d1d22', 2, -30, 17, 30); // pantalon large
-    R('#2a2a31', -19, -16, 17, 3); R('#2a2a31', 2, -16, 17, 3);
-    R('#111114', -20, -10, 19, 10); R('#111114', 1, -10, 19, 10); R('#2f2f36', -20, -10, 19, 2); R('#2f2f36', 1, -10, 19, 2); // bottes noires
-    R('#1c1c22', -22, -92, 44, 62); R('#26262e', -22, -66, 44, 2);
-    Y('#e9e6df', [[-5, -93], [5, -93], [0, -80]]); // fermeture blanche de la chemise
-    [-84, -75, -66].forEach(yy => C('#e9e6df', 0, yy, 1.6));
-    Y('#14141a', [[-14, -94], [-4, -94], [-8, -86]]); Y('#14141a', [[14, -94], [4, -94], [8, -86]]); // col
-    R('#ecebe5', -23, -40, 46, 9); R('#d4d2ca', -23, -33, 46, 2); Y('#ecebe5', [[8, -32], [16, -32], [14, -18], [9, -18]]); // large ceinture blanche, pan qui retombe
-    C('#1c1c22', -23, -88, 10); C('#1c1c22', 23, -88, 10); // épaules
-    LN('#3b2a1c', 3, -18, -92, 12, -46); // sangle de la hache dans le dos
+  } else if (n === 'Viking' && lk === 'stark') { // Stark (Frieren) : veste rouge brique à revers crème, chemise noire à brandebourgs, écharpe-ceinture crème, pantalon large gris sombre, bottes lacées
+    R('#44444d', -21, -32, 19, 32); R('#44444d', 2, -32, 19, 32); R('#363640', -21, -20, 19, 2); R('#363640', 2, -20, 19, 2); // pantalon large
+    R('#16161a', -21, -16, 19, 16); R('#16161a', 2, -16, 19, 16); R('#2b2b31', -21, -16, 19, 2); R('#2b2b31', 2, -16, 19, 2); // bottes hautes noires
+    for (let q = 0; q < 3; q++) { LN('#e8e4da', 1.3, -19, -13 + q * 4, -6, -9 + q * 4); LN('#e8e4da', 1.3, -6, -13 + q * 4, -19, -9 + q * 4); LN('#e8e4da', 1.3, 4, -13 + q * 4, 17, -9 + q * 4); LN('#e8e4da', 1.3, 17, -13 + q * 4, 4, -9 + q * 4); } // lacets en croix
+    R('#17171c', -13, -94, 26, 56); // chemise noire
+    [-86, -77, -68, -59, -50].forEach(yy => { LN('#e8e4da', 1.6, -6, yy, 6, yy); C('#e8e4da', -6, yy, 1.8); C('#e8e4da', 6, yy, 1.8); }); // brandebourgs blancs
+    R('#2a2a31', -6, -98, 12, 7); R('#e8e4da', -6, -96, 12, 1.3); // col montant
+    Y('#b23a2b', [[-24, -94], [-12, -94], [-13, -40], [-24, -40]]); Y('#b23a2b', [[24, -94], [12, -94], [13, -40], [24, -40]]); // veste ouverte
+    R('#9a2f23', -24, -66, 11, 2); R('#9a2f23', 13, -66, 11, 2); // couture
+    Y('#efe6d8', [[-13, -95], [-24, -94], [-19, -80], [-9, -92]]); Y('#efe6d8', [[13, -95], [24, -94], [19, -80], [9, -92]]); // revers crème
+    R('#e9e0cf', -22, -44, 44, 11); R('#d6ccb8', -22, -35, 44, 2); // écharpe-ceinture crème
+    Y('#e9e0cf', [[-22, -36], [-8, -36], [-11, -17], [-23, -19]]); Y('#d6ccb8', [[-8, -36], [-11, -17], [-15, -18], [-12, -36]]); // pan qui retombe
+    LN('#17171c', 4.5, -17, -94, 15, -46); R('#a8a8b0', 7, -52, 6, 6); R('#17171c', 8.5, -50.5, 3, 3); // sangle noire en bandoulière et sa boucle
     C(skin, 0, -104, 14);
-    Y('#2a1414', [[-15, -104], [-16, -116], [-8, -112], [-6, -125], [0, -114], [7, -126], [9, -114], [16, -118], [15, -103], [10, -108], [0, -111], [-10, -108]]); // racines noires
-    Y('#c9381f', [[-15, -108], [-17, -121], [-9, -116], [-7, -131], [-1, -119], [6, -133], [10, -119], [17, -124], [15, -108], [8, -113], [0, -116], [-9, -113]]); // pointes rouges
-    Y('#e0502f', [[-1, -119], [6, -133], [10, -119], [4, -116]]);
-    R('#f08a1e', s * 6 - 2, -106, 5, 5); R('#fff2d0', s * 7.5, -106, 1.5, 1.5); LN('#4a1c12', 2, s * 2, -111, s * 10, -109.5); // yeux orange, sourcils soucieux
-  } else if (n === 'Zéphyr' && lk === 'fern') { // Fern (Frieren) : longs cheveux violet sombre, manteau noir à col blanc, yeux violets
-    Y('#1f2030', [[-19, -90], [19, -90], [27, -4], [-27, -4]]);
-    R('#c9a227', -27, -8, 54, 3); R('#c9a227', -1, -88, 2, 82);
-    [-74, -58, -42].forEach(yy => C('#d9b84a', 0, yy, 2));
-    Y('#f4f1ea', [[-10, -91], [10, -91], [0, -70]]); Y('#e0dcd2', [[-10, -91], [-4, -91], [0, -80]]);
-    R('#2a2230', -16, -3, 12, 3); R('#2a2230', 4, -3, 12, 3);
-    Y('#3d2d63', [[-14, -108], [14, -108], [19, -40], [-19, -40]]); // longs cheveux jusqu'à la taille
-    LN('#f4f1ea', 3, -13, -74, 13, -74); // petit ruban qui retient les cheveux
-    C(skin, 0, -102, 13);
-    Y('#4d3a78', [[-14, -112], [14, -112], [15, -101], [11, -104], [0, -103], [-11, -104], [-15, -101]]); // frange droite (hime cut)
-    Y('#4d3a78', [[-14, -108], [-17, -66], [-10, -66], [-10, -103]]); Y('#4d3a78', [[14, -108], [17, -66], [10, -66], [10, -103]]); // mèches latérales jusqu'à la poitrine
-    R('#6a46c4', s * 5.5 - 2.5, -104, 6, 7); R('#a98cf0', s * 5.5 - 1, -104, 3.5, 3.5); R('#fff', s * 7, -103.5, 1.6, 1.6); // grands yeux violets
-    LN('#2b1d4a', 1.6, s * 2.5, -105.5, s * 10, -105.5);
-    LN('#c27a7a', 1.4, s * 3, -93, s * 7, -93);
+    Y('#c8432a', [[-15, -102], [-16, -115], [-9, -111], [-9, -125], [-2, -115], [4, -128], [8, -116], [15, -122], [15, -108], [16, -100], [9, -106], [0, -112], [-10, -106]]); // cheveux rouge-orangé
+    Y('#17171c', [[-2, -116], [4, -128], [8, -117], [3, -112]]); // mèche noire au sommet
+    Y('#df5a35', [[-9, -110], [-14, -116], [-12, -102]]);
+    R('#b8552e', s * 6 - 2.5, -106, 5, 6); R('#fff2d0', s * 7.4, -106, 1.5, 1.5); LN('#5a1f12', 2, s * 2, -111.5, s * 10, -110); // yeux rouge-brun, regard sérieux
+  } else if (n === 'Zéphyr' && lk === 'fern') { // Fern (Frieren) : cheveux violets lisses, frange droite, mèches latérales, robe blanche à plastron plissé, long manteau noir à capuche
+    Y('#5a2d86', [[-16, -106], [16, -106], [20, -22], [-20, -22]]); // longs cheveux dans le dos
+    Y('#4c4c52', [[-27, -90], [-12, -90], [-14, -4], [-32, -4]]); Y('#4c4c52', [[27, -90], [12, -90], [14, -4], [32, -4]]); // manteau noir ouvert, pans longs
+    Y('#3d3d43', [[-22, -92], [-12, -90], [-14, -4], [-24, -4]]); Y('#3d3d43', [[22, -92], [12, -90], [14, -4], [24, -4]]);
+    Y('#ecebe6', [[-12, -90], [12, -90], [15, -4], [-15, -4]]); // robe blanche
+    Y('#d9d8d2', [[-12, -90], [-8, -90], [-9, -4], [-15, -4]]); // ombre du pli
+    R('#f4f3ee', -9, -92, 18, 3); // col montant à volants
+    for (let q = -6; q <= 6; q += 3) LN('#b9b8b2', 1, q, -88, q, -66); // plissé du plastron
+    R('#c9c8c0', -12, -66, 24, 4); // ceinture de la robe
+    R('#202024', -18, -3, 14, 3); R('#202024', 4, -3, 14, 3); // bottines noires
+    C('#f6e3d3', 0, -102, 13);
+    Y('#5a2d86', [[-14, -112], [14, -112], [15, -100], [-15, -100]]); // frange droite, coupe « hime »
+    LN('#4a2470', 1, -9, -111, -9, -100); LN('#4a2470', 1, 0, -111, 0, -100); LN('#4a2470', 1, 9, -111, 9, -100);
+    Y('#5a2d86', [[-14, -108], [-18, -62], [-9, -62], [-10, -100]]); Y('#5a2d86', [[14, -108], [18, -62], [9, -62], [10, -100]]); // longues mèches devant les épaules
+    R('#6b3fc4', s * 5.5 - 2.5, -103, 6, 8); R('#b79af2', s * 5.5 - 1, -103, 3.5, 4); R('#fff', s * 7, -102.5, 1.7, 1.7); // grands yeux violets
+    LN('#c88c86', 1.3, s * 3, -92, s * 6.5, -92);
   } else if (n === 'Viking') { // viking : casque à cornes, barbe rousse, épaulières, ceinture dorée
     R('#4e342e', -17, -28, 15, 28); R('#4e342e', 2, -28, 15, 28);
     R('#2d2d2d', -19, -9, 18, 9); R('#2d2d2d', 1, -9, 18, 9);
@@ -1510,8 +1524,8 @@ function fighter(f, i) {
   };
   const sleeve = n === 'Kaze' ? '#1c1c28' : n === 'Naruto' ? '#ff7f27' : n === 'Chevalier' ? '#b0bec5' : n === 'Gojo' ? '#1a2a4f' : n === 'Deku' ? '#2e7d32' : n === 'Denji' ? '#f2f2f2' : n === 'Yugo' ? '#e2b283' : n === 'Shinra' ? '#23232f' : n === 'Eren' ? (f.fm ? '#8a4a35' : '#6d4c41') : n === 'Koro' ? '#f4d03f' : n === 'Kairos' ? '#3b2a5a' : n === 'Frieren' ? '#f4f1ea' : n === 'Ichigo' ? '#16161d' : (n === 'Luffy' && lk === 'snake') ? '#16161d' : skin;
   if (n === 'Zéphyr' && lk === 'fern') { // Fern : bâton tenu à deux mains, sorts Zoltraak à tir rapide (cercle doré au bout du bâton)
-    const k = f.ak, ap = f.ap, pp = aCl(f.pp || 0), t = Date.now(), sl = '#2a2c3c';
-    const staff = (hx, hy, ang, gl) => { const o = frStaff(s, hx, hy, ang, gl, 1); LN(sl, 8, 0, -72, s * hx, hy); C('#f6dccb', s * hx, hy, 5.5); return o; };
+    const k = f.ak, ap = f.ap, pp = aCl(f.pp || 0), t = Date.now(), sl = '#34343a';
+    const staff = (hx, hy, ang, gl) => { const o = fernStaff(s, hx, hy, ang, gl); LN(sl, 8, 0, -72, s * hx, hy); C('#f6e3d3', s * hx, hy, 5.5); return o; };
     if (k < 0) { const bob = Math.sin(t / 340) * 1.5; staff(22, -60 + bob, -1.45, .1 + .08 * Math.sin(t / 300)); LN(sl, 7, 2, -68, s * 16, -64 + bob); C('#f6dccb', s * 18, -62 + bob, 5); }
     else {
       let hx, hy, ang, gl;
@@ -1594,14 +1608,13 @@ function fighter(f, i) {
     const k = f.ak, ap = f.ap, pp = aCl(f.pp || 0), key = k * 10 + ap, ei = u => u * u, sl = '#5b4636', st = '#c4cbd4';
     if (k >= 0 && key !== vkPrev[i] && ap === 1 && (k === 1 || k === 3)) WAVES.push({ x: f.x + s * (k === 3 ? 90 : 0), t: Date.now() });
     vkPrev[i] = k >= 0 ? key : -1;
-    const axe = (hx, hy, a, L, glow) => { // hache de bataille : manche, sangle, large fer et pointe arrière ; a = angle du manche (repère face à droite)
+    const axe = (hx, hy, a, L, glow) => { // hallebarde-hache de Stark : long manche noir, culot gris, double fer sombre à tranchant argenté, pointe de lance
       x.save(); x.translate(s * hx, hy); x.scale(s, 1); x.rotate(a);
-      LN('#3a2a1e', 6.5, -16, 0, L, 0); LN('#5a4332', 2.2, -16, -1.8, L, -1.8); LN('#2b1f17', 6.8, 4, 0, 10, 0); LN('#2b1f17', 6.8, L - 24, 0, L - 18, 0);
-      if (glow) { x.fillStyle = 'rgba(255,210,110,' + glow + ')'; x.beginPath(); x.arc(L + 6, 18, 34, 0, 7); x.fill(); }
-      x.fillStyle = '#9ea7b3'; x.strokeStyle = '#4f5864'; x.lineWidth = 2; x.beginPath();
-      x.moveTo(L - 17, 3); x.quadraticCurveTo(L - 10, 40, L + 18, 44); x.quadraticCurveTo(L + 14, 20, L + 10, 3); x.closePath(); x.fill(); x.stroke();
-      x.fillStyle = st; x.beginPath(); x.moveTo(L - 4, 6); x.quadraticCurveTo(L, 32, L + 17, 41); x.lineTo(L + 19, 43); x.quadraticCurveTo(L + 12, 18, L + 10, 5); x.fill();
-      x.fillStyle = '#7d8693'; x.beginPath(); x.moveTo(L - 17, -3); x.lineTo(L - 32, -10); x.lineTo(L - 17, -9); x.closePath(); x.fill(); // contre-pointe
+      LN('#1e1a20', 6, -22, 0, L, 0); LN('#3a3440', 2, -22, -1.8, L, -1.8); LN('#8a8f98', 8, -28, 0, -16, 0); LN('#a4a9b2', 8, -28, -.5, -26, -.5);
+      LN('#8a8f98', 7, L - 12, 0, L - 5, 0);
+      if (glow) { x.fillStyle = 'rgba(255,210,110,' + glow + ')'; x.beginPath(); x.arc(L + 6, 0, 40, 0, 7); x.fill(); }
+      [1, -1].forEach(sg => { x.fillStyle = '#4b505b'; x.strokeStyle = '#c9ced6'; x.lineWidth = 2; x.beginPath(); x.moveTo(L - 14, 0); x.quadraticCurveTo(L - 8, sg * 34, L + 18, sg * 40); x.quadraticCurveTo(L + 14, sg * 16, L + 8, 0); x.closePath(); x.fill(); x.stroke(); x.fillStyle = '#2f333c'; x.beginPath(); x.moveTo(L - 6, 0); x.quadraticCurveTo(L - 2, sg * 22, L + 8, sg * 28); x.quadraticCurveTo(L + 8, sg * 12, L + 6, 0); x.fill(); });
+      x.fillStyle = '#a4a9b2'; x.beginPath(); x.moveTo(L + 6, -4); x.lineTo(L + 36, 0); x.lineTo(L + 6, 4); x.closePath(); x.fill();
       x.restore();
     };
     const trail = (a1, a2, rad, cx, cy, al, col) => { if (al <= 0 || Math.abs(a2 - a1) < .03) return; x.save(); x.translate(s * cx, cy); x.scale(s, 1); for (let q = 0; q < 4; q++) { x.strokeStyle = col + (al * (.6 - q * .13)) + ')'; x.lineWidth = 12 - q * 3; x.lineCap = 'round'; x.beginPath(); x.arc(0, 0, rad - q * 3, Math.min(a1, a2), Math.max(a1, a2)); x.stroke(); } x.restore(); };
@@ -1630,7 +1643,12 @@ function fighter(f, i) {
       if (ap === 0) { x.fillStyle = 'rgba(255,200,60,' + (.12 + .25 * pp) + ')'; x.beginPath(); x.arc(s * 12, -150, 26 + pp * 26, 0, 7); x.fill(); }
       if (ap === 1) { trail(-1.75, a, 118, 12, -80, .9, 'rgba(255,220,120,'); x.fillStyle = 'rgba(255,230,160,' + (.3 * (1 - pp)) + ')'; x.fillRect(s * 20 - 2, -170, s * 160, 190); }
     }
-    const sArm = (ex, ey, sy) => { LN(skin, 10, 0, sy, s * ex, ey); const dx = ex, dy = ey - sy, L2 = Math.hypot(dx, dy) || 1; for (let q = 1; q <= 4; q++) { const u = .25 + q * .14, px = s * dx * u, py = sy + dy * u, nx = -dy / L2 * 6, ny = dx / L2 * 6; LN('#ecebe5', 3, px - s * nx, py - ny, px + s * nx, py + ny); } C('#17171c', s * ex, ey, 6.5); }; // bras bandés, gants noirs sans doigts
+    const sArm = (ex, ey, sy) => { // manche rouge retroussée, manchette crème, avant-bras bandé, gant noir sans doigts
+      const m = .42, kx = ex * m, ky = sy + (ey - sy) * m, ux = ex - kx, uy = ey - ky, Ln = Math.hypot(ux, uy) || 1;
+      LN('#b23a2b', 12, 0, sy, s * kx, ky); LN('#efe6d8', 13, s * kx, ky, s * (kx + ux * .16), ky + uy * .16);
+      LN('#ecebe5', 9.5, s * (kx + ux * .14), ky + uy * .14, s * ex, ey);
+      for (let q = 1; q <= 4; q++) { const u = .22 + q * .16, px = s * (kx + ux * u), py = ky + uy * u, nx = -uy / Ln * 5, ny = ux / Ln * 5; LN('#c9c6bc', 1.4, px - s * nx, py - ny, px + s * nx, py + ny); }
+      C('#17171c', s * ex, ey, 6.5); };
     sArm(hx, hy, -70);
     if (two) { const q2x = hx + Math.cos(a) * 26, q2y = hy + Math.sin(a) * 26; sArm(q2x, q2y, -68); }
     axe(hx, hy, a, L, glow);
