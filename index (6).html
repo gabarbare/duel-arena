@@ -277,6 +277,8 @@ const SHOP = [
   { id: 'skin_koro_blanc', type: 'skin', char: 'Koro', name: 'Koro-sensei blanc', price: 150, look: 'white', pal: { '#f4d03f': '#f5f5f1', '#e6b800': '#dcdcd5', '#f1c40f': '#e8e8e2' } },
   { id: 'skin_shinra_banshoman', type: 'skin', char: 'Shinra', name: 'Shinra Banshoman', price: 250, look: 'banshoman', pal: { '#f5cba7': '#b8402f', '#23232f': '#a63a2f', '#1b1b24': '#7a2a22', '#bdc3c7': '#a63a2f', '#111': '#3a1410', '#15151c': '#e9e9e9', '#000': '#fff' } },
   { id: 'skin_ichigo_bloodchains', type: 'skin', char: 'Ichigo', name: 'Ichigo - Sauveur de Rukia', price: 250, look: 'bloodchains', desc: 'Ichigo à Soul Society : grand manteau beige à capuche pointue, tunique noire, bandages, obi blanc et Zangetsu au ruban blanc', pal: {} },
+  { id: 'skin_zephyr_fern', type: 'skin', char: 'Zéphyr', name: 'Fern — apprentie de Frieren', price: 400, look: 'fern', season: 1, pal: {} },
+  { id: 'skin_viking_stark', type: 'skin', char: 'Viking', name: 'Stark — guerrier à la hache', price: 400, look: 'stark', season: 1, pal: {} },
   { id: 'skin_kairos_azur', type: 'skin', char: 'Kairos', name: 'Kairos azur', price: 150, pal: { '#3b2a5a': '#174b63', '#2b1f3d': '#102f45', '#2a2038': '#163b50', '#d9b84a': '#55d6d2', '#f5ecd0': '#d9ffff' } },
 ];
 let passGain = 0, tNew = '', chestGain = '', chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
@@ -588,7 +590,7 @@ const shuf = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.rand
 function dailyIds() {
   const key = dayKey();
   if (!save.daily2 || save.daily2.day !== key) {
-    save.daily2 = { day: key, ids: shuf(SHOP.filter(q => q.type === 'skin' && !owns(q.id)).map(q => q.id)).slice(0, 3) }; persist();
+    save.daily2 = { day: key, ids: shuf(SHOP.filter(q => q.type === 'skin' && !q.season && !owns(q.id)).map(q => q.id)).slice(0, 3) }; persist();
   }
   return save.daily2.ids;
 }
@@ -632,6 +634,7 @@ const shopHtml = () => {
   const items = dailyIds().map(id => SHOP.find(q => q.id === id)).filter(Boolean);
   const ichigo = SHOP.find(q => q.id === 'skin_ichigo_bloodchains');
   if (ichigo && !owns(ichigo.id) && !items.some(q => q.id === ichigo.id)) items.unshift(ichigo);
+  if (frOn()) SHOP.filter(q => q.season && !owns(q.id)).reverse().forEach(q => items.unshift(q)); // skins de la saison Frieren
   const promoText = ichigoPromoActive() ? ` · 🎁 Ichigo Sauveur de Rukia gratuit encore ${Math.ceil(ichigoPromoRemaining() / 60000)} min` : '';
   return `<h2>🎨 Boutique de skins</h2><p>${bank()} · 3 skins par jour, nouvelle sélection à minuit (dans ${leftTxt()})${promoText}</p>` + (items.length
     ? `<div class="cards">${items.map(q => { const free = q.id === 'skin_ichigo_bloodchains' && ichigoPromoActive(); return `<div class="card shopc"><b>${q.name}</b><br>Skin · ${q.char}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.coins < (free ? 0 : q.price) ? 'disabled' : ''} onclick="buy('${q.id}')">${free ? 'GRATUIT 🎁' : q.price + ' 🪙'}</button>`}</div>`; }).join('')}</div>`
@@ -844,7 +847,6 @@ const gojoHeal = (px, py, phase = 1) => {
 };
 
 // ===== Denji : onde de choc à l'atterrissage du Saut écrasant =====
-const mixv = (a, b, u) => a + (b - a) * u, eoz = u => 1 - (1 - u) * (1 - u), smz = u => u * u * (3 - 2 * u); // courbes d'animation
 const WAVES = [], prevAir = [false, false], vkPrev = [-1, -1];
 function drawWaves() {
   const now = Date.now();
@@ -1040,8 +1042,6 @@ function fighter(f, i) {
   if (n === 'Denji' && f.fm && f.ak === 1 && f.ap === 1) x.rotate(s * .16); // charge : buste penché en avant
   if (n === 'Kaze' && f.ak === 3 && f.ad && f.ad[1] === 0) x.rotate(s * .22); // Kaze fonce sur l'ennemi
   if (n === 'Viking' && f.ak >= 0) x.rotate(s * (f.ap === 1 ? .08 : f.ap === 0 ? -.04 : .03 * (1 - (f.pp || 0)))); // le buste suit chaque coup
-  if (n === 'Shinra' && (f.ak === 1 || f.ak === 3) && f.ad && f.ap === 1) x.rotate(f.ad[0] * .22); // penché dans le sens du coup de pied
-  if (n === 'Eren' && !f.fm && f.ak === 1 && f.ad && f.ap === 1) x.rotate(s * .3); // dash grappin en vrille
   if ((n === 'Bruno' || n === 'Chevalier' || n === 'Kairos' || n === 'Frieren') && f.ak >= 0) { const ps = atkPose(n, f, brAlt[i] || 0); x.translate(s * ps.dx, 0); x.rotate(s * ps.rot); if (ps.sy !== 1) x.scale(1, ps.sy); }
   const gn = n === 'Gojo', dk = n === 'Deku';
   if (f.ak === 3 || f.bf || (gn && f.ak === 2) || (n === 'Denji' && f.fm) || (n === 'Shinra' && f.fm) || (n === 'Ichigo' && f.fm)) {
@@ -1109,7 +1109,7 @@ function fighter(f, i) {
     const w2 = Math.sin(t / 80) * 5;
     Y('#2ecc71', [[-s * 14, -114], [-s * 38, -109 + w2], [-s * 36, -116 + w2], [-s * 14, -118]]);
     R('#bdc3c7', -5, -115, 10, 4);
-  } else if (n === 'Zéphyr') { // sorcier : robe étoilée, barbe, grand chapeau pointu
+  } else if (n === 'Zéphyr' && lk !== 'fern') { // sorcier : robe étoilée, barbe, grand chapeau pointu
     Y('#6c3483', [[-20, -90], [20, -90], [28, 0], [-28, 0]]);
     R('#f1c40f', -24, -52, 48, 5);
     C('#f1c40f', -9, -72, 2.5); C('#f1c40f', 10, -30, 2.5); C('#f1c40f', -14, -20, 2.5);
@@ -1119,6 +1119,29 @@ function fighter(f, i) {
     x.fillStyle = P('#4a235a'); x.beginPath(); x.ellipse(0, -112, 26, 6, 0, 0, 7); x.fill();
     Y('#5b2c6f', [[-15, -113], [15, -113], [s * 8, -154]]);
     R('#f1c40f', -14, -117, 28, 4); C('#f1c40f', s * 2, -134, 3);
+  } else if (n === 'Viking' && lk === 'stark') { // Stark (Frieren) : jeune guerrier, cheveux roux en pointes, tunique sombre, épaulière de cuir
+    R('#3a3530', -17, -28, 15, 28); R('#3a3530', 2, -28, 15, 28);
+    R('#2a211b', -19, -10, 18, 10); R('#2a211b', 1, -10, 18, 10); R('#6b5a49', -19, -12, 18, 3); R('#6b5a49', 1, -12, 18, 3);
+    R('#3f4b4a', -22, -92, 44, 64); R('#33403f', -22, -60, 44, 4);
+    LN('#2b1f17', 5, -20, -90, 16, -42); // bandoulière
+    R('#2b1f17', -23, -40, 46, 7); R('#c9a227', -5, -41, 10, 9); R('#2b1f17', -3, -39, 6, 5);
+    C('#7a5a3a', -24, -88, 12); C('#5e4329', -24, -88, 7); C('#7a5a3a', 24, -88, 12); C('#5e4329', 24, -88, 7); // épaulières de cuir
+    R('#d9d2c4', -9, -94, 18, 6); // col de chemise
+    C(skin, 0, -104, 14);
+    Y('#a8442a', [[-15, -105], [-16, -118], [-9, -113], [-7, -127], [-1, -116], [5, -129], [9, -116], [16, -124], [15, -110], [16, -102], [10, -108], [0, -112], [-10, -108]]);
+    Y('#c4583a', [[-3, -116], [5, -129], [9, -116], [2, -113]]);
+    R('#26382e', s * 6 - 2, -106, 4, 4); LN('#6b2e1c', 2, s * 2, -112, s * 10, -110); // regard inquiet
+  } else if (n === 'Zéphyr' && lk === 'fern') { // Fern (Frieren) : longs cheveux violet sombre, manteau noir à col blanc, yeux violets
+    Y('#1f2030', [[-19, -90], [19, -90], [27, -4], [-27, -4]]);
+    R('#c9a227', -27, -8, 54, 3); R('#c9a227', -1, -88, 2, 82);
+    [-74, -58, -42].forEach(yy => C('#d9b84a', 0, yy, 2));
+    Y('#f4f1ea', [[-10, -91], [10, -91], [0, -70]]); Y('#e0dcd2', [[-10, -91], [-4, -91], [0, -80]]);
+    R('#2a2230', -16, -3, 12, 3); R('#2a2230', 4, -3, 12, 3);
+    Y('#3b2a5e', [[-15, -108], [15, -108], [20, -52], [-20, -52]]); // longs cheveux dans le dos
+    C(skin, 0, -102, 13);
+    Y('#4d3a78', [[-14, -111], [14, -111], [15, -100], [9, -106], [0, -103], [-9, -106], [-15, -100]]); // frange
+    Y('#4d3a78', [[-14, -108], [-17, -80], [-11, -84], [-10, -104]]); Y('#4d3a78', [[14, -108], [17, -80], [11, -84], [10, -104]]);
+    R('#7b52d6', s * 6 - 2, -105, 5, 5); R('#e9dcff', s * 7, -105, 1.6, 1.6);
   } else if (n === 'Viking') { // viking : casque à cornes, barbe rousse, épaulières, ceinture dorée
     R('#4e342e', -17, -28, 15, 28); R('#4e342e', 2, -28, 15, 28);
     R('#2d2d2d', -19, -9, 18, 9); R('#2d2d2d', 1, -9, 18, 9);
@@ -1416,37 +1439,15 @@ function fighter(f, i) {
     x.strokeStyle = 'rgba(255,255,255,.85)'; x.lineWidth = 2; x.beginPath();
     x.moveTo(-26, -60); x.lineTo(0, -96); x.lineTo(26, -50); x.moveTo(-10, 0); x.lineTo(0, -60); x.lineTo(14, 0); x.stroke();
   }
-  if (n === 'Shinra' && (f.fy || f.ak >= 0 || f.fm)) { // flammes aux pieds, jambe enflammée, sillage et éclat d'impact
+  if (n === 'Shinra' && (f.fy || f.ak >= 0 || f.fm)) { // flammes aux pieds, jambe enflammée pendant le coup de pied
     [-9, 9].forEach(q => { Y('#ff7a1a', [[q - 8, 0], [q + 8, 0], [q, 18 + Math.sin(t / 60 + q) * 6]]); Y('#ffe066', [[q - 4, 0], [q + 4, 0], [q, 9 + Math.sin(t / 50 + q) * 3]]); });
-    if ((f.ak === 1 || f.ak === 3) && f.ad) {
-      const ux = f.ad[0], uy = f.ad[1], ex = ux * 52, ey = -30 + uy * 52, fl = Math.sin(t / 40);
-      if (f.ap === 1) {
-        for (let q = 1; q <= 5; q++) { x.fillStyle = 'rgba(255,' + (150 + q * 20) + ',40,' + (.5 - q * .08) + ')'; x.beginPath(); x.arc(-ux * q * 18, -45 - uy * q * 18, 24 - q * 3, 0, 7); x.fill(); } // sillage de flammes
-        LN('rgba(255,120,30,.7)', 14, -ux * 90, -45 - uy * 90, ex, ey); LN('rgba(255,230,120,.9)', 6, -ux * 60, -45 - uy * 60, ex, ey);
-      }
-      LN('#23232f', 9, 0, -30, ex, ey);
-      Y('#ff7a1a', [[ex - uy * 12 - ux * 4, ey + ux * 12 - uy * 4], [ex + uy * 12 - ux * 4, ey - ux * 12 - uy * 4], [ex + ux * (22 + fl * 5), ey + uy * (22 + fl * 5)]]); // semelle enflammée
-      C('#ffd54f', ex, ey, 7);
-      if ((f.ap === 1 && (f.pp || 0) > .5) || f.ap === 2) { const sz = f.ap === 2 ? 20 * (1 - (f.pp || 0)) + 6 : 14, px0 = ex + ux * 16, py0 = ey + uy * 16; Y('#fff3a0', [[px0, py0 - sz], [px0 + 3, py0 - 3], [px0 + sz, py0], [px0 + 3, py0 + 3], [px0, py0 + sz], [px0 - 3, py0 + 3], [px0 - sz, py0], [px0 - 3, py0 - 3]]); } // éclat d'impact
-    }
+    if (f.ak === 1 && f.ad) { LN('#23232f', 9, 0, -30, f.ad[0] * 52, -30 + f.ad[1] * 52); C('#ff7a1a', f.ad[0] * 52, -30 + f.ad[1] * 52, 11); }
   }
-  if (n === 'Shinra' && f.ak === 2) { // explosion de flammes : concentration, déflagration, retombée
-    const pp = f.pp || 0;
-    if (f.ap === 0) {
-      x.fillStyle = 'rgba(255,170,50,' + (.12 + .35 * pp) + ')'; x.beginPath(); x.arc(0, -55, 18 + 22 * pp, 0, 7); x.fill();
-      for (let q = 0; q < 10; q++) { const u = (t / 220 + q / 10) % 1, an = q * 2.1 + t / 300, rr = 70 * (1 - u); C('rgba(255,' + (190 + q * 5) + ',80,' + u + ')', Math.cos(an) * rr, -55 + Math.sin(an) * rr * .8, 2.2); } // braises aspirées vers le torse
-    } else {
-      const a = f.ap === 1 ? 1 : 1 - pp, R0 = 40 + 95 * Math.min(1, (f.ap === 1 ? pp : 1) * 1.2);
-      x.fillStyle = 'rgba(255,230,160,' + a * .55 + ')'; x.beginPath(); x.arc(0, -55, R0 * .55, 0, 7); x.fill();
-      x.fillStyle = 'rgba(255,120,30,' + a * .35 + ')'; x.beginPath(); x.arc(0, -55, R0, 0, 7); x.fill();
-      x.strokeStyle = 'rgba(255,240,170,' + a + ')'; x.lineWidth = 6 * a + 1; x.beginPath(); x.arc(0, -55, R0, 0, 7); x.stroke();
-      x.strokeStyle = 'rgba(255,150,40,' + a * .8 + ')'; x.lineWidth = 3; x.beginPath(); x.arc(0, -55, R0 * 1.18, 0, 7); x.stroke();
-      for (let q = 0; q < 12; q++) { const an = q * .5236 + .2, r1 = R0 * .8, r2 = R0 * (1.15 + .25 * Math.abs(Math.sin(t / 60 + q))); Y('rgba(255,170,50,' + a * .85 + ')', [[Math.cos(an - .09) * r1, -55 + Math.sin(an - .09) * r1], [Math.cos(an) * r2, -55 + Math.sin(an) * r2], [Math.cos(an + .09) * r1, -55 + Math.sin(an + .09) * r1]]); } // langues de feu
-      for (let q = -3; q <= 3; q++) Y('rgba(255,100,20,' + a * .8 + ')', [[q * 28 - 10, 0], [q * 28 + 10, 0], [q * 28, -30 - 30 * Math.abs(Math.sin(t / 70 + q))]]); // colonnes de flammes au sol
-    }
+  if (n === 'Shinra' && f.ak === 2 && f.ap >= 1) { // explosion de flammes
+    x.fillStyle = 'rgba(255,140,30,' + (f.ap === 1 ? .5 : .18) + ')'; x.beginPath(); x.arc(0, -45, 125, 0, 7); x.fill();
+    x.strokeStyle = 'rgba(255,230,120,.9)'; x.lineWidth = 5; x.stroke();
   }
   if (n === 'Shinra' && f.ak === 3 && f.ad) LN('rgba(255,150,40,.6)', 16, 0, -45, -f.ad[0] * 70, -45 - f.ad[1] * 70); // traînée du Pas du Diable
-  if (n === 'Eren' && f.fm) for (let q = 0; q < 6; q++) { const u = (t / 600 + q / 6) % 1; C('rgba(255,255,255,' + .35 * (1 - u) + ')', Math.sin(q * 2.3 + t / 400) * 22, -96 - u * 60, 6 + u * 10); } // vapeur du Titan
   if (n === 'Kairos' && f.ak >= 2) kairosFx(f, t);
   if (f.bd) { // lié par Sorganeil : deux cercles magiques croisés
     const rt = t / 600;
@@ -1501,7 +1502,28 @@ function fighter(f, i) {
     else { C(lk === 'snake' ? '#16161d' : skin, px, py, 10); if (lk === 'snake') C('rgba(255,255,255,.14)', px - 3, py - 3, 4); }
   };
   const sleeve = n === 'Kaze' ? '#1c1c28' : n === 'Naruto' ? '#ff7f27' : n === 'Chevalier' ? '#b0bec5' : n === 'Gojo' ? '#1a2a4f' : n === 'Deku' ? '#2e7d32' : n === 'Denji' ? '#f2f2f2' : n === 'Yugo' ? '#e2b283' : n === 'Shinra' ? '#23232f' : n === 'Eren' ? (f.fm ? '#8a4a35' : '#6d4c41') : n === 'Koro' ? '#f4d03f' : n === 'Kairos' ? '#3b2a5a' : n === 'Frieren' ? '#f4f1ea' : n === 'Ichigo' ? '#16161d' : (n === 'Luffy' && lk === 'snake') ? '#16161d' : skin;
-  if (n === 'Zéphyr') {
+  if (n === 'Zéphyr' && lk === 'fern') { // Fern : bâton tenu à deux mains, sorts Zoltraak à tir rapide (cercle doré au bout du bâton)
+    const k = f.ak, ap = f.ap, pp = aCl(f.pp || 0), t = Date.now(), sl = '#2a2c3c';
+    const staff = (hx, hy, ang, gl) => { const o = frStaff(s, hx, hy, ang, gl, 1); LN(sl, 8, 0, -72, s * hx, hy); C('#f6dccb', s * hx, hy, 5.5); return o; };
+    if (k < 0) { const bob = Math.sin(t / 340) * 1.5; staff(22, -60 + bob, -1.45, .1 + .08 * Math.sin(t / 300)); LN(sl, 7, 2, -68, s * 16, -64 + bob); C('#f6dccb', s * 18, -62 + bob, 5); }
+    else {
+      let hx, hy, ang, gl;
+      if (k === 0) { hx = kf(ap, pp, 18, 10, 24, 18); hy = kf(ap, pp, -62, -64, -68, -62); ang = kf(ap, pp, -.5, -.18, -.1, -.4); gl = ap === 1 ? 1 : ap === 0 ? pp * .7 : .3 * (1 - pp); } // tir rapide
+      else if (k === 1) { hx = kf(ap, pp, 22, 2, 30, 20); hy = kf(ap, pp, -66, -70, -78, -64); ang = kf(ap, pp, -.6, -.9, -.12, -.5); gl = ap === 1 ? 1 : ap === 0 ? pp : .4 * (1 - pp); } // Zoltraak chargé
+      else if (k === 2) { hx = 22 + 6 * Math.sin(pp * 6); hy = -70 + 6 * Math.sin(pp * 9); ang = ap === 1 ? -.55 + .4 * Math.sin(pp * 9) : -.6; gl = ap === 1 ? .9 : .5; } // salve
+      else { hx = 16; hy = kf(ap, pp, -80, -118, -124, -84); ang = kf(ap, pp, -1.3, -1.52, -1.52, -1.4); gl = ap === 1 ? 1 : .6 + .3 * pp; } // Judradjim
+      const o = staff(hx, hy, ang, gl);
+      LN(sl, 7, 0, -66, s * (hx + 12), hy + 9); C('#f6dccb', s * (hx + 12), hy + 9, 5);
+      if (k < 3) {
+        const cr = k === 1 ? 26 : 17, al = ap === 1 ? .95 : ap === 0 ? .25 + .5 * pp : .4 * (1 - pp);
+        x.save(); x.translate(o[0], o[1]); x.scale(.55, 1); mCircle(0, 0, cr, al, t / 260, '255,215,120'); x.restore();
+        if (ap === 1) { C('rgba(255,240,170,.55)', o[0], o[1], cr * .7); C('#fffbe6', o[0], o[1], cr * .25); for (let q = 0; q < 3; q++) LN('rgba(255,225,130,' + (.5 - q * .14) + ')', 3, o[0] + s * (10 + q * 10), o[1] + (q - 1) * 4, o[0] + s * (34 + q * 12), o[1] + (q - 1) * 4); }
+      } else {
+        mCircle(o[0], o[1] - 22, 30 + 6 * (ap === 0 ? pp : 1), ap === 2 ? .3 : .85, t / 200, '190,150,255'); zap(o[0], o[1], ap === 1 ? 6 : 3, 46);
+        if (ap === 1) { x.fillStyle = 'rgba(190,160,255,.18)'; x.fillRect(-120, -90 - 160, 240, 250); }
+      }
+    }
+  } else if (n === 'Zéphyr') {
     if (f.ak === 3) { LN('#8d6e63', 4, s * 30, -2, s * 30, -140); C('#f1c40f', s * 30, -146, 14); }
     else if (f.ak >= 0) {
       const e = f.ap === 1 ? 34 : f.ap === 0 ? 8 : 20;
@@ -1561,6 +1583,50 @@ function fighter(f, i) {
         } else slash(Math.max(-1.57, ang - 1.3), ang, 108, 'rgba(255,240,150,', 1 - aCl(pp / .6));
       }
     }
+  } else if (n === 'Viking' && lk === 'stark') { // Stark : la grande hache — balayage, coup du dessus à deux mains, hache plantée dans le sol, fendage colossal
+    const k = f.ak, ap = f.ap, pp = aCl(f.pp || 0), key = k * 10 + ap, ei = u => u * u, sl = '#5b4636', st = '#c4cbd4';
+    if (k >= 0 && key !== vkPrev[i] && ap === 1 && (k === 1 || k === 3)) WAVES.push({ x: f.x + s * (k === 3 ? 90 : 0), t: Date.now() });
+    vkPrev[i] = k >= 0 ? key : -1;
+    const axe = (hx, hy, a, L, glow) => { // hache de bataille : manche, sangle, large fer et pointe arrière ; a = angle du manche (repère face à droite)
+      x.save(); x.translate(s * hx, hy); x.scale(s, 1); x.rotate(a);
+      LN('#6b4a2f', 6.5, -16, 0, L, 0); LN('#8a6a48', 2.2, -16, -1.8, L, -1.8); LN('#2b1f17', 6.8, 4, 0, 10, 0); LN('#2b1f17', 6.8, L - 24, 0, L - 18, 0);
+      if (glow) { x.fillStyle = 'rgba(255,210,110,' + glow + ')'; x.beginPath(); x.arc(L + 6, 18, 34, 0, 7); x.fill(); }
+      x.fillStyle = '#9ea7b3'; x.strokeStyle = '#4f5864'; x.lineWidth = 2; x.beginPath();
+      x.moveTo(L - 17, 3); x.quadraticCurveTo(L - 10, 40, L + 18, 44); x.quadraticCurveTo(L + 14, 20, L + 10, 3); x.closePath(); x.fill(); x.stroke();
+      x.fillStyle = st; x.beginPath(); x.moveTo(L - 4, 6); x.quadraticCurveTo(L, 32, L + 17, 41); x.lineTo(L + 19, 43); x.quadraticCurveTo(L + 12, 18, L + 10, 5); x.fill();
+      x.fillStyle = '#7d8693'; x.beginPath(); x.moveTo(L - 17, -3); x.lineTo(L - 32, -10); x.lineTo(L - 17, -9); x.closePath(); x.fill(); // contre-pointe
+      x.restore();
+    };
+    const trail = (a1, a2, rad, cx, cy, al, col) => { if (al <= 0 || Math.abs(a2 - a1) < .03) return; x.save(); x.translate(s * cx, cy); x.scale(s, 1); for (let q = 0; q < 4; q++) { x.strokeStyle = col + (al * (.6 - q * .13)) + ')'; x.lineWidth = 12 - q * 3; x.lineCap = 'round'; x.beginPath(); x.arc(0, 0, rad - q * 3, Math.min(a1, a2), Math.max(a1, a2)); x.stroke(); } x.restore(); };
+    let hx = 14, hy = -64, a = -2.0, L = 62, two = false, glow = 0;
+    if (k < 0) { const bob = Math.sin(Date.now() / 420 + (i || 0)) * 1.5; hx = 14; hy = -62 + bob; a = -2.05; }
+    else if (k === 0) { // balayage latéral bas → haut
+      hx = ap === 0 ? aMix(16, 2, aEo(pp)) : ap === 1 ? aMix(2, 36, aEo(pp)) : aMix(36, 16, aSm(pp)); hy = -66;
+      a = ap === 0 ? aMix(-.4, 2.5, aEo(pp)) : ap === 1 ? aMix(2.5, -.2, ei(pp)) : aMix(-.2, -.8, aSm(pp)); two = ap > 0;
+      if (ap === 1) trail(2.5, -.2 + (1 - pp) * 2.7, 80, hx - 8, hy, .8 * Math.sin(pp * 3.14), 'rgba(255,240,200,');
+    } else if (k === 1) { // coup du dessus à deux mains
+      hx = ap === 0 ? aMix(14, 4, aEo(pp)) : ap === 1 ? aMix(4, 42, ei(pp)) : aMix(42, 14, aSm(pp));
+      hy = ap === 0 ? aMix(-66, -112, aEo(pp)) : ap === 1 ? aMix(-112, -50, ei(pp)) : aMix(-50, -62, aSm(pp));
+      a = ap === 0 ? aMix(-1.0, -1.95, aEo(pp)) : ap === 1 ? aMix(-1.95, 1.1, ei(pp)) : aMix(1.1, -1.0, aSm(pp)); two = true;
+      if (ap === 1) trail(-1.95, -1.95 + (a + 1.95), 96, 14, -76, .75 * Math.sin(Math.min(1, pp * 1.1) * 3.14), 'rgba(255,240,200,');
+    } else if (k === 2) { // levée à une main puis hache plantée dans le sol : la fissure file vers l'ennemi
+      hx = ap === 0 ? aMix(16, 12, aEo(pp)) : ap === 1 ? aMix(12, 48, ei(pp)) : aMix(48, 16, aSm(pp));
+      hy = ap === 0 ? aMix(-66, -106, aEo(pp)) : ap === 1 ? aMix(-106, -38, ei(pp)) : aMix(-38, -62, aSm(pp));
+      a = ap === 0 ? aMix(-1.0, -1.7, aEo(pp)) : ap === 1 ? aMix(-1.7, 1.25, ei(pp)) : aMix(1.25, -1.0, aSm(pp));
+      if (ap >= 1) { x.strokeStyle = 'rgba(30,15,10,' + (ap === 1 ? 1 : 1 - pp) + ')'; x.lineWidth = 3; x.beginPath(); x.moveTo(s * 60, -1); for (let q = 1; q <= 6; q++) x.lineTo(s * (60 + q * 16 * (ap === 1 ? pp : 1)), -1 + (q % 2 ? 4 : -2)); x.stroke(); }
+    } else { // fendage colossal : charge au-dessus de la tête, puis arc géant
+      L = 80; two = true;
+      hx = ap === 0 ? aMix(14, 6, aEo(pp)) : ap === 1 ? aMix(6, 52, aEo(pp)) : aMix(52, 14, aSm(pp));
+      hy = ap === 0 ? aMix(-66, -130, aEo(pp)) : ap === 1 ? aMix(-130, -48, ei(pp)) : aMix(-48, -62, aSm(pp));
+      a = ap === 0 ? aMix(-1.0, -1.75, aEo(pp)) : ap === 1 ? aMix(-1.75, 1.15, aEo(pp)) : aMix(1.15, -1.0, aSm(pp));
+      glow = ap === 0 ? .1 + .25 * pp : ap === 1 ? .35 : 0;
+      if (ap === 0) { x.fillStyle = 'rgba(255,200,60,' + (.12 + .25 * pp) + ')'; x.beginPath(); x.arc(s * 12, -150, 26 + pp * 26, 0, 7); x.fill(); }
+      if (ap === 1) { trail(-1.75, a, 118, 12, -80, .9, 'rgba(255,220,120,'); x.fillStyle = 'rgba(255,230,160,' + (.3 * (1 - pp)) + ')'; x.fillRect(s * 20 - 2, -170, s * 160, 190); }
+    }
+    LN(sl, 11, 0, -70, s * hx, hy); C(skin, s * hx, hy, 6.5);
+    if (two) { const q2x = hx + Math.cos(a) * 26, q2y = hy + Math.sin(a) * 26; LN(sl, 11, 0, -68, s * q2x, q2y); C(skin, s * q2x, q2y, 6.5); }
+    axe(hx, hy, a, L, glow);
+    if (two) { const q2x = hx + Math.cos(a) * 26, q2y = hy + Math.sin(a) * 26; C(skin, s * q2x, q2y, 6.5); }
   } else if (n === 'Viking' && f.ak >= 0) { // animations fluides du Viking : chaque phase suit une courbe douce (pp)
     const k = f.ak, ap = f.ap, pp = f.pp || 0, eo = u => 1 - (1 - u) * (1 - u), ei = u => u * u, sm = u => u * u * (3 - 2 * u), mix = (a, b, u) => a + (b - a) * u, key = k * 10 + ap;
     if (key !== vkPrev[i] && ap === 1 && (k === 1 || k === 3)) WAVES.push({ x: f.x + s * (k === 3 ? 90 : 0), t: Date.now() });
@@ -1666,40 +1732,6 @@ function fighter(f, i) {
       const cx = tp[0] + s * 12, r = ap === 0 ? 8 + 26 * pp : ap === 1 ? 34 : 34 * (1 - pp), al = ap === 2 ? 1 - pp : .95;
       x.save(); x.translate(cx, tp[1]); x.scale(.42, 1); mCircle(0, 0, r, al, t / 150); mCircle(0, 0, r * .6, al * .8, -t / 110, '255,250,200'); x.restore();
       C('rgba(255,245,190,' + (ap === 1 ? .55 : .25) + ')', cx, tp[1], 12 + r * .5);
-    }
-  } else if (n === 'Shinra' && f.ak >= 0) { // poings serrés pendant les coups de pied, bras grands ouverts pendant l'explosion
-    const pp = f.pp || 0;
-    if (f.ak === 2) {
-      const sp = f.ap === 0 ? pp * .35 : f.ap === 1 ? .35 + .65 * pp : 1 - .5 * pp;
-      [1, -1].forEach(d => { const hx = d * (14 + 34 * sp), hy = -62 - 52 * sp; LN(sleeve, 9, 0, -68, hx, hy); hand(hx, hy); if (f.ap < 2) C('rgba(255,200,80,.6)', hx, hy, 8 + 6 * sp); });
-    } else { LN(sleeve, 9, 0, -68, s * 8, -58); hand(s * 8, -58); LN(sleeve, 9, 0, -68, -s * 10, -56); hand(-s * 10, -56); }
-  } else if (n === 'Eren' && f.ak >= 0) { // animations d'attaque d'Eren : repos -> préparation -> frappe -> retour (pp)
-    const k = f.ak, ap = f.ap, pp = f.pp || 0, fist = f.fm ? '#8a4a35' : '#ecf0f1', ph = (a, b, c) => ap === 0 ? mixv(a, b, eoz(pp)) : ap === 1 ? mixv(b, c, eoz(pp)) : mixv(c, a, smz(pp));
-    const blade = (hx, hy, len) => { const L = Math.hypot(hx, hy + 68) || 1, ux = hx / L, uy = (hy + 68) / L; LN('#7f8c8d', 6, hx, hy, hx + ux * 10, hy + uy * 10); LN('#dfe6e9', 4, hx + ux * 8, hy + uy * 8, hx + ux * len, hy + uy * len); return [hx + ux * len, hy + uy * len]; };
-    if (f.fm) {
-      if (k === 0) { // coup de pied : jambe qui balance en arc
-        const fx = s * ph(14, -34, 96), fy = ph(-6, -30, -52), px0 = s * mixv(-34, 96, Math.max(0, pp - .3)), py0 = mixv(-30, -52, Math.max(0, pp - .3));
-        LN('#8a4a35', 18, 0, -30, fx, fy); C('#8a4a35', fx, fy, 15); if (ap === 1) LN('rgba(255,255,255,.4)', 12, px0, py0, fx, fy);
-        LN(sleeve, 11, 0, -68, s * 20, -56); C(fist, s * 20, -56, 11);
-      } else if (k === 1) { // poing anti-air : uppercut en arc
-        const hx = s * ph(24, -14, 58), hy = ph(-50, -24, -178);
-        if (ap === 1) LN('rgba(255,255,255,.45)', 14, s * mixv(-14, 58, Math.max(0, pp - .3)), mixv(-24, -178, Math.max(0, pp - .3)), hx, hy);
-        LN(sleeve, 11, 0, -68, hx, hy); C(fist, hx, hy, 13); LN(sleeve, 11, 0, -68, -s * 10, -52); C(fist, -s * 10, -52, 11);
-      } else { LN(sleeve, 11, 0, -68, s * 14, -84); C(fist, s * 14, -84, 11); LN(sleeve, 11, 0, -68, -s * 14, -84); C(fist, -s * 14, -84, 11); } // cristallisation : bras croisés
-    } else if (k === 0) { // grappin : bras tendu et jets de gaz aux hanches
-      const hx = s * ph(24, 12, 40), hy = ph(-50, -78, -84); LN(sleeve, 8, 0, -68, hx, hy); C(fist, hx, hy, 6);
-      if (ap >= 1) for (let q = 0; q < 4; q++) C('rgba(235,240,250,' + (.6 - pp * .4 - q * .08) + ')', s * (28 + q * 6), -44 - q * 5, 4 + q * 2 + pp * 4);
-    } else if (k === 1 && f.ad) { // dash vers le grappin : lame en avant, jets de gaz dans le dos
-      const hx = s * 30, hy = -64; LN(sleeve, 8, 0, -68, hx, hy); C(fist, hx, hy, 6); LN(sleeve, 8, 0, -68, s * 22, -60); C(fist, s * 22, -60, 6);
-      LN('#dfe6e9', 4, hx, hy, hx + s * 44, hy - 6); for (let q = 0; q < 4; q++) C('rgba(230,240,255,' + (.5 - q * .1) + ')', -s * (18 + q * 12), -48 + Math.sin(t / 60 + q) * 5, 6 + q * 2);
-      if (ap === 1) { LN('rgba(255,255,255,.7)', 3, s * 40, -95, s * 78, -64); LN('rgba(255,255,255,.7)', 3, s * 78, -64, s * 45, -32); }
-    } else if (k === 1) { // épée : levée dans le dos puis grand coup en arc
-      const hx = s * ph(24, -8, 46), hy = ph(-50, -100, -56), tip = blade(hx, hy, 44);
-      LN(sleeve, 8, 0, -68, hx, hy); C(fist, hx, hy, 6); blade(hx, hy, 44);
-      if (ap === 1) { const q2 = Math.max(0, pp - .35), h2x = s * mixv(-8, 46, q2), h2y = mixv(-100, -56, q2), L2 = Math.hypot(h2x, h2y + 68) || 1; LN('rgba(255,255,255,.5)', 10, h2x + h2x / L2 * 44, h2y + (h2y + 68) / L2 * 44, tip[0], tip[1]); }
-    } else if (k === 2) { // coupe-projectiles : double entaille en X
-      const hx = s * ph(24, 10, 40), hy = ph(-52, -92, -56); LN(sleeve, 8, 0, -68, hx, hy); C(fist, hx, hy, 6); blade(hx, hy, 44); LN(sleeve, 8, 0, -68, s * 18, -70); C(fist, s * 18, -70, 6);
-      if (ap === 1) { const a = 1 - pp; LN('rgba(255,255,255,' + a + ')', 4, s * 20, -112, s * 88, -22); LN('rgba(255,255,255,' + a + ')', 4, s * 88, -112, s * 20, -22); }
     }
   } else if (f.ak >= 0) {
     let Lx = f.ap === 1 ? 62 : f.ap === 0 ? 12 : 37;
@@ -2228,6 +2260,16 @@ function draw() {
         x.fillStyle = 'rgba(255,240,150,.9)'; x.beginPath(); x.moveTo(-6, -p.r * 1.8);
         x.quadraticCurveTo(p.r * 1.4, 0, -6, p.r * 1.8); x.quadraticCurveTo(p.r * .4, 0, -6, -p.r * 1.8); x.fill();
         x.strokeStyle = '#fff'; x.lineWidth = 2; x.stroke(); x.restore();
+      }
+      else if (p.k >= 18 && p.k <= 20 && S.f[p.o] && S.f[p.o].sk === 'skin_zephyr_fern') { // Fern : Zoltraak, trait doré et blanc précédé d'un petit cercle magique
+        x.save(); x.translate(p.x, p.y); x.scale(p.v || 1, 1);
+        const rr = p.r * (p.k === 19 ? 1.15 : 1.5), len = rr * (p.k === 19 ? 3.4 : 4.2), pul = .85 + .15 * Math.sin(Date.now() / 40);
+        x.fillStyle = 'rgba(255,210,110,.28)'; x.beginPath(); x.ellipse(-len * .15, 0, len * 1.05, rr * 1.35 * pul, 0, 0, 7); x.fill();
+        const g = x.createLinearGradient(-len, 0, len * .7, 0); g.addColorStop(0, 'rgba(255,200,90,0)'); g.addColorStop(.6, 'rgba(255,225,130,.95)'); g.addColorStop(1, '#fffbe6');
+        x.fillStyle = g; x.beginPath(); x.moveTo(-len, 0); x.quadraticCurveTo(-len * .3, -rr * .75, len * .7, 0); x.quadraticCurveTo(-len * .3, rr * .75, -len, 0); x.fill();
+        x.fillStyle = '#fff'; x.beginPath(); x.ellipse(len * .1, 0, len * .42, rr * .22, 0, 0, 7); x.fill();
+        if (p.k === 19) { x.save(); x.translate(-len * .85, 0); x.scale(.45, 1); mCircle(0, 0, rr * 1.2, .8, Date.now() / 150, '255,215,120'); x.restore(); }
+        x.restore();
       }
       else if (p.k === 18) { // Zéphyr 1 : éclair magique violet et blanc
         x.save(); x.translate(p.x, p.y); x.scale(p.v || 1, 1);
