@@ -546,7 +546,14 @@ const PASS = (() => {
   for (const k in F) t[k - 1].f = F[k]; for (const k in P) t[k - 1].p = P[k];
   return t;
 })();
-const passDef = () => save.pass || (save.pass = { xp: 0, prem: 0, cl: {} });
+// Réinitialisation du pass pour tous les joueurs : si la sauvegarde n'a pas le numéro PASS_RESET, le pass repart au palier 0 (XP et paliers réclamés effacés).
+// Le pass payant déjà acheté est conservé. Pour refaire une réinitialisation plus tard, il suffit de changer la valeur de PASS_RESET.
+const PASS_RESET = 'reset-2026-11-16';
+const passDef = () => {
+  if (save.passV !== PASS_RESET) { save.pass = { xp: 0, prem: save.pass && save.pass.prem ? 1 : 0, cl: {} }; save.passV = PASS_RESET; persist(); }
+  return save.pass || (save.pass = { xp: 0, prem: 0, cl: {} });
+};
+passDef(); // appliqué dès l'ouverture du jeu
 const passOn = () => frOn();
 const passTier = () => Math.min(PASS.length, Math.floor(passDef().xp / PASS_TIER_XP));
 function passXp(n, force) { if ((save.admin && !force) || !passOn() || !n) return 0; const p = passDef(); p.xp = Math.min(PASS.length * PASS_TIER_XP, p.xp + n); persist(); return n; }
