@@ -581,7 +581,33 @@ const xpBar = () => { const v = lvlInfo(); return `<div style="width:100%;height
 const profileBar = () => save.profile ? `<div onclick="openProfile()" style="cursor:pointer;display:flex;align-items:center;gap:12px;background:#222;border:1px solid #66552a;border-radius:10px;padding:6px 14px;max-width:360px;width:100%;box-sizing:border-box">${iconHtml(save.profile.icon, 34)}<div style="flex:1;text-align:left"><b>${esc(save.profile.name)}</b> · Niv. ${lvlInfo().L} · ⭐ ${topChar()}${titleLine()}${xpBar()}</div></div>` : '';
 function openProfile() { chestGain = ''; chestNew = null; chestErr = ''; pName = save.profile.name; pIcon = save.profile.icon; pErr = ''; view = 'profile'; ui(); }
 function setIcon(i) { pIcon = allIcons()[i]; ui(); }
-function tryAdmin() { const v = (document.getElementById('admc') || {}).value || ''; if (h53(v) === ADM_H) { save.admin = 1; save.admCode = v; persist(); pErr = ''; view = 'menu'; ui(); } else { pErr = 'Code incorrect'; ui(); } }
+// ===== MODE ADMIN « BAC À SABLE » : à l'activation, une copie complète du compte est mise de côté (save.admBak) ;
+// à la désactivation, le compte reprend exactement cet état : icônes, pass, aventure, skins, pièces, quêtes, stats… rien de ce qui a été fait en admin ne reste.
+function tryAdmin() {
+  const v = (document.getElementById('admc') || {}).value || '';
+  if (h53(v) !== ADM_H) { pErr = 'Code incorrect'; ui(); return; }
+  if (!save.admBak) { const b = JSON.parse(JSON.stringify(save)); delete b.admin; delete b.admCode; save.admBak = JSON.stringify(b); }
+  save.admin = 1; save.admCode = v; persist(); pErr = ''; view = 'menu'; ui();
+}
+function admOff() {
+  let b = null; try { b = JSON.parse(save.admBak || 'null'); } catch (e) {}
+  if (b) { Object.keys(save).forEach(k => delete save[k]); Object.assign(save, b); } // retour exact au compte d'avant
+  else if (Date.now() < ADV_FROM) { // ancienne session admin sans copie : avant lundi 00h01, le pass Frieren et l'aventure ne peuvent venir que du mode admin
+    const advSkins = SHOP.filter(q => q.adv || q.season).map(q => q.id), krs = !!(save.adv && save.adv.ch && save.adv.ch.kairos && save.adv.ch.kairos.done);
+    delete save.adv; delete save.pass;
+    save.owned = (save.owned || []).filter(id => !advSkins.includes(id) && id !== 'perso_frieren');
+    Object.keys(save.skin || {}).forEach(n => { if (advSkins.includes(save.skin[n])) save.skin[n] = ''; });
+    save.icons = (save.icons || []).filter(id => id !== 'zlt' && !(krs && id === 'krs'));
+    save.sTitles = (save.sTitles || []).filter(k => k !== 'S1'); if (save.profile && save.profile.title === 'S1') save.profile.title = '';
+  }
+  save.admin = 0; save.admCode = ''; delete save.admBak;
+  if (!save.stats || typeof save.stats !== 'object') save.stats = { played: 0, wins: 0, losses: 0, byChar: {} };
+  if (!save.stats.byChar) save.stats.byChar = {};
+  ['icons', 'owned', 'friends'].forEach(k => { if (!Array.isArray(save[k])) save[k] = []; });
+  if (!save.skin || typeof save.skin !== 'object') save.skin = {};
+  for (const k in PORT_CACHE) delete PORT_CACHE[k]; // portraits redessinés avec les vrais skins
+  persist(); pErr = ''; view = 'menu'; ui();
+}
 function admSet() { if (!save.admin) return; save.coins = Math.max(0, +document.getElementById('admco').value || 0); save.crystals = Math.max(0, +document.getElementById('admcr').value || 0); persist(); ui(); }
 function saveProfile() {
   const n = pName.trim().slice(0, 14);
@@ -592,7 +618,7 @@ const profileHtml = () => `<h2>${save.profile ? '👤 Mon profil' : '👤 Crée 
   <input maxlength="14" placeholder="Pseudo" value="${pName.replace(/"/g, '')}" oninput="pName=this.value" style="width:200px;text-transform:none">
   <div class="cards">${allIcons().map((ic, i) => `<div class="card ${pIcon === ic ? 'sel' : ''}" style="width:46px;text-align:center;font-size:26px" onclick="setIcon(${i})">${iconHtml(ic, 30)}</div>`).join('')}</div>
   ${save.profile ? `<div style="width:260px"><b>Niveau ${lvlInfo().L}</b>${xpBar()}</div><p>🖼️ Icônes débloquées : ${save.icons.length}/${Object.keys(LOGOS).length}</p>${titleHtml()}<p>🆔 Code ami : <b>${myCode()}</b> · ⭐ Perso le plus joué : <b>${topChar()}</b></p><p style="font-size:12px;opacity:.8">+20 XP par partie, +30 XP par victoire, +40 XP par quête</p>` : ''}
-  ${save.admin ? '<p style="color:#ffd54a">🛡️ Mode admin actif : tout est débloqué, solde réel conservé<br><small>Régler mon solde : <input id=\"admco\" type=\"number\" min=\"0\" value=\"${save.coins}\" style=\"width:90px\"> 🪙 <input id=\"admcr\" type=\"number\" min=\"0\" value=\"${save.crystals}\" style=\"width:70px\"> 💎 <button onclick=\"admSet()\" style=\"padding:4px 10px\">OK</button></small><br><button onclick="save.admin=0;save.admCode=\'\';persist();ui()" style="background:#7f8c8d">Désactiver</button></p>' : '<details style="opacity:.5;font-size:12px"><summary>Code</summary><input id="admc" type="password" placeholder="Code" style="width:140px"><button onclick="tryAdmin()">OK</button></details>'}
+  ${save.admin ? `<p style="color:#ffd54a">🛡️ Mode admin actif : tout est débloqué pour tester.<br><small>Tout ce que tu fais en admin (icônes, pass, aventure, pièces…) sera effacé à la désactivation : ton compte reviendra exactement comme avant.</small><br><small>Solde de test : <input id="admco" type="number" min="0" value="${save.coins}" style="width:90px"> 🪙 <input id="admcr" type="number" min="0" value="${save.crystals}" style="width:70px"> 💎 <button onclick="admSet()" style="padding:4px 10px">OK</button></small><br><button onclick="admOff()" style="background:#7f8c8d">Désactiver et revenir à mon compte</button></p>` : '<details style="opacity:.5;font-size:12px"><summary>Code</summary><input id="admc" type="password" placeholder="Code" style="width:140px"><button onclick="tryAdmin()">OK</button></details>'}
   <button onclick="saveProfile()">✔ ${save.profile ? 'Enregistrer' : 'Créer mon profil'}</button>${save.profile ? `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : ''}`;
 const bank = () => `🪙 ${save.coins} pièces · 💎 ${save.crystals} cristaux`;
 const shuf = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
