@@ -895,15 +895,23 @@ function frStaff(s, hx, hy, ang, glow, mode) { // bâton tenu en (hx,hy) ; ang d
   C(mode ? '#fff3a0' : '#7fe0c3', ox, oy, 5.5 + 3 * glow); C('#f4fffb', ox - 1.5, oy - 1.5, 2 + glow);
   return [ox, oy];
 }
-function fernStaff(s, hx, hy, ang, glow) { // bâton de Fern : manche sombre, poignées enroulées de violet, embout et pointe métalliques ; renvoie la pointe
-  const dx = Math.cos(ang), dy = Math.sin(ang), nx = -dy, ny = dx, bx = hx - dx * 62, by = hy - dy * 62, tx = hx + dx * 78, ty = hy + dy * 78;
-  LN('#4a3424', 5.5, s * bx, by, s * tx, ty); LN('#6a4a34', 2, s * bx, by - 1.2, s * tx, ty - 1.2);
-  LN('#8a8f98', 7.5, s * (bx - dx * 2), by - dy * 2, s * (bx + dx * 8), by + dy * 8); // embout métallique
-  [[-4, 10], [26, 36], [56, 66]].forEach(([a, b]) => LN('#6b3fc4', 6.5, s * (hx + dx * a), hy + dy * a, s * (hx + dx * b), hy + dy * b));
-  LN('#8a8f98', 7, s * (bx + dx * 8), by + dy * 8, s * (bx + dx * 14), by + dy * 14);
-  Y('#8a8f98', [[s * (tx - dx * 4 + nx * 3), ty - dy * 4 + ny * 3], [s * (tx + dx * 14), ty + dy * 14], [s * (tx - dx * 4 - nx * 3), ty - dy * 4 - ny * 3]]);
-  const ox = s * (tx + dx * 4), oy = ty + dy * 4; if (glow > 0) C('rgba(255,240,170,' + (.12 + .3 * glow) + ')', ox, oy, 8 + 14 * glow);
-  return [ox, oy];
+function fernStaff(s, hx, hy, ang, glow) { // bâton de Fern : bois brun-rouge noueux, tête en bulbe sculpté, bandes de cuir violet, anneaux et large manchon d'argent, pointe effilée à l'arrière ; renvoie le bout de la tête
+  const dx = Math.cos(ang), dy = Math.sin(ang), nx = -dy, ny = dx;
+  const Q = (u, v) => [s * (hx + dx * u + nx * v), hy + dy * u + ny * v]; // u : le long du manche (0 = main, + vers la tête), v : de côté
+  const seg = (col, w, u1, u2, v = 0) => { const A = Q(u1, v), B = Q(u2, v); LN(col, w, A[0], A[1], B[0], B[1]); };
+  const poly = (col, pts) => { x.fillStyle = P(col); x.beginPath(); pts.forEach((p, j) => { const q = Q(p[0], p[1]); j ? x.lineTo(q[0], q[1]) : x.moveTo(q[0], q[1]); }); x.closePath(); x.fill(); };
+  seg('#5e3226', 3, -70, -56); seg('#6b3a2e', 5, -56, -36); seg('#6b3a2e', 6, -36, 64); seg('#7f4a3a', 2, -36, 64, -1.8); // manche effilé vers l'arrière
+  seg('#7a1fa0', 7.5, -52, -36); seg('#8a2fb4', 7.5, -34, -30); // grandes spires de cuir violet vers le bas
+  seg('#7a1fa0', 7.5, 12, 22); // spires vers le milieu
+  poly('#a9adb5', [[28, -8], [42, -8], [42, 8], [28, 8]]); [[31, -3.5], [35, 2], [39, -3]].forEach(p => { const q = Q(p[0], p[1]); C('#6f737b', q[0], q[1], 1.5); }); seg('#d4d7dd', 1.6, 28, 42, -6.5); // large manchon d'argent gravé
+  seg('#a9adb5', 8, -6, -2); seg('#a9adb5', 8, 1, 5); // petits anneaux d'argent
+  seg('#7a1fa0', 7.5, 48, 58); seg('#a9adb5', 9, 59, 63); // spires + anneau sous la tête
+  poly('#8a4b3a', [[62, -3.5], [70, -9], [80, -10], [88, -6], [87, 4], [80, 9.5], [70, 8], [62, 3.5]]); // tête en bulbe noueux
+  poly('#9c5844', [[70, -8], [80, -9], [86, -5], [78, -3], [70, -4]]);
+  seg('#5a2e22', 1.4, 66, 84, 2);
+  const R1 = Q(54, 4), R2 = Q(54, 17); LN('#7a1fa0', 3, R1[0], R1[1], R2[0], R2[1]); C('#e8731c', R2[0], R2[1], 2.2); // ruban de cuir et perle orange
+  const o = Q(90, 0); if (glow > 0) C('rgba(255,240,170,' + (.12 + .3 * glow) + ')', o[0], o[1], 8 + 14 * glow);
+  return o;
 }
 function mCircle(cx, cy, r, al, spin, col) { // cercle magique : deux anneaux, étoile à six branches et graduations qui tournent
   col = col || '255,225,130';
