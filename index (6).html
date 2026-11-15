@@ -279,7 +279,7 @@ const SHOP = [
   { id: 'skin_ichigo_bloodchains', type: 'skin', char: 'Ichigo', name: 'Ichigo - Sauveur de Rukia', price: 250, look: 'bloodchains', desc: 'Ichigo à Soul Society : grand manteau beige à capuche pointue, tunique noire, bandages, obi blanc et Zangetsu au ruban blanc', pal: {} },
   { id: 'skin_zephyr_fern', type: 'skin', char: 'Zéphyr', name: 'Fern — apprentie de Frieren', price: 400, look: 'fern', season: 1, pal: {} },
   { id: 'skin_viking_stark', type: 'skin', char: 'Viking', name: 'Stark — guerrier à la hache', price: 400, look: 'stark', season: 1, pal: {} },
-  { id: 'skin_chevalier_himmel', type: 'skin', char: 'Chevalier', name: 'Himmel — le héros', price: 250, look: 'himmel', season: 1, pal: {} },
+  { id: 'skin_chevalier_himmel', type: 'skin', char: 'Chevalier', name: 'Himmel — le héros', price: 400, look: 'himmel', season: 1, pal: {} },
   { id: 'skin_bruno_fantasma', type: 'skin', char: 'Bruno', name: 'Bruno Fantasma (aventure)', price: 0, adv: 1, look: 'fantasma', pal: { '#e74c3c': '#1c1c1c', '#ff7675': '#4a4a4a', '#b03a2e': '#111', '#d9534f': '#3a3a3a', '#fff': '#d4af37' } },
   { id: 'skin_zephyr_archimage', type: 'skin', char: 'Zéphyr', name: 'Zéphyr Archimage (aventure)', price: 0, adv: 1, look: 'archimage', pal: { '#6c3483': '#14213d', '#5b2c6f': '#0b1430', '#4a235a': '#1d2b55', '#5dade2': '#9fd8ff', '#d6eaf8': '#ffffff' } },
   { id: 'skin_kaze_renard', type: 'skin', char: 'Kaze', name: 'Kaze Renard (aventure)', price: 0, adv: 1, look: 'fox', pal: { '#2ecc71': '#c0392b' } },
@@ -311,6 +311,7 @@ const FR_FROM = Date.parse('2026-11-16T00:01:00+01:00'), frOn = () => !!save.adm
 // Mode aventure : visible dans le menu, jouable à partir du lundi 16/11/2026 00:01 (heure de Paris), comme côté serveur (ADV_FROM)
 const ADV_FROM = Date.parse('2026-11-16T00:01:00+01:00'), advOpen = () => !!save.admin || Date.now() >= ADV_FROM;
 const advLeft = () => { const l = Math.max(0, ADV_FROM - Date.now()), h = Math.floor(l / 3600000), m = Math.floor(l % 3600000 / 60000); return h ? h + ' h ' + String(m).padStart(2, '0') + ' min' : Math.max(1, m) + ' min'; };
+const atkNames = ch => (ch.skn && ch.skn[save.skin[ch.name]]) || ch.atk; // noms des attaques (propres au skin équipé s'il en a)
 const locked = name => SHOP.some(q => q.type === 'char' && q.char === name && !owns(q.id));
 const dayKey = () => { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
 function connect(first) {
@@ -744,7 +745,7 @@ function ui() {
   if (me < 0 && searching === 2) { const n = q2 ? q2.n : 1, left = q2 ? q2.left : 15; h = `<h2>🤝 Recherche 2v2…</h2><p style="font-size:22px">👥 ${n} / 4 joueurs trouvés</p><p>${left > 0 ? 'Des bots complèteront les équipes dans <b>' + left + ' s</b> si personne d’autre n’arrive.' : 'Création de la partie…'}</p><div style="width:260px;height:10px;background:#000;border-radius:5px;overflow:hidden;margin:6px auto"><div style="width:${(15 - left) / 15 * 100}%;height:100%;background:#e67e22;transition:width 1s linear"></div></div>${quitBtn.replace('Retour au menu', 'Annuler')}`; }
   else if (me < 0 && searching === 3) h = `<h2>🤝 Invitation acceptée !</h2><p>Connexion à la partie 2v2 avec ton ami…</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
   else if (me < 0 && searching) h = `<h2>🔎 Recherche d’un adversaire…</h2><p>Tu seras mis face à un joueur aléatoire.</p>${quitBtn.replace('Retour au menu', 'Annuler')}`;
-  else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'botlvl' ? botLvlHtml() : view === 'advmenu' ? advMenuHtml() : view === 'friends' ? friendsHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => ch.adv || (ch.hid && !save.admin) ? '' : `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${ch.atk.map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : view === 'pass' ? passHtml() : `<div class="menu-top">
+  else if (me < 0) h = !save.profile || view === 'profile' ? profileHtml() : view === 'botlvl' ? botLvlHtml() : view === 'advmenu' ? advMenuHtml() : view === 'friends' ? friendsHtml() : view === 'stats' ? statsHtml() : view === 'training' ? `<h2>🎯 Mode entraînement</h2><p>Choisis librement ton personnage : tous les personnages sont disponibles.</p><div class="cards">${chars.map((ch, i) => ch.adv || (ch.hid && !save.admin) ? '' : `<div class="card" style="border-color:${ch.color}" onclick="startTraining(${i})"><b style="color:${ch.color}">${ch.name}</b><br>${ch.desc}<br>PV : ${ch.hp}<br>${atkNames(ch).map((a,j) => 'JKLU'[j] + ' : ' + a).join('<br>')}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>` : view === 'shop' ? shopHtml() : view === 'chars' ? charShopHtml() : view === 'quests' ? questsHtml() : view === 'pass' ? passHtml() : `<div class="menu-top">
       ${profileBar()}
       <div class="menu-currency">${bank()}</div>
     </div>
@@ -782,7 +783,7 @@ function ui() {
     const ii = pre != null ? pre : infoIdx != null ? infoIdx : (S.sel[me] != null ? S.sel[me] : 0), ic = chars[ii];
     const sks = SHOP.filter(q => q.type === 'skin' && q.char === ic.name && owns(q.id)), cur = save.skin[ic.name] || '';
     h = `<h2 style="margin:2px">Choisis ton combattant</h2>${S.two ? `<p style="margin:2px">🤝 2v2 · Tu es dans l’équipe ${me < 2 ? '🔵 Bleue' : '🔴 Rouge'} · coéquipier : ${S.sel[me ^ 1] != null ? '✔ prêt' : '…'}</p>` : ''}<div class="cards">${chars.map((c, i) => c.adv || (c.hid && !save.admin) ? '' : `<div class="card sm ${S.sel[me] === i || pre === i ? 'sel' : ''} ${locked(c.name) ? 'lock' : ''}" style="border-color:${c.color}" onclick="pick(${i})" onmouseenter="info(${i})">${selectPortrait(c)}<span class="char-name" style="color:${c.color}">${c.name}</span>${locked(c.name) ? '<span class="lock-mark">🔒</span>' : ''}</div>`).join('')}</div>
-    <div class="panel"><b style="color:${ic.color};font-size:15px">${ic.name}</b>${locked(ic.name) ? ' 🔒 à débloquer dans la boutique' : ''} · ${ic.desc} · PV ${ic.hp}<br>${ic.atk.map((a, j) => 'JKLU'[j] + ' : ' + a).join(' &nbsp;·&nbsp; ')}${ic.alt ? '<br>✨ Forme : ' + ic.alt.join(' / ') : ''}${sks.length ? '<br>' + [{ id: '', name: 'Normal' }, ...sks].map(q => `<span class="chip ${cur === q.id ? 'on' : ''}" onclick="event.stopPropagation();setSkin('${ic.name}','${q.id}',${ii})">${q.name}</span>`).join('') : ''}</div>
+    <div class="panel"><b style="color:${ic.color};font-size:15px">${ic.name}</b>${locked(ic.name) ? ' 🔒 à débloquer dans la boutique' : ''} · ${ic.desc} · PV ${ic.hp}<br>${atkNames(ic).map((a, j) => 'JKLU'[j] + ' : ' + a).join(' &nbsp;·&nbsp; ')}${ic.alt ? '<br>✨ Forme : ' + ic.alt.join(' / ') : ''}${sks.length ? '<br>' + [{ id: '', name: 'Normal' }, ...sks].map(q => `<span class="chip ${cur === q.id ? 'on' : ''}" onclick="event.stopPropagation();setSkin('${ic.name}','${q.id}',${ii})">${q.name}</span>`).join('') : ''}</div>
     <button onclick="confirmPick()" ${pre == null || S.sel[me] != null ? 'disabled' : ''}>✔ Valider ${pre != null ? chars[pre].name : ''}</button>
     <p style="margin:2px">${pre == null && S.sel[me] == null ? 'Clique sur un perso, choisis ton skin, puis valide' : ''}${S.sel[me] != null ? 'Tu es prêt ✔' : ''} ${S.two ? '· ' + S.sel.filter(v => v != null).length + '/4 prêts' : S.sel[1 - me] != null ? (S.bot ? '· Bot prêt 🤖' : '· Adversaire prêt ✔') : ''}</p>
     <p style="font-size:12px;opacity:.8;margin:2px">Flèches ou ZQSD : bouger, sauter (haut), bloquer (bas) · J K L : attaques · U ou Espace : ultime (barre pleine)</p>${quitBtn}`;
@@ -1840,24 +1841,35 @@ function fighter(f, i) {
       hx = ap === 0 ? aMix(16, 2, aEo(pp)) : ap === 1 ? aMix(2, 36, aEo(pp)) : aMix(36, 16, aSm(pp)); hy = -66;
       a = ap === 0 ? aMix(-.4, 2.5, aEo(pp)) : ap === 1 ? aMix(2.5, -.2, ei(pp)) : aMix(-.2, -.8, aSm(pp)); two = ap > 0;
       if (ap === 1) trail(2.5, -.2 + (1 - pp) * 2.7, 80, hx - 8, hy, .8 * Math.sin(pp * 3.14), 'rgba(255,240,200,');
-    } else if (k === 1) { // coup du dessus à deux mains
+    } else if (k === 1) { // Écrasement : coup du dessus à deux mains, la hache claque le sol et l'onde de choc part des deux côtés
       hx = ap === 0 ? aMix(14, 4, aEo(pp)) : ap === 1 ? aMix(4, 42, ei(pp)) : aMix(42, 14, aSm(pp));
       hy = ap === 0 ? aMix(-66, -112, aEo(pp)) : ap === 1 ? aMix(-112, -50, ei(pp)) : aMix(-50, -62, aSm(pp));
       a = ap === 0 ? aMix(-1.0, -1.95, aEo(pp)) : ap === 1 ? aMix(-1.95, 1.1, ei(pp)) : aMix(1.1, -1.0, aSm(pp)); two = true;
-      if (ap === 1) trail(-1.95, -1.95 + (a + 1.95), 96, 14, -76, .75 * Math.sin(Math.min(1, pp * 1.1) * 3.14), 'rgba(255,240,200,');
-    } else if (k === 2) { // levée à une main puis hache plantée dans le sol : la fissure file vers l'ennemi
+      if (ap === 1) trail(-1.95, a, 96, 14, -76, .75 * Math.sin(Math.min(1, pp * 1.1) * 3.14), 'rgba(255,240,200,');
+      if (ap === 2 && pp < .5) { x.strokeStyle = 'rgba(255,230,170,' + (.7 * (1 - pp * 2)) + ')'; x.lineWidth = 3; x.beginPath(); x.ellipse(s * 56, -2, 26 + pp * 60, 7 + pp * 6, 0, 0, 7); x.stroke(); x.beginPath(); x.ellipse(-s * 20, -2, 20 + pp * 50, 6 + pp * 5, 0, 0, 7); x.stroke(); } // éclats de poussière de chaque côté
+    } else if (k === 2) { // Vague de séisme : hache levée à une main puis plantée dans le sol, la fissure file vers l'ennemi
       hx = ap === 0 ? aMix(16, 12, aEo(pp)) : ap === 1 ? aMix(12, 48, ei(pp)) : aMix(48, 16, aSm(pp));
       hy = ap === 0 ? aMix(-66, -106, aEo(pp)) : ap === 1 ? aMix(-106, -38, ei(pp)) : aMix(-38, -62, aSm(pp));
       a = ap === 0 ? aMix(-1.0, -1.7, aEo(pp)) : ap === 1 ? aMix(-1.7, 1.25, ei(pp)) : aMix(1.25, -1.0, aSm(pp));
       if (ap >= 1) { x.strokeStyle = 'rgba(30,15,10,' + (ap === 1 ? 1 : 1 - pp) + ')'; x.lineWidth = 3; x.beginPath(); x.moveTo(s * 60, -1); for (let q = 1; q <= 6; q++) x.lineTo(s * (60 + q * 16 * (ap === 1 ? pp : 1)), -1 + (q % 2 ? 4 : -2)); x.stroke(); }
-    } else { // fendage colossal : charge au-dessus de la tête, puis arc géant
-      L = 80; two = true;
-      hx = ap === 0 ? aMix(14, 6, aEo(pp)) : ap === 1 ? aMix(6, 52, aEo(pp)) : aMix(52, 14, aSm(pp));
-      hy = ap === 0 ? aMix(-66, -130, aEo(pp)) : ap === 1 ? aMix(-130, -48, ei(pp)) : aMix(-48, -62, aSm(pp));
-      a = ap === 0 ? aMix(-1.0, -1.75, aEo(pp)) : ap === 1 ? aMix(-1.75, 1.15, aEo(pp)) : aMix(1.15, -1.0, aSm(pp));
-      glow = ap === 0 ? .1 + .25 * pp : ap === 1 ? .35 : 0;
-      if (ap === 0) { x.fillStyle = 'rgba(255,200,60,' + (.12 + .25 * pp) + ')'; x.beginPath(); x.arc(s * 12, -150, 26 + pp * 26, 0, 7); x.fill(); }
-      if (ap === 1) { trail(-1.75, a, 118, 12, -80, .9, 'rgba(255,220,120,'); x.fillStyle = 'rgba(255,230,160,' + (.3 * (1 - pp)) + ')'; x.fillRect(s * 20 - 2, -170, s * 160, 190); }
+    } else { // Poing du Géant → Frappe foudroyante d'Eisen (animation) : la technique d'Eisen, coup vertical fulgurant ; la hache se charge d'éclairs puis fend de haut en bas
+      L = 84; two = true;
+      hx = ap === 0 ? aMix(14, 6, aEo(pp)) : ap === 1 ? aMix(6, 46, aEo(pp)) : aMix(46, 14, aSm(pp));
+      hy = ap === 0 ? aMix(-66, -132, aEo(pp)) : ap === 1 ? aMix(-132, -46, ei(pp)) : aMix(-46, -62, aSm(pp));
+      a = ap === 0 ? aMix(-1.0, -1.7, aEo(pp)) : ap === 1 ? aMix(-1.7, 1.2, aEo(pp)) : aMix(1.2, -1.0, aSm(pp));
+      glow = ap === 0 ? .1 + .3 * pp : ap === 1 ? .5 : 0;
+      const hdx = hx + Math.cos(a) * (L + 14), hdy = hy + Math.sin(a) * (L + 14); // position du fer
+      if (ap === 0) { x.fillStyle = 'rgba(150,170,255,' + (.1 + .22 * pp) + ')'; x.beginPath(); x.arc(s * hx, hy - 20, 30 + pp * 22, 0, 7); x.fill(); zap(s * hdx, hdy, 2 + Math.floor(pp * 5), 34 + pp * 26); }
+      if (ap === 1) {
+        trail(-1.7, a, 120, 12, -80, .95, 'rgba(190,205,255,'); zap(s * hdx, hdy, 5, 56);
+        x.fillStyle = 'rgba(200,215,255,' + (.28 * (1 - pp)) + ')'; x.fillRect(s > 0 ? 20 : -180, -170, 160, 190);
+        if (pp > .35) { // la foudre suit la lame jusqu'au sol, devant lui
+          const bx = s * (hx + 78), al = Math.min(1, (pp - .35) * 3) * (1 - pp * .5); x.strokeStyle = 'rgba(160,185,255,' + al * .6 + ')'; x.lineWidth = 9; x.lineJoin = 'round'; x.beginPath(); x.moveTo(bx, -190);
+          [[-14, -150], [10, -112], [-12, -74], [8, -36], [0, 0]].forEach(p => x.lineTo(bx + p[0], p[1])); x.stroke(); x.strokeStyle = 'rgba(255,255,255,' + al + ')'; x.lineWidth = 3; x.beginPath(); x.moveTo(bx, -190);
+          [[-14, -150], [10, -112], [-12, -74], [8, -36], [0, 0]].forEach(p => x.lineTo(bx + p[0], p[1])); x.stroke();
+          x.fillStyle = 'rgba(220,230,255,' + al * .5 + ')'; x.beginPath(); x.ellipse(bx, 0, 46, 9, 0, 0, 7); x.fill();
+        }
+      }
     }
     const sArm = (ex, ey, sy) => { // manche rouge retroussée, manchette crème, avant-bras bandé, gant noir sans doigts
       const m = .42, kx = ex * m, ky = sy + (ey - sy) * m, ux = ex - kx, uy = ey - ky, Ln = Math.hypot(ux, uy) || 1;
