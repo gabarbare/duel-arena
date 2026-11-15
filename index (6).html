@@ -320,7 +320,7 @@ function connect(first) {
   w.onmessage = e => {
     if (w !== ws) return;
     const m = JSON.parse(e.data);
-    if (m.t === 'chars') { chars = m.chars; if (advPending) { advPending = false; advEnter(); } else { view = 'training'; ui(); } }
+    if (m.t === 'chars') { chars = m.chars; if (advPending) { advPending = false; advEnter(); } else if (pendingTry) doTry(); else { view = 'training'; ui(); } }
     else if (m.t === 'friends') {
       fList = m.list;
       if (fAdd) { if (m.missing.includes(fAdd)) fErr = 'Code introuvable'; else { save.friends.push(fAdd); persist(); fDraft = ''; } fAdd = null; }
@@ -365,6 +365,17 @@ function openTraining() {
   if (!chars.length || !ws || ws.readyState !== 1) connect({ t: 'training_list' });
   else ui();
 }
+// ===== ESSAYER UN SKIN DE LA BOUTIQUE : lance le mode entraînement avec ce personnage et ce skin, sans l'acheter =====
+let pendingTry = null, tryBack = null;
+function tryOn(id) {
+  const q = SHOP.find(z => z.id === id); if (!q) return;
+  pendingTry = q; tryBack = view;
+  if (chars.length && ws && ws.readyState === 1) doTry(); else connect({ t: 'training_list' });
+}
+function doTry() {
+  const q = pendingTry; pendingTry = null; const i = chars.findIndex(c => c.name === q.char); if (i < 0) return;
+  ws.send(JSON.stringify({ t: 'train', adm: save.admin ? save.admCode : undefined, c: i, sk: q.id }));
+}
 function startTraining(i) {
   if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'train', adm: save.admin ? save.admCode : undefined, c: i, sk: save.skin[chars[i].name] || '' }));
 }
@@ -379,7 +390,7 @@ function kairosWin() {
   persist();
 }
 const again = () => ws.send(JSON.stringify({ t: 'again' }));
-function leave() { advOn = false; advS = null; me = -1; S = null; err = ''; view = 'menu'; searching = false; try { ws.close(); } catch (e) {} ui(); }
+function leave() { advOn = false; advS = null; me = -1; S = null; err = ''; view = tryBack || 'menu'; tryBack = null; searching = false; try { ws.close(); } catch (e) {} ui(); }
 function info(i) { if (pre == null && infoIdx !== i) { infoIdx = i; ui(); } }
 function setSkin(name, id, i) { save.skin[name] = id; persist(); if (S && S.p === 'select' && S.sel[me] === i) sendPick(i); ui(); }
 
@@ -675,7 +686,7 @@ const shopHtml = () => {
   if (frOn()) SHOP.filter(q => q.season && !owns(q.id)).reverse().forEach(q => items.unshift(q)); // skins de la saison Frieren
   const promoText = ichigoPromoActive() ? ` · 🎁 Ichigo Sauveur de Rukia gratuit encore ${Math.ceil(ichigoPromoRemaining() / 60000)} min` : '';
   return `<h2>🎨 Boutique de skins</h2><p>${bank()} · 3 skins par jour, nouvelle sélection à minuit (dans ${leftTxt()})${promoText}</p>` + (items.length
-    ? `<div class="cards">${items.map(q => { const free = q.id === 'skin_ichigo_bloodchains' && ichigoPromoActive(); return `<div class="card shopc"><b>${q.name}</b><br>Skin · ${q.char}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.coins < (free ? 0 : q.price) ? 'disabled' : ''} onclick="buy('${q.id}')">${free ? 'GRATUIT 🎁' : q.price + ' 🪙'}</button>`}</div>`; }).join('')}</div>`
+    ? `<div class="cards">${items.map(q => { const free = q.id === 'skin_ichigo_bloodchains' && ichigoPromoActive(); return `<div class="card shopc"><b>${q.name}</b><br>Skin · ${q.char}<br>${owns(q.id) ? '✓ Possédé' : `<button ${save.coins < (free ? 0 : q.price) ? 'disabled' : ''} onclick="buy('${q.id}')">${free ? 'GRATUIT 🎁' : q.price + ' 🪙'}</button> <button onclick="tryOn('${q.id}')" style="background:#16a085">👁 Essayer</button>`}</div>`; }).join('')}</div>`
     : '<p>Tu possèdes déjà tous les skins 🎉</p>') + `<button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 };
 const kCard = () => `<div class="card" style="width:190px;cursor:default;border-color:#d9b84a"><b>⭐ Quête spéciale : Kairos</b><br>Gagner 8 combats<br>${owns('perso_kairos') ? '✓ Débloqué !' : 'Progression : ' + (save.kw || 0) + ' / 8'}</div>`;
@@ -2224,7 +2235,7 @@ function hud() {
     const f = S.f[0], c = chars[f.c];
     x.fillStyle = 'rgba(0,0,0,.76)'; x.fillRect(15, 12, 370, 96);
     x.fillStyle = '#fff'; x.textAlign = 'left'; x.font = 'bold 17px sans-serif';
-    x.fillText('🎯 ENTRAÎNEMENT · ' + c.name, 28, 36);
+    x.fillText('🎯 ENTRAÎNEMENT · ' + c.name + (f.sk && !owns(f.sk) ? ' · essai : ' + ((SHOP.find(q => q.id === f.sk) || {}).name || '') : ''), 28, 36);
     x.font = '14px sans-serif';
     x.fillText('Dégâts totaux : ' + S.damage, 28, 59);
     x.fillText('Coups réussis : ' + S.hits, 28, 80);
