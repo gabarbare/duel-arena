@@ -148,12 +148,12 @@ const CH = [
     { n: 'Poing de pierre', type: 'm', su: 14, ac: 6, rc: 18, cd: 20, dmg: 13, rng: 78, h: 60, kb: 10, st: 22 },
     { n: 'Balayage rocheux', type: 'm', both: 1, su: 18, ac: 7, rc: 24, cd: 80, dmg: 17, rng: 70, h: 70, kb: 13, st: 26 },
     { n: 'Saut sismique', type: 'jam', su: 12, ac: 0, rc: 26, cd: 150, dmg: 16, jv: 10, jx: 2.5, aoe: 95, kb: 12, st: 28 }] },
-  { name: 'Morgane', adv: 1, desc: 'Sorcière du marais', hp: 95, spd: 3.7, jmp: 13, color: '#27ae60', atk: [
-    { n: 'Trait maudit', type: 'p', su: 7, ac: 1, rc: 10, cd: 30, dmg: 6, vx: 11, r: 8, kb: 4, st: 13, vis: 18 },
-    { n: 'Boule de feu verte', type: 'p', su: 12, ac: 1, rc: 30, cd: 80, dmg: 13, vx: 7, r: 16, kb: 10, st: 22, vis: 19 },
+  { name: 'Morgane', adv: 1, desc: 'Sorcière du marais', hp: 75, spd: 3.7, jmp: 13, color: '#27ae60', atk: [
+    { n: 'Trait maudit', type: 'p', su: 7, ac: 1, rc: 10, cd: 50, dmg: 5, vx: 11, r: 8, kb: 4, st: 13, vis: 18 },
+    { n: 'Boule de feu verte', type: 'p', su: 12, ac: 1, rc: 30, cd: 90, dmg: 13, vx: 7, r: 16, kb: 10, st: 22, vis: 19 },
     { n: 'Foudre des marais', type: 'sky', su: 14, ac: 1, rc: 22, cd: 160, dmg: 14, kb: 9, st: 26, warn: 34, strike: 8 }] },
   { name: 'Lysandre', adv: 1, desc: 'Ancien élève de Zéphyr, mage en robe blanche', hp: 115, spd: 4.1, jmp: 13.5, color: '#ecf0f1', atk: [
-    { n: 'Lame de lumière', type: 'p', su: 8, ac: 1, rc: 12, cd: 40, dmg: 9, vx: 12, r: 18, kb: 8, st: 18, vis: 3 },
+    { n: 'Lame de lumière', type: 'p', su: 8, ac: 1, rc: 12, cd: 40, dmg: 6, vx: 12, r: 18, kb: 8, st: 18, vis: 3 },
     { n: 'Orbes de vent (x3)', type: 'p', su: 10, ac: 1, rc: 30, cd: 100, dmg: 6, vx: 9, r: 8, kb: 5, st: 14, cnt: 3, vis: 20 },
     { n: 'Foudre blanche', type: 'sky', su: 14, ac: 1, rc: 20, cd: 140, dmg: 16, kb: 11, st: 30, warn: 28, strike: 8 },
     { n: 'Tempête de l’élève', ult: 1, ub: 1, type: 'storm', su: 14, ac: 1, rc: 22, cd: 0, offs: [0, 70, -70, 0], gap: 10, dmg: 9, kb: 6, st: 16, warn: 22, strike: 6, cl: 1 }] },
