@@ -378,7 +378,7 @@ function connect(first) {
           const charIndex = m.f && m.f[me] ? m.f[me].c : null;
           const charName = charIndex != null && chars[charIndex] ? chars[charIndex].name : 'Inconnu';
           const won = Number(m.co[me]) > Number(m.co[m.two ? (me < 2 ? 2 : 0) : 1 - me]);
-          save.stats.played++;
+          save.stats.played++; iniTrack();
           if (won) save.stats.wins++; else save.stats.losses++;
           if (!save.stats.byChar[charName]) save.stats.byChar[charName] = { played: 0, wins: 0, losses: 0 };
           const cs = save.stats.byChar[charName];
@@ -567,7 +567,7 @@ const botLvlHtml = () => `<h2>🤖 Niveau du bot</h2><p>Choisis la difficulté, 
   <button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 // ===== TITRES : débloqués à 30 parties jouées avec un personnage (à choisir dans le profil) =====
 const TITLES = { Bruno: 'L’acharné', 'Zéphyr': 'L’éclair fou', Kaze: 'L’invisible', Viking: 'Le roi du nord', Chevalier: 'Le tueur de dragon', Kairos: 'Le maître du temps', Ichigo: 'Le Shinigami remplaçant', Luffy: 'L’élastique', Naruto: 'Hokage', Deku: 'Plus Ultra', Gojo: 'L’exorciste de rang S', Denji: 'La tronçonneuse', Yugo: 'L’Éliatrope', Shinra: 'Le 4e pilier', Eren: 'Le Titan Assaillant', Koro: 'Le prof de la classe E', Frieren: 'L’elfe millénaire' };
-const SEASON_T = { S1: 'Frieren' };
+const SEASON_T = { S1: 'Frieren', INI: 'Initiateur' };
 const ttlName = k => TITLES[k] || SEASON_T[k] || '';
 const playedWith = n => (save.stats.byChar[n] && save.stats.byChar[n].played) || 0;
 const titleLine = () => save.profile.title && ttlName(save.profile.title) ? `<br><small style="color:#f1c40f">🏷️ ${esc(ttlName(save.profile.title))}</small>` : '';
@@ -724,7 +724,15 @@ function qTrack(type, n, param) {
   persist();
 }
 const leftTxt = () => { const l = new Date().setHours(24, 0, 0, 0) - Date.now(); return Math.floor(l / 3600000) + ' h ' + Math.floor(l % 3600000 / 60000) + ' min'; };
-const questsHtml = () => `<h2>📜 Quêtes du jour</h2><p>${bank()} · renouvelées à minuit (dans ${leftTxt()})</p><div class="cards">${kCard()}${questList().map(q => `<div class="card" style="width:190px;cursor:default;border-color:${q.done ? '#2ecc71' : '#444'}"><b>${q.text}</b><br>Progression : ${q.p} / ${q.goal}<br>Récompense : ${q.n} ${q.rw === 'g' ? '💎' : q.rw === 'k' ? '🎁 coffret' : '🪙'}<br>${q.done ? '✓ Terminée !' : ''}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
+// Quête spéciale « Initiateur » : jouer 10 parties (à partir de maintenant) débloque le titre « Initiateur » (à équiper dans le profil)
+const INI_GOAL = 10, iniDef = () => save.ini || (save.ini = { n: 0, done: 0 });
+function iniTrack() {
+  if (save.admin) return; const q = iniDef(); if (q.done) return;
+  if (++q.n >= INI_GOAL) { q.done = 1; (save.sTitles = save.sTitles || []).includes('INI') || save.sTitles.push('INI'); tNew = SEASON_T.INI; if (save.profile && !save.profile.title) save.profile.title = 'INI'; }
+  persist();
+}
+const iniCard = () => { const q = iniDef(); return `<div class="card" style="width:190px;cursor:default;border-color:#d9b84a"><b>⭐ Quête spéciale : Initiateur</b><br>Jouer ${INI_GOAL} parties<br>${q.done ? '✓ Titre « ' + SEASON_T.INI + ' » obtenu !' : 'Progression : ' + q.n + ' / ' + INI_GOAL + '<br>Récompense : 🏷️ titre « ' + SEASON_T.INI + ' »'}</div>`; };
+const questsHtml = () => `<h2>📜 Quêtes du jour</h2><p>${bank()} · renouvelées à minuit (dans ${leftTxt()})</p><div class="cards">${kCard()}${iniCard()}${questList().map(q => `<div class="card" style="width:190px;cursor:default;border-color:${q.done ? '#2ecc71' : '#444'}"><b>${q.text}</b><br>Progression : ${q.p} / ${q.goal}<br>Récompense : ${q.n} ${q.rw === 'g' ? '💎' : q.rw === 'k' ? '🎁 coffret' : '🪙'}<br>${q.done ? '✓ Terminée !' : ''}</div>`).join('')}</div><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 const shopHtml = () => {
   const items = dailyIds().map(id => SHOP.find(q => q.id === id)).filter(Boolean);
   const ichigo = SHOP.find(q => q.id === 'skin_ichigo_bloodchains');
