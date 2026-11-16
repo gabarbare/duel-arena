@@ -188,7 +188,7 @@ const CH = [
     { n: 'Morsure', type: 'm', su: 4, ac: 4, rc: 8, cd: 6, dmg: 7, rng: 62, h: 40, by: .6, kb: 4, st: 12 },
     { n: 'Bond', type: 'd', su: 5, ac: 12, rc: 14, cd: 50, dmg: 12, rng: 34, h: 60, kb: 10, st: 22, spd: 16 },
     { n: 'Hurlement', type: 'buff', su: 10, ac: 1, rc: 14, cd: 400, dur: 300 }] },
-  { name: 'Géant de givre', adv: 1, desc: 'Voleur du cor sacré, deux fois plus grand', hp: 230, spd: 2.4, jmp: 9, color: '#7fc4e0', bz: 2, atk: [
+  { name: 'Géant de givre', adv: 1, desc: 'Voleur du cor sacré, deux fois plus grand', hp: 330, spd: 2.7, jmp: 9, color: '#7fc4e0', bz: 2, atk: [
     { n: 'Poing de glace', type: 'm', su: 16, ac: 6, rc: 20, cd: 18, dmg: 16, rng: 70, h: 80, kb: 14, st: 26 },
     { n: 'Balayage glacé', type: 'm', both: 1, su: 20, ac: 7, rc: 24, cd: 80, dmg: 18, rng: 80, h: 90, kb: 15, st: 28 },
     { n: 'Piétinement', type: 'jam', su: 14, ac: 0, rc: 26, cd: 140, dmg: 18, jv: 8, jx: 1, aoe: 150, kb: 14, st: 30 }] },
