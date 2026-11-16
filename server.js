@@ -169,7 +169,7 @@ const CH = [
   { name: 'Hibana', adv: 1, desc: 'Kunoichi de feu, très rapide', hp: 85, spd: 6.0, jmp: 15, color: '#ff7a1a', atk: [
     { n: 'Kunaï enflammé', type: 'm', su: 3, ac: 3, rc: 6, cd: 4, dmg: 4, rng: 56, h: 35, kb: 3, st: 11 },
     { n: 'Ruée de flammes', type: 'd', su: 4, ac: 10, rc: 12, cd: 55, dmg: 10, rng: 34, h: 60, kb: 10, st: 22, spd: 17, trail: { tick: 1.2, life: 120, w: 120 } },
-    { n: 'Kunaï de feu (x3)', type: 'p', su: 8, ac: 1, rc: 20, cd: 90, dmg: 4, vx: 12, r: 8, kb: 5, st: 12, cnt: 3, vis: 19 }] },
+    { n: 'Kunaï de feu (x3)', type: 'p', su: 8, ac: 1, rc: 20, cd: 130, dmg: 2, vx: 12, r: 8, kb: 5, st: 1, cnt: 3, vis: 19 }] },
   { name: 'Renard masqué', adv: 1, desc: 'Le voleur du rouleau sacré', hp: 130, spd: 5.4, jmp: 14.5, color: '#e8e4da', atk: [
     { n: 'Lame du renard', type: 'm', su: 4, ac: 4, rc: 8, cd: 6, dmg: 8, rng: 72, h: 40, kb: 6, st: 14 },
     { n: 'Pas du renard (derrière toi)', type: 'tpb', su: 3, ac: 1, rc: 9, cd: 130 },
