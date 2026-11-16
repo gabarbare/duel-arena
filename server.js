@@ -22,7 +22,7 @@ const CH = [
   { name: 'Kaze', desc: 'Ninja, rapide avec dash', hp: 85, spd: 5.6, jmp: 14.5, color: '#2ecc71', atk: [
     { n: 'Kunai au corps à corps', type: 'm', su: 3, ac: 3, rc: 6, cd: 4, dmg: 4, rng: 55, h: 35, kb: 3, st: 11 },
     { n: 'Dash', type: 'd', su: 4, ac: 10, rc: 14, cd: 60, dmg: 11, rng: 34, h: 60, kb: 10, st: 22, spd: 15 },
-    { n: 'Lancer de kunai', type: 'p', su: 5, ac: 1, rc: 10, cd: 80, dmg: 5, vx: 14, r: 6, kb: 4, st: 5, vis: 21 },
+    { n: 'Lancer de kunai', type: 'p', su: 5, ac: 1, rc: 10, cd: 70, dmg: 8, vx: 14, r: 6, kb: 4, st: 5, vis: 21 },
     { n: 'Pluie de kunaï (5 + 1 planté)', ult: 1, ub: 1, type: 'kunai6', su: 10, ac: 76, rc: 14, cd: 0, cnt: 5, gap: 8, vx: 22, r: 6, spd: 32, fin: 16, finKb: 14, finSt: 34, lift: -6, kd: { dmg: 6, kb: 4, st: 12, vis: 21, ub: 1 } }] },
   { name: 'Viking', desc: 'Tank, lent mais puissant', hp: 150, spd: 3.0, jmp: 11.9, color: '#f39c12', atk: [
     { n: 'Poing', type: 'm', su: 8, ac: 5, rc: 12, cd: 6, dmg: 9, rng: 98, h: 60, kb: 8, st: 18 },
@@ -173,7 +173,7 @@ const CH = [
   { name: 'Renard masqué', adv: 1, desc: 'Le voleur du rouleau sacré', hp: 130, spd: 5.4, jmp: 14.5, color: '#e8e4da', atk: [
     { n: 'Lame du renard', type: 'm', su: 4, ac: 4, rc: 8, cd: 6, dmg: 8, rng: 72, h: 40, kb: 6, st: 14 },
     { n: 'Pas du renard (derrière toi)', type: 'tpb', su: 3, ac: 1, rc: 9, cd: 130 },
-    { n: 'Kunaï de l’ombre (x2)', type: 'p', su: 5, ac: 1, rc: 10, cd: 60, dmg: 7, vx: 15, r: 6, kb: 5, st: 10, cnt: 2, vis: 21 },
+    { n: 'Kunaï de l’ombre (x2)', type: 'p', su: 5, ac: 1, rc: 10, cd: 70, dmg: 6, vx: 15, r: 6, kb: 5, st: 10, cnt: 2, vis: 21 },
     { n: 'Mille kunaï du renard', ult: 1, ub: 1, type: 'kunai6', su: 10, ac: 76, rc: 14, cd: 0, cnt: 5, gap: 8, vx: 22, r: 6, spd: 32, fin: 16, finKb: 14, finSt: 34, lift: -6, kd: { dmg: 6, kb: 4, st: 12, vis: 21, ub: 1 } }] },
   // Chapitre 4 (Viking, « Le Dernier Drakkar ») : morts-vivants et géant dessinés avec le corps du Viking, louveteau dessiné à part
   { name: 'Draugr', adv: 1, desc: 'Guerrier mort-vivant des tertres', hp: 95, spd: 3.2, jmp: 11.5, color: '#7f9c8a', atk: [
