@@ -1068,12 +1068,6 @@ function atkPose(n, f, alt) {
     else if (k === 1) { rot = kf(ap, pp, 0, -.1, .09, 0, .2); dx = kf(ap, pp, 0, -6, 12, 0, .2); }
     else if (k === 2) { rot = kf(ap, pp, 0, -.14, .2, 0, .4); dx = kf(ap, pp, 0, -4, 10, 0, .4); sy = kf(ap, pp, 1, .98, 1, 1); }
     else { rot = ap === 2 ? aMix(.14, 0, aSm(aCl((pp - .6) / .4))) * aEo(aCl(pp / .3)) : kf(ap, pp, 0, -.1, 0, 0); dx = ap === 2 ? aMix(10, 0, aSm(aCl((pp - .6) / .4))) * aEo(aCl(pp / .3)) : kf(ap, pp, 0, -3, 0, 0); }
-  } else if (n === 'Jumelles') { // Jumelles : la sœur active au premier plan, sa jumelle en fantôme derrière elle, anneau psychique
-    const sis = f.sis | 0, gl = sis ? '178,102,255' : '95,208,255';
-    twinFig(1 - sis, s, t, -s * 26, .28);
-    x.strokeStyle = 'rgba(' + gl + ',.55)'; x.lineWidth = 2; x.beginPath(); x.ellipse(0, -100, 22, 6 + Math.sin(t / 300) * 1.5, 0, 0, 7); x.stroke(); // anneau psychique
-    twinFig(sis, s, t, 0, 1);
-    for (let q = 0; q < 3; q++) { const an = t / 400 + q * 2.1; C('rgba(' + gl + ',.8)', Math.cos(an) * 32, -60 + Math.sin(an) * 14, 3); }
   } else if (n === 'Frieren') {
     if (k === 0) rot = kf(ap, pp, 0, -.03, .04, 0, .3);
     else if (k === 1) { rot = kf(ap, pp, 0, -.05, .04, 0, .3); dx = kf(ap, pp, 0, -2, -5, 0, .3); }
@@ -1578,6 +1572,12 @@ function fighter(f, i) {
     Y('#111', [[-24, -124], [24, -124], [18, -132], [-18, -132]]); R('#111', -16, -124, 32, 5);
     LN('#f1c40f', 2, 0, -128, 22, -118); C('#f1c40f', 22, -116, 3);
     if (lk === 'white') { C('#f5f5f1', 0, -102, 11); C('#111', -6, -109, 2.5); C('#111', 6, -109, 2.5); LN('#111', 2, -7, -97, 7, -97); } // visage blanc, expression neutre
+  } else if (n === 'Jumelles') { // Jumelles : la sœur active au premier plan, sa jumelle en fantôme derrière elle, anneau psychique
+    const sis = f.sis | 0, gl = sis ? '178,102,255' : '95,208,255';
+    twinFig(1 - sis, s, t, -s * 26, .28);
+    x.strokeStyle = 'rgba(' + gl + ',.55)'; x.lineWidth = 2; x.beginPath(); x.ellipse(0, -100, 22, 6 + Math.sin(t / 300) * 1.5, 0, 0, 7); x.stroke(); // anneau psychique
+    twinFig(sis, s, t, 0, 1);
+    for (let q = 0; q < 3; q++) { const an = t / 400 + q * 2.1; C('rgba(' + gl + ',.8)', Math.cos(an) * 32, -60 + Math.sin(an) * 14, 3); }
   } else if (n === 'Kairos') { // Kairos : horloger du temps, haut-de-forme, monocle, cadran sur le torse
     R('#2a2038', -16, -28, 13, 28); R('#2a2038', 3, -28, 13, 28);
     R('#111', -18, -9, 17, 9); R('#111', 1, -9, 17, 9);
@@ -1734,7 +1734,7 @@ function fighter(f, i) {
   if (n === 'Jumelles' && f.ct) { // emprise psychique : bras levés, halo et fils d'énergie vers l'ennemi contrôlé
     const gl = f.sis ? '178,102,255' : '95,208,255', ej = S.f.find(q => q.hd && q.te !== f.te);
     x.fillStyle = 'rgba(' + gl + ',.25)'; x.beginPath(); x.arc(0, -60, 50 + Math.sin(t / 120) * 4, 0, 7); x.fill();
-    [1, -1].forEach(d => { LN('#f7d9c4', 7, d * 8, -78, d * 26, -118); C('rgba(' + gl + ',.9)', d * 26, -120, 7); });
+    [1, -1].forEach(d => { LN('#fde3d0', 7, d * 8, -78, d * 26, -118); C('rgba(' + gl + ',.9)', d * 26, -120, 7); });
     if (ej) { const dx = ej.x - f.x, dy = ej.y - 50 - f.y; for (let ln = 0; ln < 3; ln++) { x.strokeStyle = 'rgba(' + gl + ',' + (.8 - ln * .2) + ')'; x.lineWidth = 3 - ln * .7; x.beginPath(); for (let k = 0; k <= 12; k++) { const u = k / 12, wv = Math.sin(t / 110 + k * .9 + ln * 2) * 9 * Math.sin(u * 3.14); if (k) x.lineTo(dx * u, -120 + (dy + 120) * u + wv); else x.moveTo(0, -120); } x.stroke(); } }
   }
   if (f.hd) { // contrôlé : cage d'anneaux psychiques et étincelles
@@ -1785,7 +1785,7 @@ function fighter(f, i) {
     }
     else if (n === 'Shinra') { C(skin, px, py, 6); if (lk === 'banshoman') for (let k = 0; k < 3; k++) { x.strokeStyle = 'rgba(255,230,150,' + (.95 - k * .2) + ')'; x.lineWidth = 2; x.beginPath(); x.ellipse(px, py, 8 + k * 3, 3 + k, t / 400 + k, 0, 7); x.stroke(); } } // trois anneaux lumineux aux poignets
     else if (n === 'Eren') { if (f.fm) C('#8a4a35', px, py, 11); else { C('#ecf0f1', px, py, 6); if (f.ak === 1) LN('#dfe6e9', 4, px, py, px + s * (f.ad ? 16 : 42), py); } }
-    else if (n === 'Jumelles') { C('#f7d9c4', px, py, 6); if (f.ak >= 0 && f.ak !== 2 && f.ap < 2) { const gc = f.sis ? '#b266ff' : '#5fd0ff'; C(gc, px + s * 8, py - 2, f.ak === 3 ? 12 : 8); C('#fff', px + s * 8, py - 2, 3); } }
+    else if (n === 'Jumelles') { C('#fde3d0', px, py, 6); if (f.ak >= 0 && f.ak !== 2 && f.ap < 2) { const gc = f.sis ? '#b266ff' : '#5fd0ff'; C(gc, px + s * 8, py - 2, f.ak === 3 ? 12 : 8); C('#fff', px + s * 8, py - 2, 3); } }
     else if (n === 'Koro') C('#f4d03f', px, py, 6);
     else if (n === 'Ichigo') {
       C(skin, px, py, 6);
@@ -1811,7 +1811,7 @@ function fighter(f, i) {
     else if (n === 'Naruto') { C(skin, px, py, 7); if (f.ak === 1 && f.ap < 2) rasen(px + s * 12, py, 13 + 2 * Math.sin(t / 45), 0); if (f.ak === 3 && f.ap < 2) rasen(px + s * 4, py - 26, 22, 1); if (f.ak === 0 && f.ap < 2) { C('#f5cba7', px + s * 3, py, 8); LN('#fff0c2', 2, px + s * 2, py - 5, px + s * 10, py - 8); } }
     else { C(lk === 'snake' ? '#16161d' : skin, px, py, 10); if (lk === 'snake') C('rgba(255,255,255,.14)', px - 3, py - 3, 4); }
   };
-  const sleeve = n === 'Golem' ? '#6d7377' : n === 'Kaze' ? '#1c1c28' : n === 'Naruto' ? '#ff7f27' : n === 'Chevalier' ? (lk === 'himmel' ? '#3f6fb5' : '#b0bec5') : n === 'Gojo' ? '#1a2a4f' : n === 'Deku' ? '#2e7d32' : n === 'Denji' ? '#f2f2f2' : n === 'Yugo' ? '#e2b283' : n === 'Shinra' ? '#23232f' : n === 'Eren' ? (f.fm ? '#8a4a35' : '#6d4c41') : n === 'Koro' ? '#f4d03f' : n === 'Kairos' ? '#3b2a5a' : n === 'Frieren' ? '#f4f1ea' : n === 'Ichigo' ? '#16161d' : (n === 'Luffy' && lk === 'snake') ? '#16161d' : skin;
+  const sleeve = n === 'Golem' ? '#6d7377' : n === 'Kaze' ? '#1c1c28' : n === 'Naruto' ? '#ff7f27' : n === 'Chevalier' ? (lk === 'himmel' ? '#3f6fb5' : '#b0bec5') : n === 'Gojo' ? '#1a2a4f' : n === 'Deku' ? '#2e7d32' : n === 'Denji' ? '#f2f2f2' : n === 'Yugo' ? '#e2b283' : n === 'Shinra' ? '#23232f' : n === 'Eren' ? (f.fm ? '#8a4a35' : '#6d4c41') : n === 'Koro' ? '#f4d03f' : n === 'Kairos' ? '#3b2a5a' : n === 'Jumelles' ? '#fde3d0' : n === 'Frieren' ? '#f4f1ea' : n === 'Ichigo' ? '#16161d' : (n === 'Luffy' && lk === 'snake') ? '#16161d' : skin;
   if (n === 'Loup' || n === 'Dragon') { /* pas de bras : la gueule et les pattes sont dessinées avec le corps */ }
   else if (n === 'Zéphyr' && lk === 'fern') { // Fern : bâton tenu à deux mains, sorts Zoltraak à tir rapide (cercle doré au bout du bâton)
     const k = f.ak, ap = f.ap, pp = aCl(f.pp || 0), t = Date.now(), sl = '#34343a';
