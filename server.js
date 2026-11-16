@@ -162,9 +162,9 @@ const CH = [
     { n: 'Coup de sabre', type: 'm', su: 6, ac: 4, rc: 12, cd: 10, dmg: 8, rng: 78, h: 40, kb: 6, st: 15 },
     { n: 'Charge', type: 'd', su: 6, ac: 10, rc: 16, cd: 80, dmg: 10, rng: 34, h: 60, kb: 10, st: 20, spd: 12 },
     { n: 'Shuriken', type: 'p', su: 7, ac: 1, rc: 12, cd: 70, dmg: 5, vx: 12, r: 6, kb: 4, st: 8, vis: 21 }] },
-  { name: 'Garde Sora', adv: 1, desc: 'Garde des toits du clan du Vent', hp: 90, spd: 4.8, jmp: 14.5, color: '#2980b9', atk: [
+  { name: 'Garde Sora', adv: 1, desc: 'Garde des toits du clan du Vent', hp: 75, spd: 4.8, jmp: 14.5, color: '#2980b9', atk: [
     { n: 'Coup de sabre', type: 'm', su: 5, ac: 4, rc: 10, cd: 8, dmg: 8, rng: 80, h: 40, kb: 6, st: 15 },
-    { n: 'Charge', type: 'd', su: 5, ac: 10, rc: 14, cd: 65, dmg: 11, rng: 34, h: 60, kb: 10, st: 21, spd: 14 },
+    { n: 'Charge', type: 'd', su: 5, ac: 10, rc: 14, cd: 65, dmg: 9, rng: 34, h: 60, kb: 10, st: 21, spd: 14 },
     { n: 'Shuriken (x2)', type: 'p', su: 6, ac: 1, rc: 12, cd: 60, dmg: 5, vx: 13, r: 6, kb: 4, st: 8, cnt: 2, vis: 21 }] },
   { name: 'Hibana', adv: 1, desc: 'Kunoichi de feu, très rapide', hp: 85, spd: 6.0, jmp: 15, color: '#ff7a1a', atk: [
     { n: 'Kunaï enflammé', type: 'm', su: 3, ac: 3, rc: 6, cd: 4, dmg: 5, rng: 56, h: 35, kb: 3, st: 11 },
