@@ -716,12 +716,21 @@ function tick(r) {
     fxs(r);
 
     // Le mannequin ne bouge pas et ne peut pas être éliminé.
-    const dummy = r.f[1];
-    if (!(dummy.held > 0)) { dummy.x = W - 250; dummy.y = G; dummy.vx = 0; dummy.vy = 0; }
+    // Le mannequin est indestructible mais subit désormais recul, projection, étourdissement et effets (immobilisation, gel...), puis revient à sa place.
+    const dummy = r.f[1], home = W - 250;
+    if (!(dummy.held > 0)) {
+      if (dummy.stun > 0) dummy.stun--;
+      if (dummy.bound > 0) dummy.bound--;
+      if (dummy.fl > 0) dummy.fl--;
+      if (!(dummy.frozen > 0)) {
+        dummy.x += dummy.vx; dummy.y += dummy.vy;
+        if (dummy.y < G) dummy.vy += GR; else { dummy.y = G; dummy.vy = 0; dummy.vx *= .86; }
+        dummy.x = Math.max(40, Math.min(W - 40, dummy.x));
+        if (dummy.stun <= 0 && dummy.y >= G && Math.abs(dummy.vx) < .6) { dummy.vx = 0; dummy.x += (home - dummy.x) * .08; if (Math.abs(home - dummy.x) < 1) dummy.x = home; }
+      }
+    }
     dummy.hp = 1000000000;
-    dummy.stun = 0;
     dummy.atk = null;
-    dummy.fl = 0;
     dummy.inv = 0;
     dummy.block = 0;
     dummy.fly = 0;
