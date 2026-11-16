@@ -692,7 +692,7 @@ function dailyIds() {
 function buy(id) {
   const q = SHOP.find(z => z.id === id);
   const ichigoFree = id === 'skin_ichigo_bloodchains' && ichigoPromoActive();
-  if (!q || q.type !== 'skin' || owns(id) || (!ichigoFree && !dailyIds().includes(id)) || save.coins < (ichigoFree ? 0 : q.price)) return;
+  if (!q || q.type !== 'skin' || owns(id) || (!ichigoFree && !(q.season && frOn()) && !dailyIds().includes(id)) || save.coins < (ichigoFree ? 0 : q.price)) return;
   if (!ichigoFree) save.coins -= q.price;
   save.owned.push(id); persist(); ui();
 }
