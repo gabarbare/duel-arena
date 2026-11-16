@@ -219,7 +219,7 @@ const CH = [
 [['Bruno', 'Écho de Bruno'], ['Zéphyr', 'Écho de Zéphyr'], ['Kaze', 'Écho de Kaze'], ['Viking', 'Écho du Viking'], ['Chevalier', 'Écho du Chevalier']].forEach(([nm, en]) => {
   const c = CH.find(q => q.name === nm); CH.push({ ...c, name: en, adv: 1, desc: 'Souvenir de ' + nm + ', figé dans le temps', color: '#8fb8e8' });
 });
-CH.push({ ...CH.find(q => q.name === 'Kairos'), name: 'Horloger Noir', adv: 1, desc: 'Reflet de Kairos, maître des secondes volées', hp: 135, color: '#b0182a' });
+CH.push({ ...CH.find(q => q.name === 'Kairos'), name: 'Horloger Noir', adv: 1, desc: 'Reflet de Kairos, maître des secondes volées', hp: 100, color: '#b0182a' });
 // Événement Frieren : dispo du dimanche soir à 00h01 (heure de Paris, soit lundi 16/11/2026 00:01) ensuite définitivement. Modifier FRIEREN_FROM pour changer la date.
 const FRIEREN_FROM = Date.parse('2026-11-16T00:01:00+01:00');
 // Mode aventure : visible tout de suite, jouable à partir du lundi 16/11/2026 00:01 (heure de Paris). Modifier ADV_FROM pour changer la date.
