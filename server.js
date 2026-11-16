@@ -206,11 +206,11 @@ const CH = [
   // Jumelles (perso original) : 2 sœurs en 1. J et K sont différents pour chaque sœur (atk = Luma, alt = Nox), L = changer de sœur, ultime = emprise psychique (l'ennemi est soulevé et contrôlé 4 s)
   { name: 'Jumelles', twin: 1, hidden: 1, desc: 'Deux sœurs psychiques en un perso : Luma (télékinésie) et Nox (esprit). Emprise psychique', hp: 95, spd: 4.4, jmp: 13.5, color: '#9f8cff', atk: [
     { n: 'Luma · Onde psychique', type: 'p', su: 6, ac: 1, rc: 8, cd: 20, dmg: 5, vx: 13, r: 8, kb: 3, st: 12, vis: 23 },
-    { n: 'Luma · Poussée télékinétique', type: 'm', su: 10, ac: 4, rc: 16, cd: 50, dmg: 10, rng: 125, h: 85, kb: 24, st: 22 },
+    { n: 'Luma · Cube psychique (encaisse 1 coup)', type: 'cube', su: 8, ac: 1, rc: 12, cd: 240, dur: 420 },
     { n: 'Changer de sœur', type: 'swap', su: 6, ac: 1, rc: 8, cd: 60 },
     { n: 'Emprise psychique (contrôle l’ennemi 4 s)', ult: 1, ub: 1, type: 'mindctrl', su: 16, ac: 1, rc: 14, cd: 0, rng: 480, dur: 240 }], alt: [
     { n: 'Nox · Orbe mental', type: 'p', su: 9, ac: 1, rc: 12, cd: 45, dmg: 12, vx: 6, r: 16, kb: 9, st: 22, vis: 24 },
-    { n: 'Nox · Rafale spectrale (x3)', type: 'p', su: 10, ac: 1, rc: 28, cd: 90, dmg: 5, vx: 9, r: 8, kb: 4, st: 14, cnt: 3, vis: 24 },
+    { n: 'Nox · Météore psychique (tombe du ciel)', type: 'orbfall', su: 12, ac: 1, rc: 20, cd: 150, dmg: 18, kb: 14, st: 26, warn: 36, rad: 70 },
     { n: 'Changer de sœur', type: 'swap', su: 6, ac: 1, rc: 8, cd: 60 },
     { n: 'Emprise psychique (contrôle l’ennemi 4 s)', ult: 1, ub: 1, type: 'mindctrl', su: 16, ac: 1, rc: 14, cd: 0, rng: 480, dur: 240 }] }
   // Kairos (perso original) : echo = frappe différée sur la position marquée | rewind = retour 2 s en arrière (rend une partie des PV perdus) | timestop = fige l'ennemi, ses dégâts sont mis de côté puis infligés d'un coup
@@ -285,7 +285,7 @@ function rollMap(r) {
 
 const atks = f => CH[f.c].twin ? (f.sis ? CH[f.c].alt : CH[f.c].atk) : (f.form > 0 && CH[f.c].alt) || CH[f.c].atk;
 const nf = (c, i, inp, ult, two) => ({ c, i, tm: two ? i >> 1 : i, dead: 0, x: two ? [170, 330, W - 330, W - 170][i] : (i ? W - 250 : 250), y: G, vx: 0, vy: 0, hp: CH[c].hp, face: (two ? i >> 1 : i) ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
-  block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, portal: null, lz: 0, lzcd: 0, lzd: null, hist: [], sis: 0, ctl: 0, held: 0, heldBy: 0, cdAlt: [0, 0], frozen: 0, stored: 0, fzm: 1, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
+  block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, portal: null, lz: 0, lzcd: 0, lzd: null, hist: [], sis: 0, cube: 0, ctl: 0, held: 0, heldBy: 0, cdAlt: [0, 0], frozen: 0, stored: 0, fzm: 1, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
 
 const sz = f => f.sz || 1;
 // ===== 2v2 : équipes. tm = équipe (1v1 : tm = index). enemies = adversaires vivants, foe = le plus proche =====
@@ -325,6 +325,7 @@ function recordTrainingHit(t, dmg) {
 function hurt(t, dmg, kb, st, lift, srcX, ub, a) {
   const dir = srcX < t.x ? 1 : -1;
   if (t.inv) return;
+  if (t.cube > 0) { t.cube = 0; t.fl = 3; return; } // cube psychique : absorbe un seul coup, sans dégâts ni recul
   if (t.frozen > 0) { t.stored += dmg * (t.fzm || 1); t.fl = 3; recordTrainingHit(t, dmg); return; }
   if (t.shield > 0 && ub !== 2) { // Infini : la 2e barre de vie absorbe tout, sans recul ni étourdissement
     t.shield = Math.max(0, t.shield - dmg); t.fl = 3;
@@ -364,7 +365,7 @@ function step(r, i) {
     return;
   }
   f.hist.push([f.x, f.y, f.hp]); if (f.hist.length > 130) f.hist.shift(); // mémoire des ~2 dernières secondes (rembobinage)
-  f.cds = f.cds.map(v => v > 0 ? v - 1 : 0); f.cdAlt = f.cdAlt.map(v => v > 0 ? v - 1 : 0);
+  f.cds = f.cds.map(v => v > 0 ? v - 1 : 0); f.cdAlt = f.cdAlt.map(v => v > 0 ? v - 1 : 0); if (f.cube > 0) f.cube--;
   if (f.ctl > 0) { // emprise psychique : toutes les secondes la sœur perd 1/10 de ses PV max (jamais mortel)
     f.ctl--;
     if (f.ctl % 60 === 0) { f.hp = Math.max(1, f.hp - c.hp * .1); f.fl = 3; }
@@ -421,6 +422,8 @@ function step(r, i) {
       else if (d.type === 'fly') f.fly = d.dur;
       else if (d.type === 'echo') r.fx.push({ k: 'echo', x: o.x, y: o.y - BH * sz(o) / 2, t: 0, o: i, d });
       else if (d.type === 'timestop') { for (const e of enemies(r, i)) { e.frozen = d.dur; e.stored = 0; e.fzm = d.mult; } }
+      else if (d.type === 'cube') { f.cube = d.dur; r.fx.push({ k: 'cos', x: f.x, y: f.y - 45, t: 0, life: 14 }); } // champ psychique en cube autour de la sœur
+      else if (d.type === 'orbfall') r.fx.push({ k: 'psyorb', x: o.x, t: 0, o: i, d }); // boule psychique qui tombe du ciel sur la position visée
       else if (d.type === 'swap') { // changer de sœur : J et K deviennent ceux de l'autre jumelle (recharges conservées séparément)
         f.sis ^= 1; const tmp = [f.cds[0], f.cds[1]]; f.cds[0] = f.cdAlt[0]; f.cds[1] = f.cdAlt[1]; f.cdAlt = tmp;
         r.fx.push({ k: 'cos', x: f.x, y: f.y - 45, t: 0, life: 14 });
@@ -593,6 +596,10 @@ function fxs(r) {
       if (e.t % 12 === 0) for (const t of T) if (t.y >= G - 2 && Math.abs(t.x - e.x) < e.w / 2 + 14 * sz(t)) burn(t, d.tick * dm);
       return e.t <= d.life;
     }
+    if (e.k === 'psyorb') { // météore psychique : visée au sol, la boule tombe puis explose à l'impact
+      if (e.t === d.warn && !e.hit) { e.hit = 1; for (const t of T) { const tz = sz(t); if (Math.hypot(t.x - e.x, t.y - BH * tz / 2 - (G - 30)) < d.rad + 14 * tz) hurt(t, d.dmg * dm, d.kb, d.st, -6, e.x, d.ub, ow); } }
+      return e.t <= d.warn + 12;
+    }
     if (e.k === 'echo') { // écho : la zone marquée explose après "warn" frames
       if (e.t === d.warn && !e.hit) {
         e.hit = 1;
@@ -678,10 +685,11 @@ function thinkOne(r, i) {
         score = (f.hp < c.hp * .72 || f.buff <= 0 || f.shield <= 0 || f.form <= 0) ? 75 : -10;
       } else if (a.type === 'rewind') score = f.hp < c.hp * .6 ? 70 : -10;
       else if (a.type === 'swap') score = Math.random() < .06 ? 45 : -10;
+      else if (a.type === 'cube') score = f.cube <= 0 && o.atk && dist < 320 ? 62 : -10;
       else if (a.type === 'p') score = (dist < 520 ? 55 : 10) - Math.abs(dist - 260) * .04;
       else if (a.type === 'shield' && a.ttl) score = f.shield <= 0 && ((o.atk && dist < 300) || f.hp < c.hp * .6) ? 72 : -10; // barrière : quand l'ennemi attaque
       else if (a.type === 'storm' || a.type === 'sorg') score = dist < 520 ? 58 : 8;
-      else if (a.type === 'kunai6' || a.type === 'sky' || a.type === 'portals' || a.type === 'fire' || a.type === 'beam' || a.type === 'rush' || a.type === 'echo' || a.type === 'timestop') score = dist < 420 ? 58 : 5;
+      else if (a.type === 'kunai6' || a.type === 'orbfall' || a.type === 'sky' || a.type === 'portals' || a.type === 'fire' || a.type === 'beam' || a.type === 'rush' || a.type === 'echo' || a.type === 'timestop') score = dist < 420 ? 58 : 5;
       else if (a.type === 'tp' || a.type === 'grap' || a.type === 'portal') score = dist > 180 ? 38 : 5;
       else score = dist < (a.rng || 75) + 45 ? 65 : -5;
       if (a.ult && f.ult >= 100) score += P.ult;
@@ -768,7 +776,7 @@ function tick(r) {
     f: live ? r.f.map((f, q) => {
       const d = f.atk && f.atk.d;
       return { c: f.c, sk: r.sk[q], te: f.tm, dd: f.dead ? 1 : 0, bo: r.bots && r.bots[q] ? 1 : 0, x: Math.round(f.x), y: Math.round(f.y), hp: Math.max(0, Math.round(f.hp)), fc: f.face, bl: f.block, fl: f.fl > 0 ? 1 : 0,
-        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0, lz: f.lz > 0 ? 1 : 0, fz: f.frozen > 0 ? 1 : 0, bd: f.bound > 0 ? 1 : 0, sis: f.sis | 0, ct: f.ctl > 0 ? 1 : 0, hd: f.held > 0 ? 1 : 0, sd: Math.round(f.stored), vx: Math.round(f.vx * 10) / 10, vy: Math.round(f.vy * 10) / 10, pt: f.portal ? [Math.round(f.portal.x), Math.round(f.portal.y)] : null,
+        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0, lz: f.lz > 0 ? 1 : 0, fz: f.frozen > 0 ? 1 : 0, bd: f.bound > 0 ? 1 : 0, sis: f.sis | 0, ct: f.ctl > 0 ? 1 : 0, cb: f.cube > 0 ? 1 : 0, hd: f.held > 0 ? 1 : 0, sd: Math.round(f.stored), vx: Math.round(f.vx * 10) / 10, vy: Math.round(f.vy * 10) / 10, pt: f.portal ? [Math.round(f.portal.x), Math.round(f.portal.y)] : null,
         hk: f.hook ? [Math.round(f.hook.x), Math.round(f.hook.y)] : f.hf ? [Math.round(f.hf.x), Math.round(f.hf.y)] : null,
         ad: f.atk && f.atk.dx !== undefined ? [Math.round(f.atk.dx * 10) / 10, Math.round((f.atk.dy || 0) * 10) / 10] : null,
         ak: f.atk ? f.atk.k : -1, ap: d ? (f.atk.f <= d.su + (d.dsh || 0) ? 0 : f.atk.f <= d.su + (d.dsh || 0) + d.ac ? 1 : 2) : -1, pp: d ? atkPP(f) : 0,
@@ -780,6 +788,7 @@ function tick(r) {
       : e.k === 'echo' ? { p: 6, x: Math.round(e.x), y: Math.round(e.y), a: Math.min(1, e.t / e.d.warn), r: e.d.rad, h: e.t >= e.d.warn ? 1 : 0 }
       : e.k === 'beam' ? { p: e.t >= e.d.warn ? 4 : 3, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: Math.min(1, e.t / e.d.warn), wd: e.d.wd, np: e.np, cl: e.d.cl || 0 }
       : e.k === 'por' ? { p: e.t >= e.d.warn ? 4 : 3, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: Math.min(1, e.t / e.d.warn) }
+      : e.k === 'psyorb' ? { p: 7, x: Math.round(e.x), a: Math.min(1, e.t / e.d.warn), h: e.t >= e.d.warn ? 1 : 0, u: Math.max(0, e.t - e.d.warn), r: e.d.rad }
       : { p: e.t > e.d.warn ? 1 : 0, x: Math.round(e.x), c: e.d.cl || 0 }) : [] };
   r.ps.forEach(p => tx(p, s));
 }
