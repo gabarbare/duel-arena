@@ -268,7 +268,7 @@ CH.push({ ...CH.find(q => q.name === 'Kairos'), name: 'Horloger Noir', adv: 1, d
       { n: 'Charge', type: 'd', su: 8, ac: 10, rc: 16, cd: 75, dmg: 11, rng: 34, h: 60, kb: 10, st: 20, spd: 13 }] },
     { ...G, name: 'Golem de livres', adv: 1, desc: 'Gardien de la bibliothèque interdite', hp: 140, color: '#c9a66b' },
     { name: 'Iris', adv: 1, desc: 'Meilleure élève de Vesper, copie les pouvoirs', hp: 100, spd: 4.6, jmp: 13.5, color: '#2ecc9a', atk: [
-      { ...J.atk[0], n: 'Onde copiée' }, { ...J.alt[0], n: 'Orbe copié' }, { ...J.alt[1], n: 'Météore copié', cd: 170 },
+      { ...J.atk[0], n: 'Onde copiée', cd: 40 }, { ...J.alt[0], n: 'Orbe copié', cd: 120 }, { ...J.alt[1], n: 'Météore copié', cd: 170 },
       { n: 'Pas éclair', type: 'tpb', su: 3, ac: 1, rc: 9, cd: 160 }] },
     { name: 'Cauchemar', adv: 1, desc: 'L’ombre des peurs de Nox', hp: 110, spd: 4.4, jmp: 13.5, color: '#3a1f5c', atk: [
       { ...J.alt[0], n: 'Orbe de peur' }, { ...J.alt[1], n: 'Chute de cauchemar', cd: 140 },
