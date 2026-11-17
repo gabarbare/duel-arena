@@ -289,6 +289,8 @@ const SHOP = [
   { id: 'skin_viking_givre', type: 'skin', char: 'Viking', name: 'Viking de Givre (aventure)', price: 0, adv: 1, look: 'frost', pal: { '#6d4c41': '#5b8fb0', '#4e342e': '#2f5d7c', '#3e2723': '#1d3d55', '#2d2d2d': '#1d3d55', '#95a5a6': '#d4eef8', '#7f8c8d': '#9cc8de', '#ecf0f1': '#bfe9ff', '#f1c40f': '#7fe0ff' } },
   { id: 'skin_chevalier_dragon', type: 'skin', char: 'Chevalier', name: 'Chevalier Dragon (aventure)', price: 0, adv: 1, look: 'dragonarmor', pal: { '#b0bec5': '#a93226', '#cfd8dc': '#c0392b', '#78909c': '#7b241c', '#455a64': '#4a1410', '#90a4ae': '#922b21', '#2c5fa8': '#1c1c1c', '#c0392b': '#f39c12' } },
   { id: 'skin_kairos_eternel', type: 'skin', char: 'Kairos', name: 'Kairos Éternel (aventure)', price: 0, adv: 1, look: 'eternal', pal: { '#3b2a5a': '#f5ecd0', '#2b1f3d': '#d9b84a', '#2a2038': '#e8dcc0', '#d9b84a': '#ffffff', '#f5ecd0': '#fffbe6' } },
+  { id: 'skin_jumelles_eclipse', type: 'skin', char: 'Jumelles', name: 'Jumelles Éclipse (aventure)', price: 0, adv: 1, look: 'eclipse', pal: { '#7fd0ff': '#f4c542', '#e4f5ff': '#fff4cf', '#3aa8ff': '#d4a017', '#eef3ff': '#fff1b8', '#a9d8ff': '#ffd36b', '#2fb4ff': '#f39c12', '#0b5fa8': '#9a6a00', '#2f6ea8': '#8a5a10', '#5b2f8a': '#151520', '#b266ff': '#c9d1e8', '#2b1450': '#0b0b12', '#c36bff': '#9aa6c8', '#ff3fb4': '#e8ecf8', '#8a0f62': '#5a6278', '#241038': '#0e0e16', '#150a24': '#05050a' } },
+  { id: 'skin_bryan_star', type: 'skin', char: 'Bryan', name: 'Bryan Star d’Action (aventure)', price: 0, adv: 1, look: 'star', pal: { '#16161b': '#5a3a22', '#f4f4f6': '#2c3e66', '#e9e9ee': '#22324f' } },
   { id: 'skin_kairos_azur', type: 'skin', char: 'Kairos', name: 'Kairos azur', price: 150, pal: { '#3b2a5a': '#174b63', '#2b1f3d': '#102f45', '#2a2038': '#163b50', '#d9b84a': '#55d6d2', '#f5ecd0': '#d9ffff' } },
 ];
 let passGain = 0, tNew = '', chestGain = '', chestNew = null, chestErr = '', fList = [], fErr = '', fDraft = '', fAdd = null, pName = '', pIcon = '🥷', pErr = '', earnedXp = 0, lvUp = 0, earnedCr = 0, rw = 0, pre = null, kNew = 0;
@@ -1235,7 +1237,7 @@ function fighter(f, i) {
       x.fillStyle = 'rgba(231,76,60,.22)'; x.fillRect(-s * 30 - 22, -92, 44, 92); x.fillStyle = 'rgba(231,76,60,.12)'; x.fillRect(-s * 62 - 22, -92, 44, 92);
     }
   }
-  const skin = n === 'Viking' ? '#e0ac69' : n === 'Bruno' ? '#e8b48a' : '#f5cba7';
+  const skin = n === 'Viking' ? '#e0ac69' : n === 'Bruno' ? '#e8b48a' : n === 'Silas' ? '#a8714a' : n === 'Odile' ? '#f1d6bf' : '#f5cba7';
   if (n === 'Bruno') { // boxeur : torse nu, short rouge, gants, bandeau
     R(skin, -16, -26, 13, 26); R(skin, 3, -26, 13, 26);
     R('#222', -18, -8, 17, 8); R('#222', 1, -8, 17, 8);
@@ -1302,6 +1304,13 @@ function fighter(f, i) {
     x.fillStyle = P('#4a235a'); x.beginPath(); x.ellipse(0, -112, 26, 6, 0, 0, 7); x.fill();
     Y('#5b2c6f', [[-15, -113], [15, -113], [s * 8, -154]]);
     R('#f1c40f', -14, -117, 28, 4); C('#f1c40f', s * 2, -134, 3);
+    if (lk === 'vesper') { // Pr Vesper : casque amplificateur (dôme, antenne, fils), lunettes rondes
+      x.fillStyle = 'rgba(200,215,230,.85)'; x.beginPath(); x.arc(0, -114, 19, Math.PI, 0); x.fill(); R('#7f8c8d', -21, -116, 42, 6);
+      x.strokeStyle = 'rgba(195,107,255,.6)'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(-10, -128); x.lineTo(-4, -120); x.lineTo(2, -128); x.lineTo(8, -120); x.stroke();
+      LN('#5d6670', 2.5, 0, -133, 0, -146); C('rgba(195,107,255,' + (.5 + .4 * Math.sin(t / 150)) + ')', 0, -148, 5);
+      LN('#c36bff', 1.5, -20, -112, -26, -92); LN('#c36bff', 1.5, 20, -112, 26, -92);
+      x.strokeStyle = '#2c3038'; x.lineWidth = 1.5; x.beginPath(); x.arc(s * 6, -104, 4, 0, 7); x.stroke(); x.beginPath(); x.arc(-s * 3, -104, 3.5, 0, 7); x.stroke();
+    }
     if (lk === 'archimage') { // robe bleu nuit étoilée : constellations argentées, lune sur le chapeau
       [[-10, -80], [8, -60], [-6, -44], [12, -26], [-16, -14], [4, -84]].forEach((q, j) => { const tw = .55 + .45 * Math.sin(t / 220 + j * 1.7); x.fillStyle = 'rgba(220,235,255,' + tw + ')'; x.beginPath(); x.arc(q[0], q[1], 1.8, 0, 7); x.fill(); });
       LN('rgba(200,220,255,.45)', 1, -10, -80, 8, -60); LN('rgba(200,220,255,.45)', 1, 8, -60, -6, -44); LN('rgba(200,220,255,.45)', 1, -6, -44, 12, -26);
@@ -1586,10 +1595,42 @@ function fighter(f, i) {
     if (lk === 'white') { C('#f5f5f1', 0, -102, 11); C('#111', -6, -109, 2.5); C('#111', 6, -109, 2.5); LN('#111', 2, -7, -97, 7, -97); } // visage blanc, expression neutre
   } else if (n === 'Jumelles') { // Jumelles : la sœur active au premier plan, sa jumelle en fantôme derrière elle, anneau psychique
     const sis = f.sis | 0, gl = sis ? '178,102,255' : '95,208,255';
-    twinFig(1 - sis, s, t, -s * 26, .28);
+    if (lk === 'shade') { for (let q = 0; q < 5; q++) { const u = ((t / 1000 + q / 5) % 1); C('rgba(40,10,60,' + (.55 * (1 - u)) + ')', Math.sin(t / 300 + q * 2) * 24, -10 - u * 110, 6 + u * 8); } }
+    if (!(AL && AL.solo)) twinFig(1 - sis, s, t, -s * 26, .28);
     x.strokeStyle = 'rgba(' + gl + ',.55)'; x.lineWidth = 2; x.beginPath(); x.ellipse(0, -100, 22, 6 + Math.sin(t / 300) * 1.5, 0, 0, 7); x.stroke(); // anneau psychique
     twinFig(sis, s, t, 0, 1);
     for (let q = 0; q < 3; q++) { const an = t / 400 + q * 2.1; C('rgba(' + gl + ',.8)', Math.cos(an) * 32, -60 + Math.sin(an) * 14, 3); }
+    if (lk === 'shade') { C('#ff2d6a', s * 6, -101, 2.2); x.fillStyle = 'rgba(255,45,106,.3)'; x.beginPath(); x.arc(s * 6, -101, 6, 0, 7); x.fill(); }
+    if (lk === 'iris') { Y('#e8fff6', [[0, -122], [5, -114], [0, -110], [-5, -114]]); x.strokeStyle = 'rgba(46,204,154,.8)'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(-5, -114); x.lineTo(5, -114); x.stroke(); } // prisme sur le front
+    if (lk === 'eclipse') { const an = t / 700; C('#ffd84a', Math.cos(an) * 36, -70 + Math.sin(an) * 12, 7); for (let q = 0; q < 8; q++) LN('#ffd84a', 1.5, Math.cos(an) * 36 + Math.cos(q * .8) * 9, -70 + Math.sin(an) * 12 + Math.sin(q * .8) * 9, Math.cos(an) * 36 + Math.cos(q * .8) * 12, -70 + Math.sin(an) * 12 + Math.sin(q * .8) * 12);
+      const bx = Math.cos(an + Math.PI) * 36, by = -70 + Math.sin(an + Math.PI) * 12; C('#e8ecf8', bx, by, 7); x.fillStyle = 'rgba(11,11,18,1)'; x.beginPath(); x.arc(bx + 3, by - 2, 6, 0, 7); x.fill(); }
+  } else if (n === 'Odile') { // Odile « la Pie » : queue-de-pie noire et blanche aux reflets bleu-vert, loup noir, carré noir à mèche blanche, foulard, bourse de pièces
+    const w = Math.sin(t / 110) * 4, run = Math.abs(f.vx || 0) > 1 ? 6 : 0;
+    Y('#3fb8c9', [[-s * 6, -88], [-s * (34 + run), -84 + w], [-s * (30 + run), -76 + w], [-s * 6, -80]]); // foulard qui flotte
+    Y('#15181e', [[-s * 4, -50], [-s * (26 + run), -18 + w * .6], [-s * (14 + run), -10 + w * .6], [-s * 4, -34]]); // pans de la queue-de-pie
+    Y('#2a8a99', [[-s * 8, -40], [-s * (22 + run), -16 + w * .6], [-s * (18 + run), -14 + w * .6]]);
+    R('#22303f', -13, -36, 11, 32); R('#22303f', 2, -36, 11, 32); R('#3b2a22', -15, -12, 14, 12); R('#3b2a22', 1, -12, 14, 12); R('#5a4030', -15, -12, 14, 3); R('#5a4030', 1, -12, 14, 3);
+    R('#15181e', -15, -88, 30, 50); Y('#f4f4f6', [[-7, -86], [7, -86], [9, -52], [0, -46], [-9, -52]]); // plastron blanc de pie
+    LN('#3fb8c9', 2, -15, -88, -15, -40); LN('#3fb8c9', 2, 15, -88, 15, -40);
+    R('#6d4c2f', -16, -44, 32, 6); R('#8a6a44', s * 6, -46, 9, 11); C('#f1c40f', s * 10, -36, 3); C('#f1c40f', s * 7, -34, 2.5); // ceinture et bourse
+    R(skin, -3, -92, 6, 5); C(skin, 0, -102, 12);
+    x.fillStyle = P('#111318'); x.beginPath(); x.arc(0, -105, 13.5, Math.PI * .95, Math.PI * 2.05); x.fill(); R('#111318', -14, -106, 7, 15); R('#111318', 7, -106, 7, 15);
+    Y('#f4f4f6', [[-s * 2, -117], [s * 5, -117], [s * 2, -106]]); // mèche blanche
+    R('#111318', -12, -105, 24, 6); R('#3fb8c9', -12, -101, 24, 1.5); C('#fff', s * 6, -102, 2.2); C('#fff', -s * 3, -102, 2); C('#111', s * 6.5, -102, 1.1); // loup noir
+    LN('#8a3b2e', 1.4, s * 2, -95, s * 7, -94); LN('#8a3b2e', 1.2, s * 7, -94, s * 8, -96); // sourire en coin
+    x.save(); x.translate(-s * 9, -116); x.rotate(-s * .6); x.fillStyle = P('#15181e'); x.beginPath(); x.ellipse(0, -9, 3.5, 11, 0, 0, 7); x.fill(); x.fillStyle = P('#3fb8c9'); x.beginPath(); x.ellipse(0, -14, 2, 5, 0, 0, 7); x.fill(); x.restore(); // plume de pie
+  } else if (n === 'Silas') { // Silas, le jardinier des cendres : chapeau de paille brûlé où pousse une pousse, barbe grise, tablier de toile plein de sachets de graines
+    R('#5d6b3a', -16, -36, 14, 32); R('#5d6b3a', 2, -36, 14, 32); R('#4a3424', -18, -10, 17, 10); R('#4a3424', 1, -10, 17, 10); R('#2e2016', -18, -2, 17, 2); R('#2e2016', 1, -2, 17, 2);
+    R('#6d7f4a', -21, -92, 42, 54); R('#8a7a5a', -16, -82, 32, 50); R('#8a7a5a', -14, -92, 5, 12); R('#8a7a5a', 9, -92, 5, 12); // tablier
+    R('#7a6a4a', -12, -62, 24, 14); [-8, 0, 8].forEach((q, k) => { R(['#c0392b', '#f1c40f', '#8e44ad'][k], q - 3, -68, 6, 9); R('#f4ead0', q - 2, -66, 4, 3); }); // poche et sachets de graines
+    x.fillStyle = 'rgba(70,70,70,.25)'; x.beginPath(); x.ellipse(-8, -48, 6, 3, 0, 0, 7); x.ellipse(10, -78, 5, 2.5, 0, 0, 7); x.fill(); // traces de cendre
+    R(skin, -4, -94, 8, 5); C(skin, 0, -104, 13);
+    Y('#9a948a', [[-11, -101], [11, -101], [9, -86], [0, -78], [-9, -86]]); LN('#7a746a', 1, -4, -96, -2, -84); LN('#7a746a', 1, 4, -96, 3, -84);
+    Y('#6aa84f', [[s * 2, -90], [s * 9, -94], [s * 4, -86]]); // une feuille coincée dans la barbe
+    C('#2e2016', s * 6, -106, 1.8); LN('#6d5a4a', 1.5, s * 2, -110, s * 10, -110); x.fillStyle = P('#d9967a'); x.beginPath(); x.arc(s * 11, -101, 2.4, 0, 7); x.fill();
+    x.fillStyle = P('#c9a86a'); x.beginPath(); x.ellipse(0, -116, 28, 6, 0, 0, 7); x.fill(); x.beginPath(); x.moveTo(-14, -116); x.quadraticCurveTo(-13, -132, 0, -132); x.quadraticCurveTo(13, -132, 14, -116); x.fill();
+    R('#5a3a1a', -14, -121, 28, 4); x.fillStyle = 'rgba(40,30,20,.55)'; x.beginPath(); x.arc(-24, -115, 4, 0, 7); x.arc(22, -117, 3, 0, 7); x.fill(); // bords brûlés
+    LN('#5d8a3a', 2, s * 8, -128, s * 10, -142); Y('#7cb342', [[s * 10, -140], [s * 20, -146 + Math.sin(t / 300) * 2], [s * 12, -136]]); Y('#7cb342', [[s * 10, -140], [s * 2, -148 + Math.sin(t / 340) * 2], [s * 8, -136]]); // pousse sur le chapeau
   } else if (n === 'Bryan') { // Bryan : cheveux noirs en pointes, t-shirt noir moulant (déchiré par l'ultime), pantalon blanc, baskets
     const kk = f.ak >= 0 && f.ak <= 2, rg = f.rg;
     R('#f4f4f6', -15, -32, 13, 32); LN('rgba(0,0,0,.12)', 1.5, -9, -30, -9, -6); R('#e9e9ee', -17, -6, 17, 6); R('#222', -17, -2, 17, 2);
@@ -1600,6 +1641,18 @@ function fighter(f, i) {
     R(skin, -3, -92, 6, 5); C(skin, 0, -102, 13);
     Y('#0f0f14', [[-14, -104], [-17, -116], [-9, -111], [-6, -123], [0, -113], [6, -124], [10, -112], [18, -117], [14, -104]]); R('#0f0f14', -14, -110, 28, 6);
     R('#111', s * 5 - 1, -104, 3, 3); LN('#0f0f14', 2, s * 2, -108, s * 9, -107); LN('#7a3b2e', 1.5, s * 2, -95, s * 7, -95);
+    if (lk === 'rick') { Y('#f1c40f', [[-14, -104], [-17, -116], [-9, -111], [-6, -123], [0, -113], [6, -124], [10, -112], [18, -117], [14, -104]]); R('#c0392b', -14, -110, 28, 4); Y('#c0392b', [[-s * 14, -110], [-s * 24, -104 + Math.sin(t / 150) * 3], [-s * 22, -100 + Math.sin(t / 150) * 3], [-s * 13, -106]]); }
+    else if (lk === 'sheriff' || lk === 'pirate' || lk === 'bx') { // robots du studio : visière rouge, rivets
+      R('#111', s > 0 ? -3 : -13, -108, 16, 6); R('#ff2d2d', s > 0 ? -1 : -11, -106, 12, 2); C('rgba(255,45,45,.3)', s * 5, -105, 8);
+      C('#5d6670', -9, -96, 1.5); C('#5d6670', 9, -96, 1.5); LN('rgba(0,0,0,.25)', 1.2, -12, -98, 12, -98);
+      if (lk === 'sheriff') { x.fillStyle = P('#7b4a2e'); x.beginPath(); x.ellipse(0, -114, 25, 5, 0, 0, 7); x.fill(); x.beginPath(); x.moveTo(-12, -114); x.quadraticCurveTo(-12, -134, -4, -128); x.quadraticCurveTo(0, -122, 4, -128); x.quadraticCurveTo(12, -134, 12, -114); x.fill(); R('#3e2723', -12, -118, 24, 3);
+        Y('#f1c40f', [[-9, -78], [-6, -78], [-5, -82], [-4, -78], [-1, -78], [-3.5, -75.5], [-2.5, -72], [-5, -74], [-7.5, -72], [-6.5, -75.5]]); }
+      else if (lk === 'pirate') { Y('#1a1a1f', [[-24, -110], [24, -110], [16, -128], [0, -122], [-16, -128]]); C('#ecf0f1', 0, -117, 3.5); LN('#ecf0f1', 1.2, -4, -113, 4, -113);
+        LN('#111', 1.5, -14, -108, 14, -100); C('#111', -s * 4, -104, 5); [-78, -66, -54].forEach(yy => C('#d4af37', 0, yy, 2)); }
+      else { C('rgba(255,60,60,' + (.4 + .3 * Math.sin(t / 120)) + ')', 0, -70, 5); LN('rgba(0,0,0,.3)', 1, -8, -112, -8, -96); LN('rgba(0,0,0,.3)', 1, 0, -92, 0, -86); x.fillStyle = 'rgba(255,255,255,.5)'; x.font = 'bold 8px sans-serif'; x.textAlign = 'center'; x.fillText('X', s * -8, -60); }
+    } else if (lk === 'star') { R('#0b0b0f', -2, -108, 16, 6); R('#0b0b0f', s > 0 ? -12 : 0, -108, 12, 6); R('rgba(255,255,255,.35)', s > 0 ? 2 : 4, -107, 4, 2);
+      if (!rg) { Y('#3e2614', [[-17, -90], [-6, -90], [-10, -70]]); Y('#3e2614', [[17, -90], [6, -90], [10, -70]]); }
+      if (Math.sin(t / 400) > .85) { x.fillStyle = '#fff'; x.font = 'bold 14px sans-serif'; x.textAlign = 'center'; x.fillText('✦', s * 14, -112); } }
   } else if (n === 'Kairos') { // Kairos : horloger du temps, haut-de-forme, monocle, cadran sur le torse
     R('#2a2038', -16, -28, 13, 28); R('#2a2038', 3, -28, 13, 28);
     R('#111', -18, -9, 17, 9); R('#111', 1, -9, 17, 9);
@@ -1695,6 +1748,27 @@ function fighter(f, i) {
     x.restore();
     if (howl) for (let q = 0; q < 3; q++) { x.strokeStyle = 'rgba(220,240,255,' + (.6 - q * .18) + ')'; x.lineWidth = 2; x.beginPath(); x.arc(s * 50, -112, 12 + q * 10 + (t / 40 % 10), -1.2, .2); x.stroke(); }
     x.restore();
+  } else if (n === 'Drone') { // drone de surveillance : coque ovale, objectif cyan, hélices, flotte au-dessus du sol
+    const by = -62 + Math.sin(t / 260) * 5, atk = f.ak >= 0 && f.ap >= 0;
+    x.fillStyle = 'rgba(0,0,0,.18)'; x.beginPath(); x.ellipse(0, -2, 24, 5, 0, 0, 7); x.fill();
+    [-1, 1].forEach(d => { LN('#5d6670', 3, d * 16, by - 18, d * 28, by - 30); const w = Math.abs(Math.sin(t / 25 + d)) * 18 + 4; x.fillStyle = 'rgba(200,230,240,.55)'; x.beginPath(); x.ellipse(d * 28, by - 32, w, 3, 0, 0, 7); x.fill(); C('#5d6670', d * 28, by - 31, 3); });
+    x.fillStyle = P('#dfe6ec'); x.beginPath(); x.ellipse(0, by, 30, 22, 0, 0, 7); x.fill(); x.fillStyle = P('#9fb0bd'); x.beginPath(); x.ellipse(0, by + 8, 30, 12, 0, 0, Math.PI); x.fill();
+    LN('#9fb0bd', 1.5, -26, by - 4, 26, by - 4); R('#2c3e50', -4, by - 24, 8, 6);
+    C('#1b2a35', s * 12, by - 2, 11); C(atk ? '#ff4d4d' : '#5fe0ff', s * 12, by - 2, 6); C('#fff', s * 14, by - 4, 2);
+    x.fillStyle = 'rgba(' + (atk ? '255,77,77' : '95,224,255') + ',.18)'; x.beginPath(); x.moveTo(s * 18, by - 2); x.lineTo(s * 70, by + 40); x.lineTo(s * 40, by + 52); x.fill();
+    C(Math.sin(t / 200) > 0 ? '#ff4d4d' : '#5a1a1a', -s * 18, by - 12, 2.5);
+  } else if (n === 'Mecha') { // robot de tournage de Max Silver : tête-caméra, cockpit vitré, poing hydraulique et projecteur
+    const k = f.ak, ap = f.ap, pp = f.pp || 0, punch = k === 0 && ap === 1 ? 26 : k === 0 && ap === 0 ? -6 * pp : 0, lamp = k === 1 && ap >= 0;
+    R('#3d3d46', -26, -40, 18, 40); R('#3d3d46', 8, -40, 18, 40); R('#26262e', -30, -10, 26, 10); R('#26262e', 4, -10, 26, 10); R('#d4af37', -26, -40, 18, 4); R('#d4af37', 8, -40, 18, 4);
+    R('#56565f', -34, -96, 68, 58); R('#d4af37', -34, -96, 68, 5); R('#d4af37', -34, -43, 68, 5);
+    x.fillStyle = 'rgba(160,210,240,.55)'; x.beginPath(); x.roundRect(-22, -88, 44, 34, 6); x.fill();
+    C('#f0c8a0', 0, -70, 8); R('#eef0f2', -8, -80, 16, 5); R('#111', s > 0 ? -2 : -10, -72, 12, 3); R('#f4f4f6', -9, -62, 18, 8); C('#d4af37', 0, -58, 2); // Max Silver dans le cockpit
+    x.fillStyle = 'rgba(255,255,255,.25)'; x.beginPath(); x.moveTo(-18, -86); x.lineTo(-8, -86); x.lineTo(-18, -60); x.fill();
+    R('#26262e', -18, -122, 36, 26); C('#26262e', -10, -128, 10); C('#26262e', 10, -128, 10); C('#56565f', -10, -128, 4); C('#56565f', 10, -128, 4);
+    R('#111', s > 0 ? 18 : -30, -116, 12, 14); C('#5fd0ff', s * 26, -109, 4); C(Math.sin(t / 200) > 0 ? '#ff2d2d' : '#5a1a1a', -s * 12, -116, 2.5);
+    LN('#56565f', 10, s * 34, -88, s * (50 + punch), -66); C('#3d3d46', s * (54 + punch), -64, 12); C('#d4af37', s * (54 + punch), -64, 4);
+    LN('#56565f', 10, -s * 34, -88, -s * 44, -60); R('#26262e', -s * 44 - 10, -64, 20, 16);
+    if (lamp) { x.fillStyle = 'rgba(255,250,200,.35)'; x.beginPath(); x.moveTo(-s * 44, -56); x.lineTo(-s * 120, -10); x.lineTo(-s * 120, -110); x.fill(); C('#fffbe0', -s * 44, -56, 8); }
   } else if (n === 'Golem') { // golem de pierre : blocs fissurés, mousse, rune et yeux bleus qui luisent
     const gl = .55 + .4 * Math.sin(t / 260);
     R('#5f666b', -21, -34, 18, 34); R('#5f666b', 3, -34, 18, 34); R('#4b5155', -23, -8, 22, 8); R('#4b5155', 1, -8, 22, 8);
@@ -1815,6 +1889,8 @@ function fighter(f, i) {
     else if (n === 'Eren') { if (f.fm) C('#8a4a35', px, py, 11); else { C('#ecf0f1', px, py, 6); if (f.ak === 1) LN('#dfe6e9', 4, px, py, px + s * (f.ad ? 16 : 42), py); } }
     else if (n === 'Jumelles') { C('#fde3d0', px, py, 6); if (f.ak >= 0 && f.ak !== 2 && f.ap < 2) { const gc = f.sis ? '#b266ff' : '#5fd0ff'; C(gc, px + s * 8, py - 2, f.ak === 3 ? 12 : 8); C('#fff', px + s * 8, py - 2, 3); } }
     else if (n === 'Bryan') C(skin, px, py, 7);
+    else if (n === 'Odile') { C('#2c3440', px, py, 7); [-5, 0, 5].forEach(q => LN('#cfd8dc', 2, px + s * 4, py + q, px + s * (f.ak === 0 && f.ap === 1 ? 20 : 13), py + q * 1.6)); if (f.ak === 1 && f.ap >= 1) { C('#f1c40f', px + s * 10, py - 8, 4); C('#f1c40f', px + s * 4, py - 12, 3); } } // gant à griffes ; larcin : des pièces volées
+    else if (n === 'Silas') { C(skin, px, py, 8); if (f.ak === 1 && f.ap === 0) C('#6d4c2f', px + s * 6, py - 4, 4); if (f.ak === 2 && f.ap >= 1) for (let q = 0; q < 5; q++) { const an = t / 200 + q * 1.26; C('#f48fb1', px + Math.cos(an) * 12, py - 10 + Math.sin(an) * 12, 3); } } // graine en main ; floraison : pétales
     else if (n === 'Koro') C('#f4d03f', px, py, 6);
     else if (n === 'Ichigo') {
       C(skin, px, py, 6);
@@ -1840,8 +1916,8 @@ function fighter(f, i) {
     else if (n === 'Naruto') { C(skin, px, py, 7); if (f.ak === 1 && f.ap < 2) rasen(px + s * 12, py, 13 + 2 * Math.sin(t / 45), 0); if (f.ak === 3 && f.ap < 2) rasen(px + s * 4, py - 26, 22, 1); if (f.ak === 0 && f.ap < 2) { C('#f5cba7', px + s * 3, py, 8); LN('#fff0c2', 2, px + s * 2, py - 5, px + s * 10, py - 8); } }
     else { C(lk === 'snake' ? '#16161d' : skin, px, py, 10); if (lk === 'snake') C('rgba(255,255,255,.14)', px - 3, py - 3, 4); }
   };
-  const sleeve = n === 'Golem' ? '#6d7377' : n === 'Kaze' ? '#1c1c28' : n === 'Naruto' ? '#ff7f27' : n === 'Chevalier' ? (lk === 'himmel' ? '#3f6fb5' : '#b0bec5') : n === 'Gojo' ? '#1a2a4f' : n === 'Deku' ? '#2e7d32' : n === 'Denji' ? '#f2f2f2' : n === 'Yugo' ? '#e2b283' : n === 'Shinra' ? '#23232f' : n === 'Eren' ? (f.fm ? '#8a4a35' : '#6d4c41') : n === 'Koro' ? '#f4d03f' : n === 'Kairos' ? '#3b2a5a' : n === 'Jumelles' ? '#fde3d0' : n === 'Frieren' ? '#f4f1ea' : n === 'Ichigo' ? '#16161d' : (n === 'Luffy' && lk === 'snake') ? '#16161d' : skin;
-  if (n === 'Loup' || n === 'Dragon') { /* pas de bras : la gueule et les pattes sont dessinées avec le corps */ }
+  const sleeve = n === 'Odile' ? '#15181e' : n === 'Silas' ? '#6d7f4a' : n === 'Golem' ? '#6d7377' : n === 'Kaze' ? '#1c1c28' : n === 'Naruto' ? '#ff7f27' : n === 'Chevalier' ? (lk === 'himmel' ? '#3f6fb5' : '#b0bec5') : n === 'Gojo' ? '#1a2a4f' : n === 'Deku' ? '#2e7d32' : n === 'Denji' ? '#f2f2f2' : n === 'Yugo' ? '#e2b283' : n === 'Shinra' ? '#23232f' : n === 'Eren' ? (f.fm ? '#8a4a35' : '#6d4c41') : n === 'Koro' ? '#f4d03f' : n === 'Kairos' ? '#3b2a5a' : n === 'Jumelles' ? '#fde3d0' : n === 'Frieren' ? '#f4f1ea' : n === 'Ichigo' ? '#16161d' : (n === 'Luffy' && lk === 'snake') ? '#16161d' : skin;
+  if (n === 'Loup' || n === 'Dragon' || n === 'Drone' || n === 'Mecha') { /* pas de bras : la gueule et les pattes sont dessinées avec le corps */ }
   else if (n === 'Zéphyr' && lk === 'fern') { // Fern : bâton tenu à deux mains, sorts Zoltraak à tir rapide (cercle doré au bout du bâton)
     const k = f.ak, ap = f.ap, pp = aCl(f.pp || 0), t = Date.now(), sl = '#34343a';
     const staff = (hx, hy, ang, gl) => { const o = fernStaff(s, hx, hy, ang, gl); LN(sl, 8, 0, -72, s * hx, hy); C('#f6e3d3', s * hx, hy, 5.5); return o; };
@@ -2130,6 +2206,12 @@ function fighter(f, i) {
       x.save(); x.translate(cx, tp[1]); x.scale(.42, 1); mCircle(0, 0, r, al, t / 150); mCircle(0, 0, r * .6, al * .8, -t / 110, '255,250,200'); x.restore();
       C('rgba(255,245,190,' + (ap === 1 ? .55 : .25) + ')', cx, tp[1], 12 + r * .5);
     }
+  } else if (n === 'Silas' && f.ak === 0) { // coup de bêche : armé au-dessus de l'épaule, puis abattu vers l'avant
+    const ap = f.ap, pp = f.pp || 0, ang = ap === 0 ? -2.3 + -.3 * pp : ap === 1 ? -2.6 + 3.1 * eoz(pp) : .5 - 1.4 * smz(pp), hx = s * 16, hy = -72;
+    const ex = hx + s * Math.cos(ang) * 74, ey = hy + Math.sin(ang) * 74;
+    if (ap === 1) { x.strokeStyle = 'rgba(255,255,255,.35)'; x.lineWidth = 10; x.beginPath(); x.arc(hx, hy, 74, s > 0 ? -2.6 : Math.PI + 2.6 - 3.1 * eoz(pp), s > 0 ? -2.6 + 3.1 * eoz(pp) : Math.PI + 2.6, false); x.stroke(); }
+    LN('#7a5230', 5, hx - s * Math.cos(ang) * 14, hy - Math.sin(ang) * 14, ex, ey); x.save(); x.translate(ex, ey); x.rotate(s > 0 ? ang : Math.PI - ang); Y('#8d99a3', [[0, -10], [22, -9], [26, 0], [22, 9], [0, 10]]); R('#5d6670', -2, -10, 4, 20); x.restore();
+    LN(sleeve, 9, 0, -66, hx, hy); hand(hx, hy);
   } else if (n === 'Bryan' && f.ak >= 0) { // coups de pied : la jambe d'attaque est dessinée par-dessus (progression pp) ; ultime : le t-shirt est déchiré
     const k = f.ak, ap = f.ap, pp = f.pp || 0, cm = f.cm | 0, ph = (a, b, c) => ap === 0 ? mixv(a, b, eoz(pp)) : ap === 1 ? mixv(b, c, eoz(pp)) : mixv(c, a, smz(pp));
     if (k <= 2) {
@@ -2187,6 +2269,11 @@ function fighter(f, i) {
   else if (n === 'Luffy' && lk === 'snake') { // garde du Snakeman : poing avant levé, bras arrière lové
     LN('#16161d', 8, 0, -70, s * 26, -62); LN('#16161d', 8, s * 26, -62, s * 22, -82); hand(s * 22, -84);
     LN('#16161d', 8, 0, -68, -s * 22, -50); C('#16161d', -s * 22, -50, 10);
+  } else if (n === 'Silas') { // au repos : la bêche plantée à côté de lui, la main sur le manche
+    LN('#7a5230', 5, s * 30, -84, s * 32, -16); Y('#8d99a3', [[s * 22, -18], [s * 42, -18], [s * 40, 2], [s * 32, 8], [s * 24, 2]]); R('#5d6670', s > 0 ? 22 : -42, -20, 20, 3);
+    LN(sleeve, 9, 0, -68, s * 30, -70); hand(s * 30, -70);
+  } else if (n === 'Odile') { // garde de voleuse : main griffue en avant, l'autre sur la bourse
+    const bob = Math.sin(t / 160) * 2; LN(sleeve, 8, 0, -68, s * 22, -72 + bob); hand(s * 24, -72 + bob); LN(sleeve, 8, 0, -66, s * 4, -50); C(skin, s * 6, -48, 5);
   } else if (n === 'Bryan') { LN(skin, 7, 0, -68, s * 16, -80); C(skin, s * 18, -82, 7); LN(skin, 7, 0, -68, s * 6, -70); C(skin, s * 8, -72, 7); } else hand(s * 24, -50);
   if (f.bl && n !== 'Chevalier') { x.fillStyle = 'rgba(120,200,255,.6)'; x.fillRect(s * 24 - 5, -95, 10, 85); }
   // Naruto : mouvement de taijutsu, chakra et clones
@@ -2511,6 +2598,36 @@ function drawMap(m) {
     for (let k = 0; k < 4; k++) { x.fillStyle = 'rgba(140,60,180,.15)'; x.beginPath(); x.ellipse(((t * 18 + k * 260) % 1100) - 100, 340 + k * 8, 220, 22, 0, 0, 7); x.fill(); }
     floor('#3a3046', '#7a6a90');
     x.fillStyle = '#7a1f2b'; x.fillRect(380, 382, 140, 260); x.fillStyle = '#d4af37'; x.fillRect(380, 382, 4, 260); x.fillRect(516, 382, 4, 260);
+  } else if (m === 15) { // Couloirs de l'Académie Prisme : hautes fenêtres en arc, bannières au prisme, casiers, damier
+    grad('#1a1438', '#3d3470');
+    for (let k = 0; k < 4; k++) { const wx = 90 + k * 240; x.fillStyle = '#0e0b24'; x.fillRect(wx - 44, 60, 88, 200); x.beginPath(); x.arc(wx, 60, 44, Math.PI, 0); x.fill(); x.fillStyle = 'rgba(150,170,255,.35)'; x.fillRect(wx - 38, 64, 76, 190); x.beginPath(); x.arc(wx, 64, 38, Math.PI, 0); x.fill(); LN('#0e0b24', 3, wx, 26, wx, 254); LN('#0e0b24', 3, wx - 38, 150, wx + 38, 150); }
+    x.fillStyle = 'rgba(255,250,220,.9)'; x.beginPath(); x.arc(330, 100, 22, 0, 7); x.fill();
+    [210, 450, 690].forEach(bx => { x.fillStyle = '#5b2f8a'; x.fillRect(bx - 22, 40, 44, 90); x.beginPath(); x.moveTo(bx - 22, 130); x.lineTo(bx, 116); x.lineTo(bx + 22, 130); x.fill(); Y('#e4f5ff', [[bx, 66], [bx + 12, 92], [bx - 12, 92]]); x.strokeStyle = '#ff9ec7'; x.lineWidth = 2; x.beginPath(); x.moveTo(bx + 6, 80); x.lineTo(bx + 18, 84); x.stroke(); });
+    for (let k = 0; k < 18; k++) { x.fillStyle = k % 2 ? '#3a4a7a' : '#334270'; x.fillRect(k * 50, 300, 48, 80); C('#d4af37', k * 50 + 40, 340, 2); }
+    floor('#2a2350', '#c9b8ff'); x.fillStyle = 'rgba(255,255,255,.06)'; for (let k = 0; k < 900; k += 60) for (let r2 = 0; r2 < 4; r2++) if ((k / 60 + r2) % 2) x.fillRect(k, 386 + r2 * 30, 60, 30);
+  } else if (m === 16) { // Monde des rêves : ciel violet, îles flottantes, soleil et lune, étoiles et livres qui flottent
+    grad('#160a30', '#8a5ac8');
+    C('rgba(255,220,120,.85)', 160, 90, 40); C('rgba(232,236,248,.9)', 740, 90, 36); x.fillStyle = '#160a30'; x.beginPath(); x.arc(756, 80, 32, 0, 7); x.fill();
+    for (let k = 0; k < 50; k++) { x.fillStyle = 'rgba(255,255,255,' + (.3 + .5 * Math.abs(Math.sin(t + k))) + ')'; x.fillRect(rnd(k) * 900, rnd(k + 9) * 300 - 40, 2, 2); }
+    [[150, 230, 70], [450, 180, 90], [760, 250, 60]].forEach(([ix, iy, w], k) => { const yy = iy + Math.sin(t + k) * 8; x.fillStyle = '#4a2f7a'; x.beginPath(); x.moveTo(ix - w, yy); x.lineTo(ix + w, yy); x.lineTo(ix + w * .4, yy + 40); x.lineTo(ix, yy + 70); x.lineTo(ix - w * .5, yy + 36); x.fill(); x.fillStyle = '#9f8cff'; x.fillRect(ix - w, yy - 4, w * 2, 6); });
+    for (let k = 0; k < 6; k++) { const bx = (rnd(k + 30) * 900 + t * 15) % 900, by2 = 120 + rnd(k + 40) * 160 + Math.sin(t * 1.5 + k) * 10; x.save(); x.translate(bx, by2); x.rotate(Math.sin(t + k) * .4); x.fillStyle = ['#c0392b', '#2980b9', '#27ae60'][k % 3]; x.fillRect(-10, -7, 20, 14); x.fillStyle = '#f5ecd0'; x.fillRect(-8, -5, 16, 10); x.restore(); }
+    floor('#2a1450', '#c9b8ff'); for (let k = 0; k < 4; k++) { x.fillStyle = 'rgba(200,170,255,.15)'; x.beginPath(); x.ellipse(((t * 20 + k * 280) % 1200) - 150, 392, 200, 14, 0, 0, 7); x.fill(); }
+  } else if (m === 17) { // Plateau western : toile peinte du désert, façade de saloon en contreplaqué (étais visibles), cactus découpés, projecteurs
+    grad('#f39c12', '#ffd79a'); C('rgba(255,240,180,.9)', 640, 180, 60);
+    x.fillStyle = '#c8784a'; x.beginPath(); x.moveTo(0, 300); [[120, 220], [200, 230], [260, 300], [520, 300], [580, 200], [700, 205], [760, 300]].forEach(q => x.lineTo(q[0], q[1])); x.lineTo(900, 300); x.lineTo(900, 380); x.lineTo(0, 380); x.fill();
+    x.fillStyle = '#8a5a2b'; x.fillRect(80, 180, 300, 200); x.fillStyle = '#6d4423'; x.fillRect(70, 170, 320, 20); x.fillStyle = '#f5ecd0'; x.font = 'bold 30px serif'; x.textAlign = 'center'; x.fillText('SALOON', 230, 230);
+    x.fillStyle = '#3e2723'; x.fillRect(200, 290, 60, 90); LN('#6d4423', 4, 380, 190, 420, 380); LN('#6d4423', 4, 380, 260, 420, 380);
+    [[560, 280], [820, 300]].forEach(([cx, cy]) => { x.fillStyle = '#2e7d32'; x.fillRect(cx - 9, cy, 18, 380 - cy); x.fillRect(cx - 30, cy + 30, 12, 34); x.fillRect(cx - 30, cy + 54, 30, 10); x.fillRect(cx + 18, cy + 16, 12, 30); x.fillRect(cx + 9, cy + 38, 21, 10); LN('#6d4423', 3, cx, cy + 40, cx - 30, 380); });
+    [150, 450, 750].forEach(lx => { x.fillStyle = 'rgba(255,250,210,.1)'; x.beginPath(); x.moveTo(lx - 12, -OFF); x.lineTo(lx + 12, -OFF); x.lineTo(lx + 90, 380); x.lineTo(lx - 90, 380); x.fill(); });
+    floor('#c9a46b', '#e6c48a');
+  } else if (m === 18) { // Grand plateau des Studios Silver : rampe de projecteurs, fond vert, caméras, chaises de réalisateur, câbles
+    grad('#101016', '#2a2a36');
+    x.fillStyle = '#3d3d46'; x.fillRect(0, 20, 900, 10); for (let k = 0; k < 7; k++) { const lx = 60 + k * 130; x.fillStyle = '#26262e'; x.fillRect(lx - 14, 30, 28, 20); x.fillStyle = 'rgba(255,250,210,' + (.06 + .04 * Math.sin(t * 2 + k)) + ')'; x.beginPath(); x.moveTo(lx - 10, 50); x.lineTo(lx + 10, 50); x.lineTo(lx + 70, 380); x.lineTo(lx - 70, 380); x.fill(); }
+    x.fillStyle = '#2ecc71'; x.fillRect(300, 90, 300, 290); x.fillStyle = 'rgba(0,0,0,.12)'; for (let k = 300; k < 600; k += 30) x.fillRect(k, 90, 2, 290);
+    [[120, 1], [780, -1]].forEach(([cx, d]) => { LN('#3d3d46', 3, cx, 320, cx - 14, 380); LN('#3d3d46', 3, cx, 320, cx + 14, 380); x.fillStyle = '#26262e'; x.fillRect(cx - 22, 290, 44, 30); x.fillRect(cx + d * 22 - (d < 0 ? 14 : 0), 298, 14, 14); C(Math.sin(t * 3) > 0 ? '#ff2d2d' : '#5a1a1a', cx - d * 14, 296, 3.5); });
+    [[230, '#c0392b'], [660, '#2c3e50']].forEach(([cx, col]) => { LN('#6d4423', 3, cx - 14, 340, cx + 14, 380); LN('#6d4423', 3, cx + 14, 340, cx - 14, 380); x.fillStyle = col; x.fillRect(cx - 16, 320, 32, 6); x.fillRect(cx - 16, 300, 32, 14); x.fillStyle = '#fff'; x.font = 'bold 7px sans-serif'; x.textAlign = 'center'; x.fillText('SILVER', cx, 310); });
+    floor('#3a3a44', '#6a6a78'); x.strokeStyle = '#111'; x.lineWidth = 3; x.beginPath(); x.moveTo(0, 410); x.bezierCurveTo(200, 400, 300, 430, 500, 412); x.bezierCurveTo(700, 396, 800, 425, 900, 408); x.stroke();
+    x.fillStyle = '#f1c40f'; [[420, 384], [480, 384]].forEach(q => { x.fillRect(q[0], q[1], 20, 4); x.fillRect(q[0] + 8, q[1] - 6, 4, 16); });
   } else if (m === 14) { // Cœur de la Grande Horloge (aventure) : engrenages géants qui tournent, cadran, balancier, lumière dorée
     grad('#140c24', '#4a3a1e');
     const gear = (gx, gy, r, n, sp, col) => { x.save(); x.translate(gx, gy); x.rotate(t * sp); x.fillStyle = col; x.beginPath(); for (let q = 0; q < n * 2; q++) { const a2 = q * Math.PI / n, rr = q % 2 ? r : r * 1.14; x.lineTo(Math.cos(a2) * rr, Math.sin(a2) * rr); } x.fill(); x.fillStyle = '#140c24'; x.beginPath(); x.arc(0, 0, r * .35, 0, 7); x.fill(); x.restore(); };
@@ -2656,6 +2773,24 @@ function draw() {
       } else if (e.p === 0) {
         x.fillStyle = 'rgba(255,60,60,.15)'; x.fillRect(e.x - 45, 0, 90, 380);
         x.fillStyle = 'rgba(255,60,60,.55)'; x.beginPath(); x.ellipse(e.x, 380, 45, 8, 0, 0, 7); x.fill();
+      } else if (e.p === 10) { // forêt renaissante : herbe et fleurs sur tout le sol, feuilles qui tombent
+        const al = e.a < .1 ? e.a * 10 : e.a > .88 ? (1 - e.a) / .12 : 1, tt = Date.now() / 1000;
+        x.fillStyle = 'rgba(60,140,50,' + .28 * al + ')'; x.fillRect(0, 300, WW, 80);
+        for (let q = 0; q < 70; q++) { const gx = q * WW / 70 + (q % 3) * 4, hh = 10 + (q * 7) % 16; LN('rgba(110,180,60,' + .9 * al + ')', 3, gx, 382, gx + Math.sin(tt * 2 + q) * 4, 382 - hh); if (q % 6 === 0) C('rgba(244,143,177,' + al + ')', gx + 2, 380 - hh, 4); }
+        for (let q = 0; q < 16; q++) { const lx = (q * 83 + tt * 30) % WW, ly = ((tt * 60 + q * 53) % 420) - 40; x.save(); x.translate(lx + Math.sin(tt * 2 + q) * 12, ly); x.rotate(tt * 2 + q); x.fillStyle = 'rgba(124,179,66,' + .8 * al + ')'; x.beginPath(); x.ellipse(0, 0, 6, 3, 0, 0, 7); x.fill(); x.restore(); }
+      } else if (e.p === 8) { // graine de Silas : lancée en cloche, puis elle pousse en buisson de ronces
+        const u = Math.min(1, e.a * 5);
+        if (u < 1) { const gx = e.sx + (e.x - e.sx) * u, gy = 330 - Math.sin(Math.PI * u) * 70 + u * 46; C('#6d4c2f', gx, gy, 5); C('#a1887f', gx - 1.5, gy - 1.5, 2); }
+        else {
+          x.fillStyle = '#4a3424'; x.beginPath(); x.ellipse(e.x, 381, 16, 5, 0, Math.PI, 0); x.fill();
+          if (e.a < 1) { const hh = 6 + 22 * e.a; LN('#6aa84f', 2.5, e.x, 380, e.x, 380 - hh); Y('#7cb342', [[e.x, 380 - hh], [e.x + 8, 384 - hh - 6], [e.x + 2, 384 - hh]]); Y('#7cb342', [[e.x, 380 - hh], [e.x - 8, 384 - hh - 6], [e.x - 2, 384 - hh]]); }
+          else { const tt = Date.now() / 300; for (let q = 0; q < 5; q++) { const an = -Math.PI / 2 + (q - 2) * .45 + Math.sin(tt + q) * .06; x.strokeStyle = '#3e6b2a'; x.lineWidth = 3; x.beginPath(); x.moveTo(e.x, 380); x.quadraticCurveTo(e.x + Math.cos(an) * 20, 380 + Math.sin(an) * 14, e.x + Math.cos(an) * 26, 380 + Math.sin(an) * 30); x.stroke();
+              for (let k = 1; k < 4; k++) { const px = e.x + Math.cos(an) * 8 * k, py = 380 + Math.sin(an) * 9 * k; LN('#c8d6a0', 1.2, px, py, px + 4, py - 3); } C('#c0392b', e.x + Math.cos(an) * 26, 380 + Math.sin(an) * 30, 2.5); }
+            x.strokeStyle = 'rgba(124,179,66,' + (.25 + .2 * Math.sin(tt * 2)) + ')'; x.lineWidth = 2; x.beginPath(); x.ellipse(e.x, 382, 26, 6, 0, 0, 7); x.stroke(); }
+        }
+      } else if (e.p === 11 && !e.h) { // racine qui va jaillir : le sol se fissure
+        x.strokeStyle = 'rgba(90,60,30,' + (.4 + .5 * e.a) + ')'; x.lineWidth = 3; x.beginPath(); for (let q = 0; q < 5; q++) { x.moveTo(e.x, 381); x.lineTo(e.x + (q - 2) * 12 * e.a, 381 + (q % 2 ? 4 : -2)); } x.stroke();
+        x.fillStyle = 'rgba(124,179,66,' + .25 * e.a + ')'; x.beginPath(); x.ellipse(e.x, 381, 40, 8, 0, 0, 7); x.fill();
       } else if (e.p === 5) { // vague de feu au sol
         const tt = Date.now() / 90, al = 1 - e.a * .5;
         for (let q = 0; q < 9; q++) {
@@ -2667,13 +2802,27 @@ function draw() {
     drawWaves();
     S.f.forEach(f => { if (f.lz || f.dd) return; const z = f.sz || 1, k = Math.min(1, (380 - f.y) / 250); x.fillStyle = 'rgba(0,0,0,' + (.35 * (1 - k)) + ')'; x.beginPath(); x.ellipse(f.x, 380, 34 * z * (1 - .4 * k), 7 * z, 0, 0, 7); x.fill(); });
     S.f.forEach((f, i) => { if (!f.dd) fighter(f, i); });
+    S.f.forEach(f => { if (f.dd) return; const z = f.sz || 1;
+      if (f.slw) for (let q = 0; q < 4; q++) { const vx = f.x + (q - 1.5) * 10 * z, tt = Date.now() / 200 + q; x.strokeStyle = '#3e6b2a'; x.lineWidth = 2.5; x.beginPath(); x.moveTo(vx, 382); x.quadraticCurveTo(vx + Math.sin(tt) * 8, 370, vx + Math.sin(tt * 1.3) * 5, 356); x.stroke(); C('#7cb342', vx + Math.sin(tt * 1.3) * 5, 356, 2.5); } // la forêt agrippe ses pieds
+      if (f.stl) { const ty = f.y - 140 * z - 30, tx = '🪶 ' + f.stl; x.font = 'bold 12px sans-serif'; const tw = x.measureText(tx).width + 14; x.fillStyle = 'rgba(21,24,30,.85)'; x.beginPath(); x.roundRect(f.x - tw / 2, ty - 15, tw, 20, 7); x.fill(); x.strokeStyle = '#3fb8c9'; x.lineWidth = 1.5; x.stroke(); x.fillStyle = '#bff3fa'; x.textAlign = 'center'; x.fillText(tx, f.x, ty); } // technique volée prête (L)
+    });
     if (S.f.some(q => q.fz)) { x.fillStyle = 'rgba(110,130,210,.22)'; x.fillRect(0, -OFF, WW, 600); }
     if (S.p === 'training') {
       x.fillStyle = '#fff'; x.font = 'bold 14px sans-serif'; x.textAlign = 'center';
       x.fillText('MANNEQUIN', S.f[1].x, S.f[1].y - 150);
     }
     S.fx.forEach(e => {
-      if (e.p === 2) { // éclat de téléportation
+      if (e.p === 9) { // éclosion : explosion de pétales et de ronces
+        const k = e.a, R1 = 20 + 70 * k, al = 1 - k;
+        for (let q = 0; q < 12; q++) { const an = q * .5236 + k; C('rgba(244,143,177,' + al + ')', e.x + Math.cos(an) * R1, 360 + Math.sin(an) * R1 * .6, 5 * al + 2); }
+        for (let q = 0; q < 6; q++) { const an = -Math.PI / 2 + (q - 2.5) * .4; LN('rgba(62,107,42,' + al + ')', 4, e.x, 380, e.x + Math.cos(an) * 60 * Math.min(1, k * 3), 380 + Math.sin(an) * 80 * Math.min(1, k * 3)); }
+      } else if (e.p === 11 && e.h) { // racine qui jaillit du sol
+        const k = Math.min(1, e.u / 5), al = e.u > 10 ? 1 - (e.u - 10) / 6 : 1;
+        for (let q = 0; q < 3; q++) { const bx = e.x + (q - 1) * 18, hh = (70 + q * 14 * (q % 2 ? 1 : .6)) * k; x.fillStyle = 'rgba(93,64,40,' + al + ')'; x.beginPath(); x.moveTo(bx - 9, 382); x.quadraticCurveTo(bx - 4 + (q - 1) * 10, 382 - hh * .6, bx + (q - 1) * 6, 382 - hh); x.quadraticCurveTo(bx + 4, 382 - hh * .5, bx + 9, 382); x.fill(); Y('rgba(124,179,66,' + al + ')', [[bx + (q - 1) * 6, 382 - hh], [bx + (q - 1) * 6 + 10, 382 - hh + 4], [bx + (q - 1) * 6 + 2, 382 - hh + 8]]); }
+      } else if (e.p === 12) { // pièces et butin volés qui filent vers Odile
+        for (let q = 0; q < e.n; q++) { const u = Math.max(0, Math.min(1, e.a * 1.4 - q * .05)), px = e.x + (e.tx - e.x) * u, py = e.y + (e.ty - e.y) * u - Math.sin(Math.PI * u) * (40 + q * 8) + (q % 3 - 1) * 8, w = Math.abs(Math.cos(Date.now() / 80 + q)) * 6 + 1;
+          x.fillStyle = q % 4 === 3 ? '#3fb8c9' : '#f1c40f'; x.beginPath(); x.ellipse(px, py, w, 6, 0, 0, 7); x.fill(); x.strokeStyle = '#b7950b'; x.lineWidth = 1; x.stroke(); }
+      } else if (e.p === 2) { // éclat de téléportation
         const r0 = 10 + e.a * 40; x.strokeStyle = 'rgba(90,200,255,' + (1 - e.a) + ')'; x.lineWidth = 4; x.beginPath(); x.ellipse(e.x, e.y, r0, r0 * 1.3, 0, 0, 7); x.stroke();
       } else if (e.p === 7) { // météore psychique : visée au sol, la boule tombe puis explose
         const gx = e.x, tt = Date.now() / 100;
@@ -2851,7 +3000,10 @@ const ADV_CH = [
   { id: 'kaze', hero: 'Kaze', col: '#2ecc71', t: 'L’Ombre du Clan', d: 'Prouver son innocence et retrouver le rouleau sacré.' },
   { id: 'viking', hero: 'Viking', col: '#f39c12', t: 'Le Dernier Drakkar', d: 'Reprendre le cor sacré au géant de givre.' },
   { id: 'chevalier', hero: 'Chevalier', col: '#aab7c4', t: 'Le Serment Brisé', d: 'Vaincre le dragon du pic et lever la malédiction du roi.' },
-  { id: 'kairos', hero: 'Kairos', col: '#d9b84a', t: 'Les Heures Perdues', d: 'Remettre en marche la Grande Horloge de l’arène.' }
+  { id: 'kairos', hero: 'Kairos', col: '#d9b84a', t: 'Les Heures Perdues', d: 'Remettre en marche la Grande Horloge de l’arène.' },
+  // ===== Saison 2 (chapitres 7 et 8, débloqués après Kairos) =====
+  { id: 'jumelles', hero: 'Jumelles', col: '#9f8cff', t: 'Deux Esprits, Un Cœur', d: 'Libérer l’Académie Prisme du Pr Vesper, le directeur qui vole les rêves.', s2: 1 },
+  { id: 'bryan', hero: 'Bryan', col: '#cfd2dc', t: 'Action !', d: 'Démasquer le producteur qui remplace les acteurs par des robots.', s2: 1 }
 ];
 let advOn = false, advPending = false, advS = null, advRw = '';
 const ADV_LV = {};
@@ -2863,7 +3015,8 @@ const advClearKeys = () => ['l', 'r', 'u', 'd', 0, 1, 2, 3].forEach(k => { keys[
 
 // ----- écran de choix des chapitres -----
 function advMenuHtml() {
-  return `<h2 style="margin:2px">📖 Mode aventure</h2><p style="margin:2px">Vis les histoires des héros originaux. Les chapitres se débloquent dans l’ordre.</p><div class="cards">${ADV_CH.map((c, i) => {
+  return `<h2 style="margin:2px">📖 Mode aventure</h2><p style="margin:2px">Vis les histoires des héros originaux. Les chapitres se débloquent dans l’ordre.</p><h3 style="margin:4px 0 0">📜 Saison 1</h3><div class="cards">${ADV_CH.map((c, i) => {
+    const sep = c.s2 && !ADV_CH[i - 1].s2 ? `</div><h3 style="margin:8px 0 0;color:#c9b8ff">✨ Saison 2 <small style="font-weight:normal;opacity:.8">· se débloque après la Saison 1</small></h3><div class="cards">` : '';
     const st = advSave().ch[c.id], ready = !!ADV_LV[c.id], open = ready && advPrevDone(i), nc = ready ? ADV_LV[c.id].coins.length : 0;
     let act;
     if (!ready) act = '<small style="opacity:.7">🚧 Bientôt</small>';
@@ -2871,15 +3024,15 @@ function advMenuHtml() {
     else if (st && st.done) act = `<span style="color:#2ecc71">✓ Terminé</span><br><button onclick="advStart('${c.id}')" style="padding:6px 12px">▶ Explorer</button> <button onclick="advReset('${c.id}')" style="background:#7f8c8d;padding:6px 10px">↺ Rejouer</button>`;
     else if (st && (st.step > 0 || st.intro)) act = `<button onclick="advStart('${c.id}')" style="padding:6px 12px">▶ Continuer</button> <button onclick="advReset('${c.id}')" style="background:#7f8c8d;padding:6px 10px">↺</button>`;
     else act = `<button onclick="advStart('${c.id}')" style="padding:6px 12px">▶ Commencer</button>`;
-    return `<div class="card" style="width:185px;cursor:default;border-color:${c.col};${open ? '' : 'opacity:.6'}"><b style="color:${c.col}">Chapitre ${i + 1} · ${c.hero}</b><br><i>« ${c.t} »</i><br><small>${c.d}</small><br>${ready ? `<small>🪙 Pièces cachées : ${st && st.coins ? st.coins.length : 0}/${nc}</small><br>` : ''}${act}</div>`;
+    return sep + `<div class="card" style="width:185px;cursor:default;border-color:${c.col};${open ? '' : 'opacity:.6'}"><b style="color:${c.col}">Chapitre ${i + 1} · ${c.hero}</b><br><i>« ${c.t} »</i><br><small>${c.d}</small><br>${ready ? `<small>🪙 Pièces cachées : ${st && st.coins ? st.coins.length : 0}/${nc}</small><br>` : ''}${act}</div>`;
   }).join('')}</div><p style="font-size:12px;opacity:.8;margin:2px">Flèches / ZQSD : marcher et sauter · J ou Entrée : parler · Échap : quitter</p><button onclick="view='menu';ui()" style="background:#7f8c8d">← Menu</button>`;
 }
 
 // ----- démarrer / quitter -----
-function advNew(id) { const L = ADV_LV[id], st = advCh(id); return { id, L, x: st.x || L.start, safeX: st.x || L.start, safeY: st.y || 380, fr: 0, zap: 0, swing: 0, k0: true, u0: true, wj: 0, touch: 0, kn: [], cutAt: {}, hits: {}, arrows: [], mets: [], block: false, wt: 0, ts: 0, tsCd: 0, onPrev: null, shake: 0, shatter: null, on: null, puff: null, beam: null, y: st.y || 380, vx: 0, vy: 0, face: 1, ground: true, walk: 0, dlg: null, acc: 0, last: performance.now(), j0: true, busy: false, toast: null, npc: null, res: null }; }
+function advNew(id) { const L = ADV_LV[id], st = advCh(id); return { id, L, x: st.x || L.start, safeX: st.x || L.start, safeY: st.y || 380, fr: 0, zap: 0, swing: 0, k0: true, u0: true, wj: 0, touch: 0, kn: [], cutAt: {}, hits: {}, arrows: [], mets: [], block: false, sis: 0, l0: true, cam: {}, wt: 0, ts: 0, tsCd: 0, onPrev: null, shake: 0, shatter: null, on: null, puff: null, beam: null, y: st.y || 380, vx: 0, vy: 0, face: 1, ground: true, walk: 0, dlg: null, acc: 0, last: performance.now(), j0: true, busy: false, toast: null, npc: null, res: null }; }
 function advStart(id) {
   if (!ADV_LV[id] || !advOpen()) return;
-  for (const p of ADV_LV[id].plats) { p.c = 0; p.g = 0; if (p.bx != null) { p.x = p.bx; p.y = p.by; } } // glace fine reformée, plateformes à horloge remises en place
+  for (const p of ADV_LV[id].plats) { p.c = 0; p.g = 0; if (p.bx != null) { p.x = p.bx; p.y = p.by; } if (p.tk) { if (p.ox == null) { p.ox = p.x; p.oy = p.y; } const dn = advCh(id).gates.includes(p.tk); p.x = dn ? p.tx : p.ox; p.y = dn ? p.ty : p.oy; } } // glace fine reformée, plateformes à horloge remises en place
   advS = advNew(id);
   if (!chars.length) { advPending = true; connect({ t: 'training_list' }); return; } // il faut la liste des persos (dessin des combattants)
   advEnter();
@@ -2909,7 +3062,7 @@ function advNext() {
   if (d.i >= d.lines.length) { advS.dlg = null; if (d.then) d.then(); }
 }
 function advToast(t) { if (advS) advS.toast = { t, e: performance.now() + 2600 }; }
-function advSetStep(s) { const st = advCh(advS.id); if (s > st.step) { st.step = s; persist(); advToast('🎯 Nouvel objectif : ' + advS.L.goal(st.step)); } }
+function advSetStep(s) { const st = advCh(advS.id); if (s > st.step) { st.step = s; persist(); advToast('🎯 Nouvel objectif : ' + advS.L.goal(st.step, st)); } }
 function advNear() {
   const st = advCh(advS.id); let b = null, bd = 85;
   for (const n of advS.L.npcs) { if (n.show && !n.show(st.step)) continue; const d = Math.abs(n.x - advS.x); if (d < bd && Math.abs(advS.y - (n.py || 380)) < 110) { bd = d; b = n; } }
@@ -2970,6 +3123,13 @@ function advFinish() {
 function advStep() {
   const A = advS, L = A.L, st = advCh(A.id), walls = L.walls || [];
   A.fr++; if (A.ts > 0) A.ts--; else A.wt++; if (A.tsCd > 0) A.tsCd--; // A.wt = temps du monde (figé pendant l'arrêt du temps)
+  for (const p of L.plats) if (p.tk) { // objets déplacés par télékinésie : glissent vers leur nouvelle place (et portent le joueur)
+    if (p.ox == null) { p.ox = p.x; p.oy = p.y; }
+    const dn = st.gates.includes(p.tk), tx = dn ? p.tx : p.ox, ty = dn ? p.ty : p.oy;
+    const nx = p.x + Math.max(-7, Math.min(7, tx - p.x)), ny = p.y + Math.max(-7, Math.min(7, ty - p.y));
+    if (A.onPrev === p) { A.x += nx - p.x; A.y = ny; }
+    p.lift = nx !== tx || ny !== ty; p.x = nx; p.y = ny;
+  }
   for (const p of L.plats) if (p.mv) { // plateformes à horloge : avancent pendant 3/4 du cycle puis se rembobinent ; elles portent le joueur
     if (p.bx == null) { p.bx = p.x; p.by = p.y; }
     const u = ((A.wt + (p.mv.off || 0)) % p.mv.per) / p.mv.per, fr = u < .75 ? u / .75 : 1 - (u - .75) / .25, nx = p.bx + p.mv.dx * fr, ny = p.by + p.mv.dy * fr;
@@ -3001,9 +3161,9 @@ function advStep() {
   const ropeOk = id => st.ropes.includes(id) && (A.cutAt[id] == null || A.fr - A.cutAt[id] > 22);
   if (A.y >= 380 && py <= 380.5 && !pit(A.x)) { A.y = 380; A.vy = 0; A.ground = true; A.safeX = A.x; A.safeY = 380; }
   else if (A.vy >= 0) {
-    for (const p of L.plats) if ((!p.rope || ropeOk(p.rope)) && !(p.g > 0) && A.x > p.x - 8 && A.x < p.x + p.w + 8 && py <= p.y + .5 && A.y >= p.y) { A.y = p.y; A.vy = 0; A.ground = true; A.on = p; break; } // plateformes traversables par dessous
+    for (const p of L.plats) if ((!p.rope || ropeOk(p.rope)) && !(p.g > 0) && (!p.nox || A.sis === 1) && A.x > p.x - 8 && A.x < p.x + p.w + 8 && py <= p.y + .5 && A.y >= p.y) { A.y = p.y; A.vy = 0; A.ground = true; A.on = p; break; } // plateformes traversables par dessous
     if (!A.ground) for (const w of walls) if (A.x > w.x1 - 14 && A.x < w.x2 + 14 && py <= w.top + .5 && A.y >= w.top) { A.y = w.top; A.vy = 0; A.ground = true; break; }
-    if (A.ground && A.y < 380 && !(A.on && A.on.mv)) { A.safeX = A.x; A.safeY = A.y; }
+    if (A.ground && A.y < 380 && !(A.on && (A.on.mv || A.on.nox || A.on.tk))) { A.safeX = A.x; A.safeY = A.y; }
   }
   for (const p of L.plats) if (p.k === 'thin') { // glace fine : craque si on reste dessus, puis se reforme
     if (p.g > 0) { if (--p.g === 0) p.c = 0; continue; }
@@ -3024,6 +3184,23 @@ function advStep() {
   if (A.ground && Math.abs(A.vx) > .6) A.walk += .3;
   // touche K : coup de sceptre (paratonnerres) ou lancer de kunaï (cordes)
   const k = !!keys[1], kp = k && !A.k0 && !frozen; A.k0 = k;
+  if (L.twin) { // L : changer de sœur (Luma = télékinésie, Nox = voit l'invisible)
+    const l2 = !!keys[2], lp = l2 && !A.l0 && !frozen; A.l0 = l2;
+    if (lp) { A.sis = A.sis ? 0 : 1; A.puff = { x: A.x, y: A.y - 40, t: 14 }; advToast(A.sis ? '🌙 Nox : elle voit les plateformes invisibles et lit les pensées' : '☀️ Luma : télékinésie avec K'); }
+  }
+  if (kp && L.twin) for (const p of L.plats) if (p.tk && !st.gates.includes(p.tk) && Math.abs(A.x - (p.x + p.w / 2)) < 190) {
+    if (A.sis) advToast('🌙 Nox ne peut pas déplacer les objets : appuie sur L pour passer à Luma');
+    else { st.gates.push(p.tk); persist(); A.shake = 6; advToast(p.msg || '✨ Télékinésie ! L’objet se déplace.'); }
+    break;
+  }
+  for (const cm of L.cams || []) { // caméras : la cascade doit être tournée entre « Action ! » et « Coupez ! »
+    if (st.gates.includes(cm.id)) continue;
+    const lit = (A.wt + (cm.off || 0)) % cm.per < cm.on, inZ = A.x > cm.x1 && A.x < cm.x2; cm.lit = lit;
+    if (inZ && !A.cam[cm.id]) { if (lit) A.cam[cm.id] = 1; else { A.x = cm.x1 - 18; if (A.vx > 0) A.vx = 0; advToast('✋ Attends le « Action ! » avant d’entrer dans le décor'); } }
+    else if (A.cam[cm.id] && A.x <= cm.x1) A.cam[cm.id] = 0;
+    else if (A.cam[cm.id] && !lit) { A.cam[cm.id] = 0; A.x = cm.x1 - 40; A.y = 380; A.vx = A.vy = 0; A.shake = 6; advToast('🎬 « Coupez ! » Trop lent… On la refait !'); }
+    else if (A.cam[cm.id] && A.x >= cm.x2) { st.gates.push(cm.id); A.cam[cm.id] = 0; if (!save.admin) save.coins += 10; persist(); advToast(cm.msg || '🎬 « Coupez ! C’est dans la boîte ! » +10 pièces'); }
+  }
   if (kp && L.timestop) { // arrêt du temps de Kairos
     if (A.tsCd > 0) advToast('⏳ Arrêt du temps en recharge… ' + Math.ceil(A.tsCd / 60) + ' s');
     else { A.ts = 150; A.tsCd = 420; A.shake = 6; advToast('⏸️ Le temps s’arrête !'); }
@@ -3091,13 +3268,13 @@ function advStep() {
     advToast('🪙 Pièce cachée ! +5 pièces (' + st.coins.length + '/' + L.coins.length + ')');
   }
   if (L.clues && L.clueOn(st)) for (const c of L.clues) if (!st.clues.includes(c.id) && Math.abs(A.x - c.x) < 30 && c.y > A.y - 110 && c.y < A.y + 6) {
-    st.clues.push(c.id); persist(); advToast('🔍 Indice trouvé : ' + c.n + ' (' + st.clues.length + '/' + L.clues.length + ')');
+    st.clues.push(c.id); persist(); advToast((L.clueTxt || '🔍 Indice trouvé : ') + c.n + ' (' + st.clues.length + '/' + L.clues.length + ')');
     if (st.clues.length >= L.clues.length && L.onClues) L.onClues(st);
   }
   const j = !!keys[0];
   if (j && !A.j0) { if (A.dlg) advNext(); else if (!A.busy) { const n = advNear(); if (n) advTalk(n); } }
   A.j0 = j;
-  if (A.ground && !(A.on && A.on.mv)) { st.x = A.x; st.y = A.y; } else { st.x = A.safeX || A.x; st.y = A.safeY || 380; }
+  if (A.ground && !(A.on && (A.on.mv || A.on.nox || A.on.tk))) { st.x = A.x; st.y = A.y; } else { st.x = A.safeX || A.x; st.y = A.safeY || 380; }
   A.onPrev = A.on;
 }
 // éclair en zigzag (déterministe pour une image donnée)
@@ -3149,6 +3326,16 @@ function advMech(L, st, A) {
       } else if (A.shatter && A.shatter.x === g.x) { const u = 1 - A.shatter.t / 45; for (let q = 0; q < 14; q++) { const a2 = q * .45, d = u * (60 + q * 8); x.fillStyle = 'rgba(200,240,255,' + (1 - u) + ')'; x.fillRect(g.x + Math.cos(a2) * d, 300 + Math.sin(a2) * d * .6 + u * u * 120, 7, 7); } }
       continue;
     }
+    if (g.look === 'wood') { // décor en contreplaqué : se fend à chaque coup de pied
+      if (!open) {
+        const h = A.hits[g.id] || 0, sh = A.shake > 0 && A.hits[g.id] ? (Math.random() - .5) * 4 : 0;
+        x.fillStyle = '#c8a06a'; x.fillRect(g.x - 38 + sh, 230, 76, 150); x.fillStyle = '#a97d48'; for (let q = 0; q < 5; q++) x.fillRect(g.x - 38 + sh, 236 + q * 30, 76, 3);
+        x.fillStyle = '#6d4c41'; x.fillRect(g.x - 44, 226, 8, 154); x.fillRect(g.x + 36, 226, 8, 154);
+        x.fillStyle = '#fff'; x.font = 'bold 12px sans-serif'; x.textAlign = 'center'; x.fillText(g.label || 'DÉCOR', g.x + sh, 300);
+        x.strokeStyle = '#3e2723'; x.lineWidth = 2; x.beginPath(); if (h >= 1) { x.moveTo(g.x - 30, 260); x.lineTo(g.x - 4, 300); x.lineTo(g.x - 18, 340); } if (h >= 2) { x.moveTo(g.x + 30, 250); x.lineTo(g.x + 6, 290); x.lineTo(g.x + 24, 360); } x.stroke();
+      } else if (A.shatter && A.shatter.x === g.x) { const u = 1 - A.shatter.t / 45; for (let q = 0; q < 12; q++) { const a2 = q * .52, d = u * (50 + q * 7); x.fillStyle = 'rgba(200,160,106,' + (1 - u) + ')'; x.fillRect(g.x + Math.cos(a2) * d, 300 + Math.sin(a2) * d * .6 + u * u * 120, 12, 5); } }
+      continue;
+    }
     if (g.look === 'portcullis') { // herse en fer : se lève quand le mécanisme est touché
       x.fillStyle = '#5b5566'; x.fillRect(g.x - 46, 200, 14, 180); x.fillRect(g.x + 32, 200, 14, 180); x.fillRect(g.x - 50, 190, 100, 18);
       const lift = open ? 140 : 0; x.strokeStyle = '#2c2c34'; x.lineWidth = 4; x.beginPath();
@@ -3187,6 +3374,18 @@ function advMech(L, st, A) {
     }
   }
   if (A.beam) advBolt(A.beam.x1, A.beam.y1, A.beam.x2, A.beam.y2, sd, 6);
+  for (const cm of L.cams || []) { // caméra sur trépied, voyant rouge, marquages au sol
+    const done = st.gates.includes(cm.id), lit = !done && cm.lit, cx = cm.x1 - 70;
+    LN('#3d3d46', 3, cx, 330, cx - 14, 380); LN('#3d3d46', 3, cx, 330, cx + 14, 380); LN('#3d3d46', 3, cx, 330, cx, 380);
+    x.fillStyle = '#26262e'; x.fillRect(cx - 22, 300, 44, 30); C('#26262e', cx - 12, 296, 9); C('#26262e', cx + 8, 296, 9); x.fillStyle = '#111'; x.fillRect(cx + 22, 308, 14, 14);
+    C(lit ? '#ff2d2d' : '#5a1a1a', cx - 14, 306, 4); if (lit) { x.fillStyle = 'rgba(255,45,45,.25)'; x.beginPath(); x.arc(cx - 14, 306, 12, 0, 7); x.fill(); }
+    x.fillStyle = done ? 'rgba(46,204,113,.5)' : '#f1c40f'; x.fillRect(cm.x1, 380, 6, 8); x.fillRect(cm.x2 - 6, 380, 6, 8);
+    if (!done) { x.fillStyle = 'rgba(255,255,255,' + (lit ? .05 : .0) + ')'; x.fillRect(cm.x1, 200, cm.x2 - cm.x1, 180); }
+    const lab = done ? '✓ DANS LA BOÎTE' : lit ? '🎬 ACTION !' : '✋ COUPEZ — attends…';
+    x.font = 'bold 18px sans-serif'; x.textAlign = 'center'; x.lineWidth = 4; x.strokeStyle = '#000'; x.fillStyle = done ? '#2ecc71' : lit ? '#ff5050' : '#ddd';
+    x.strokeText(lab, (cm.x1 + cm.x2) / 2, 196); x.fillText(lab, (cm.x1 + cm.x2) / 2, 196);
+    if (!done && lit && A.cam[cm.id]) { const u = ((A.wt + (cm.off || 0)) % cm.per) / cm.on; x.fillStyle = '#000'; x.fillRect(cm.x1, 204, cm.x2 - cm.x1, 6); x.fillStyle = '#ff5050'; x.fillRect(cm.x1, 204, (cm.x2 - cm.x1) * (1 - u), 6); }
+  }
   for (const pd of L.pends || []) { // balancier : axe doré, tige, lame en demi-lune
     const an = pd.amp * Math.sin(2 * Math.PI * (A.wt + pd.off) / pd.per), bx = pd.x + Math.sin(an) * pd.len, by = pd.top + Math.cos(an) * pd.len;
     x.fillStyle = '#3a2c18'; x.fillRect(pd.x - 40, pd.top - 12, 80, 12); C('#d9b84a', pd.x, pd.top, 8);
@@ -3349,6 +3548,7 @@ function advFrame() {
     if (A.swing > 0) { hf.ak = L.timestop ? 3 : 0; hf.ap = A.swing > 10 ? 1 : 2; hf.pp = A.swing > 10 ? (18 - A.swing) / 8 : (10 - A.swing) / 10; }
     if (A.zap > 14) hf.fl = (A.zap >> 2) & 1;
     if (A.block) hf.bl = 1;
+    if (L.twin) hf.sis = A.sis;
     fighter(hf, 9);
   }
   x.restore();
@@ -4592,6 +4792,494 @@ ADV_LV.kairos = (() => {
     }
   };
 }
+
+// ===================== SAISON 2 =====================
+// Chapitre 7 : Jumelles · Deux Esprits, Un Cœur — Chapitre 8 : Bryan · Action !
+ADV_LOOK['Drone gardien'] = { base: 'Drone' };
+ADV_LOOK['Golem de livres'] = { base: 'Golem', pal: { '#5f666b': '#7a4a2a', '#4b5155': '#5a3420', '#7f8c8d': '#c9a66b', '#8f9a9c': '#e8d6a8', '#6d7377': '#8a5a34', '#8b9196': '#f4ead0', '#737a7f': '#a07850' } };
+ADV_LOOK['Iris'] = { base: 'Jumelles', look: 'iris', solo: 1, pal: { '#7fd0ff': '#2ecc9a', '#e4f5ff': '#e8fff6', '#3aa8ff': '#17a589', '#eef3ff': '#1e3a34', '#a9d8ff': '#48c9b0', '#2fb4ff': '#1abc9c', '#0b5fa8': '#0e6655', '#2f6ea8': '#145a32' } };
+ADV_LOOK['Cauchemar'] = { base: 'Jumelles', look: 'shade', solo: 1, pal: { '#7fd0ff': '#1a0d26', '#e4f5ff': '#3a1f4a', '#3aa8ff': '#5a1a3a', '#eef3ff': '#0b0610', '#a9d8ff': '#3d0f2a', '#2fb4ff': '#ff2d6a', '#0b5fa8': '#8a0f2a', '#2f6ea8': '#0b0610', '#ffffff': '#2a1838', '#fde3d0': '#4a3a5a' } };
+ADV_LOOK['Pr Vesper'] = { base: 'Zéphyr', look: 'vesper', pal: { '#6c3483': '#e8ecef', '#5b2c6f': 'rgba(0,0,0,0)', '#4a235a': 'rgba(0,0,0,0)', '#ecf0f1': '#9aa0a6', '#f1c40f': '#c36bff', '#5dade2': '#c36bff', '#d6eaf8': '#ead1ff' } };
+ADV_LOOK['Rick'] = { base: 'Bryan', look: 'rick', pal: { '#16161b': '#c0392b', '#0f0f14': '#f1c40f' } };
+ADV_LOOK['Shérif robot'] = { base: 'Bryan', look: 'sheriff', pal: { '#f5cba7': '#aab4bf', '#16161b': '#7b4a2e', '#f4f4f6': '#3e5c8a', '#e9e9ee': '#33507a', '#0f0f14': '#5d6670' } };
+ADV_LOOK['Capitaine Boulon'] = { base: 'Bryan', look: 'pirate', pal: { '#f5cba7': '#9aa4ae', '#16161b': '#7a1f1f', '#f4f4f6': '#2c2c34', '#e9e9ee': '#22222a', '#0f0f14': '#3a3f48' } };
+ADV_LOOK['Bryan-X'] = { base: 'Bryan', look: 'bx', pal: { '#f5cba7': '#c0c6d0', '#16161b': '#3a3f48', '#f4f4f6': '#5d6670', '#e9e9ee': '#4f5862', '#0f0f14': '#2a2e36' } };
+ADV_LOOK['Max Silver'] = { base: 'Mecha' };
+
+// PNJ de la saison 2
+{
+  const baseNpc = advNpc;
+  advNpc = (k, px, s, py = 380) => {
+    const t = Date.now(), br = Math.sin(t / 500 + px) * 1.2;
+    if (k === 'pip') { // Pip : petit élève de l'Académie, uniforme bleu marine, grosses lunettes, cravate prisme, livre sous le bras
+      x.save(); x.translate(px, py); const hop = Math.abs(Math.sin(t / 260)) * 3;
+      R('#2c3e66', -10, -26, 8, 26); R('#2c3e66', 2, -26, 8, 26); R('#111', -12, -5, 11, 5); R('#111', 1, -5, 11, 5);
+      R('#1f2b4d', -15, -64 - hop, 30, 40); R('#f4f6fb', -4, -64 - hop, 8, 14); Y('#9f8cff', [[0, -58 - hop], [4, -46 - hop], [0, -40 - hop], [-4, -46 - hop]]);
+      R('#c0392b', -s * 22, -54 - hop, 10, 14); R('#f5ecd0', -s * 22 + 2, -52 - hop, 6, 10);
+      C('#f2c9a0', 0, -78 - hop, 12); x.fillStyle = '#6d4c41'; x.beginPath(); x.arc(0, -82 - hop, 13, Math.PI, 0); x.fill(); R('#6d4c41', -13, -84 - hop, 6, 8);
+      x.strokeStyle = '#222'; x.lineWidth = 1.6; x.beginPath(); x.arc(s * 6, -79 - hop, 4.5, 0, 7); x.stroke(); x.beginPath(); x.arc(-s * 3, -79 - hop, 4, 0, 7); x.stroke(); C('#222', s * 6, -79 - hop, 1.4);
+      LN('#7a3b2e', 1.4, s * 1, -71 - hop, s * 6, -71 - hop);
+      x.restore(); return;
+    }
+    if (k === 'ghost') { // Mme Pages, la bibliothécaire fantôme : à peine visible pour Luma, nette pour Nox
+      const nox = advS && advS.sis === 1, fy = Math.sin(t / 420) * 6; x.save(); x.translate(px, py - 30 + fy); x.globalAlpha = nox ? .9 : .22;
+      x.fillStyle = '#cfe8ff'; x.beginPath(); x.moveTo(-20, -70); x.quadraticCurveTo(-24, -10, -28, 10); for (let q = 0; q < 5; q++) x.lineTo(-28 + q * 14 + 7, 10 + Math.sin(t / 150 + q) * 5), x.lineTo(-28 + (q + 1) * 14, 4); x.quadraticCurveTo(24, -10, 20, -70); x.fill();
+      C('#e8f4ff', 0, -86, 14); x.fillStyle = '#b8d4ee'; x.beginPath(); x.arc(0, -98, 9, 0, 7); x.fill(); // chignon
+      x.strokeStyle = '#4a6a8a'; x.lineWidth = 1.5; x.beginPath(); x.arc(s * 5, -86, 4, 0, 7); x.stroke(); x.beginPath(); x.arc(-s * 4, -86, 3.6, 0, 7); x.stroke(); LN('#4a6a8a', 1, -6, -95, 9, -95);
+      LN('#cfe8ff', 5, s * 14, -60, s * 26, -48); R('#6a3a7a', s * 22 - 6, -56, 14, 18); R('#f4ead0', s * 22 - 4, -54, 10, 14);
+      x.restore(); if (nox) { x.fillStyle = 'rgba(178,102,255,.35)'; x.beginPath(); x.arc(px, py - 120 + fy, 6 + Math.sin(t / 200) * 2, 0, 7); x.fill(); } return;
+    }
+    if (k === 'cat') { // Moustache, le chat noir médium : grandes moustaches blanches, yeux dorés, queue qui ondule
+      x.save(); x.translate(px, py); const w = Math.sin(t / 300) * 8;
+      x.fillStyle = '#16141c'; x.beginPath(); x.ellipse(0, -16, 20, 12, 0, 0, 7); x.fill(); R('#16141c', -14, -10, 5, 10); R('#16141c', 9, -10, 5, 10);
+      x.strokeStyle = '#16141c'; x.lineWidth = 5; x.lineCap = 'round'; x.beginPath(); x.moveTo(-s * 18, -18); x.quadraticCurveTo(-s * 34, -30 + w, -s * 30, -48 + w); x.stroke(); x.lineCap = 'butt';
+      C('#16141c', s * 18, -30, 11); Y('#16141c', [[s * 10, -36], [s * 12, -48], [s * 17, -38]]); Y('#16141c', [[s * 20, -38], [s * 25, -48], [s * 27, -35]]);
+      C('#f1c40f', s * 15, -32, 2.6); C('#f1c40f', s * 23, -32, 2.6); R('#111', s * 15 - .6, -34, 1.2, 4); R('#111', s * 23 - .6, -34, 1.2, 4);
+      [-1, 1].forEach(d => { LN('#fff', 1.2, s * 20, -26, s * 34, -27 + d * 4); LN('#fff', 1.2, s * 20, -26, s * 6, -27 + d * 4); });
+      C('#ff9ec7', s * 20, -27, 1.5); x.restore(); return;
+    }
+    if (k === 'lola') { // Lola, la réalisatrice : béret rouge, écharpe, mégaphone, carnet de scénario
+      x.save(); x.translate(px, py);
+      R('#2d2d34', -12, -34, 10, 34); R('#2d2d34', 2, -34, 10, 34); R('#5a2d1e', -14, -6, 13, 6); R('#5a2d1e', 1, -6, 13, 6);
+      R('#e8e0d0', -17, -86 + br, 34, 54 - br); Y('#c0392b', [[-17, -86], [17, -86], [10, -76], [-14, -60], [-17, -70]]);
+      LN('#e8e0d0', 7, s * 15, -80, s * 26, -66); Y('#f1c40f', [[s * 24, -74], [s * 42, -84], [s * 42, -58], [s * 24, -66]]); C('#2d2d34', s * 24, -70, 4);
+      LN('#e8e0d0', 7, -s * 15, -80, -s * 18, -52); R('#2c3e50', -s * 18 - 6, -60, 12, 15);
+      C('#e0a87a', 0, -100, 12); x.fillStyle = '#3d2314'; x.beginPath(); x.arc(0, -100, 13, Math.PI * .9, Math.PI * 2.1); x.fill(); R('#3d2314', -13, -100, 6, 16);
+      x.fillStyle = '#c0392b'; x.beginPath(); x.ellipse(-s * 2, -112, 16, 6, -s * .2, 0, 7); x.fill(); C('#c0392b', -s * 2, -118, 2);
+      C('#111', s * 6, -101, 1.8); LN('#8a3b2e', 1.4, s * 2, -94, s * 7, -94);
+      x.restore(); return;
+    }
+    if (k === 'gaston') { // Gaston, le machiniste-projectionniste : salopette, casquette, grosse moustache, bobine sous le bras
+      x.save(); x.translate(px, py);
+      R('#3b5b8a', -15, -34, 13, 34); R('#3b5b8a', 2, -34, 13, 34); R('#222', -16, -6, 15, 6); R('#222', 1, -6, 15, 6);
+      R('#c0392b', -20, -88 + br, 40, 30); R('#3b5b8a', -18, -64, 36, 34); R('#3b5b8a', -12, -88, 6, 26); R('#3b5b8a', 6, -88, 6, 26); C('#f1c40f', -9, -66, 2); C('#f1c40f', 9, -66, 2);
+      LN('#c0392b', 8, -s * 18, -82, -s * 22, -56); C('#d9a07a', -s * 22, -54, 5);
+      x.save(); x.translate(s * 24, -66); x.rotate(t / 600); x.fillStyle = '#7f8c8d'; x.beginPath(); x.arc(0, 0, 14, 0, 7); x.fill(); x.fillStyle = '#2c2c34'; for (let q = 0; q < 5; q++) { x.beginPath(); x.arc(Math.cos(q * 1.26) * 8, Math.sin(q * 1.26) * 8, 3, 0, 7); x.fill(); } x.restore();
+      C('#d9a07a', 0, -102, 13); R('#2c3e50', -14, -117, 28, 8); R('#2c3e50', s > 0 ? 2 : -24, -111, 22, 3);
+      Y('#4a3020', [[-s * 2, -97], [s * 14, -96], [s * 16, -90], [s * 6, -93], [-s * 4, -91]]); C('#111', s * 7, -104, 1.8); C('#e8967a', s * 12, -99, 3);
+      x.restore(); return;
+    }
+    if (k === 'max') { // Max Silver en personne, sorti de son robot : costume argent, lunettes de soleil, brushing argenté
+      x.save(); x.translate(px, py);
+      R('#9aa0aa', -13, -36, 11, 36); R('#9aa0aa', 2, -36, 11, 36); R('#111', -14, -6, 13, 6); R('#111', 1, -6, 13, 6);
+      R('#c8ccd4', -18, -88 + br, 36, 54 - br); Y('#f4f4f6', [[-6, -88], [6, -88], [0, -72]]); Y('#d4af37', [[-2, -84], [2, -84], [3, -68], [0, -64], [-3, -68]]);
+      LN('#c8ccd4', 7, s * 16, -82, s * 24, -98); C('#f0c8a0', s * 25, -101, 5); // il se gratte la tête, gêné
+      LN('#c8ccd4', 7, -s * 16, -82, -s * 20, -54); C('#f0c8a0', -s * 20, -52, 5);
+      C('#f0c8a0', 0, -102, 12); x.fillStyle = '#e8eaee'; x.beginPath(); x.ellipse(-s * 2, -114, 15, 8, s * .3, 0, 7); x.fill();
+      R('#111', s > 0 ? -2 : -12, -106, 14, 5); LN('#8a3b2e', 1.4, s * 1, -95, s * 7, -96);
+      x.restore(); return;
+    }
+    baseNpc(k, px, s, py);
+  };
+}
+// plateformes de la saison 2
+{
+  const basePlatsS2 = advPlats;
+  advPlats = L => {
+    basePlatsS2(L);
+    const t = Date.now() / 1000, A = advS, nox = A && A.sis === 1;
+    for (const p of L.plats) {
+      if (p.k === 'psy') { // plateforme psychique : seule Nox la voit (et peut marcher dessus)
+        if (nox) { x.fillStyle = 'rgba(178,102,255,.25)'; x.fillRect(p.x - 4, p.y - 4, p.w + 8, 18); x.fillStyle = '#b266ff'; x.beginPath(); x.roundRect(p.x, p.y, p.w, 10, 5); x.fill(); x.fillStyle = '#ead1ff'; x.fillRect(p.x + 4, p.y + 1, p.w - 8, 2);
+          for (let q = 0; q < 3; q++) { const u = (t * .8 + q / 3) % 1; x.fillStyle = 'rgba(234,209,255,' + (1 - u) + ')'; x.fillRect(p.x + p.w * (q + .5) / 3, p.y + 10 + u * 22, 2, 2); } }
+        else { x.strokeStyle = 'rgba(178,102,255,' + (.12 + .08 * Math.sin(t * 3 + p.x)) + ')'; x.lineWidth = 1.5; x.setLineDash([5, 6]); x.strokeRect(p.x, p.y, p.w, 10); x.setLineDash([]); }
+      } else if (p.k === 'tkbox') { // meuble déplaçable par télékinésie (lueur bleue tant qu'il n'a pas bougé)
+        const near = A && A.sis === 0 && !advCh(A.id).gates.includes(p.tk) && Math.abs(A.x - (p.x + p.w / 2)) < 190, h = p.h || 40;
+        if (near || p.lift) { x.fillStyle = 'rgba(127,208,255,' + (.25 + .15 * Math.sin(t * 6)) + ')'; x.fillRect(p.x - 6, p.y - 6, p.w + 12, h + 12); }
+        x.fillStyle = '#6d4423'; x.fillRect(p.x, p.y, p.w, h); x.fillStyle = '#8a5a34'; x.fillRect(p.x, p.y, p.w, 6);
+        const cols = ['#c0392b', '#2980b9', '#27ae60', '#8e44ad', '#d4ac0d']; for (let q = 0; q < p.w - 14; q += 9) { x.fillStyle = cols[(q / 9 + p.x) % 5 | 0]; x.fillRect(p.x + 7 + q, p.y + 9, 7, h - 14); }
+        if (near && !A.dlg) { x.fillStyle = 'rgba(0,0,0,.7)'; x.beginPath(); x.roundRect(p.x + p.w / 2 - 70, p.y - 42, 140, 24, 8); x.fill(); x.fillStyle = '#bfe6ff'; x.font = 'bold 13px sans-serif'; x.textAlign = 'center'; x.fillText('✨ K : télékinésie', p.x + p.w / 2, p.y - 25); }
+      } else if (p.k === 'shelf') { // haut d'étagère de bibliothèque
+        x.fillStyle = '#5a3420'; x.fillRect(p.x, p.y, p.w, 12); x.fillStyle = '#7a4a2a'; x.fillRect(p.x, p.y, p.w, 4);
+      } else if (p.k === 'cloud') { // île de rêve flottante
+        x.fillStyle = '#4a2f7a'; x.beginPath(); x.moveTo(p.x, p.y + 6); x.lineTo(p.x + p.w, p.y + 6); x.lineTo(p.x + p.w * .7, p.y + 30); x.lineTo(p.x + p.w * .45, p.y + 44); x.lineTo(p.x + p.w * .25, p.y + 26); x.fill();
+        x.fillStyle = '#c9b8ff'; x.beginPath(); x.roundRect(p.x, p.y, p.w, 9, 4); x.fill(); x.fillStyle = 'rgba(255,255,255,.5)'; x.fillRect(p.x + 6, p.y + 1, p.w - 12, 2);
+      } else if (p.k === 'barrel') { // tonneau flottant
+        x.fillStyle = '#8a5a2b'; x.beginPath(); x.roundRect(p.x, p.y, p.w, 22, 6); x.fill(); x.fillStyle = '#4a4a52'; x.fillRect(p.x + 8, p.y, 4, 22); x.fillRect(p.x + p.w - 12, p.y, 4, 22); x.fillStyle = 'rgba(255,255,255,.2)'; x.fillRect(p.x, p.y, p.w, 3);
+      } else if (p.k === 'deck') { // pont de bateau en contreplaqué (on voit les étais derrière)
+        x.fillStyle = '#6d4423'; x.fillRect(p.x, p.y, p.w, p.h || 14); x.fillStyle = '#8a5a34'; for (let q = 0; q < p.w; q += 30) x.fillRect(p.x + q, p.y, 28, 4);
+      } else if (p.k === 'roofjp') { // toit de décor japonais
+        x.fillStyle = '#2c3440'; x.beginPath(); x.moveTo(p.x - 12, p.y + 14); x.lineTo(p.x, p.y); x.lineTo(p.x + p.w, p.y); x.lineTo(p.x + p.w + 12, p.y + 14); x.fill(); x.fillStyle = '#4a5464'; x.fillRect(p.x, p.y, p.w, 3);
+        x.fillStyle = 'rgba(0,0,0,.25)'; for (let q = 6; q < p.w; q += 12) x.fillRect(p.x + q, p.y + 3, 2, 10);
+      } else if (p.k === 'space') { // plateforme de la station spatiale (feu de position)
+        x.fillStyle = '#8a94a6'; x.beginPath(); x.roundRect(p.x, p.y, p.w, 12, 3); x.fill(); x.fillStyle = '#3a4250'; x.fillRect(p.x + 4, p.y + 4, p.w - 8, 3);
+        C(Math.sin(t * 4 + p.x) > 0 ? '#2ecc71' : '#145a32', p.x + 6, p.y + 6, 2.5); C(Math.sin(t * 4 + p.x) > 0 ? '#e74c3c' : '#5a1a1a', p.x + p.w - 6, p.y + 6, 2.5);
+        x.fillStyle = 'rgba(95,208,255,.25)'; x.beginPath(); x.moveTo(p.x + p.w / 2 - 10, p.y + 12); x.lineTo(p.x + p.w / 2 + 10, p.y + 12); x.lineTo(p.x + p.w / 2, p.y + 34 + Math.sin(t * 20) * 4); x.fill();
+      } else if (p.k === 'scaff') { // échafaudage de plateau
+        x.fillStyle = '#7f8c8d'; x.fillRect(p.x + 4, p.y, 4, 380 - p.y); x.fillRect(p.x + p.w - 8, p.y, 4, 380 - p.y); LN('#7f8c8d', 2, p.x + 6, p.y + 10, p.x + p.w - 6, 376);
+        x.fillStyle = '#b07a43'; x.fillRect(p.x, p.y, p.w, 8); x.fillStyle = '#f1c40f'; x.fillRect(p.x, p.y, p.w, 2);
+      }
+    }
+  };
+}
+// petit utilitaire : bulle de nom de zone en haut de l'écran
+const advZoneTag = (zones, a, b, ic) => { for (const z of zones) { const zx = z[0] + 60; if (zx + 420 < a || zx - 20 > b) continue; x.fillStyle = 'rgba(10,8,20,.6)'; x.font = 'bold 15px sans-serif'; const tw = x.measureText(ic + ' ' + z[2]).width; x.beginPath(); x.roundRect(zx - 10, 52, tw + 20, 28, 8); x.fill(); x.fillStyle = z[3]; x.textAlign = 'left'; x.fillText(ic + ' ' + z[2], zx, 71); } };
+
+// ---------------------------------------------------------------- CHAPITRE 7 : JUMELLES
+ADV_LV.jumelles = (() => {
+  const ZONES = [[0, 900, 'LA COUR DE L’ACADÉMIE PRISME', '#9f8cff'], [900, 1700, 'LES COULOIRS', '#7fd0ff'], [1700, 2750, 'LA BIBLIOTHÈQUE INTERDITE', '#d4ac0d'], [2750, 3550, 'LE JARDIN DES DORTOIRS', '#7fe0b0'], [3550, 4700, 'LE MONDE DES RÊVES', '#c36bff'], [4700, 5700, 'LA TOUR DU DIRECTEUR', '#ff3fb4']];
+  const L = {
+    hero: 'Jumelles', title: 'Chapitre 7 · Deux Esprits, Un Cœur', len: 5700, start: 160, skin: 'skin_jumelles_eclipse', twin: true, kHint: 'L : changer de sœur · K : télékinésie (Luma)',
+    fall: '↩ Les jumelles se réveillent en sursaut… et reprennent un peu plus loin.', clueTxt: '📄 Page du journal secret : ',
+    colors: { Jumelles: '#9f8cff', Luma: '#7fd0ff', Nox: '#c36bff', Pip: '#2c3e66', 'Mme Pages': '#bfe6ff', Moustache: '#f1c40f', 'Drone gardien': '#5fe0ff', 'Golem de livres': '#c9a66b', Iris: '#2ecc9a', Cauchemar: '#ff2d6a', 'Pr Vesper': '#c36bff', '🏆': '#d4ac0d', '🎭': '#d4ac0d', '🌙': '#c36bff', '📄': '#f4ead0' },
+    pits: [[1250, 1440], [3700, 4380]],
+    plats: [
+      { x: 520, y: 300, w: 90, k: 'shelf' },
+      { x: 1000, y: 340, w: 190, h: 40, k: 'tkbox', tk: 'tk1', tx: 1252, ty: 380, msg: '✨ Luma soulève l’armoire et la couche au-dessus du trou : un pont !' },
+      { x: 1980, y: 300, w: 80, k: 'psy', nox: 1 }, { x: 2090, y: 220, w: 80, k: 'psy', nox: 1 }, { x: 2200, y: 150, w: 120, k: 'shelf' },
+      { x: 2470, y: 340, w: 110, h: 40, k: 'tkbox', tk: 'tk2', tx: 2380, ty: 250, msg: '✨ Le chariot de livres s’envole jusqu’en haut de l’étagère !' }, { x: 2380, y: 170, w: 90, k: 'shelf' },
+      { x: 2880, y: 290, w: 90, k: 'psy', nox: 1 }, { x: 3000, y: 210, w: 90, k: 'psy', nox: 1 }, { x: 3120, y: 150, w: 140, k: 'shelf' },
+      { x: 3720, y: 330, w: 100, k: 'cloud' }, { x: 3880, y: 280, w: 90, k: 'psy', nox: 1 }, { x: 3880, y: 170, w: 120, h: 40, k: 'tkbox', tk: 'tk3', tx: 4060, ty: 320, msg: '✨ Luma pousse l’armoire des rêves… elle flotte jusqu’à l’île suivante !' }, { x: 4250, y: 330, w: 110, k: 'cloud' },
+      { x: 3770, y: 230, w: 90, k: 'psy', nox: 1 },
+      { x: 4900, y: 300, w: 90, k: 'psy', nox: 1 }, { x: 5020, y: 230, w: 90, k: 'shelf' }
+    ],
+    gates: [{ id: 'g1', x: 1900 }, { id: 'g2', x: 3600 }, { id: 'g3', x: 4760 }],
+    clues: [
+      { id: 1, x: 2240, y: 115, n: '« Les rêves des élèves sont une énergie inépuisable… »' },
+      { id: 2, x: 3190, y: 115, n: '« Avec l’amplificateur, je lirai TOUTES les pensées de l’arène. »' },
+      { id: 3, x: 3815, y: 195, n: '« Deux esprits liés comme ceux des jumelles… voilà ce qu’il me manque. »' }
+    ],
+    coins: [{ id: 1, x: 565, y: 265 }, { id: 2, x: 1345, y: 330 }, { id: 3, x: 2130, y: 185 }, { id: 4, x: 2425, y: 135 }, { id: 5, x: 3040, y: 175 }, { id: 6, x: 3920, y: 245 }, { id: 7, x: 4305, y: 295 }, { id: 8, x: 5065, y: 195 }]
+  };
+  L.clueOn = st => st.step >= 1;
+  L.onClues = st => { st.journal = 1; if (!save.admin) save.coins += 20; persist(); advSay([
+    ['Luma', 'Les trois pages du journal ! L’écriture est… celle du Pr Vesper, le directeur.'],
+    ['Nox', 'Il vole les rêves des élèves pour alimenter une machine. Et il veut nos deux esprits pour la terminer.'],
+    ['📄', 'Journal complet : +20 pièces. Le Pr Vesper ne pourra plus rien vous cacher…']
+  ]); };
+  const G = ['Parle à Pip dans la cour de l’Académie', 'Traverse les couloirs et neutralise le drone gardien', 'Entre dans la bibliothèque interdite et bats le golem de livres', 'Retrouve Iris dans le jardin des dortoirs', 'Entre dans le monde des rêves et affronte le Cauchemar', 'Monte à la tour et affronte le Pr Vesper', 'L’Académie est libérée ! Parle à tes amis'];
+  L.goal = (s, st) => {
+    st = st || advCh('jumelles'); const ax = advS ? advS.x : 0, sis = advS ? advS.sis : 0, pg = s >= 1 && s < 6 ? ' (pages ' + st.clues.length + '/3)' : '';
+    if (s >= 1 && st && !st.gates.includes('tk1') && ax > 950 && ax < 1260) return 'Le sol est effondré : passe à Luma (L) et soulève l’armoire (K)' + pg;
+    if (s === 2 && st && !st.gates.includes('g1') && ax > 1700) return sis ? 'Parle à la bibliothécaire fantôme (J)' + pg : 'Une barrière psychique… Nox (L) pourrait voir ce que Luma ne voit pas' + pg;
+    if (s >= 1 && ax > 1900 && ax < 2350 && !sis && st && !st.clues.includes(1)) return 'Des marches invisibles ? Passe à Nox (L) pour les voir' + pg;
+    if (s >= 4 && ax > 3600 && ax < 4400 && st && !st.gates.includes('tk3')) return 'Depuis la 1re île, Luma (K) peut faire descendre l’armoire flottante… Nox voit le reste' + pg;
+    return G[Math.min(s, 6)] + pg;
+  };
+  L.target = s => ['pip', 'j0', 'j1', 'j2', 'j3', 'j4'][s] || '';
+  L.intro = [
+    ['', 'L’Académie Prisme, l’école des jeunes médiums. Depuis une semaine, plus aucun élève ne rêve… et tous se réveillent épuisés.'],
+    ['Luma', 'Nox ! Tu as encore dormi d’un œil ouvert ?'],
+    ['Nox', 'Je n’ai pas dormi du tout. Quelqu’un rôde dans les rêves de l’école, Luma. Je le sens.'],
+    ['', 'Flèches : bouger · Haut : sauter · J : parler · L : changer de sœur · K : télékinésie (Luma). Nox voit les plateformes invisibles et lit les pensées.']
+  ];
+  L.lose = [['Pip', 'Ouille… Relevez-vous ! Les jumelles ne perdent jamais deux fois de suite !']];
+  L.reward = [
+    ['🏆', 'Chapitre 7 terminé ! +100 pièces et +5 cristaux.'],
+    ['🎭', 'Nouveau skin : « Jumelles Éclipse » ! Luma rayonne d’or solaire, Nox se drape de nuit lunaire, et un soleil et une lune tournent autour d’elles.'],
+    ['🌙', 'L’Académie rêve de nouveau. Mais à l’autre bout de l’arène, un plateau de cinéma s’allume…']
+  ];
+  const nox = () => advS && advS.sis === 1;
+  L.npcs = [
+    { id: 'pip', name: 'Pip', look: 'pip', x: 380, talk: st => {
+      if (st.step === 0) return { lines: [
+        ['Pip', 'Luma ! Nox ! Enfin ! Ça recommence : toute la classe s’est réveillée sans le moindre rêve… comme vidée.'],
+        ['Luma', 'Encore ? Ça fait sept nuits de suite. Les profs ne disent rien ?'],
+        ['Pip', 'Le Pr Vesper a interdit d’en parler. Et il a fait installer des drones dans les couloirs… « pour notre sécurité ».'],
+        ['Nox', '(Elle lit les pensées de Pip…) Il a peur. Et il pense à son chat.'],
+        ['Pip', 'Et en plus… Moustache a disparu ! Mon chat ! Il dormait sur mon lit et pouf, plus rien. Si vous le voyez…'],
+        ['Luma', 'On s’occupe de tout, Pip. Nox, on y va : couloirs, bibliothèque, et on remonte jusqu’au fond de cette histoire.']
+      ], then: () => advSetStep(1) };
+      if (st.cat === 1) { st.cat = 2; if (!save.admin) save.coins += 15; persist(); return { lines: [['Pip', 'MOUSTACHE ! Tu l’as retrouvé ! Il était sur le toit des dortoirs ? Ce chat est un vrai fantôme…'], ['Moustache', 'Miaou.'], ['', '🐈‍⬛ Quête « Le chat de Pip » terminée : +15 pièces !']] }; }
+      if (nox()) return { lines: [['Nox', '(Pensées de Pip : « J’espère qu’elles vont bien… et que Moustache a mangé. »)']] };
+      return { lines: [['Pip', st.step >= 6 ? 'Cette nuit, j’ai rêvé que je volais ! Merci les jumelles !' : st.cat ? 'Moustache est rentré ! Bonne chance pour la suite !' : 'Moustache est un chat noir avec de grandes moustaches blanches. Il adore grimper très, très haut…']] };
+    } },
+    advMkFight({ id: 'j0', name: 'Drone gardien', x: 1600, fight: 'j0', need: 1,
+      wait: [['', '(Un drone de surveillance tourne en rond, objectif braqué sur le couloir.)']],
+      pre: [['Drone gardien', 'BZZT. ÉLÈVES HORS DE LEUR DORTOIR. PROTOCOLE DE RÉVEIL FORCÉ ACTIVÉ.'], ['Luma', 'Un drone ? Dans une école ?'], ['Nox', 'Il ne pense pas. Il obéit. Débranchons-le.']],
+      win: [['', 'Le drone s’écrase dans un nuage d’étincelles. Sur sa coque : un logo… « Propriété du Pr Vesper ».'], ['Nox', 'Le directeur fait surveiller ses propres élèves. Intéressant.']],
+      idle: [['', '(Le drone grésille encore un peu.)']] }),
+    { id: 'ghost', name: 'Mme Pages', look: 'ghost', x: 1810, talk: st => {
+      if (!nox()) return { lines: [['Luma', 'J’ai cru voir… quelque chose ? Non, rien. Nox, toi, tu vois quelque chose ?'], ['', '(Appuie sur L pour passer à Nox.)']] };
+      if (!st.gates.includes('g1')) return { lines: [
+        ['Mme Pages', 'Oh ! Une élève qui me voit ! Personne ne m’a parlé depuis… cent ans, peut-être ?'],
+        ['Nox', 'Bonsoir, madame. Nous devons passer cette barrière.'],
+        ['Mme Pages', 'La barrière de la réserve… Le mot de passe est « Silence », bien sûr. C’est une bibliothèque.'],
+        ['Mme Pages', 'Mais attention : le directeur a ensorcelé les livres de la réserve. Ils se sont rassemblés en un golem… et il n’aime pas qu’on fasse du bruit.'],
+        ['', '🔓 « Silence… » La barrière psychique se dissipe !']
+      ], then: () => { st.gates.push('g1'); persist(); } };
+      return { lines: [['Mme Pages', st.step >= 6 ? 'Merci, mes petites. La bibliothèque est enfin calme… comme il se doit.' : 'Chuuut. Des pages se sont envolées du bureau du directeur… cherchez en hauteur.']] };
+    } },
+    advMkFight({ id: 'j1', name: 'Golem de livres', x: 2660, fight: 'j1', need: 2,
+      wait: [['', '(Une montagne de livres empilés… qui respire lentement.)']],
+      pre: [['Golem de livres', 'CHUUUUT…'], ['Luma', 'Les livres se sont assemblés en… géant ?'], ['Nox', 'Il garde la sortie vers les dortoirs. Désolée, monsieur le golem, nous allons faire un peu de bruit.']],
+      win: [['', 'Le golem s’effondre en une pluie de pages qui se rangent toutes seules sur les étagères.'], ['Luma', 'Le passage vers les dortoirs est libre. Et j’entends quelqu’un pleurer, là-bas…']],
+      idle: [['', '(Les livres sont bien rangés, par ordre alphabétique.)']] }),
+    { id: 'moustache', name: 'Moustache', look: 'cat', x: 3190, py: 150, show: () => !advCh('jumelles').cat, talk: st => {
+      if (!nox()) return { lines: [['Moustache', 'Miaou.'], ['Luma', 'Moustache ! Le chat de Pip ! Viens là, minou… Il ne bouge pas. Nox saurait peut-être ce qu’il veut.']] };
+      st.cat = 1; persist(); return { lines: [
+        ['Moustache', 'Miaou. (Pensée : enfin quelqu’un qui m’écoute. Les humains sont si lents.)'],
+        ['Nox', 'Pourquoi tu t’es enfui, Moustache ?'],
+        ['Moustache', '(Pensée : le directeur ne dort jamais. La nuit, il pose un drôle de casque sur sa tête, et tous les rêves s’envolent vers sa tour. Les chats voient ces choses-là.)'],
+        ['Moustache', '(Pensée : je rentre chez Pip. Il a du thon.)'],
+        ['', '🐈‍⬛ Moustache saute du toit et file vers la cour. Retourne voir Pip pour une récompense !']
+      ] };
+    } },
+    advMkFight({ id: 'j2', name: 'Iris', x: 3420, fight: 'j2', need: 3,
+      wait: [['', '(Une élève aux cheveux verts fixe le vide, un prisme brillant sur le front.)']],
+      pre: [['Iris', '… Les jumelles. Les élèves parfaites. Toujours deux, jamais seules.'], ['Luma', 'Iris ? C’est nous ! Qu’est-ce que tu as sur le front ?'],
+        ['Nox', '(Elle lit ses pensées…) Il n’y a qu’une voix dans sa tête, et ce n’est pas la sienne. Quelqu’un la contrôle avec ce prisme.'], ['Iris', 'Le directeur m’a promis… que je serais plus forte que vous deux réunies.']],
+      win: [['', 'Le prisme se fend et tombe du front d’Iris. Elle cligne des yeux, comme au sortir d’un long rêve.'], ['Iris', 'Je… Pardon. Vesper m’a donné ce prisme pour « m’aider à dormir ». Depuis, je n’entends plus que lui.'],
+        ['Iris', 'Il cache les rêves volés dans le monde des rêves, derrière ce portail. Un monstre les garde… le Cauchemar.'], ['', '🌀 Le portail des rêves s’ouvre derrière Iris !']],
+      idle: [['Iris', 'Allez-y. Moi, je reste ici pour reprendre mes esprits… les miens, cette fois.']],
+      after: () => { const st = advCh('jumelles'); if (!st.gates.includes('g2')) st.gates.push('g2'); persist(); } }),
+    advMkFight({ id: 'j3', name: 'Cauchemar', x: 4550, fight: 'j3', need: 4,
+      wait: [['', '(Une ombre immense, faite de tous les mauvais rêves de l’Académie.)']],
+      pre: [['Cauchemar', 'Vous… rêvez… trop fort… petites sœurs…'], ['Luma', 'Il a… la silhouette de Nox ?'],
+        ['Nox', 'C’est ma peur, Luma. Celle de te perdre un jour. Le monde des rêves la rend réelle.'], ['Luma', 'Alors on l’affronte ensemble. Comme toujours.']],
+      win: [['', 'Le Cauchemar se dissout. Des centaines de petites lumières s’en échappent : les rêves volés des élèves !'], ['Nox', 'Il n’en a gardé qu’une partie… le reste monte vers la tour du directeur.'], ['', '🌀 Le passage vers la tour du directeur s’ouvre !']],
+      idle: [['', '(Il ne reste qu’un peu de brume tiède.)']],
+      after: () => { const st = advCh('jumelles'); if (!st.gates.includes('g3')) st.gates.push('g3'); persist(); } }),
+    Object.assign(advMkFight({ id: 'j4', name: 'Pr Vesper', x: 5380, fight: 'j4', need: 5,
+      wait: [['Pr Vesper', 'Retournez dans vos dortoirs, mesdemoiselles.']],
+      pre: [['Pr Vesper', 'Mesdemoiselles. Vous êtes hors du couvre-feu.'], ['Luma', 'C’est vous qui volez les rêves des élèves !'], ['Pr Vesper', 'Je les « récolte ». Un rêve est une énergie pure, et cette école en produit des milliers chaque nuit.'],
+        ['Nox', 'Et votre casque ? (Elle lit ses pensées…) Il vous manque deux esprits liés pour le terminer. Les nôtres.'], ['Pr Vesper', 'Perspicace. Avec vos esprits jumeaux, mon amplificateur lira toutes les pensées de l’arène. Personne ne pourra plus rien me cacher.'],
+        ['Luma', 'Personne ne lira dans nos têtes sans notre permission !'], ['', 'Attention : son ultime « Emprise du directeur » prend le contrôle de ton personnage !']],
+      win: [['', 'Le casque de Vesper se fissure dans un éclair violet. Des milliers de rêves s’envolent par les fenêtres de la tour et retournent dans les dortoirs.'],
+        ['Pr Vesper', 'Impossible… Deux esprits… qui ne font qu’un…'], ['Luma', 'C’est ça que vous n’avez jamais compris. Ce n’est pas une machine qui nous relie.'], ['Nox', 'C’est un cœur. Un seul, pour deux.'],
+        ['', 'Le Pr Vesper est démis de ses fonctions. Mme Pages, la bibliothécaire, assure la direction par intérim… de l’au-delà.']],
+      idle: [['', '…']],
+      after: () => { advFinish(); } }), { show: s => s < 6 }),
+    { id: 'f1', name: 'Iris', fighter: 'Iris', x: 5180, show: s => s >= 6, talk: () => ({ lines: [['Iris', 'La prochaine fois, je vous battrai pour de vrai. Sans prisme. Promis !']] }) },
+    { id: 'f2', name: 'Pip', look: 'pip', x: 5260, show: s => s >= 6, talk: st => ({ lines: [['Pip', st.journal ? 'Vous avez retrouvé tout son journal ? Le conseil de l’école va adorer le lire !' : 'Toute la classe a rêvé cette nuit ! Vous êtes nos héroïnes !']] }) },
+    { id: 'f3', name: 'Moustache', look: 'cat', x: 5470, show: s => s >= 6, talk: () => ({ lines: [['Moustache', 'Miaou. (Pensée : pas mal, pour des humaines.)']] }) }
+  ];
+  // en fin de chapitre, Pip et ses amis ne sont plus dans la cour
+  L.npcs[0].show = s => s < 6;
+
+  L.bg = cam => {
+    const t = Date.now() / 1000, mid = cam + WW / 2, dream = mid > 3550 && mid < 4700, z = ZONES.find(q => mid >= q[0] && mid < q[1]) || ZONES[0];
+    const g = x.createLinearGradient(0, -OFF, 0, 380); g.addColorStop(0, dream ? '#160a30' : '#0e0b24'); g.addColorStop(1, advLerp('#2a2350', z[3], dream ? .45 : .25)); x.fillStyle = g; x.fillRect(0, -OFF, WW, 470);
+    for (let k = 0; k < 60; k++) { x.fillStyle = 'rgba(255,255,255,' + (.2 + .5 * Math.abs(Math.sin(t + k))) + ')'; x.fillRect(((arnd(k) * 1500 - cam * .04) % 1250 + 1250) % 1250, arnd(k + 30) * 300 - 70, 2, 2); }
+    C('rgba(255,250,220,.85)', 820 - cam * .02, 40, 26); x.fillStyle = dream ? '#160a30' : '#0e0b24'; x.beginPath(); x.arc(832 - cam * .02, 32, 22, 0, 7); x.fill();
+    for (let k = 0; k < 4; k++) { const tx2 = ((k * 420 - cam * .15) % 1680 + 1680) % 1680 - 200; x.fillStyle = 'rgba(40,30,80,.8)'; x.fillRect(tx2, 120 + (k % 2) * 30, 70, 300); x.beginPath(); x.moveTo(tx2 - 10, 120 + (k % 2) * 30); x.lineTo(tx2 + 35, 50 + (k % 2) * 30); x.lineTo(tx2 + 80, 120 + (k % 2) * 30); x.fill(); x.fillStyle = 'rgba(255,220,140,.5)'; x.fillRect(tx2 + 28, 170 + (k % 2) * 30, 14, 20); }
+  };
+  L.scene = (cam, st) => {
+    const t = Date.now() / 1000, a = cam - 60, b = cam + WW + 60, vis = (l, r) => r > a && l < b;
+    if (vis(0, 900)) { // cour : grille, fontaine au prisme, arbres
+      x.fillStyle = '#3d3470'; x.fillRect(0, 140, 900, 240); for (let q = 0; q < 900; q += 120) { x.fillStyle = '#4a4080'; x.fillRect(q + 20, 160, 70, 120); x.beginPath(); x.arc(q + 55, 160, 35, Math.PI, 0); x.fill(); x.fillStyle = 'rgba(255,220,140,' + (.35 + .1 * Math.sin(t + q)) + ')'; x.fillRect(q + 30, 170, 50, 100); }
+      x.fillStyle = '#5a4a8a'; x.fillRect(640, 320, 140, 60); x.fillRect(690, 250, 40, 70); Y('#e4f5ff', [[710, 200], [735, 250], [685, 250]]); for (let q = 0; q < 3; q++) { const u = (t + q / 3) % 1; x.fillStyle = 'rgba(127,208,255,' + (1 - u) + ')'; x.fillRect(690 + q * 18, 320 - u * 50, 3, 8); }
+      x.fillStyle = '#e8e0ff'; x.font = 'bold 22px serif'; x.textAlign = 'center'; x.fillText('ACADÉMIE PRISME', 450, 130);
+    }
+    if (vis(900, 1700)) { // couloirs : casiers, fenêtres, caméras de surveillance
+      x.fillStyle = '#2f2858'; x.fillRect(900, 100, 800, 280); for (let q = 920; q < 1700; q += 46) { x.fillStyle = (q / 46) % 2 < 1 ? '#3a4a7a' : '#334270'; x.fillRect(q, 290, 42, 90); C('#d4af37', q + 34, 330, 2); }
+      [1000, 1300, 1550].forEach(wx => { x.fillStyle = 'rgba(150,170,255,.3)'; x.fillRect(wx, 140, 70, 110); x.beginPath(); x.arc(wx + 35, 140, 35, Math.PI, 0); x.fill(); });
+      [1180, 1480].forEach(cx2 => { x.fillStyle = '#26262e'; x.fillRect(cx2, 110, 26, 14); C(Math.sin(t * 3 + cx2) > 0 ? '#ff4d4d' : '#5a1a1a', cx2 + 20, 117, 3); });
+    }
+    if (vis(1700, 2750)) { // bibliothèque : étagères immenses, échelles, bougies flottantes
+      x.fillStyle = '#2a1a14'; x.fillRect(1700, 60, 1050, 320);
+      for (let q = 1720; q < 2750; q += 130) { x.fillStyle = '#4a2c1a'; x.fillRect(q, 80, 110, 300); for (let r = 0; r < 6; r++) { x.fillStyle = '#3a2214'; x.fillRect(q, 120 + r * 45, 110, 5); for (let bk = 0; bk < 10; bk++) { x.fillStyle = ['#7a2a2a', '#2a4a7a', '#2a6a3a', '#6a4a8a', '#8a6a2a'][(bk + r + q) % 5]; x.fillRect(q + 4 + bk * 10.5, 92 + r * 45, 9, 28); } } }
+      for (let k = 0; k < 6; k++) { const cx2 = 1780 + k * 170, cy = 110 + Math.sin(t + k) * 10; x.fillStyle = '#f4ead0'; x.fillRect(cx2 - 3, cy, 6, 16); x.fillStyle = 'rgba(255,200,80,.9)'; x.beginPath(); x.ellipse(cx2, cy - 5, 3, 6, 0, 0, 7); x.fill(); x.fillStyle = 'rgba(255,200,80,.15)'; x.beginPath(); x.arc(cx2, cy - 4, 20, 0, 7); x.fill(); }
+    }
+    if (vis(2750, 3550)) { // jardin des dortoirs : bâtiment aux fenêtres éteintes, haies, lanternes
+      x.fillStyle = '#2a3a4a'; x.fillRect(3050, 150, 300, 230); Y('#1a2430', [[3030, 150], [3200, 90], [3370, 150]]); for (let q = 0; q < 4; q++) { x.fillStyle = 'rgba(30,40,60,1)'; x.fillRect(3075 + q * 70, 200, 30, 40); x.fillRect(3075 + q * 70, 280, 30, 40); }
+      for (let q = 2770; q < 3550; q += 90) { x.fillStyle = '#1e4a34'; x.beginPath(); x.ellipse(q + 40, 360, 46, 24, 0, Math.PI, 0); x.fill(); }
+      [2850, 3450].forEach(lx => { x.fillStyle = '#3a3a44'; x.fillRect(lx, 260, 6, 120); C('rgba(255,220,140,.9)', lx + 3, 256, 8); });
+    }
+    if (vis(3550, 4700)) { // monde des rêves : livres, horloges molles, lumières de rêves
+      for (let k = 0; k < 14; k++) { const bx = 3600 + k * 80, by = 120 + Math.sin(t + k * 1.7) * 30 + (k % 3) * 40; if (!vis(bx - 20, bx + 20)) continue; x.save(); x.translate(bx, by); x.rotate(Math.sin(t * .7 + k) * .5); x.fillStyle = ['#c0392b', '#2980b9', '#27ae60', '#d4ac0d'][k % 4]; x.fillRect(-10, -7, 20, 14); x.fillStyle = '#f5ecd0'; x.fillRect(-8, -5, 16, 10); x.restore(); }
+      const done = st.step >= 5; for (let k = 0; k < 20; k++) { const lx = 3600 + arnd(k) * 1100, ly = 300 - ((t * 30 + arnd(k + 5) * 400) % 400); if (!vis(lx, lx)) continue; x.fillStyle = done ? 'rgba(255,230,140,.8)' : 'rgba(195,107,255,.6)'; x.beginPath(); x.arc(lx, ly, 3, 0, 7); x.fill(); }
+    }
+    if (vis(4700, 5700)) { // tour du directeur : bureau, tuyaux qui aspirent les rêves, machine à prisme
+      x.fillStyle = '#1e1430'; x.fillRect(4700, 40, 1000, 340); x.fillStyle = '#2a1e44'; for (let q = 4700; q < 5700; q += 80) x.fillRect(q, 40, 6, 340);
+      const on = st.step < 6; x.strokeStyle = '#5d6670'; x.lineWidth = 10; x.beginPath(); x.moveTo(4720, 90); x.lineTo(5560, 90); x.lineTo(5560, 200); x.stroke();
+      if (on) for (let k = 0; k < 8; k++) { const u = ((t * .3 + k / 8) % 1); C('rgba(195,107,255,.85)', 4720 + u * 840, 90, 3); }
+      x.fillStyle = '#3a2c54'; x.fillRect(5500, 200, 120, 180); Y(on ? '#c36bff' : '#5a4a6a', [[5560, 210], [5600, 280], [5520, 280]]); if (on) { x.fillStyle = 'rgba(195,107,255,' + (.15 + .1 * Math.sin(t * 4)) + ')'; x.beginPath(); x.arc(5560, 250, 60, 0, 7); x.fill(); }
+      x.fillStyle = '#4a2c1a'; x.fillRect(5150, 320, 140, 12); x.fillRect(5160, 332, 10, 48); x.fillRect(5270, 332, 10, 48); C('#c36bff', 5180, 312, 6);
+    }
+    for (let k = 0; k < ZONES.length; k++) { const [l, r, , col] = ZONES[k], L0 = Math.max(a, l), R0 = Math.min(b, r); if (R0 <= L0) continue; const dr = l === 3550; x.fillStyle = dr ? '#2a1450' : advLerp('#2a2350', col, .2); x.fillRect(L0, 380, R0 - L0, 260); x.fillStyle = dr ? '#9f8cff' : advLerp('#5a4a90', col, .4); x.fillRect(L0, 380, R0 - L0, 5); if (!dr) { x.fillStyle = 'rgba(255,255,255,.05)'; for (let q = Math.floor(L0 / 60) * 60; q < R0; q += 60) if ((q / 60) % 2) x.fillRect(q, 385, 60, 30); } }
+    for (const [l, r] of L.pits) { const L0 = Math.max(a, l), R0 = Math.min(b, r); if (R0 <= L0) continue; x.fillStyle = l < 2000 ? '#0a0614' : '#0b0418'; x.fillRect(L0, 380, R0 - L0, 260);
+      if (l < 2000) { x.fillStyle = '#5a4a3a'; for (let q = 0; q < 4; q++) Y('#5a4a3a', [[l + q * 50, 380], [l + q * 50 + 30, 380], [l + q * 50 + 18, 404]]); } // plancher effondré
+      else for (let q = 0; q < 6; q++) { const sx = l + (r - l) * (q + .5) / 6; x.fillStyle = 'rgba(195,107,255,' + (.2 + .2 * Math.sin(t * 2 + q)) + ')'; x.beginPath(); x.arc(sx, 440 + Math.sin(t + q) * 10, 14, 0, 7); x.fill(); } }
+    advZoneTag(ZONES, a, b, '✨');
+  };
+  L.fg = (cam, st) => { // pages du journal (au lieu des feux follets) qui battent au vent
+    const t = Date.now() / 1000;
+    if (st.step >= 1) for (const c of L.clues) if (!st.clues.includes(c.id)) { x.save(); x.translate(c.x, c.y + Math.sin(t * 2 + c.id) * 4); x.rotate(Math.sin(t * 1.5 + c.id) * .2); x.fillStyle = '#f4ead0'; x.fillRect(-9, -12, 18, 24); x.fillStyle = '#8a7a5a'; for (let q = 0; q < 4; q++) x.fillRect(-6, -7 + q * 5, 12, 1.5); x.restore(); }
+    if (st.gates.includes('g2')) { const px = 3600; for (let q = 0; q < 3; q++) { x.strokeStyle = 'rgba(195,107,255,' + (.6 - q * .15) + ')'; x.lineWidth = 3; x.beginPath(); x.ellipse(px, 300, 26 + q * 8, 80 + q * 8, 0, t * (q % 2 ? 1 : -1), t * (q % 2 ? 1 : -1) + 5); x.stroke(); } }
+  };
+  return L;
+})();
+
+// ---------------------------------------------------------------- CHAPITRE 8 : BRYAN
+ADV_LV.bryan = (() => {
+  const ZONES = [[0, 900, 'L’ENTRÉE DES STUDIOS SILVER', '#cfd2dc'], [900, 2050, 'PLATEAU 1 · WESTERN', '#e67e22'], [2050, 3250, 'PLATEAU 2 · PIRATES', '#3498db'], [3250, 4150, 'PLATEAU 3 · LA VILLE AUX LANTERNES', '#e74c3c'], [4150, 5100, 'PLATEAU 4 · STATION SPATIALE', '#5fd0ff'], [5100, 6100, 'LE GRAND PLATEAU', '#d4af37']];
+  const L = {
+    hero: 'Bryan', title: 'Chapitre 8 · Action !', len: 6100, start: 160, skin: 'skin_bryan_star', kHint: 'K : coup de pied',
+    fall: '↩ « Coupez ! » Un machiniste te repêche et te ramène sur le plateau.', clueTxt: '🎞️ Bobine retrouvée : ',
+    colors: { Bryan: '#cfd2dc', Lola: '#c0392b', Gaston: '#3b5b8a', Léo: '#f1c40f', Rick: '#f1c40f', 'Shérif robot': '#aab4bf', 'Capitaine Boulon': '#9aa4ae', 'Bryan-X': '#c0c6d0', 'Max Silver': '#d4af37', '🏆': '#d4ac0d', '🎭': '#d4ac0d', '🎬': '#f1c40f', '🎞️': '#bdc3c7' },
+    pits: [[2120, 2330], [4380, 4800]],
+    walls: [
+      { x1: 1120, x2: 1150, top: 342, c: '#8a5a2b', cap: '#5a3a1a' }, { x1: 1260, x2: 1290, top: 342, c: '#8a5a2b', cap: '#5a3a1a' }, // tonneaux du western
+      { x1: 2640, x2: 2672, top: 340, c: '#6d4423', cap: '#3e2723' }, { x1: 2770, x2: 2802, top: 340, c: '#6d4423', cap: '#3e2723' }, // caisses du bateau
+      { x1: 3520, x2: 3550, top: 344, c: '#7a1f1f', cap: '#3a0f0f' }, { x1: 3650, x2: 3680, top: 344, c: '#7a1f1f', cap: '#3a0f0f' } // étals de la ville aux lanternes
+    ],
+    plats: [
+      { x: 560, y: 300, w: 100, k: 'scaff' },
+      { x: 1600, y: 290, w: 110, k: 'crate', h: 90 }, { x: 1730, y: 220, w: 100, k: 'scaff' },
+      { x: 2140, y: 362, w: 70, k: 'barrel', mv: { dx: 110, dy: 0, per: 240, off: 0 } },
+      { x: 2420, y: 270, w: 130, k: 'deck' }, { x: 2900, y: 250, w: 140, k: 'deck' },
+      { x: 3330, y: 290, w: 120, k: 'roofjp' }, { x: 3830, y: 260, w: 140, k: 'roofjp' }, { x: 4000, y: 190, w: 100, k: 'roofjp' },
+      { x: 4400, y: 330, w: 80, k: 'space', mv: { dx: 0, dy: -70, per: 220, off: 0 } }, { x: 4520, y: 260, w: 90, k: 'space' }, { x: 4650, y: 300, w: 80, k: 'space', mv: { dx: 60, dy: 0, per: 200, off: 50 } },
+      { x: 5280, y: 300, w: 100, k: 'scaff' }, { x: 5400, y: 230, w: 100, k: 'scaff' }
+    ],
+    gates: [
+      { id: 'w1', x: 1560, look: 'wood', hits: 2, label: 'SALOON', msg: '💥 Les portes du saloon en contreplaqué volent en éclats !' },
+      { id: 'w2', x: 2420, look: 'wood', hits: 2, label: 'CALE', msg: '💥 La porte de la cale cède dans un grand CRAC !' },
+      { id: 'w3', x: 4120, look: 'wood', hits: 3, label: '暖簾', msg: '💥 Le mur du décor japonais tombe… on voit l’envers en carton !' }
+    ],
+    cams: [
+      { id: 'c1', x1: 1060, x2: 1400, per: 330, on: 190, msg: '🎬 « Coupez ! Parfait, la cascade du western est dans la boîte ! » +10 pièces' },
+      { id: 'c2', x1: 2580, x2: 2880, per: 320, on: 180, off: 90, msg: '🎬 « Coupez ! Magnifique abordage ! » +10 pièces' },
+      { id: 'c3', x1: 3460, x2: 3780, per: 300, on: 170, off: 40, msg: '🎬 « Coupez ! La poursuite sous les lanternes est parfaite ! » +10 pièces' }
+    ],
+    clues: [
+      { id: 1, x: 1780, y: 185, n: 'la bobine « Le Saut de la Mort »' },
+      { id: 2, x: 2970, y: 215, n: 'la bobine « L’Abordage »' },
+      { id: 3, x: 4050, y: 155, n: 'la bobine « Coulisses — NE PAS DIFFUSER »' }
+    ],
+    coins: [{ id: 1, x: 610, y: 265 }, { id: 2, x: 1205, y: 300 }, { id: 3, x: 1655, y: 255 }, { id: 4, x: 2485, y: 235 }, { id: 5, x: 3390, y: 255 }, { id: 6, x: 3900, y: 225 }, { id: 7, x: 4565, y: 225 }, { id: 8, x: 5450, y: 195 }]
+  };
+  L.clueOn = st => st.step >= 1;
+  L.onClues = st => { st.reels = 1; persist(); advSay([
+    ['Bryan', 'Les trois bobines perdues ! Dont une marquée « NE PAS DIFFUSER »… Ça sent le coup monté.'],
+    ['🎞️', 'Apporte-les à Gaston, le projectionniste, au bout des studios.']
+  ]); };
+  const G = ['Parle à Lola, la réalisatrice, à l’entrée des studios', 'Bats Rick à l’audition pour le premier rôle', 'Western : tourne la cascade, entre dans le saloon et bats le shérif robot', 'Pirates : passe sur le bateau et bats le Capitaine Boulon', 'Ville aux lanternes puis station spatiale : rattrape Bryan-X', 'Grand plateau : affronte Max Silver et son robot géant', 'Le film est sauvé ! Parle à l’équipe'];
+  L.goal = (s, st) => {
+    st = st || advCh('bryan'); const ax = advS ? advS.x : 0, rl = s >= 1 && s < 6 ? ' (bobines ' + st.clues.length + '/3)' : '';
+    const cm = (L.cams || []).find(c => !st.gates.includes(c.id) && ax > c.x1 - 260 && ax < c.x2);
+    if (s >= 2 && cm) return (advS.cam[cm.id] ? '🎬 Fonce jusqu’au bout du décor avant « Coupez ! »' : 'Attends le voyant rouge « Action ! » puis traverse le décor en sautant les obstacles') + rl;
+    const gt = L.gates.find(g => !st.gates.includes(g.id) && ax > g.x - 300 && ax < g.x);
+    if (s >= 2 && gt) return 'Décor fermé : enfonce-le à coups de pied (K)' + rl;
+    if (s >= 5 && st.reels === 1 && ax > 4900) return 'Apporte les bobines à Gaston, le projectionniste' + rl;
+    return G[Math.min(s, 6)] + rl;
+  };
+  L.target = s => ['lola', 'y0', 'y1', 'y2', 'y3', 'y4'][s] || '';
+  L.intro = [
+    ['', 'Les Studios Silver, la plus grande usine à films d’action de l’arène. Aujourd’hui, on tourne « Le Dernier Cascadeur ».'],
+    ['Bryan', 'Premier jour de tournage. Pas de doublure, pas de câbles, pas de trucage : je fais toutes mes cascades moi-même.'],
+    ['', 'Mais un bruit court dans les couloirs : le patron, Max Silver, voudrait remplacer tous les acteurs… par des robots.'],
+    ['', 'Flèches : bouger · Haut : sauter · J : parler · K : coup de pied (enfonce les décors en contreplaqué). Aux caméras, attends « Action ! » avant d’entrer.']
+  ];
+  L.lose = [['Lola', '« Coupez ! » On la refait. Une star, ça ne tombe pas : ça répète !']];
+  L.reward = [
+    ['🏆', 'Chapitre 8 terminé ! +100 pièces et +5 cristaux.'],
+    ['🎭', 'Nouveau skin : « Bryan Star d’Action » ! Blouson de cuir, jean, lunettes noires… et l’étincelle de la célébrité.'],
+    ['🎬', 'Fin de la Saison 2. Merci d’avoir joué… et restez jusqu’au bout du générique !']
+  ];
+  const sb = id => advCh('bryan').gates.includes(id);
+  L.npcs = [
+    { id: 'lola', name: 'Lola', look: 'lola', x: 330, show: s => s < 6, talk: st => {
+      if (st.step === 0) return { lines: [
+        ['Lola', 'Bryan ! Tu tombes bien. Mauvaise nouvelle : Max Silver veut tourner tout le film avec des robots. Plus d’acteurs, plus de cascadeurs, plus de salaires.'],
+        ['Bryan', 'Des robots ? Un robot ne sait pas tomber. Il ne sait pas avoir peur. C’est ça, une cascade.'],
+        ['Lola', 'Alors prouve-le. Tourne les quatre plateaux aujourd’hui, en vrai, devant mes caméras. Si les rushes sont meilleurs que ceux des robots, Max ne pourra pas dire non.'],
+        ['Lola', 'Ah, et… trois bobines de film ont disparu de la salle de montage. Si tu tombes dessus, rapporte-les à Gaston, notre projectionniste.'],
+        ['Lola', 'Mais d’abord, l’audition ! Rick veut le premier rôle, lui aussi. Il t’attend sur le tapis.']
+      ], then: () => advSetStep(1) };
+      return { lines: [['Lola', st.step < 2 ? 'Rick t’attend pour l’audition, juste là. Fais-moi rêver !' : 'Aux caméras : attends le voyant rouge « Action ! », puis traverse le décor d’une traite. Si j’entends « Coupez », tu recommences !']] };
+    } },
+    advMkFight({ id: 'y0', name: 'Rick', x: 760, fight: 'y0', need: 1,
+      wait: [['Rick', 'L’audition, c’est après avoir vu Lola, mon vieux.']],
+      pre: [['Rick', 'Bryan ! Le premier rôle est pour moi. J’ai les cheveux, le bandeau, et le regard de braise.'], ['Bryan', 'Et moi, j’ai les cascades.'], ['Rick', 'On verra ça sur le tapis. Lola, tu filmes ?'], ['Lola', 'Moteur… Ça tourne… Action !']],
+      win: [['Rick', 'D’accord, d’accord… Le rôle est à toi. Mais si un jour tu as besoin d’un partenaire de combat, je suis là.'], ['Lola', 'Coupez ! Direction le plateau western !']],
+      idle: [['Rick', 'Mon bandeau est tout de travers… Bah. Ça fait plus authentique.']] }),
+    { id: 'leo', name: 'Léo', look: 'leo', x: 2010, talk: st => {
+      if (st.auto) return { lines: [['Léo', 'Je vais l’encadrer, ton autographe ! Plus tard, je serai cascadeur, moi aussi !']] };
+      if (!sb('c1')) return { lines: [['Léo', 'Wouah, c’est toi, Bryan ?! Tu peux me signer un autographe ? Mais d’abord… je veux voir une vraie cascade !']] };
+      st.auto = 1; if (!save.admin) save.coins += 10; persist(); return { lines: [['Léo', 'J’ai tout vu ! Le saut au-dessus des tonneaux ! Tu peux signer mon carnet ?'], ['Bryan', 'Pour Léo, futur cascadeur. Ne fais jamais ça à la maison.'], ['', '✍️ Autographe signé : +10 pièces !']] };
+    } },
+    advMkFight({ id: 'y1', name: 'Shérif robot', x: 1860, fight: 'y1', need: 2,
+      wait: [['', '(Un robot-shérif attend son signal, immobile, la main sur le revolver.)']],
+      pre: [['Shérif robot', 'CETTE VILLE EST TROP PETITE POUR NOUS DEUX, HUMAIN. RÉPLIQUE 1 SUR 1.'], ['Bryan', 'Tu as appris ton texte par cœur, au moins.'], ['Lola', 'Silence plateau ! Duel au soleil… Action !']],
+      win: [['', 'Le robot-shérif tourne sur lui-même, son chapeau tombe… et il s’éteint.'], ['Lola', 'Coupez ! C’est ça que je veux voir ! Plateau des pirates, tout le monde !']],
+      idle: [['', '(BZZT… « Ce n’était… pas dans… le scénario… »)']] }),
+    advMkFight({ id: 'y2', name: 'Capitaine Boulon', x: 3080, fight: 'y2', need: 3,
+      wait: [['', '(Sur le pont, un pirate robot astique son canon.)']],
+      pre: [['Capitaine Boulon', 'HO HISSE, MOUSSAILLON. CE NAVIRE APPARTIENT AUX STUDIOS SILVER. LES HUMAINS PASSENT PAR-DESSUS BORD.'], ['Bryan', 'L’eau du bassin fait trente centimètres, capitaine.'], ['Capitaine Boulon', '… À L’ABORDAGE !']],
+      win: [['', 'Le Capitaine Boulon bascule par-dessus le bastingage… et atterrit dans trente centimètres d’eau, avec un petit « plouf » métallique.'],
+        ['Lola', 'Formidable ! Mais… où est passé ton double ? Max Silver avait fait fabriquer un robot à ton image : Bryan-X. Il s’est enfui vers la ville aux lanternes !']],
+      idle: [['', '(Glou… glou… bzzt.)']] }),
+    advMkFight({ id: 'y3', name: 'Bryan-X', x: 4980, fight: 'y3', need: 4,
+      wait: [['', '(Une silhouette… qui te ressemble trait pour trait. En métal.)']],
+      pre: [['Bryan-X', 'BRYAN. VERSION HUMAINE. OBSOLÈTE.'], ['Bryan', 'C’est mon visage, ça ? J’ai vraiment ce menton ?'], ['Bryan-X', 'JE SUIS PLUS RAPIDE. PLUS FORT. JE N’AI PAS PEUR. JE NE ME FATIGUE PAS.'], ['Bryan', 'Et tu ne sais pas improviser. Montre-moi.']],
+      win: [['Bryan-X', 'ERREUR… L’HUMAIN… A FAIT… QUELQUE CHOSE… QUI N’ÉTAIT PAS… PRÉVU…'], ['Bryan', 'Ça s’appelle une cascade.'], ['', 'Bryan-X s’effondre. Au loin, sur le Grand Plateau, un énorme projecteur s’allume. Quelqu’un t’attend.']],
+      idle: [['', '(Bryan-X répète en boucle : « Pas prévu… pas prévu… »)']] }),
+    { id: 'gaston', name: 'Gaston', look: 'gaston', x: 5180, talk: st => {
+      if (st.reels === 1) { st.reels = 2; if (!save.admin) save.coins += 25; persist(); return { lines: [
+        ['Gaston', 'Mes bobines ! On me les avait volées dans la cabine de projection ! Voyons voir… « Coulisses — NE PAS DIFFUSER »…'],
+        ['', 'Gaston lance la projection sur le mur du studio. On y voit Max Silver… en train de saboter les câbles des cascadeurs, la nuit !'],
+        ['Gaston', 'C’est lui ! C’est lui qui provoquait les « accidents » pour faire croire que les humains sont trop fragiles !'],
+        ['', '🎞️ Quête « Les bobines perdues » terminée : +25 pièces. Max Silver ne pourra plus mentir à personne.']
+      ] }; }
+      return { lines: [['Gaston', st.step >= 6 ? 'Le film sort la semaine prochaine. Je garde un fauteuil au premier rang pour toi !' : st.clues.length ? 'Tu as retrouvé des bobines ? Il en manque trois en tout. Rapporte-les-moi quand tu les as toutes !' : 'Trente ans que je projette des films ici. Jamais vu un patron aussi radin que Max Silver…']] };
+    } },
+    Object.assign(advMkFight({ id: 'y4', name: 'Max Silver', x: 5800, fight: 'y4', need: 5, sz: 1.5,
+      wait: [['', '(Un robot de tournage géant, la tête en forme de caméra, attend dans l’ombre du Grand Plateau.)']],
+      pre: [['Max Silver', 'Bryan. La petite star qui refuse de se faire remplacer.'], ['Bryan', 'Max Silver. Dans un robot géant. Vous n’avez même pas le courage de vous battre vous-même ?'],
+        ['Max Silver', 'Les robots ne demandent pas de salaire, pas de vacances, pas de pause déjeuner. Le cinéma de demain, c’est MOI qui le pilote !'], ['Bryan', 'Le cinéma, ce sont des gens qui prennent des risques pour faire rêver d’autres gens. Vous allez voir.'],
+        ['Lola', 'Toutes les caméras sur Bryan ! Moteur… Ça tourne… ACTION !']],
+      win: [['', 'Le robot géant vacille, son projecteur clignote… puis il s’effondre dans un nuage de confettis de décor. Le cockpit s’ouvre.'],
+        ['Max Silver', 'D’accord… D’accord ! Les humains restent. Les cascades restent. Tout le monde garde son poste…'], ['Lola', 'Et on garde la scène. C’était la meilleure prise de toute ma carrière. COUPEZ !'],
+        ['', 'Tout le plateau applaudit. Même Rick.']],
+      idle: [['', '…']],
+      after: () => { advFinish(); } }), { show: s => s < 6, py: 380 }),
+    { id: 'm1', name: 'Max Silver', look: 'max', x: 5880, show: s => s >= 6, talk: st => ({ lines: [['Max Silver', st.reels === 2 ? 'Les bobines… Gaston a tout montré à la presse. Je crois que je vais prendre de longues vacances.' : 'Peut-être… peut-être qu’un robot ne remplace pas un vrai cascadeur. Ne le répète à personne.']] }) },
+    { id: 'm2', name: 'Lola', look: 'lola', x: 5680, show: s => s >= 6, talk: () => ({ lines: [['Lola', 'Bryan, tu es la star du « Dernier Cascadeur ». Et il y aura une suite… j’ai déjà le titre : « Le Retour du Dernier Cascadeur » !']] }) },
+    { id: 'm3', name: 'Rick', fighter: 'Rick', x: 5600, show: s => s >= 6, talk: () => ({ lines: [['Rick', 'Bon, OK. Tu es meilleur que moi à l’écran. Mais pour le second rôle, je suis le meilleur, compris ?']] }) }
+  ];
+
+  L.bg = cam => { // hangars des studios, ciel de fin d'après-midi
+    const t = Date.now() / 1000, g = x.createLinearGradient(0, -OFF, 0, 380); g.addColorStop(0, '#2c3e66'); g.addColorStop(1, '#e8a35a'); x.fillStyle = g; x.fillRect(0, -OFF, WW, 470);
+    for (let k = 0; k < 6; k++) { const hx = ((k * 300 - cam * .12) % 1800 + 1800) % 1800 - 250, hw = 220; x.fillStyle = 'rgba(60,60,80,.75)'; x.fillRect(hx, 150, hw, 260); x.beginPath(); x.ellipse(hx + hw / 2, 150, hw / 2, 40, 0, Math.PI, 0); x.fill(); x.fillStyle = 'rgba(255,255,255,.6)'; x.font = 'bold 18px sans-serif'; x.textAlign = 'center'; x.fillText('STUDIO ' + (k % 6 + 1), hx + hw / 2, 200); }
+    const sx = 700 - cam * .03; x.fillStyle = 'rgba(255,255,255,.85)'; x.font = 'bold 30px serif'; x.textAlign = 'center'; x.fillText('SILVER STUDIOS', sx, 70);
+    for (let k = 0; k < 2; k++) { const a2 = Math.sin(t * .6 + k * 2) * .5; x.save(); x.translate(sx + (k ? 180 : -180), 120); x.rotate(a2 - Math.PI / 2); x.fillStyle = 'rgba(255,250,210,.08)'; x.beginPath(); x.moveTo(0, 0); x.lineTo(400, -50); x.lineTo(400, 50); x.fill(); x.restore(); }
+  };
+  L.scene = (cam, st) => {
+    const t = Date.now() / 1000, a = cam - 60, b = cam + WW + 60, vis = (l, r) => r > a && l < b;
+    if (vis(0, 900)) { // entrée : portail doré, loges, tapis rouge
+      x.fillStyle = '#34344a'; x.fillRect(0, 160, 900, 220); x.fillStyle = '#d4af37'; x.fillRect(80, 130, 16, 250); x.fillRect(380, 130, 16, 250); x.fillRect(70, 120, 336, 18); x.fillStyle = '#16161b'; x.font = 'bold 14px sans-serif'; x.textAlign = 'center'; x.fillText('★ STUDIOS SILVER ★', 238, 134);
+      [520, 680].forEach(lx => { x.fillStyle = '#5a5a6e'; x.fillRect(lx, 230, 120, 150); x.fillStyle = '#f1c40f'; Y('#f1c40f', [[lx + 60, 248], [lx + 66, 262], [lx + 80, 262], [lx + 68, 270], [lx + 72, 284], [lx + 60, 276], [lx + 48, 284], [lx + 52, 270], [lx + 40, 262], [lx + 54, 262]]); x.fillStyle = '#26262e'; x.fillRect(lx + 40, 300, 40, 80); });
+      x.fillStyle = '#9a1f2a'; x.fillRect(100, 374, 700, 6);
+    }
+    if (vis(900, 2050)) { // western : toile peinte, saloon en contreplaqué
+      x.fillStyle = '#e8a35a'; x.fillRect(900, 120, 1150, 260); x.fillStyle = '#c8784a'; x.beginPath(); x.moveTo(900, 300); [[1050, 200], [1150, 220], [1250, 300], [1700, 300], [1800, 210], [1950, 230], [2050, 300]].forEach(q => x.lineTo(q[0], q[1])); x.lineTo(2050, 380); x.lineTo(900, 380); x.fill();
+      x.fillStyle = '#8a5a2b'; x.fillRect(1480, 180, 260, 200); x.fillStyle = '#6d4423'; x.fillRect(1470, 170, 280, 18); x.fillStyle = '#f5ecd0'; x.font = 'bold 26px serif'; x.textAlign = 'center'; x.fillText('SALOON', 1610, 220);
+      LN('#6d4423', 4, 1740, 190, 1780, 380); [[960, 300], [1440, 290]].forEach(([cx2, cy]) => { x.fillStyle = '#2e7d32'; x.fillRect(cx2 - 9, cy, 18, 380 - cy); x.fillRect(cx2 - 28, cy + 26, 10, 30); x.fillRect(cx2 - 28, cy + 48, 28, 8); });
+    }
+    if (vis(2050, 3250)) { // pirates : bassin, coque de bateau, mât, voiles
+      x.fillStyle = '#5a3a1e'; x.beginPath(); x.moveTo(2330, 300); x.lineTo(3200, 300); x.lineTo(3150, 380); x.lineTo(2360, 380); x.fill(); x.fillStyle = '#3e2714'; for (let q = 2400; q < 3150; q += 60) C('#2a1a0e', q, 330, 8);
+      x.fillStyle = '#4a2f18'; x.fillRect(2780, 40, 12, 260); x.fillStyle = '#ecf0f1'; x.beginPath(); x.moveTo(2700, 60); x.quadraticCurveTo(2790 + Math.sin(t) * 10, 120, 2700, 200); x.lineTo(2880, 200); x.quadraticCurveTo(2870 + Math.sin(t) * 10, 120, 2880, 60); x.fill();
+      x.fillStyle = '#111'; x.fillRect(2780, 20, 50, 30); C('#ecf0f1', 2805, 34, 7); LN('#ecf0f1', 2, 2796, 44, 2814, 44);
+    }
+    if (vis(3250, 4150)) { // ville aux lanternes : façades en bois, lanternes rouges
+      for (let q = 3260; q < 4150; q += 150) { x.fillStyle = '#4a2a1a'; x.fillRect(q, 200, 130, 180); x.fillStyle = '#2c3440'; x.beginPath(); x.moveTo(q - 14, 210); x.lineTo(q + 65, 170); x.lineTo(q + 144, 210); x.fill(); x.fillStyle = 'rgba(255,230,180,.6)'; x.fillRect(q + 20, 250, 36, 50); x.fillRect(q + 76, 250, 36, 50); }
+      for (let k = 0; k < 10; k++) { const lx = 3280 + k * 90, ly = 150 + Math.sin(t * 2 + k) * 4; LN('#222', 1, lx, 120, lx, ly - 12); x.fillStyle = '#e74c3c'; x.beginPath(); x.ellipse(lx, ly, 10, 13, 0, 0, 7); x.fill(); x.fillStyle = 'rgba(255,120,80,.2)'; x.beginPath(); x.arc(lx, ly, 22, 0, 7); x.fill(); }
+      if (sb('w3')) { x.fillStyle = '#b8a888'; x.fillRect(4060, 340, 120, 40); x.fillStyle = '#7a6a4a'; x.font = '9px sans-serif'; x.textAlign = 'center'; x.fillText('CARTON – STUDIOS SILVER', 4120, 364); }
+    }
+    if (vis(4150, 5100)) { // station spatiale : hublots, étoiles, planète
+      x.fillStyle = '#0a0d1a'; x.fillRect(4150, 40, 950, 340); for (let k = 0; k < 40; k++) { x.fillStyle = 'rgba(255,255,255,' + (.3 + .5 * Math.abs(Math.sin(t + k))) + ')'; x.fillRect(4160 + arnd(k) * 930, 50 + arnd(k + 3) * 300, 2, 2); }
+      C('#c0392b', 4900, 140, 50); x.strokeStyle = 'rgba(255,200,150,.5)'; x.lineWidth = 4; x.beginPath(); x.ellipse(4900, 140, 80, 16, -.3, 0, 7); x.stroke();
+      [4220, 4980].forEach(px2 => { x.fillStyle = '#5d6670'; x.fillRect(px2 - 40, 60, 80, 320); for (let q = 0; q < 3; q++) { C('#2c3440', px2, 120 + q * 90, 18); C('rgba(95,208,255,.4)', px2, 120 + q * 90, 13); } });
+    }
+    if (vis(5100, 6100)) { // grand plateau : rampe de projecteurs, fond vert
+      x.fillStyle = '#16161e'; x.fillRect(5100, 40, 1000, 340); x.fillStyle = '#3d3d46'; x.fillRect(5100, 40, 1000, 10);
+      for (let k = 0; k < 8; k++) { const lx = 5150 + k * 125; x.fillStyle = '#26262e'; x.fillRect(lx - 12, 50, 24, 16); x.fillStyle = 'rgba(255,250,210,' + (.05 + .04 * Math.sin(t * 2 + k)) + ')'; x.beginPath(); x.moveTo(lx - 8, 66); x.lineTo(lx + 8, 66); x.lineTo(lx + 60, 380); x.lineTo(lx - 60, 380); x.fill(); }
+      x.fillStyle = '#2ecc71'; x.fillRect(5600, 110, 380, 270); if (st.step >= 6) for (let k = 0; k < 40; k++) { x.fillStyle = ['#f1c40f', '#e74c3c', '#3498db', '#ecf0f1'][k % 4]; x.fillRect(5600 + arnd(k) * 400, (t * 60 + arnd(k + 7) * 300) % 300 + 60, 5, 8); }
+    }
+    for (let k = 0; k < ZONES.length; k++) { const [l, r, , col] = ZONES[k], L0 = Math.max(a, l), R0 = Math.min(b, r); if (R0 <= L0) continue; x.fillStyle = advLerp('#2a2a36', col, .3); x.fillRect(L0, 380, R0 - L0, 260); x.fillStyle = advLerp('#5a5a6a', col, .5); x.fillRect(L0, 380, R0 - L0, 5); }
+    for (const [l, r] of L.pits) { const L0 = Math.max(a, l), R0 = Math.min(b, r); if (R0 <= L0) continue;
+      if (l < 3000) { x.fillStyle = '#1f6fa8'; x.fillRect(L0, 388, R0 - L0, 252); x.fillStyle = 'rgba(255,255,255,.3)'; for (let q = l; q < r; q += 30) x.fillRect(q + Math.sin(t * 2 + q) * 6, 392, 16, 2); } // bassin du plateau pirates
+      else { x.fillStyle = '#05060c'; x.fillRect(L0, 380, R0 - L0, 260); for (let k = 0; k < 8; k++) { x.fillStyle = '#fff'; x.fillRect(l + arnd(k + 50) * (r - l), 400 + arnd(k + 60) * 200, 2, 2); } } }
+    advZoneTag(ZONES, a, b, '🎬');
+  };
+  L.fg = (cam, st) => { // bobines de film à ramasser
+    const t = Date.now() / 1000;
+    if (st.step >= 1) for (const c of L.clues) if (!st.clues.includes(c.id)) { x.save(); x.translate(c.x, c.y + Math.sin(t * 2 + c.id) * 4); x.rotate(t * 1.5); x.fillStyle = '#7f8c8d'; x.beginPath(); x.arc(0, 0, 13, 0, 7); x.fill(); x.fillStyle = '#2c2c34'; for (let q = 0; q < 5; q++) { x.beginPath(); x.arc(Math.cos(q * 1.26) * 7, Math.sin(q * 1.26) * 7, 2.6, 0, 7); x.fill(); } C('#bdc3c7', 0, 0, 3); x.restore(); }
+  };
+  return L;
+})();
 
 setInterval(() => { if (me < 0 && view === 'menu' && !searching) ui(); }, 20000); // compte à rebours du mode aventure (et ouverture à 00h01 sans recharger)
 ui(); draw();
