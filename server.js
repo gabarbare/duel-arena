@@ -212,7 +212,16 @@ const CH = [
     { n: 'Nox · Orbe mental', type: 'p', su: 9, ac: 1, rc: 12, cd: 45, dmg: 12, vx: 6, r: 16, kb: 9, st: 22, vis: 24 },
     { n: 'Nox · Météore psychique (tombe du ciel)', type: 'orbfall', su: 12, ac: 1, rc: 20, cd: 150, dmg: 18, kb: 14, st: 26, warn: 36, rad: 70 },
     { n: 'Changer de sœur', type: 'swap', su: 6, ac: 1, rc: 8, cd: 60 },
-    { n: 'Emprise psychique (contrôle l’ennemi 4 s)', ult: 1, ub: 1, type: 'mindctrl', su: 16, ac: 1, rc: 14, cd: 0, rng: 480, dur: 240 }] }
+    { n: 'Emprise psychique (contrôle l’ennemi 4 s)', ult: 1, ub: 1, type: 'mindctrl', su: 16, ac: 1, rc: 14, cd: 0, rng: 480, dur: 240 }] },
+  // Bryan (perso original, admin seulement) : combattant aux coups de pied. J = combo de 3 coups de pied enchaînés (appuyer à nouveau pendant la récupération), K = coup de pied plongeant, L = projection arrière, ultime = chemise déchirée (cadence d'attaque très rapide pendant 4 s)
+  { name: 'Bryan', hidden: 1, desc: 'Combattant aux coups de pied : combo à 3, plongeon, projection, chemise déchirée', hp: 100, spd: 4.8, jmp: 14, color: '#cfd2dc', atk: [
+    { n: 'Combo de pieds (jusqu’à 3)', type: 'm', su: 5, ac: 3, rc: 8, cd: 0, dmg: 6, rng: 64, h: 44, by: .62, kb: 3, st: 14, combo: [
+      { n: 'Coup de pied direct', su: 5, ac: 3, rc: 8, cd: 0, dmg: 6, rng: 64, h: 44, by: .62, kb: 3, st: 15 },
+      { n: 'Coup de pied retourné', su: 5, ac: 3, rc: 9, cd: 0, dmg: 7, rng: 72, h: 56, by: .85, kb: 3, st: 15 },
+      { n: 'Coup de pied sauté', su: 7, ac: 4, rc: 14, cd: 26, dmg: 11, rng: 78, h: 74, by: .95, kb: 12, st: 22, lift: -5 }] },
+    { n: 'Coup de pied plongeant', type: 'dk', fix: [.7, .72], jump: 11, su: 14, ac: 26, rc: 14, cd: 70, spd: 15, dmg: 14, kb: 8, st: 26 },
+    { n: 'Projection arrière', type: 'm', su: 12, ac: 5, rc: 22, cd: 90, dmg: 13, rng: 84, h: 72, by: .8, kb: 28, st: 28, lift: -9 },
+    { n: 'Chemise déchirée (cadence x3 pendant 4 s)', ult: 1, type: 'rage', su: 14, ac: 1, rc: 12, cd: 0, dur: 240 }] }
   // Kairos (perso original) : echo = frappe différée sur la position marquée | rewind = retour 2 s en arrière (rend une partie des PV perdus) | timestop = fige l'ennemi, ses dégâts sont mis de côté puis infligés d'un coup
 ];
 // Chapitre 6 (Kairos, « Les Heures Perdues ») : les échos des cinq héros (copies figées dans le temps) et l'Horloger Noir (reflet de Kairos)
@@ -285,7 +294,7 @@ function rollMap(r) {
 
 const atks = f => CH[f.c].twin ? (f.sis ? CH[f.c].alt : CH[f.c].atk) : (f.form > 0 && CH[f.c].alt) || CH[f.c].atk;
 const nf = (c, i, inp, ult, two) => ({ c, i, tm: two ? i >> 1 : i, dead: 0, x: two ? [170, 330, W - 330, W - 170][i] : (i ? W - 250 : 250), y: G, vx: 0, vy: 0, hp: CH[c].hp, face: (two ? i >> 1 : i) ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
-  block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, portal: null, lz: 0, lzcd: 0, lzd: null, hist: [], sis: 0, cube: 0, ctl: 0, held: 0, heldBy: 0, cdAlt: [0, 0], frozen: 0, stored: 0, fzm: 1, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
+  block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, portal: null, lz: 0, lzcd: 0, lzd: null, hist: [], sis: 0, cube: 0, cstep: 0, cwin: 0, rage: 0, ctl: 0, held: 0, heldBy: 0, cdAlt: [0, 0], frozen: 0, stored: 0, fzm: 1, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
 
 const sz = f => f.sz || 1;
 // ===== 2v2 : équipes. tm = équipe (1v1 : tm = index). enemies = adversaires vivants, foe = le plus proche =====
@@ -347,6 +356,9 @@ function burn(t, dmg) {
   t.hp -= actualDamage; t.fl = 2;
 }
 
+// combo de Bryan : choisit le coup suivant ; rage : cadence très rapide (départ et récupération raccourcis, pas de délai)
+const comboDef = (f, d0) => { const st = f.cwin > 0 ? f.cstep : 0; f.cstep = st >= 2 ? 0 : st + 1; return { ...d0, ...d0.combo[st], combo: null, comb: st }; };
+const rageScale = (f, d) => f.rage > 0 && !d.ult && d.type !== 'swap' ? { ...d, su: d.jump ? d.su : Math.max(1, d.su * .4 | 0), rc: Math.max(2, d.rc * .3 | 0), cd: 0 } : d;
 function step(r, i) {
   const f = r.f[i], o = foe(r, i), c = CH[f.c], k = f.inp, dm = f.buff > 0 ? 1.25 : 1, M = MAPS[r.mi];
   if (f.dead) return;
@@ -365,7 +377,7 @@ function step(r, i) {
     return;
   }
   f.hist.push([f.x, f.y, f.hp]); if (f.hist.length > 130) f.hist.shift(); // mémoire des ~2 dernières secondes (rembobinage)
-  f.cds = f.cds.map(v => v > 0 ? v - 1 : 0); f.cdAlt = f.cdAlt.map(v => v > 0 ? v - 1 : 0); if (f.cube > 0) f.cube--;
+  f.cds = f.cds.map(v => v > 0 ? v - 1 : 0); f.cdAlt = f.cdAlt.map(v => v > 0 ? v - 1 : 0); if (f.cube > 0) f.cube--; if (f.cwin > 0 && --f.cwin === 0) f.cstep = 0; if (f.rage > 0) f.rage--;
   if (f.ctl > 0) { // emprise psychique : toutes les secondes la sœur perd 1/10 de ses PV max (jamais mortel)
     f.ctl--;
     if (f.ctl % 60 === 0) { f.hp = Math.max(1, f.hp - c.hp * .1); f.fl = 3; }
@@ -390,6 +402,9 @@ function step(r, i) {
     else if (h.x <= 0 || h.x >= W || h.y <= 40 || h.y >= G) { f.hook = { x: Math.max(0, Math.min(W, h.x)), y: Math.max(40, Math.min(G, h.y)) }; f.hkt = 180; f.hf = null; }
     else if (h.t > 28) f.hf = null;
   }
+  if (f.atk && !f.stun && f.atk.d.comb !== undefined && f.atk.d.comb < 2 && f.cwin > 0 && k.a[f.atk.k] && f.atk.f > f.atk.d.su + f.atk.d.ac) { // enchaînement fluide : le coup suivant annule la récupération
+    const nd = rageScale(f, comboDef(f, atks(f)[f.atk.k])); f.cwin = nd.rc + 26; f.cds[f.atk.k] = nd.cd + nd.su + nd.ac + nd.rc; f.atk = { k: f.atk.k, f: 0, d: nd };
+  }
   const gr = f.y >= G; f.block = 0;
   if (f.lz > 0) { // forme laser (ultime de Yugo) : vol libre, invulnérable, blesse l'ennemi au contact
     const d = f.lzd, L = Math.hypot(dx0, dy0);
@@ -401,6 +416,7 @@ function step(r, i) {
   else if (f.stun > 0) { f.stun--; f.vx *= .9 + (1 - M.acc) * .08; }
   else if (f.atk) {
     const a = f.atk, d = a.d, s0 = d.su + (d.dsh || 0); a.f++;
+    if (d.jump) { if (a.f === 1 && gr) f.vy = -d.jump; if (a.f <= d.su) f.vx = f.face * 4; if (a.f > d.su + 2 && f.y >= G - 1) a.f = Math.max(a.f, s0 + d.ac); } // plongeon : saute puis retombe en diagonale
     if ((d.type === 'd' && a.f > d.su && a.f <= d.su + d.ac) || (d.type === 'dp' && a.f > d.su && a.f <= s0)) f.vx = f.face * d.spd; else if (gr) f.vx *= .6 + (1 - M.acc) * .35;
     if (f.fly > 0) f.vy = 0; // en vol, on reste en l'air pendant une attaque
     if (d.type === 'bd' && a.f > d.su && a.f <= d.su + d.ac) { f.vx = -f.face * d.spd; f.inv = 1; }
@@ -422,6 +438,7 @@ function step(r, i) {
       else if (d.type === 'fly') f.fly = d.dur;
       else if (d.type === 'echo') r.fx.push({ k: 'echo', x: o.x, y: o.y - BH * sz(o) / 2, t: 0, o: i, d });
       else if (d.type === 'timestop') { for (const e of enemies(r, i)) { e.frozen = d.dur; e.stored = 0; e.fzm = d.mult; } }
+      else if (d.type === 'rage') { f.rage = d.dur; f.buff = d.dur; r.fx.push({ k: 'cos', x: f.x, y: f.y - 55, t: 0, life: 14 }); } // chemise déchirée : cadence très rapide + vitesse et dégâts accrus
       else if (d.type === 'cube') { f.cube = d.dur; r.fx.push({ k: 'cos', x: f.x, y: f.y - 45, t: 0, life: 14 }); } // champ psychique en cube autour de la sœur
       else if (d.type === 'orbfall') r.fx.push({ k: 'psyorb', x: o.x, t: 0, o: i, d }); // boule psychique qui tombe du ciel sur la position visée
       else if (d.type === 'swap') { // changer de sœur : J et K deviennent ceux de l'autre jumelle (recharges conservées séparément)
@@ -480,6 +497,7 @@ function step(r, i) {
       } else if (d.type === 'dk') {
         let ux, uy;
         if (d.tohook && f.hook) { ux = (f.hook.e ? o.x : f.hook.x) - f.x; uy = (f.hook.e ? o.y - BH * sz(o) / 2 : f.hook.y) - (f.y - BH * z / 2); f.hook = null; }
+        else if (d.fix) { ux = d.fix[0] * f.face; uy = d.fix[1]; }
         else if (d.aim) { ux = o.x - f.x; uy = (o.y - BH * sz(o) / 2) - (f.y - BH * z / 2); } // visée automatique vers l'ennemi, même dans les airs
         else if (f.y < G || f.fly > 0) { ux = dx0; uy = dy0; } else { ux = f.face; uy = 0; }
         if (!ux && !uy) ux = f.face;
@@ -548,6 +566,9 @@ function step(r, i) {
       if (d.nohook && !f.hook) d = d.nohook;
       if (d.ult && f.ult < 100) continue;
       if (d.ult) f.ult = 0;
+      if (d.combo) d = comboDef(f, d);
+      d = rageScale(f, d);
+      if (d.comb !== undefined) f.cwin = d.rc + 26;
       f.atk = { k: j, f: 0, d }; f.cds[j] = d.cd + d.su + (d.dsh || 0) + d.ac + d.rc; break;
     }
   }
@@ -785,7 +806,7 @@ function tick(r) {
     f: live ? r.f.map((f, q) => {
       const d = f.atk && f.atk.d;
       return { c: f.c, sk: r.sk[q], te: f.tm, dd: f.dead ? 1 : 0, bo: r.bots && r.bots[q] ? 1 : 0, x: Math.round(f.x), y: Math.round(f.y), hp: Math.max(0, Math.round(f.hp)), fc: f.face, bl: f.block, fl: f.fl > 0 ? 1 : 0,
-        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0, lz: f.lz > 0 ? 1 : 0, fz: f.frozen > 0 ? 1 : 0, bd: f.bound > 0 ? 1 : 0, sis: f.sis | 0, ct: f.ctl > 0 ? 1 : 0, cb: f.cube > 0 ? 1 : 0, hd: f.held > 0 ? 1 : 0, sd: Math.round(f.stored), vx: Math.round(f.vx * 10) / 10, vy: Math.round(f.vy * 10) / 10, pt: f.portal ? [Math.round(f.portal.x), Math.round(f.portal.y)] : null,
+        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0, lz: f.lz > 0 ? 1 : 0, fz: f.frozen > 0 ? 1 : 0, bd: f.bound > 0 ? 1 : 0, sis: f.sis | 0, ct: f.ctl > 0 ? 1 : 0, cb: f.cube > 0 ? 1 : 0, rg: f.rage > 0 ? 1 : 0, cm: d && d.comb !== undefined ? d.comb : -1, hd: f.held > 0 ? 1 : 0, sd: Math.round(f.stored), vx: Math.round(f.vx * 10) / 10, vy: Math.round(f.vy * 10) / 10, pt: f.portal ? [Math.round(f.portal.x), Math.round(f.portal.y)] : null,
         hk: f.hook ? [Math.round(f.hook.x), Math.round(f.hook.y)] : f.hf ? [Math.round(f.hf.x), Math.round(f.hf.y)] : null,
         ad: f.atk && f.atk.dx !== undefined ? [Math.round(f.atk.dx * 10) / 10, Math.round((f.atk.dy || 0) * 10) / 10] : null,
         ak: f.atk ? f.atk.k : -1, ap: d ? (f.atk.f <= d.su + (d.dsh || 0) ? 0 : f.atk.f <= d.su + (d.dsh || 0) + d.ac ? 1 : 2) : -1, pp: d ? atkPP(f) : 0,
