@@ -235,7 +235,21 @@ const CH = [
     { n: 'Coup de bêche', type: 'm', su: 7, ac: 4, rc: 12, cd: 8, dmg: 9, rng: 84, h: 50, kb: 7, st: 16 },
     { n: 'Graine de ronce (piège, 3 max)', type: 'seed', su: 8, ac: 1, rc: 10, cd: 70, dist: 130, grow: 80, life: 900, dmg: 5, root: 75, max: 3 },
     { n: 'Floraison (fait éclore les graines)', type: 'bloom', su: 10, ac: 1, rc: 16, cd: 120, rad: 95, dmg: 10, kb: 9, st: 20, heal: 5 },
-    { n: 'Forêt renaissante (ralentit, racines, régénère)', ult: 1, ub: 1, type: 'forest', su: 16, ac: 1, rc: 16, cd: 0, life: 330, every: 55, warn: 26, dmg: 7, root: 40, regen: .06 }] }
+    { n: 'Forêt renaissante (ralentit, racines, régénère)', ult: 1, ub: 1, type: 'forest', su: 16, ac: 1, rc: 16, cd: 0, life: 330, every: 55, warn: 26, dmg: 7, root: 40, regen: .06 }] },
+  // Aster, la Gardienne du Sceau (perso original, admin seulement) : chaque coup pose des sceaux (marques) sur l'ennemi ; à 5 sceaux, il est réduit au silence
+  // (seul J reste utilisable). L = rempart de lumière (bloque les projectiles et le passage), ultime = grand scellement (plus il y a de sceaux, plus c'est fort)
+  { name: 'Aster', hidden: 1, desc: 'Gardienne du Sceau : marque l’ennemi de sceaux, le réduit au silence, dresse des remparts de lumière', hp: 100, spd: 4.7, jmp: 13.5, color: '#d4af37', atk: [
+    { n: 'Lame d’aube (+1 sceau)', type: 'm', mark: 1, su: 5, ac: 3, rc: 10, cd: 6, dmg: 7, rng: 74, h: 46, kb: 5, st: 14 },
+    { n: 'Sceau lancé (+2 sceaux)', type: 'p', mark: 2, su: 8, ac: 1, rc: 12, cd: 60, dmg: 6, vx: 11, r: 11, kb: 3, st: 12, vis: 30 },
+    { n: 'Rempart de lumière', type: 'wall', su: 8, ac: 1, rc: 12, cd: 300, life: 240, dist: 72 },
+    { n: 'Grand Scellement (silence selon les sceaux)', ult: 1, ub: 1, type: 'seal', su: 14, ac: 1, rc: 16, cd: 0, rng: 650, base: 6, per: 7, sil0: 90, silk: 45, st: 30 }] },
+  // Malik, le Briseur de chaînes (perso original, admin seulement) : K = chaîne harpon (attache l'ennemi, qui ne peut plus s'éloigner), L = arrachement brise-garde
+  // (tire l'ennemi attaché jusqu'à lui ; ignore la garde, les boucliers, les cubes et les remparts), ultime = les chaînes tombent (insensible aux étourdissements, vol de vie, efface silence et sceaux)
+  { name: 'Malik', hidden: 1, desc: 'Briseur de chaînes : enchaîne l’ennemi, brise toutes les gardes, devient inarrêtable', hp: 110, spd: 4.9, jmp: 13.5, color: '#e8692b', atk: [
+    { n: 'Maillons', type: 'm', su: 4, ac: 3, rc: 9, cd: 5, dmg: 7, rng: 96, h: 44, kb: 5, st: 13 },
+    { n: 'Chaîne harpon (attache l’ennemi)', type: 'p', teth: 1, tt: 360, len: 230, su: 9, ac: 1, rc: 14, cd: 130, dmg: 5, vx: 15, r: 8, kb: 0, st: 18, vis: 31 },
+    { n: 'Arrachement (brise-garde)', type: 'm', gb: 1, yank: 1, su: 9, ac: 4, rc: 16, cd: 110, dmg: 11, rng: 82, h: 60, kb: 12, st: 24 },
+    { n: 'Les chaînes tombent (inarrêtable, vol de vie)', ult: 1, ub: 1, type: 'lib', su: 12, ac: 1, rc: 12, cd: 0, dur: 360 }] }
   // Kairos (perso original) : echo = frappe différée sur la position marquée | rewind = retour 2 s en arrière (rend une partie des PV perdus) | timestop = fige l'ennemi, ses dégâts sont mis de côté puis infligés d'un coup
 ];
 // Chapitre 6 (Kairos, « Les Heures Perdues ») : les échos des cinq héros (copies figées dans le temps) et l'Horloger Noir (reflet de Kairos)
@@ -364,7 +378,7 @@ function rollMap(r) {
 
 const atks = f => CH[f.c].twin ? (f.sis ? CH[f.c].alt : CH[f.c].atk) : (f.form > 0 && CH[f.c].alt) || CH[f.c].atk;
 const nf = (c, i, inp, ult, two) => ({ c, i, tm: two ? i >> 1 : i, dead: 0, x: two ? [170, 330, W - 330, W - 170][i] : (i ? W - 250 : 250), y: G, vx: 0, vy: 0, hp: CH[c].hp, face: (two ? i >> 1 : i) ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
-  block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, portal: null, lz: 0, lzcd: 0, lzd: null, hist: [], sis: 0, cube: 0, cstep: 0, cwin: 0, rage: 0, ctl: 0, held: 0, heldBy: 0, cdAlt: [0, 0], frozen: 0, stored: 0, fzm: 1, stolen: null, slow: 0, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
+  block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, portal: null, lz: 0, lzcd: 0, lzd: null, hist: [], sis: 0, cube: 0, cstep: 0, cwin: 0, rage: 0, ctl: 0, held: 0, heldBy: 0, cdAlt: [0, 0], frozen: 0, stored: 0, fzm: 1, stolen: null, slow: 0, mk: 0, mkt: 0, sil: 0, lib: 0, teth: null, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
 
 const sz = f => f.sz || 1;
 // ===== 2v2 : équipes. tm = équipe (1v1 : tm = index). enemies = adversaires vivants, foe = le plus proche =====
@@ -414,6 +428,9 @@ function hurt(t, dmg, kb, st, lift, srcX, ub, a) {
   if (t.crys > 0 && ub !== 2) dmg *= .4; // cristallisation
   if (!ub && t.block && t.stun <= 0 && t.y >= G) { t.hp -= dmg * (CH[t.c].blk ?? .15); t.vx = dir * kb * .3; t.fl = 4; return; }
   recordTrainingHit(t, dmg);
+  if (t.lib > 0) dmg *= .75; // Malik libéré : encaisse moins
+  if (a && a.lib > 0 && a !== t) a.hp = Math.min(CH[a.c].hp, a.hp + dmg * .3); // vol de vie
+  if (t.lib > 0) { recordTrainingHit(t, dmg); t.hp -= dmg; t.fl = 4; if (!ub) { t.ult = Math.min(100, t.ult + dmg * 1.2); if (a) a.ult = Math.min(100, a.ult + dmg * 1.5); } return; } // inarrêtable : ni recul ni étourdissement
   t.hp -= dmg; t.stun = st; t.bound = 0; t.vx = dir * kb; if (lift) t.vy = lift; t.atk = null; t.fl = 6; t.fly = 0; t.hf = null; t.hook = null;
   if (!ub) { t.ult = Math.min(100, t.ult + dmg * 1.2); if (a) a.ult = Math.min(100, a.ult + dmg * 1.5); }
 }
@@ -427,6 +444,19 @@ function burn(t, dmg) {
 }
 
 // combo de Bryan : choisit le coup suivant ; rage : cadence très rapide (départ et récupération raccourcis, pas de délai)
+// avant chaque coup qui touche : brise-garde, sceaux d'Aster, chaîne de Malik
+function addMarks(e, n, r) {
+  if (e.lib > 0) return; // les chaînes sont tombées : les sceaux n'accrochent plus
+  e.mk += n; e.mkt = 360;
+  if (e.mk >= 5) { e.mk = 0; e.mkt = 0; e.sil = Math.max(e.sil, 100); r.fx.push({ k: 'sealfx', x: e.x, y: e.y - 60, t: 0, life: 26 }); }
+}
+function preHit(f, e, d, r) {
+  if (e.inv || e.frozen > 0) return;
+  if (d.gb) { if (e.cube > 0 || e.shield > 0) r.fx.push({ k: 'cos', x: e.x, y: e.y - 50, t: 0, life: 14 }); e.cube = 0; e.shield = 0; e.crys = 0; e.block = 0; }
+  if (e.cube > 0) return;
+  if (d.mark) addMarks(e, d.mark, r);
+  if (d.teth) f.teth = { o: r.f.indexOf(e), t: d.tt, len: d.len };
+}
 const NOSTEAL = ['swap', 'stolen', 'heist', 'forest', 'mindctrl']; // techniques qu'Odile ne peut pas copier
 // Odile : copie une technique de la victime (la dernière qu'elle a utilisée, sinon une au hasard), utilisable une fois dans les 12 s
 function stealFrom(f, e, r) {
@@ -456,6 +486,12 @@ function step(r, i) {
   }
   f.hist.push([f.x, f.y, f.hp]); if (f.hist.length > 130) f.hist.shift(); // mémoire des ~2 dernières secondes (rembobinage)
   f.cds = f.cds.map(v => v > 0 ? v - 1 : 0); f.cdAlt = f.cdAlt.map(v => v > 0 ? v - 1 : 0); if (f.cube > 0) f.cube--; if (f.cwin > 0 && --f.cwin === 0) f.cstep = 0; if (f.rage > 0) f.rage--; if (f.slow > 0) f.slow--; if (f.stolen && --f.stolen.t <= 0) f.stolen = null;
+  if (f.sil > 0) f.sil--; if (f.mkt > 0 && --f.mkt === 0) f.mk = 0; if (f.lib > 0) f.lib--;
+  if (f.teth) { // chaîne de Malik : l'ennemi attaché ne peut pas s'éloigner au-delà de la longueur de la chaîne
+    const e = r.f[f.teth.o];
+    if (--f.teth.t <= 0 || !e || e.dead || f.dead) f.teth = null;
+    else { const dx = e.x - f.x; if (Math.abs(dx) > f.teth.len) { e.x = f.x + Math.sign(dx) * f.teth.len; if (Math.sign(e.vx) === Math.sign(dx)) e.vx = 0; } }
+  }
   if (f.ctl > 0) { // emprise psychique : toutes les secondes la sœur perd 1/10 de ses PV max (jamais mortel)
     f.ctl--;
     if (f.ctl % 60 === 0) { f.hp = Math.max(1, f.hp - c.hp * .1); f.fl = 3; }
@@ -502,6 +538,11 @@ function step(r, i) {
     if ((d.type === 'tp' || d.type === 'tpb' || (d.type === 'portal' && a.tp) || d.type === 'rewind' || d.type === 'swap') && a.f <= d.su + (d.type === 'rewind' ? 10 : 6)) f.inv = 1;
     if (a.f === d.su + 1) {
       if (d.trail && f.y >= G - 2) r.fx.push({ k: 'fire', x: f.x, w: d.trail.w, t: 0, o: i, d: d.trail });
+      if (d.yank && f.teth) { // arrachement : Malik tire d'un coup sec l'ennemi enchaîné jusque devant lui
+        const e = r.f[f.teth.o];
+        if (e && !e.dead && !e.inv && !(e.frozen > 0)) { r.fx.push({ k: 'cos', x: e.x, y: e.y - 45, t: 0, life: 14 }); e.x = clampX(f.x + f.face * 54, sz(e)); e.vx = 0; e.atk = null; if (e.lib <= 0) e.stun = Math.max(e.stun, 16); }
+        f.teth = null;
+      }
       if (d.type === 'p') {
         for (let j = 0; j < (d.cnt || 1); j++)
           r.pj.push({ x: f.x + f.face * (30 - (d.clone ? j * 45 : 0)), y: f.y - (d.cy || (d.low ? 18 : BH * .6)), vx: f.face * d.vx, vy: d.vy0 || (d.cnt && !d.clone ? (j - 1) * 1.8 : 0), r: d.r, o: i, d });
@@ -565,6 +606,15 @@ function step(r, i) {
         }
         r.fx = r.fx.filter(e => !(e.k === 'seed' && e.o === i));
       } else if (d.type === 'forest') r.fx.push({ k: 'forest', t: 0, o: i, d });
+      else if (d.type === 'wall') { r.fx = r.fx.filter(e => !(e.k === 'wall' && e.o === i)); r.fx.push({ k: 'wall', x: clampX(f.x + f.face * d.dist, 1), t: 0, o: i, life: d.life }); }
+      else if (d.type === 'seal') { // grand scellement : dégâts et silence selon le nombre de sceaux
+        if (Math.abs(o.x - f.x) <= d.rng && !o.dead && !o.inv) {
+          const n = o.mk; o.mk = 0; o.mkt = 0;
+          hurt(o, d.base + d.per * n, 4, d.st, -4, f.x, 1, f);
+          if (o.lib <= 0) o.sil = Math.max(o.sil, Math.min(320, d.sil0 + d.silk * n));
+          r.fx.push({ k: 'sealfx', x: o.x, y: o.y - 60, t: 0, life: 30, big: 1 });
+        }
+      } else if (d.type === 'lib') { f.lib = d.dur; f.sil = 0; f.mk = 0; f.mkt = 0; f.stun = 0; f.bound = 0; r.fx.push({ k: 'cos', x: f.x, y: f.y - 55, t: 0, life: 14 }); r.fx.push({ k: 'sealfx', x: f.x, y: f.y - 60, t: 0, life: 26, brk: 1 }); } // les chaînes tombent
       else if (d.type === 'heist') { // grand cambriolage : vole la jauge d'ultime, les bonus actifs et les projectiles de l'ennemi, et un peu de PV
         if (Math.abs(o.x - f.x) <= d.rng && !o.dead && !o.inv) {
           f.ult = Math.min(100, o.ult); o.ult = 0;
@@ -657,7 +707,7 @@ function step(r, i) {
       if (a.lb > 0) { a.lb--; a.b = [f.x - d.aoe, f.x + d.aoe, G - 70, G]; }
     }
     if (a.b && d.multi && a.f % d.multi === 0) a.hit = a.hm = 0;
-    if (a.b && d.type !== 'cut') for (const e of enemies(r, i)) { const bit = 1 << e.i; if (!(a.hm & bit) && (!d.air || e.y < G - 15) && hit(a.b, e)) { a.hm |= bit; a.hit = 1; if (d.steal && !e.inv && !(e.cube > 0)) stealFrom(f, e, r); hurt(e, d.pct ? CH[e.c].hp * d.pct : (a.fin ? d.fin : d.dmg) * dm, a.fin ? 22 : d.kb, a.fin ? 36 : d.st, d.lift, f.x, d.ub, f); } }
+    if (a.b && d.type !== 'cut') for (const e of enemies(r, i)) { const bit = 1 << e.i; if (!(a.hm & bit) && (!d.air || e.y < G - 15) && hit(a.b, e)) { a.hm |= bit; a.hit = 1; preHit(f, e, d, r); if (d.steal && !e.inv && !(e.cube > 0)) stealFrom(f, e, r); hurt(e, d.pct ? CH[e.c].hp * d.pct : (a.fin ? d.fin : d.dmg) * dm, a.fin ? 22 : d.kb, a.fin ? 36 : d.st, d.lift, f.x, d.ub, f); } }
     if (f.atk && (d.type === 'jam' ? (a.land && a.f >= a.land + d.rc) || a.f > 150 : a.f >= s0 + d.ac + d.rc)) f.atk = null;
   } else {
     f.face = o.x >= f.x ? 1 : -1;
@@ -669,6 +719,7 @@ function step(r, i) {
     for (let j = 0; j < 4; j++) if (k.a[j] && !f.cds[j] && !f.block) {
       let d = atks(f)[j];
       if (!d) continue;
+      if (f.sil > 0 && j >= 1) continue; // réduit au silence par les sceaux d'Aster
       if (d.type === 'stolen') { if (!f.stolen) continue; d = { ...f.stolen.d }; f.stolen = null; } // Odile : la technique volée part, une seule fois
       if (d.nohook && !f.hook) d = d.nohook;
       if (d.ult && f.ult < 100) continue;
@@ -705,10 +756,11 @@ function projs(r) {
     const ow = r.f[p.o];
     if (ow.frozen > 0) return true; // projectile figé avec son lanceur
     p.x += p.vx; p.y += p.vy; if (p.d.grav) p.vy += p.d.grav;
+    for (const w of r.fx) if (w.k === 'wall' && r.f[w.o].tm !== ow.tm && Math.abs(p.x - w.x) < 14 + p.r && p.y > G - 215) { r.fx.push({ k: 'cos', x: p.x, y: p.y, t: 0, life: 10 }); return false; } // rempart d'Aster
     for (const t of enemies(r, p.o)) {
       const tz = sz(t);
       if (Math.abs(p.x - t.x) < BW * tz / 2 + p.r && p.y > t.y - BH * tz - p.r && p.y < t.y + p.r) {
-        hurt(t, p.d.dmg * (ow.buff > 0 ? 1.25 : 1), p.d.kb, p.d.st, 0, p.d.pull ? t.x + Math.sign(p.vx) * 50 : p.x - p.vx * 3, p.d.ub, ow); return false;
+        preHit(ow, t, p.d, r); hurt(t, p.d.dmg * (ow.buff > 0 ? 1.25 : 1), p.d.kb, p.d.st, 0, p.d.pull ? t.x + Math.sign(p.vx) * 50 : p.x - p.vx * 3, p.d.ub, ow); return false;
       }
     }
     return p.x > -50 && p.x < W + 50 && p.y < G + 25;
@@ -721,7 +773,14 @@ function fxs(r) {
   r.fx = r.fx.filter(e => {
     if (e.o != null && r.f[e.o].frozen > 0) return true; // les effets d'un combattant figé sont figés aussi
     e.t++;
-    if (e.k === 'cos' || e.k === 'bloomfx' || e.k === 'loot') return e.t <= e.life;
+    if (e.k === 'cos' || e.k === 'bloomfx' || e.k === 'loot' || e.k === 'sealfx') return e.t <= e.life;
+    if (e.k === 'wall') { // rempart d'Aster : les ennemis ne passent pas ; un coup brise-garde le fait voler en éclats
+      for (const t of enemies(r, e.o)) {
+        if (t.atk && t.atk.d.gb && t.atk.b && t.atk.b[0] < e.x + 12 && t.atk.b[1] > e.x - 12) { add.push({ k: 'cos', x: e.x, y: G - 100, t: 0, life: 14 }); return false; }
+        if (t.y > G - 215 && Math.abs(t.x - e.x) < 22 * sz(t) + 8) { const sd = Math.sign(t.x - e.x) || 1; t.x = e.x + sd * (22 * sz(t) + 8); if (Math.sign(t.vx) === -sd) t.vx = 0; }
+      }
+      return e.t <= e.life;
+    }
     if (e.k === 'seed') { // graine : mûrit, puis des ronces immobilisent le premier ennemi qui marche dessus
       if (e.t >= e.d.grow) for (const t of enemies(r, e.o)) if (!t.inv && t.y >= G - 4 && Math.abs(t.x - e.x) < 22 + 14 * sz(t)) {
         hurt(t, e.d.dmg, 0, e.d.root, 0, e.x, 1, r.f[e.o]); t.bound = e.d.root; t.vx = 0; t.fly = 0; add.push({ k: 'bloomfx', x: e.x, t: 0, life: 22 }); return false;
@@ -839,6 +898,11 @@ function thinkOne(r, i) {
       else if (a.type === 'bloom') score = r.fx.some(e => e.k === 'seed' && e.o === i && Math.abs(e.x - o.x) < 100) ? 78 : -20;
       else if (a.type === 'heist' || a.type === 'forest') score = dist < 500 ? 60 : 5;
       else if (a.steal && !f.stolen && dist < 130) score = 70;
+      else if (a.type === 'seal') score = o.mk >= 2 ? 82 : o.mk >= 1 ? 50 : 20;
+      else if (a.type === 'wall') score = (r.pj.some(p => p.o !== i && Math.sign(f.x - p.x) === Math.sign(p.vx) && Math.abs(p.x - f.x) < 300) || (dist < 110 && f.hp < c.hp * .5)) ? 70 : -10;
+      else if (a.type === 'lib') score = f.sil > 0 || f.hp < c.hp * .7 ? 80 : 40;
+      else if (a.yank) score = f.teth ? 85 : (o.block || o.shield > 0 || o.cube > 0) && dist < 100 ? 70 : -5;
+      else if (a.teth && f.teth) score = -20;
       else if (a.type === 'cube') score = f.cube <= 0 && o.atk && dist < 320 ? 62 : -10;
       else if (a.type === 'p') score = (dist < 520 ? 55 : 10) - Math.abs(dist - 260) * .04;
       else if (a.type === 'shield' && a.ttl) score = f.shield <= 0 && ((o.atk && dist < 300) || f.hp < c.hp * .6) ? 72 : -10; // barrière : quand l'ennemi attaque
@@ -939,7 +1003,7 @@ function tick(r) {
     f: live ? r.f.map((f, q) => {
       const d = f.atk && f.atk.d;
       return { c: f.c, sk: r.sk[q], te: f.tm, dd: f.dead ? 1 : 0, bo: r.bots && r.bots[q] ? 1 : 0, x: Math.round(f.x), y: Math.round(f.y), hp: Math.max(0, Math.round(f.hp)), fc: f.face, bl: f.block, fl: f.fl > 0 ? 1 : 0,
-        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0, lz: f.lz > 0 ? 1 : 0, fz: f.frozen > 0 ? 1 : 0, bd: f.bound > 0 ? 1 : 0, sis: f.sis | 0, ct: f.ctl > 0 ? 1 : 0, cb: f.cube > 0 ? 1 : 0, rg: f.rage > 0 ? 1 : 0, stl: f.stolen ? f.stolen.n : '', slw: f.slow > 0 ? 1 : 0, cm: d && d.comb !== undefined ? d.comb : -1, hd: f.held > 0 ? 1 : 0, sd: Math.round(f.stored), vx: Math.round(f.vx * 10) / 10, vy: Math.round(f.vy * 10) / 10, pt: f.portal ? [Math.round(f.portal.x), Math.round(f.portal.y)] : null,
+        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0, lz: f.lz > 0 ? 1 : 0, fz: f.frozen > 0 ? 1 : 0, bd: f.bound > 0 ? 1 : 0, sis: f.sis | 0, ct: f.ctl > 0 ? 1 : 0, cb: f.cube > 0 ? 1 : 0, rg: f.rage > 0 ? 1 : 0, stl: f.stolen ? f.stolen.n : '', slw: f.slow > 0 ? 1 : 0, mk: f.mk, sil: f.sil > 0 ? 1 : 0, lib: f.lib > 0 ? 1 : 0, th: f.teth ? f.teth.o : -1, cm: d && d.comb !== undefined ? d.comb : -1, hd: f.held > 0 ? 1 : 0, sd: Math.round(f.stored), vx: Math.round(f.vx * 10) / 10, vy: Math.round(f.vy * 10) / 10, pt: f.portal ? [Math.round(f.portal.x), Math.round(f.portal.y)] : null,
         hk: f.hook ? [Math.round(f.hook.x), Math.round(f.hook.y)] : f.hf ? [Math.round(f.hf.x), Math.round(f.hf.y)] : null,
         ad: f.atk && f.atk.dx !== undefined ? [Math.round(f.atk.dx * 10) / 10, Math.round((f.atk.dy || 0) * 10) / 10] : null,
         ak: f.atk ? f.atk.k : -1, ap: d ? (f.atk.f <= d.su + (d.dsh || 0) ? 0 : f.atk.f <= d.su + (d.dsh || 0) + d.ac ? 1 : 2) : -1, pp: d ? atkPP(f) : 0,
@@ -951,6 +1015,8 @@ function tick(r) {
       : e.k === 'echo' ? { p: 6, x: Math.round(e.x), y: Math.round(e.y), a: Math.min(1, e.t / e.d.warn), r: e.d.rad, h: e.t >= e.d.warn ? 1 : 0 }
       : e.k === 'beam' ? { p: e.t >= e.d.warn ? 4 : 3, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: Math.min(1, e.t / e.d.warn), wd: e.d.wd, np: e.np, cl: e.d.cl || 0 }
       : e.k === 'por' ? { p: e.t >= e.d.warn ? 4 : 3, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: Math.min(1, e.t / e.d.warn) }
+      : e.k === 'wall' ? { p: 13, x: Math.round(e.x), a: e.t / e.life, o: e.o }
+      : e.k === 'sealfx' ? { p: 14, x: Math.round(e.x), y: Math.round(e.y), a: e.t / e.life, b: e.big ? 1 : 0, k: e.brk ? 1 : 0 }
       : e.k === 'seed' ? { p: 8, x: Math.round(e.x), sx: Math.round(e.sx), a: Math.min(1, e.t / e.d.grow), o: e.o }
       : e.k === 'bloomfx' ? { p: 9, x: Math.round(e.x), a: e.t / e.life }
       : e.k === 'forest' ? { p: 10, a: e.t / e.d.life, o: e.o }
