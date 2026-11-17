@@ -221,7 +221,21 @@ const CH = [
       { n: 'Coup de pied sauté', su: 7, ac: 4, rc: 14, cd: 26, dmg: 11, rng: 78, h: 74, by: .95, kb: 12, st: 22, lift: -5 }] },
     { n: 'Coup de pied plongeant', type: 'dk', fix: [.7, .72], jump: 11, su: 14, ac: 26, rc: 14, cd: 70, spd: 15, dmg: 14, kb: 8, st: 26 },
     { n: 'Projection arrière', type: 'm', su: 12, ac: 5, rc: 22, cd: 90, dmg: 13, rng: 84, h: 72, by: .8, kb: 28, st: 28, lift: -9 },
-    { n: 'Chemise déchirée (cadence x3 pendant 4 s)', ult: 1, type: 'rage', su: 14, ac: 1, rc: 12, cd: 0, dur: 240 }] }
+    { n: 'Chemise déchirée (cadence x3 pendant 4 s)', ult: 1, type: 'rage', su: 14, ac: 1, rc: 12, cd: 0, dur: 240 }] },
+  // Odile « la Pie » (perso original, admin seulement) : voleuse de techniques. K = larcin (si ça touche, elle copie la dernière technique de l'ennemi),
+  // L = utilise la technique volée (une seule fois, dans les 12 s), ultime = grand cambriolage (vole la jauge d'ultime, les bonus et les projectiles de l'ennemi)
+  { name: 'Odile', hidden: 1, desc: 'Voleuse de techniques : copie l’attaque de l’ennemi, vole sa jauge d’ultime et ses bonus', hp: 90, spd: 5.4, jmp: 14.5, color: '#3fb8c9', atk: [
+    { n: 'Griffes de pie', type: 'm', su: 4, ac: 3, rc: 8, cd: 4, dmg: 6, rng: 66, h: 42, kb: 4, st: 13 },
+    { n: 'Larcin (copie la technique ennemie)', type: 'm', steal: 1, su: 6, ac: 5, rc: 14, cd: 150, dmg: 5, rng: 82, h: 60, kb: 3, st: 16, spd0: 9 },
+    { n: 'Technique volée (1 utilisation)', type: 'stolen', su: 0, ac: 0, rc: 0, cd: 20 },
+    { n: 'Grand cambriolage (vole ultime, bonus et projectiles)', ult: 1, ub: 1, type: 'heist', su: 12, ac: 1, rc: 18, cd: 0, rng: 560, dmg: 14, st: 40 }] },
+  // Silas, le jardinier des cendres (perso original, admin seulement) : K = plante une graine (mûrit en 1,3 s, puis des ronces immobilisent l'ennemi qui marche dessus ; 3 max),
+  // L = floraison (toutes ses graines éclosent d'un coup et le soignent), ultime = forêt renaissante (ennemis ralentis, racines qui jaillissent, régénération)
+  { name: 'Silas', hidden: 1, desc: 'Jardinier des cendres : graines-pièges qui poussent, floraison à distance, forêt qui ralentit l’ennemi', hp: 115, spd: 3.9, jmp: 12.5, color: '#7cb342', atk: [
+    { n: 'Coup de bêche', type: 'm', su: 7, ac: 4, rc: 12, cd: 8, dmg: 9, rng: 84, h: 50, kb: 7, st: 16 },
+    { n: 'Graine de ronce (piège, 3 max)', type: 'seed', su: 8, ac: 1, rc: 10, cd: 70, dist: 130, grow: 80, life: 900, dmg: 5, root: 75, max: 3 },
+    { n: 'Floraison (fait éclore les graines)', type: 'bloom', su: 10, ac: 1, rc: 16, cd: 120, rad: 95, dmg: 10, kb: 9, st: 20, heal: 5 },
+    { n: 'Forêt renaissante (ralentit, racines, régénère)', ult: 1, ub: 1, type: 'forest', su: 16, ac: 1, rc: 16, cd: 0, life: 330, every: 55, warn: 26, dmg: 7, root: 40, regen: .06 }] }
   // Kairos (perso original) : echo = frappe différée sur la position marquée | rewind = retour 2 s en arrière (rend une partie des PV perdus) | timestop = fige l'ennemi, ses dégâts sont mis de côté puis infligés d'un coup
 ];
 // Chapitre 6 (Kairos, « Les Heures Perdues ») : les échos des cinq héros (copies figées dans le temps) et l'Horloger Noir (reflet de Kairos)
@@ -229,6 +243,47 @@ const CH = [
   const c = CH.find(q => q.name === nm); CH.push({ ...c, name: en, adv: 1, desc: 'Souvenir de ' + nm + ', figé dans le temps', color: '#8fb8e8' });
 });
 CH.push({ ...CH.find(q => q.name === 'Kairos'), name: 'Horloger Noir', adv: 1, desc: 'Reflet de Kairos, maître des secondes volées', hp: 100, color: '#b0182a' });
+// ===== SAISON 2 de l'aventure =====
+// Chapitre 7 (Jumelles, « Deux Esprits, Un Cœur ») : adversaires de l'Académie Prisme
+{
+  const J = CH.find(q => q.name === 'Jumelles'), G = CH.find(q => q.name === 'Golem'), B = CH.find(q => q.name === 'Bryan');
+  CH.push(
+    { name: 'Drone gardien', adv: 1, desc: 'Drone de surveillance de l’Académie Prisme', hp: 90, spd: 4.2, jmp: 12, color: '#7fd6e8', atk: [
+      { n: 'Laser', type: 'p', su: 5, ac: 1, rc: 8, cd: 18, dmg: 5, vx: 15, r: 6, kb: 3, st: 10, vis: 23 },
+      { n: 'Rafale laser (x3)', type: 'p', su: 9, ac: 1, rc: 18, cd: 90, dmg: 5, vx: 13, r: 6, kb: 4, st: 12, cnt: 3, vis: 23 },
+      { n: 'Charge', type: 'd', su: 8, ac: 10, rc: 16, cd: 75, dmg: 11, rng: 34, h: 60, kb: 10, st: 20, spd: 13 }] },
+    { ...G, name: 'Golem de livres', adv: 1, desc: 'Gardien de la bibliothèque interdite', hp: 140, color: '#c9a66b' },
+    { name: 'Iris', adv: 1, desc: 'Meilleure élève de Vesper, copie les pouvoirs', hp: 100, spd: 4.6, jmp: 13.5, color: '#2ecc9a', atk: [
+      { ...J.atk[0], n: 'Onde copiée' }, { ...J.alt[0], n: 'Orbe copié' }, { ...J.alt[1], n: 'Météore copié', cd: 170 },
+      { n: 'Pas éclair', type: 'tpb', su: 3, ac: 1, rc: 9, cd: 160 }] },
+    { name: 'Cauchemar', adv: 1, desc: 'L’ombre des peurs de Nox', hp: 110, spd: 4.4, jmp: 13.5, color: '#3a1f5c', atk: [
+      { ...J.alt[0], n: 'Orbe de peur' }, { ...J.alt[1], n: 'Chute de cauchemar', cd: 140 },
+      { n: 'Ruée d’ombre', type: 'd', su: 6, ac: 10, rc: 14, cd: 70, dmg: 11, rng: 34, h: 60, kb: 9, st: 20, spd: 14 }] },
+    { name: 'Pr Vesper', adv: 1, desc: 'Directeur de l’Académie Prisme, casque amplificateur', hp: 150, spd: 3.7, jmp: 12.5, color: '#8e44ad', atk: [
+      { ...J.atk[0], n: 'Onde amplifiée', dmg: 7 }, { ...J.alt[1], n: 'Météore amplifié', cd: 130, dmg: 20 },
+      { ...J.atk[0], n: 'Rafale mentale (x3)', cd: 100, cnt: 3 }, { ...J.atk[3], n: 'Emprise du directeur' }] },
+  // Chapitre 8 (Bryan, « Action ! ») : adversaires des Studios Silver
+    { name: 'Rick', adv: 1, desc: 'Cascadeur rival, jaloux de Bryan', hp: 100, spd: 4.6, jmp: 14, color: '#e74c3c', atk: [
+      { n: 'Direct', type: 'm', su: 5, ac: 4, rc: 9, cd: 8, dmg: 7, rng: 64, h: 40, kb: 4, st: 13 },
+      { n: 'Coup de pied retourné', type: 'm', su: 8, ac: 4, rc: 14, cd: 40, dmg: 11, rng: 76, h: 56, by: .85, kb: 9, st: 19 },
+      { n: 'Coup de pied sauté', type: 'm', su: 11, ac: 5, rc: 20, cd: 90, dmg: 15, rng: 78, h: 74, by: .95, kb: 12, st: 24, lift: -6 },
+      { n: 'Glissade', type: 'd', su: 5, ac: 10, rc: 14, cd: 70, dmg: 9, rng: 34, h: 40, kb: 8, st: 18, spd: 13 }] },
+    { name: 'Shérif robot', adv: 1, desc: 'Robot du plateau western', hp: 115, spd: 3.6, jmp: 12, color: '#b9770e', atk: [
+      { n: 'Coup de crosse', type: 'm', su: 8, ac: 4, rc: 14, cd: 14, dmg: 10, rng: 70, h: 50, kb: 8, st: 18 },
+      { n: 'Double tir', type: 'p', su: 7, ac: 1, rc: 12, cd: 50, dmg: 6, vx: 16, r: 5, kb: 4, st: 10, cnt: 2, vis: 21 },
+      { n: 'Tir chargé', type: 'p', su: 16, ac: 1, rc: 20, cd: 120, dmg: 15, vx: 12, r: 12, kb: 12, st: 24, vis: 19 }] },
+    { name: 'Capitaine Boulon', adv: 1, desc: 'Robot pirate du plateau du galion', hp: 125, spd: 3.5, jmp: 12, color: '#7f8c8d', atk: [
+      { n: 'Coup de sabre', type: 'm', su: 7, ac: 4, rc: 12, cd: 10, dmg: 9, rng: 84, h: 44, kb: 6, st: 15 },
+      { n: 'Boulet de canon', type: 'p', su: 16, ac: 1, rc: 22, cd: 110, dmg: 16, vx: 7, r: 16, kb: 13, st: 24, vis: 19 },
+      { n: 'À l’abordage !', type: 'd', su: 8, ac: 12, rc: 16, cd: 90, dmg: 12, rng: 40, h: 70, kb: 11, st: 22, spd: 12 }] },
+    { ...B, name: 'Bryan-X', adv: 1, desc: 'Doublure robot de Bryan', hp: 120, color: '#c0c6d0' },
+    { name: 'Max Silver', adv: 1, desc: 'Le producteur, aux commandes de son robot de tournage', hp: 240, spd: 2.6, jmp: 9.5, color: '#d4af37', bz: 1.8, atk: [
+      { n: 'Poing hydraulique', type: 'm', su: 14, ac: 6, rc: 18, cd: 18, dmg: 15, rng: 74, h: 80, kb: 13, st: 24 },
+      { n: 'Rayon du projecteur', type: 'p', su: 12, ac: 1, rc: 18, cd: 70, dmg: 12, vx: 14, r: 12, kb: 9, st: 20, vis: 3 },
+      { n: 'Chute de projecteur', type: 'sky', su: 14, ac: 1, rc: 22, cd: 150, dmg: 16, kb: 10, st: 26, warn: 34, strike: 8 },
+      { n: 'Piétinement', type: 'jam', su: 14, ac: 0, rc: 26, cd: 130, dmg: 17, jv: 8, jx: 1, aoe: 140, kb: 13, st: 28 }] }
+  );
+}
 // Événement Frieren : dispo du dimanche soir à 00h01 (heure de Paris, soit lundi 16/11/2026 00:01) ensuite définitivement. Modifier FRIEREN_FROM pour changer la date.
 const FRIEREN_FROM = Date.parse('2026-11-16T00:01:00+01:00');
 // Mode aventure : visible tout de suite, jouable à partir du lundi 16/11/2026 00:01 (heure de Paris). Modifier ADV_FROM pour changer la date.
@@ -264,7 +319,18 @@ const ADV = {
   t2: { p: 'Kairos', o: 'Écho de Kaze', lvl: 1, map: 8, noUlt: 1 },
   t3: { p: 'Kairos', o: 'Écho du Viking', lvl: 1, map: 10, noUlt: 1 },
   t4: { p: 'Kairos', o: 'Écho du Chevalier', lvl: 1, map: 13, noUlt: 1 },
-  t5: { p: 'Kairos', o: 'Horloger Noir', lvl: 2, map: 14, noUlt: 0 } // boss final : duel de deux arrêts du temps
+  t5: { p: 'Kairos', o: 'Horloger Noir', lvl: 2, map: 14, noUlt: 0 }, // boss final : duel de deux arrêts du temps
+  // Saison 2
+  j0: { p: 'Jumelles', o: 'Drone gardien', lvl: 1, map: 15, noUlt: 1 },
+  j1: { p: 'Jumelles', o: 'Golem de livres', lvl: 1, map: 15, noUlt: 1 },
+  j2: { p: 'Jumelles', o: 'Iris', lvl: 1, map: 15, noUlt: 1 },
+  j3: { p: 'Jumelles', o: 'Cauchemar', lvl: 1, map: 16, noUlt: 1 },
+  j4: { p: 'Jumelles', o: 'Pr Vesper', lvl: 2, map: 16, noUlt: 0 }, // boss : emprise psychique autorisée
+  y0: { p: 'Bryan', o: 'Rick', lvl: 1, map: 18, noUlt: 1 },
+  y1: { p: 'Bryan', o: 'Shérif robot', lvl: 1, map: 17, noUlt: 1 },
+  y2: { p: 'Bryan', o: 'Capitaine Boulon', lvl: 1, map: 18, noUlt: 1 },
+  y3: { p: 'Bryan', o: 'Bryan-X', lvl: 1, map: 18, noUlt: 1 },
+  y4: { p: 'Bryan', o: 'Max Silver', lvl: 2, map: 18, noUlt: 0 } // boss : chemise déchirée autorisée
 };
 
 // gr = gravité, acc = adhérence du sol (1 = normal, petit = glissant)
@@ -284,7 +350,11 @@ const MAPS = [
   { n: 'Trône de givre', note: 'aventure', gr: GR, acc: 1, adv: 1 },
   { n: 'Pic du dragon', note: 'aventure', gr: GR, acc: 1, adv: 1 },
   { n: 'Salle du trône maudite', note: 'aventure', gr: GR, acc: 1, adv: 1 },
-  { n: 'Cœur de la Grande Horloge', note: 'aventure', gr: GR, acc: 1, adv: 1 }
+  { n: 'Cœur de la Grande Horloge', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Couloirs de l’Académie Prisme', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Monde des rêves', note: 'gravité réduite', gr: GR * .75, acc: 1, adv: 1 },
+  { n: 'Plateau western', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Grand plateau des Studios Silver', note: 'aventure', gr: GR, acc: 1, adv: 1 }
 ];
 function rollMap(r) {
   if (r.fixMap != null) { r.mi = r.fixMap; return; }
@@ -294,7 +364,7 @@ function rollMap(r) {
 
 const atks = f => CH[f.c].twin ? (f.sis ? CH[f.c].alt : CH[f.c].atk) : (f.form > 0 && CH[f.c].alt) || CH[f.c].atk;
 const nf = (c, i, inp, ult, two) => ({ c, i, tm: two ? i >> 1 : i, dead: 0, x: two ? [170, 330, W - 330, W - 170][i] : (i ? W - 250 : 250), y: G, vx: 0, vy: 0, hp: CH[c].hp, face: (two ? i >> 1 : i) ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
-  block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, portal: null, lz: 0, lzcd: 0, lzd: null, hist: [], sis: 0, cube: 0, cstep: 0, cwin: 0, rage: 0, ctl: 0, held: 0, heldBy: 0, cdAlt: [0, 0], frozen: 0, stored: 0, fzm: 1, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
+  block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, portal: null, lz: 0, lzcd: 0, lzd: null, hist: [], sis: 0, cube: 0, cstep: 0, cwin: 0, rage: 0, ctl: 0, held: 0, heldBy: 0, cdAlt: [0, 0], frozen: 0, stored: 0, fzm: 1, stolen: null, slow: 0, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
 
 const sz = f => f.sz || 1;
 // ===== 2v2 : équipes. tm = équipe (1v1 : tm = index). enemies = adversaires vivants, foe = le plus proche =====
@@ -357,6 +427,14 @@ function burn(t, dmg) {
 }
 
 // combo de Bryan : choisit le coup suivant ; rage : cadence très rapide (départ et récupération raccourcis, pas de délai)
+const NOSTEAL = ['swap', 'stolen', 'heist', 'forest', 'mindctrl']; // techniques qu'Odile ne peut pas copier
+// Odile : copie une technique de la victime (la dernière qu'elle a utilisée, sinon une au hasard), utilisable une fois dans les 12 s
+function stealFrom(f, e, r) {
+  const pool = atks(e).filter(q => q && !q.ult && !NOSTEAL.includes(q.type) && !q.steal), d = (e.last && pool.includes(e.last)) ? e.last : pool[Math.random() * pool.length | 0];
+  if (!d) return;
+  f.stolen = { d, n: d.n.replace(/\s*\(.*\)$/, ''), t: 720 }; f.cds[2] = 0;
+  r.fx.push({ k: 'cos', x: e.x, y: e.y - 60, t: 0, life: 14 }); r.fx.push({ k: 'loot', x: e.x, y: e.y - 70, tx: f.x, ty: f.y - 70, t: 0, life: 22, n: 3 });
+}
 const comboDef = (f, d0) => { const st = f.cwin > 0 ? f.cstep : 0; f.cstep = st >= 2 ? 0 : st + 1; return { ...d0, ...d0.combo[st], combo: null, comb: st }; };
 const rageScale = (f, d) => f.rage > 0 && !d.ult && d.type !== 'swap' ? { ...d, su: d.jump ? d.su : Math.max(1, d.su * .4 | 0), rc: Math.max(2, d.rc * .3 | 0), cd: 0 } : d;
 function step(r, i) {
@@ -377,7 +455,7 @@ function step(r, i) {
     return;
   }
   f.hist.push([f.x, f.y, f.hp]); if (f.hist.length > 130) f.hist.shift(); // mémoire des ~2 dernières secondes (rembobinage)
-  f.cds = f.cds.map(v => v > 0 ? v - 1 : 0); f.cdAlt = f.cdAlt.map(v => v > 0 ? v - 1 : 0); if (f.cube > 0) f.cube--; if (f.cwin > 0 && --f.cwin === 0) f.cstep = 0; if (f.rage > 0) f.rage--;
+  f.cds = f.cds.map(v => v > 0 ? v - 1 : 0); f.cdAlt = f.cdAlt.map(v => v > 0 ? v - 1 : 0); if (f.cube > 0) f.cube--; if (f.cwin > 0 && --f.cwin === 0) f.cstep = 0; if (f.rage > 0) f.rage--; if (f.slow > 0) f.slow--; if (f.stolen && --f.stolen.t <= 0) f.stolen = null;
   if (f.ctl > 0) { // emprise psychique : toutes les secondes la sœur perd 1/10 de ses PV max (jamais mortel)
     f.ctl--;
     if (f.ctl % 60 === 0) { f.hp = Math.max(1, f.hp - c.hp * .1); f.fl = 3; }
@@ -420,6 +498,7 @@ function step(r, i) {
     if ((d.type === 'd' && a.f > d.su && a.f <= d.su + d.ac) || (d.type === 'dp' && a.f > d.su && a.f <= s0)) f.vx = f.face * d.spd; else if (gr) f.vx *= .6 + (1 - M.acc) * .35;
     if (f.fly > 0) f.vy = 0; // en vol, on reste en l'air pendant une attaque
     if (d.type === 'bd' && a.f > d.su && a.f <= d.su + d.ac) { f.vx = -f.face * d.spd; f.inv = 1; }
+    if (d.spd0 && a.f > d.su && a.f <= d.su + d.ac) f.vx = f.face * d.spd0; // larcin : elle se faufile vers l'ennemi
     if ((d.type === 'tp' || d.type === 'tpb' || (d.type === 'portal' && a.tp) || d.type === 'rewind' || d.type === 'swap') && a.f <= d.su + (d.type === 'rewind' ? 10 : 6)) f.inv = 1;
     if (a.f === d.su + 1) {
       if (d.trail && f.y >= G - 2) r.fx.push({ k: 'fire', x: f.x, w: d.trail.w, t: 0, o: i, d: d.trail });
@@ -474,6 +553,33 @@ function step(r, i) {
         }
       }
       else if (d.type === 'crys') f.crys = d.dur;
+      else if (d.type === 'seed') { // Silas : plante une graine devant lui (la plus ancienne disparaît s'il y en a déjà 3)
+        const mine = r.fx.filter(e => e.k === 'seed' && e.o === i);
+        if (mine.length >= d.max) r.fx.splice(r.fx.indexOf(mine[0]), 1);
+        r.fx.push({ k: 'seed', x: clampX(f.x + f.face * d.dist, 1), sx: f.x, t: 0, o: i, d });
+      } else if (d.type === 'bloom') { // floraison : chaque graine éclot et blesse autour d'elle, Silas récupère des PV
+        const mine = r.fx.filter(e => e.k === 'seed' && e.o === i);
+        for (const sd of mine) {
+          for (const t of enemies(r, i)) if (Math.abs(t.x - sd.x) < d.rad + 14 * sz(t) && t.y > G - 150) hurt(t, d.dmg * dm, d.kb, d.st, -7, sd.x, d.ub, f);
+          f.hp = Math.min(c.hp, f.hp + d.heal); r.fx.push({ k: 'bloomfx', x: sd.x, t: 0, life: 22 });
+        }
+        r.fx = r.fx.filter(e => !(e.k === 'seed' && e.o === i));
+      } else if (d.type === 'forest') r.fx.push({ k: 'forest', t: 0, o: i, d });
+      else if (d.type === 'heist') { // grand cambriolage : vole la jauge d'ultime, les bonus actifs et les projectiles de l'ennemi, et un peu de PV
+        if (Math.abs(o.x - f.x) <= d.rng && !o.dead && !o.inv) {
+          f.ult = Math.min(100, o.ult); o.ult = 0;
+          if (o.buff > 0) { f.buff = Math.max(f.buff, o.buff); o.buff = 0; }
+          if (o.shield > 0) { f.shield = o.shield; f.sht = o.sht || 300; o.shield = 0; o.sht = 0; }
+          if (o.crys > 0) { f.crys = o.crys; o.crys = 0; }
+          if (o.rage > 0) { f.rage = o.rage; o.rage = 0; }
+          if (o.cube > 0) { f.cube = o.cube; o.cube = 0; }
+          o.form = 0; o.fly = 0; o.lz = 0;
+          for (const p of r.pj) if (r.f[p.o].tm !== f.tm) { p.o = i; p.vx = -p.vx; } // ses projectiles changent de camp
+          hurt(o, d.dmg, 2, d.st, -5, f.x, 1, f); f.hp = Math.min(c.hp, f.hp + d.dmg);
+          r.fx.push({ k: 'loot', x: o.x, y: o.y - 60, tx: f.x, ty: f.y - 70, t: 0, life: 30, n: 8 });
+        }
+        r.fx.push({ k: 'cos', x: f.x, y: f.y - 45, t: 0, life: 14 });
+      }
       else if (d.type === 'fire') r.fx.push({ k: 'fire', x: clampX(f.x + f.face * 80, 1), w: d.w, t: 0, o: i, d });
       else if (d.type === 'grap') { let ux = dx0, uy = dy0; if (!ux && !uy) ux = f.face; const L = Math.hypot(ux, uy); f.hf = { x: f.x, y: f.y - BH * z * .6, dx: ux / L, dy: uy / L, t: 0 }; }
       else if (d.type === 'tp') {
@@ -551,11 +657,11 @@ function step(r, i) {
       if (a.lb > 0) { a.lb--; a.b = [f.x - d.aoe, f.x + d.aoe, G - 70, G]; }
     }
     if (a.b && d.multi && a.f % d.multi === 0) a.hit = a.hm = 0;
-    if (a.b && d.type !== 'cut') for (const e of enemies(r, i)) { const bit = 1 << e.i; if (!(a.hm & bit) && (!d.air || e.y < G - 15) && hit(a.b, e)) { a.hm |= bit; a.hit = 1; hurt(e, d.pct ? CH[e.c].hp * d.pct : (a.fin ? d.fin : d.dmg) * dm, a.fin ? 22 : d.kb, a.fin ? 36 : d.st, d.lift, f.x, d.ub, f); } }
+    if (a.b && d.type !== 'cut') for (const e of enemies(r, i)) { const bit = 1 << e.i; if (!(a.hm & bit) && (!d.air || e.y < G - 15) && hit(a.b, e)) { a.hm |= bit; a.hit = 1; if (d.steal && !e.inv && !(e.cube > 0)) stealFrom(f, e, r); hurt(e, d.pct ? CH[e.c].hp * d.pct : (a.fin ? d.fin : d.dmg) * dm, a.fin ? 22 : d.kb, a.fin ? 36 : d.st, d.lift, f.x, d.ub, f); } }
     if (f.atk && (d.type === 'jam' ? (a.land && a.f >= a.land + d.rc) || a.f > 150 : a.f >= s0 + d.ac + d.rc)) f.atk = null;
   } else {
     f.face = o.x >= f.x ? 1 : -1;
-    const spd = c.spd * (f.buff > 0 ? 1.4 : 1) * (f.form > 0 && c.fspd ? c.fspd : 1);
+    const spd = c.spd * (f.buff > 0 ? 1.4 : 1) * (f.form > 0 && c.fspd ? c.fspd : 1) * (f.slow > 0 ? .5 : 1); // forêt de Silas : ralenti
     if (f.ctl > 0) { f.vx *= .6; } // emprise psychique : la sœur ne peut pas bouger
     else if (k.d && gr && !(f.fly > 0)) { f.block = 1; f.vx *= 1 - M.acc; }
     else if (f.fly > 0) { f.vx += (dx0 * spd * 1.1 - f.vx) * .5; f.vy = dy0 * spd * 1.1; } // vol : déplacement libre dans les airs
@@ -563,13 +669,16 @@ function step(r, i) {
     for (let j = 0; j < 4; j++) if (k.a[j] && !f.cds[j] && !f.block) {
       let d = atks(f)[j];
       if (!d) continue;
+      if (d.type === 'stolen') { if (!f.stolen) continue; d = { ...f.stolen.d }; f.stolen = null; } // Odile : la technique volée part, une seule fois
       if (d.nohook && !f.hook) d = d.nohook;
       if (d.ult && f.ult < 100) continue;
       if (d.ult) f.ult = 0;
       if (d.combo) d = comboDef(f, d);
       d = rageScale(f, d);
       if (d.comb !== undefined) f.cwin = d.rc + 26;
-      f.atk = { k: j, f: 0, d }; f.cds[j] = d.cd + d.su + (d.dsh || 0) + d.ac + d.rc; break;
+      f.atk = { k: j, f: 0, d }; f.cds[j] = d.cd + d.su + (d.dsh || 0) + d.ac + d.rc;
+      if (!d.ult && !NOSTEAL.includes(d.type) && !d.steal) f.last = atks(f)[j]; // dernière technique utilisée (c'est elle qu'Odile peut copier)
+      break;
     }
   }
   f.x += f.vx; f.y += f.vy;
@@ -608,10 +717,28 @@ function projs(r) {
 
 // effets au sol / dans l'air : foudre, vague de feu, portails à lasers, éclats cosmétiques
 function fxs(r) {
+  const add = r.fxAdd = []; // effets créés pendant la boucle (racines, éclosions) : ajoutés après
   r.fx = r.fx.filter(e => {
     if (e.o != null && r.f[e.o].frozen > 0) return true; // les effets d'un combattant figé sont figés aussi
     e.t++;
-    if (e.k === 'cos') return e.t <= e.life;
+    if (e.k === 'cos' || e.k === 'bloomfx' || e.k === 'loot') return e.t <= e.life;
+    if (e.k === 'seed') { // graine : mûrit, puis des ronces immobilisent le premier ennemi qui marche dessus
+      if (e.t >= e.d.grow) for (const t of enemies(r, e.o)) if (!t.inv && t.y >= G - 4 && Math.abs(t.x - e.x) < 22 + 14 * sz(t)) {
+        hurt(t, e.d.dmg, 0, e.d.root, 0, e.x, 1, r.f[e.o]); t.bound = e.d.root; t.vx = 0; t.fly = 0; add.push({ k: 'bloomfx', x: e.x, t: 0, life: 22 }); return false;
+      }
+      return e.t <= e.d.life;
+    }
+    if (e.k === 'forest') { // forêt renaissante : ennemis au sol ralentis, Silas régénère, graines mûres d'un coup, racines toutes les ~0,9 s
+      const ow2 = r.f[e.o], d2 = e.d;
+      if (!ow2.dead) ow2.hp = Math.min(CH[ow2.c].hp, ow2.hp + d2.regen);
+      for (const fx2 of r.fx) if (fx2.k === 'seed' && fx2.o === e.o) fx2.t = Math.max(fx2.t, fx2.d.grow);
+      for (const t of enemies(r, e.o)) { if (t.y >= G - 4) t.slow = Math.max(t.slow, 4); if (e.t % d2.every === 10) add.push({ k: 'root', x: t.x, t: 0, o: e.o, d: d2 }); }
+      return e.t <= d2.life;
+    }
+    if (e.k === 'root') { // racine : le sol se fissure, puis elle jaillit
+      if (e.t === e.d.warn) for (const t of enemies(r, e.o)) if (Math.abs(t.x - e.x) < 40 * sz(t) && t.y > G - 120) { hurt(t, e.d.dmg, 3, e.d.root, -4, e.x, 1, r.f[e.o]); t.bound = e.d.root; }
+      return e.t <= e.d.warn + 16;
+    }
     const d = e.d, ow = r.f[e.o], dm = ow.buff > 0 ? 1.25 : 1, T = enemies(r, e.o), f0 = foe(r, e.o);
     if (e.k === 'fire') {
       if (e.t % 12 === 0) for (const t of T) if (t.y >= G - 2 && Math.abs(t.x - e.x) < e.w / 2 + 14 * sz(t)) burn(t, d.tick * dm);
@@ -647,6 +774,7 @@ function fxs(r) {
       for (const t of T) { const bit = 1 << t.i; if (!(e.hm & bit) && Math.abs(t.x - e.x) < 45 * sz(t)) { e.hm |= bit; hurt(t, d.dmg * dm, d.kb, d.st, -8, e.x, d.ub, ow); } }
     return e.t <= d.warn + d.strike;
   });
+  if (add.length) r.fx.push(...add);
 }
 
 function start(r) { r.f = r.sel.map((c, i) => nf(c, i, null, 0, !!r.two)); r.pj = []; r.fx = []; rollMap(r); r.ph = 'cd'; r.t = 150; r.tm = ROUND; r.msg = ''; }
@@ -706,6 +834,11 @@ function thinkOne(r, i) {
         score = (f.hp < c.hp * .72 || f.buff <= 0 || f.shield <= 0 || f.form <= 0) ? 75 : -10;
       } else if (a.type === 'rewind') score = f.hp < c.hp * .6 ? 70 : -10;
       else if (a.type === 'swap') score = Math.random() < .06 ? 45 : -10;
+      else if (a.type === 'stolen') score = f.stolen ? 66 : -99;
+      else if (a.type === 'seed') score = r.fx.filter(e => e.k === 'seed' && e.o === i).length < 3 && dist < 420 ? 50 : -10;
+      else if (a.type === 'bloom') score = r.fx.some(e => e.k === 'seed' && e.o === i && Math.abs(e.x - o.x) < 100) ? 78 : -20;
+      else if (a.type === 'heist' || a.type === 'forest') score = dist < 500 ? 60 : 5;
+      else if (a.steal && !f.stolen && dist < 130) score = 70;
       else if (a.type === 'cube') score = f.cube <= 0 && o.atk && dist < 320 ? 62 : -10;
       else if (a.type === 'p') score = (dist < 520 ? 55 : 10) - Math.abs(dist - 260) * .04;
       else if (a.type === 'shield' && a.ttl) score = f.shield <= 0 && ((o.atk && dist < 300) || f.hp < c.hp * .6) ? 72 : -10; // barrière : quand l'ennemi attaque
@@ -806,7 +939,7 @@ function tick(r) {
     f: live ? r.f.map((f, q) => {
       const d = f.atk && f.atk.d;
       return { c: f.c, sk: r.sk[q], te: f.tm, dd: f.dead ? 1 : 0, bo: r.bots && r.bots[q] ? 1 : 0, x: Math.round(f.x), y: Math.round(f.y), hp: Math.max(0, Math.round(f.hp)), fc: f.face, bl: f.block, fl: f.fl > 0 ? 1 : 0,
-        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0, lz: f.lz > 0 ? 1 : 0, fz: f.frozen > 0 ? 1 : 0, bd: f.bound > 0 ? 1 : 0, sis: f.sis | 0, ct: f.ctl > 0 ? 1 : 0, cb: f.cube > 0 ? 1 : 0, rg: f.rage > 0 ? 1 : 0, cm: d && d.comb !== undefined ? d.comb : -1, hd: f.held > 0 ? 1 : 0, sd: Math.round(f.stored), vx: Math.round(f.vx * 10) / 10, vy: Math.round(f.vy * 10) / 10, pt: f.portal ? [Math.round(f.portal.x), Math.round(f.portal.y)] : null,
+        ul: Math.round(f.ult), bf: f.buff > 0 ? 1 : 0, sh: Math.round(f.shield), fm: f.form > 0 ? 1 : 0, iv: f.inv ? 1 : 0, sz: f.sz, cr: f.crys > 0 ? 1 : 0, fy: f.fly > 0 ? 1 : 0, lz: f.lz > 0 ? 1 : 0, fz: f.frozen > 0 ? 1 : 0, bd: f.bound > 0 ? 1 : 0, sis: f.sis | 0, ct: f.ctl > 0 ? 1 : 0, cb: f.cube > 0 ? 1 : 0, rg: f.rage > 0 ? 1 : 0, stl: f.stolen ? f.stolen.n : '', slw: f.slow > 0 ? 1 : 0, cm: d && d.comb !== undefined ? d.comb : -1, hd: f.held > 0 ? 1 : 0, sd: Math.round(f.stored), vx: Math.round(f.vx * 10) / 10, vy: Math.round(f.vy * 10) / 10, pt: f.portal ? [Math.round(f.portal.x), Math.round(f.portal.y)] : null,
         hk: f.hook ? [Math.round(f.hook.x), Math.round(f.hook.y)] : f.hf ? [Math.round(f.hf.x), Math.round(f.hf.y)] : null,
         ad: f.atk && f.atk.dx !== undefined ? [Math.round(f.atk.dx * 10) / 10, Math.round((f.atk.dy || 0) * 10) / 10] : null,
         ak: f.atk ? f.atk.k : -1, ap: d ? (f.atk.f <= d.su + (d.dsh || 0) ? 0 : f.atk.f <= d.su + (d.dsh || 0) + d.ac ? 1 : 2) : -1, pp: d ? atkPP(f) : 0,
@@ -818,6 +951,11 @@ function tick(r) {
       : e.k === 'echo' ? { p: 6, x: Math.round(e.x), y: Math.round(e.y), a: Math.min(1, e.t / e.d.warn), r: e.d.rad, h: e.t >= e.d.warn ? 1 : 0 }
       : e.k === 'beam' ? { p: e.t >= e.d.warn ? 4 : 3, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: Math.min(1, e.t / e.d.warn), wd: e.d.wd, np: e.np, cl: e.d.cl || 0 }
       : e.k === 'por' ? { p: e.t >= e.d.warn ? 4 : 3, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: Math.min(1, e.t / e.d.warn) }
+      : e.k === 'seed' ? { p: 8, x: Math.round(e.x), sx: Math.round(e.sx), a: Math.min(1, e.t / e.d.grow), o: e.o }
+      : e.k === 'bloomfx' ? { p: 9, x: Math.round(e.x), a: e.t / e.life }
+      : e.k === 'forest' ? { p: 10, a: e.t / e.d.life, o: e.o }
+      : e.k === 'root' ? { p: 11, x: Math.round(e.x), a: Math.min(1, e.t / e.d.warn), h: e.t >= e.d.warn ? 1 : 0, u: Math.max(0, e.t - e.d.warn) }
+      : e.k === 'loot' ? { p: 12, x: Math.round(e.x), y: Math.round(e.y), tx: Math.round(e.tx), ty: Math.round(e.ty), a: e.t / e.life, n: e.n }
       : e.k === 'psyorb' ? { p: 7, x: Math.round(e.x), a: Math.min(1, e.t / e.d.warn), h: e.t >= e.d.warn ? 1 : 0, u: Math.max(0, e.t - e.d.warn), r: e.d.rad }
       : { p: e.t > e.d.warn ? 1 : 0, x: Math.round(e.x), c: e.d.cl || 0 }) : [] };
   r.ps.forEach(p => tx(p, s));
