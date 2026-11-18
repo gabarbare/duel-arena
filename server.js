@@ -2,7 +2,7 @@ const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
 const html = fs.readFileSync(path.join(__dirname, 'index (6).html'));
 const server = http.createServer((q, r) => { r.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); r.end(html); });
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ server }); 
 
 const W = 1200, // largeur de l'arène (doit être égale à WW dans index (6).html)
   G = 380, BW = 44, BH = 90, GR = 0.65, ROUND = 5400; // 5400 frames = 1 min 30
