@@ -358,7 +358,7 @@ const ADV = {
   a0: { p: 'Aster', o: 'Brûleur des Fosses', lvl: 1, map: 21, noUlt: 1 },
   a1: { p: 'Aster', o: 'Le Colosse enchaîné', lvl: 1, map: 23, noUlt: 1 },
   a2: { p: 'Aster', o: 'Sœur Cendre', lvl: 1, map: 23, noUlt: 1 },
-  a3: { p: 'Aster', o: 'Écho de la Bête', lvl: 1, map: 22, noUlt: 1 },
+  a3: { p: 'Aster', o: 'Écho de la Bête', lvl: 0, map: 22, noUlt: 1 },
   a4: { p: 'Aster', o: 'Malik', lvl: 2, map: 22, noUlt: 0 },
   q0: { p: 'Malik', o: 'Inquisiteur', lvl: 1, map: 23, noUlt: 1 },
   q1: { p: 'Malik', o: 'Sentinelle de cristal', lvl: 1, map: 21, noUlt: 1 },
