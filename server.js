@@ -9,10 +9,10 @@ const W = 1200, // largeur de l'arène (doit être égale à WW dans index (6).h
 // type: m = mêlée, p = projectile, d = dash, sky = foudre du ciel, buff = bonus temporaire
 // ult:1 = ultime (barre pleine requise), ub:1 = ne peut pas être bloqué, multi = touche plusieurs fois
 const CH = [
-  { name: 'Bruno', desc: 'Bagarreur, corps à corps', hp: 110, spd: 4.2, jmp: 13.5, color: '#e74c3c', atk: [
-    { n: 'Direct', type: 'm', su: 4, ac: 4, rc: 8, cd: 6, dmg: 9, rng: 68, h: 30, kb: 4, st: 14 },
-    { n: 'Crochet', type: 'm', su: 8, ac: 5, rc: 14, cd: 35, dmg: 15, rng: 74, h: 40, kb: 9, st: 20 },
-    { n: 'Uppercut', type: 'm', su: 12, ac: 6, rc: 24, cd: 100, dmg: 24, rng: 55, h: 80, kb: 12, st: 32, lift: -11 },
+  { name: 'Bruno', desc: 'Bagarreur, corps à corps', hp: 110, spd: 4.0, jmp: 13.5, color: '#e74c3c', atk: [
+    { n: 'Direct', type: 'm', su: 4, ac: 4, rc: 8, cd: 6, dmg: 7, rng: 68, h: 30, kb: 4, st: 14 },
+    { n: 'Crochet', type: 'm', su: 8, ac: 5, rc: 14, cd: 35, dmg: 13, rng: 74, h: 40, kb: 9, st: 20 },
+    { n: 'Uppercut', type: 'm', su: 12, ac: 6, rc: 24, cd: 100, dmg: 21, rng: 55, h: 80, kb: 12, st: 32, lift: -11 },
     { n: 'Charge rageuse', ult: 1, ub: 1, type: 'd', su: 10, ac: 14, rc: 20, cd: 0, dmg: 30, rng: 50, h: 90, kb: 18, st: 50, lift: -9, spd: 18 }] },
   { name: 'Zéphyr', desc: 'Mage, attaques à distance', hp: 90, spd: 3.6, jmp: 13, color: '#9b59b6', atk: [
     { n: 'Éclair', type: 'p', su: 6, ac: 1, rc: 8, cd: 23, dmg: 5, vx: 12, r: 7, kb: 3, st: 12, vis: 18 },
@@ -411,7 +411,7 @@ const nf = (c, i, inp, ult, two) => ({ c, i, tm: two ? i >> 1 : i, dead: 0, x: t
   const Br = F('Bruno'), Vk = F('Viking'), Kz = F('Kaze'), Ch = F('Chevalier'), Go = F('Golem'), Lp = F('Louveteau géant'), Dr = F('Dragon'), Od = F('Odile'), Ma = F('Malik'), As = F('Aster');
   CH.push(
     // Chapitre 3 · Odile — La Pie et le Corbeau
-    { ...Br, name: 'Douanier', adv: 1, desc: 'Douanier corrompu du Vieux-Port', hp: 85, color: '#2c3e66', atk: rn(Br, ['Matraque', 'Coup de sifflet', 'Fouille au corps']) },
+    { ...Br, name: 'Douanier', adv: 1, desc: 'Douanier corrompu du Vieux-Port', hp: 65, color: '#2c3e66', atk: rn(Br, ['Matraque', 'Coup de sifflet', 'Fouille au corps']) },
     { ...Od, name: 'Madame Velours', adv: 1, hidden: 0, desc: 'Receleuse du Vieux-Port, elle vole aussi', hp: 95, color: '#7d3c98', atk: rn(Od, ['Coup d’éventail', 'Marchandage (copie ta technique)', 'Article d’occasion', 'Liquidation totale']) },
     { ...Vk, name: 'Le Molosse', adv: 1, desc: 'Garde du corps de la Guilde du Sel', hp: 150, bz: 1.25, color: '#4a3a2e', atk: rn(Vk, ['Mandale', 'Charge de taureau', 'Écrasement']) },
     { ...Od, name: 'Le Corbeau', adv: 1, hidden: 0, desc: 'Le maître des Pies. Mort depuis deux ans.', hp: 135, spd: 5.7, color: '#2b2140', atk: rn(Od, ['Serres', 'Leçon n°1 (copie ta technique)', 'Ce que je t’ai appris', 'Le Grand Envol']) },
