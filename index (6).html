@@ -289,6 +289,10 @@ const SHOP = [
   { id: 'skin_viking_givre', type: 'skin', char: 'Viking', name: 'Viking de Givre (aventure)', price: 0, adv: 1, look: 'frost', pal: { '#6d4c41': '#5b8fb0', '#4e342e': '#2f5d7c', '#3e2723': '#1d3d55', '#2d2d2d': '#1d3d55', '#95a5a6': '#d4eef8', '#7f8c8d': '#9cc8de', '#ecf0f1': '#bfe9ff', '#f1c40f': '#7fe0ff' } },
   { id: 'skin_chevalier_dragon', type: 'skin', char: 'Chevalier', name: 'Chevalier Dragon (aventure)', price: 0, adv: 1, look: 'dragonarmor', pal: { '#b0bec5': '#a93226', '#cfd8dc': '#c0392b', '#78909c': '#7b241c', '#455a64': '#4a1410', '#90a4ae': '#922b21', '#2c5fa8': '#1c1c1c', '#c0392b': '#f39c12' } },
   { id: 'skin_kairos_eternel', type: 'skin', char: 'Kairos', name: 'Kairos Éternel (aventure)', price: 0, adv: 1, look: 'eternal', pal: { '#3b2a5a': '#f5ecd0', '#2b1f3d': '#d9b84a', '#2a2038': '#e8dcc0', '#d9b84a': '#ffffff', '#f5ecd0': '#fffbe6' } },
+  { id: 'skin_odile_reine', type: 'skin', char: 'Odile', name: 'Odile Reine des Pies (aventure)', price: 0, adv: 1, look: 'reine', pal: { '#15181e': '#f4f4f6', '#f4f4f6': '#15181e', '#2a8a99': '#3fb8c9', '#22303f': '#e8ecef', '#3b2a22': '#15181e' } },
+  { id: 'skin_silas_printemps', type: 'skin', char: 'Silas', name: 'Silas du Printemps (aventure)', price: 0, adv: 1, look: 'printemps', pal: { '#8a7a5a': '#c5e1a5', '#7a6a4a': '#aed581', '#6d7f4a': '#7cb342', '#9a948a': '#e8e4dc', '#c9a86a': '#f4e3b0' } },
+  { id: 'skin_aster_aube', type: 'skin', char: 'Aster', name: 'Aster Aube brisée (aventure)', price: 0, adv: 1, look: 'aube', pal: { '#2f5f9a': '#1d1d2b', '#f4f1e8': '#e2dccb', '#d4af37': '#f0c95a' } },
+  { id: 'skin_malik_aurore', type: 'skin', char: 'Malik', name: 'Malik Aurore (aventure)', price: 0, adv: 1, look: 'aurore', pal: { '#b0302a': '#f4f1e8', '#5a5550': '#6a5d4a' } },
   { id: 'skin_jumelles_eclipse', type: 'skin', char: 'Jumelles', name: 'Jumelles Éclipse (aventure)', price: 0, adv: 1, look: 'eclipse', pal: { '#7fd0ff': '#f4c542', '#e4f5ff': '#fff4cf', '#3aa8ff': '#d4a017', '#eef3ff': '#fff1b8', '#a9d8ff': '#ffd36b', '#2fb4ff': '#f39c12', '#0b5fa8': '#9a6a00', '#2f6ea8': '#8a5a10', '#5b2f8a': '#151520', '#b266ff': '#c9d1e8', '#2b1450': '#0b0b12', '#c36bff': '#9aa6c8', '#ff3fb4': '#e8ecf8', '#8a0f62': '#5a6278', '#241038': '#0e0e16', '#150a24': '#05050a' } },
   { id: 'skin_bryan_star', type: 'skin', char: 'Bryan', name: 'Bryan Star d’Action (aventure)', price: 0, adv: 1, look: 'star', pal: { '#16161b': '#5a3a22', '#f4f4f6': '#2c3e66', '#e9e9ee': '#22324f' } },
   { id: 'skin_kairos_azur', type: 'skin', char: 'Kairos', name: 'Kairos azur', price: 150, pal: { '#3b2a5a': '#174b63', '#2b1f3d': '#102f45', '#2a2038': '#163b50', '#d9b84a': '#55d6d2', '#f5ecd0': '#d9ffff' } },
@@ -1254,6 +1258,9 @@ function fighter(f, i) {
       R('#fefefe', s * 6 - 1.5, -106, 3, 3);
       LN('#d4af37', 2, -s * 8, -96, s * 2, -94); LN('#d4af37', 2, s * 2, -94, s * 13, -97);
       LN('#c0392b', 2.5, s * 3, -92, s * 10, -92);
+    } else if (lk === 'douane') { // képi bleu marine à visière, insigne doré, grosse moustache
+      R('#1f2d4d', -14, -122, 28, 12); x.fillStyle = P('#111'); x.beginPath(); x.ellipse(s * 6, -110, 14, 3.5, 0, 0, 7); x.fill(); C('#d4af37', 0, -116, 3);
+      Y('#3a2414', [[-s * 1, -97], [s * 13, -96], [s * 15, -91], [s * 6, -94], [-s * 3, -92]]);
     } else if (lk === 'tommy') { // casque de sparring bleu
       x.fillStyle = P('#1b4f8a'); x.beginPath(); x.arc(0, -104, 16, Math.PI, 0); x.fill();
       R('#1b4f8a', -16, -106, 6, 14); R('#1b4f8a', 10, -106, 6, 14); R('#1b4f8a', -12, -120, 24, 5);
@@ -1286,6 +1293,10 @@ function fighter(f, i) {
       LN('#111', 2.2, s * 2, -105, s * 11, -108);
       LN('#c0392b', 2, s * 1, -110, s * 10, -114); LN('#c0392b', 2, -s * 9, -109, -s * 2, -112); C('#c0392b', -s * 3, -115, 1.8);
       LN('#c0392b', 1.5, s * 9, -98, s * 17, -96); LN('#c0392b', 1.5, s * 8, -95, s * 15, -92);
+    } else if (lk === 'cendre') { // Sœur Cendre : lunettes de forge, cheveux gris-cendre en bataille, foulard rouge
+      Y('#9a948a', [[-15, -108], [-20, -122], [-8, -116], [-4, -128], [4, -117], [12, -126], [16, -110]]); R('#2a2a30', -15, -108, 30, 6); C('#e8692b', s * 6, -105, 4.5); C('#e8692b', -s * 4, -105, 4); C('rgba(255,255,255,.5)', s * 7, -106, 1.5);
+    } else if (lk === 'ombre') { // L'Ombre blanche : masque de porcelaine lisse, une larme dorée
+      C('#f4f4f6', 0, -103, 13.5); LN('#111', 2, s * 2, -106, s * 10, -106); LN('#111', 2, -s * 6, -106, -s * 1, -106); Y('#d4af37', [[s * 6, -103], [s * 8, -96], [s * 4, -96]]); LN('rgba(0,0,0,.2)', 1, -10, -95, 10, -95);
     } else if (lk === 'guard') { // chapeau de paille des gardes
       Y('#c9a86a', [[-26, -110], [26, -110], [0, -130]]); LN('#8a6d3b', 1.5, -26, -110, 26, -110); LN('#8a6d3b', 1, 0, -130, -14, -112); LN('#8a6d3b', 1, 0, -130, 14, -112);
     } else if (lk === 'hibana') { // longue queue de cheval en flammes
@@ -1418,6 +1429,13 @@ function fighter(f, i) {
     R('#90a4ae', -2, -120, 4, 8);
     const w = Math.sin(t / 100) * 4;
     Y('#c0392b', [[-s * 3, -119], [-s * 26, -122 + w], [-s * 24, -108 + w], [-s * 3, -112]]);
+    if (lk === 'baron') { // Baron Vautrin : haut-de-forme, monocle, chaîne de montre en or
+      R('#111', -13, -150, 26, 30); R('#111', -20, -122, 40, 4); R('#8a2a1a', -13, -128, 26, 4); x.strokeStyle = '#d4af37'; x.lineWidth = 1.5; x.beginPath(); x.arc(s * 6, -104, 5, 0, 7); x.stroke(); LN('#d4af37', 1, s * 10, -102, s * 14, -80);
+      x.strokeStyle = '#d4af37'; x.beginPath(); x.moveTo(-8, -64); x.quadraticCurveTo(0, -56, 8, -64); x.stroke();
+    }
+    if (lk === 'varn') { // Grand Inquisiteur Varn : écharpe rouge de l'Ordre, registre enchaîné à la ceinture
+      LN('#7a1f2a', 6, -16, -92, 16, -50); R('#5a3a1a', -s * 22, -58, 14, 18); R('#f4ead0', -s * 22 + 2, -56, 10, 14); LN('#7a7f88', 1.5, -s * 15, -58, -s * 6, -52);
+    }
     if (lk === 'cursed') { // Chevalier Noir : aura violette, regard rouge dans la visière, fumée maudite
       x.fillStyle = 'rgba(120,40,160,' + (.12 + .06 * Math.sin(t / 200)) + ')'; x.beginPath(); x.arc(0, -55, 66, 0, 7); x.fill();
       R('#ff2d2d', s > 0 ? 3 : -13, -106, 10, 2); C('rgba(255,60,60,.4)', s * 8, -105, 6);
@@ -1618,6 +1636,14 @@ function fighter(f, i) {
     x.fillStyle = P('#f0e2b0'); x.beginPath(); x.arc(0, -107, 13, Math.PI * .95, Math.PI * 2.05); x.fill(); R('#f0e2b0', -13, -108, 5, 12); R('#f0e2b0', 8, -108, 5, 10);
     LN('#d4af37', 2, -12, -111, 12, -111); Y('#6fc3ff', [[0, -116], [3, -112], [0, -108], [-3, -112]]); // diadème
     C('#1c3d66', s * 6, -104, 1.9); C('#6fc3ff', s * 6, -104, .9); LN('#9a6a5a', 1.3, s * 2, -96, s * 7, -96);
+    if (lk === 'inquis') { // Inquisiteur : capuche rouge sombre et masque lisse fendu
+      x.fillStyle = P('#3a0f16'); x.beginPath(); x.arc(0, -106, 16, Math.PI * .9, Math.PI * 2.1); x.fill(); Y('#3a0f16', [[-16, -106], [-12, -86], [12, -86], [16, -106]]);
+      C('#c9c2ae', 0, -102, 10.5); R('#111', -7, -105, 14, 2.5); LN('#7a1f2a', 2, 0, -112, 0, -94);
+    }
+    if (lk === 'aube') { // Aube brisée : armure fendue de lumière, cercle du Sceau cassé
+      x.strokeStyle = 'rgba(255,240,170,' + (.7 + .3 * Math.sin(t / 150)) + ')'; x.lineWidth = 2; x.beginPath(); x.moveTo(-8, -88); x.lineTo(-2, -76); x.lineTo(-10, -62); x.lineTo(-4, -50); x.moveTo(10, -84); x.lineTo(5, -70); x.lineTo(12, -58); x.stroke();
+      x.save(); x.translate(0, -100); x.rotate(-t / 1600); x.strokeStyle = 'rgba(255,240,170,.9)'; x.lineWidth = 3; x.beginPath(); x.arc(0, 0, 34, .3, 2.6); x.stroke(); x.beginPath(); x.arc(0, 0, 34, 3.1, 5.6); x.stroke(); x.restore();
+    }
   } else if (n === 'Malik') { // Malik, Briseur de chaînes : tunique grise déchirée, foulard rouge, fers brisés aux poignets, cicatrice ; fissures orange quand les chaînes tombent
     const lib = f.lib, w = Math.sin(t / 120) * 4, run = Math.abs(f.vx || 0) > 1 ? 6 : 0;
     Y('#b0302a', [[-s * 6, -90], [-s * (32 + run), -82 + w], [-s * (28 + run), -74 + w], [-s * 4, -84]]); // foulard
@@ -1629,6 +1655,14 @@ function fighter(f, i) {
     x.fillStyle = P('#16120f'); x.beginPath(); x.arc(0, -107, 12.5, Math.PI, Math.PI * 2); x.fill(); Y('#16120f', [[-8, -118], [-2, -126], [2, -117], [8, -124], [12, -112], [-12, -112]]); R('#3a302a', -12, -108, 4, 8); R('#3a302a', 8, -108, 4, 8); // cheveux courts, côtés rasés
     C('#16120f', s * 6, -104, 1.9); LN('#16120f', 2, s * 2, -109, s * 10, -108); LN('#d98a70', 1.5, s * 3, -112, s * 9, -97); LN('#7a3b2e', 1.4, s * 2, -96, s * 7, -96); // cicatrice sur l'œil
     if (lib) { x.strokeStyle = 'rgba(255,140,50,' + (.7 + .3 * Math.sin(t / 80)) + ')'; x.lineWidth = 2; x.beginPath(); x.moveTo(-10, -86); x.lineTo(-4, -76); x.lineTo(-9, -64); x.moveTo(8, -84); x.lineTo(3, -70); x.lineTo(9, -56); x.moveTo(-4, -100); x.lineTo(-8, -94); x.stroke(); C('#ffb070', s * 6, -104, 2.2); }
+    if (lk === 'brule') { // Brûleur des Fosses : sac de toile en cagoule, yeux brillants
+      x.fillStyle = P('#8a7a5a'); x.beginPath(); x.arc(0, -106, 15, Math.PI * .8, Math.PI * 2.2); x.fill(); R('#8a7a5a', -15, -106, 30, 16); LN('#5a4a3a', 2, -14, -92, 14, -92);
+      C('#ff8a3a', s * 6, -104, 3); C('#ff8a3a', -s * 3, -104, 2.6); LN('#5a4a3a', 1.2, -6, -98, 8, -97);
+    }
+    if (lk === 'aurore') { // Malik Aurore : la lumière des Fosses coule dans ses fissures
+      x.strokeStyle = 'rgba(255,224,130,' + (.75 + .25 * Math.sin(t / 120)) + ')'; x.lineWidth = 2; x.beginPath(); x.moveTo(-10, -86); x.lineTo(-4, -76); x.lineTo(-9, -64); x.moveTo(8, -84); x.lineTo(3, -70); x.lineTo(9, -56); x.moveTo(-4, -100); x.lineTo(-8, -94); x.stroke();
+      C('#ffe082', 0, -80, 4); for (let q = 0; q < 8; q++) LN('#ffe082', 1, Math.cos(q * .785) * 5, -80 + Math.sin(q * .785) * 5, Math.cos(q * .785) * 8, -80 + Math.sin(q * .785) * 8);
+    }
   } else if (n === 'Odile') { // Odile « la Pie » : queue-de-pie noire et blanche aux reflets bleu-vert, loup noir, carré noir à mèche blanche, foulard, bourse de pièces
     const w = Math.sin(t / 110) * 4, run = Math.abs(f.vx || 0) > 1 ? 6 : 0;
     Y('#3fb8c9', [[-s * 6, -88], [-s * (34 + run), -84 + w], [-s * (30 + run), -76 + w], [-s * 6, -80]]); // foulard qui flotte
@@ -1644,6 +1678,20 @@ function fighter(f, i) {
     R('#111318', -12, -105, 24, 6); R('#3fb8c9', -12, -101, 24, 1.5); C('#fff', s * 6, -102, 2.2); C('#fff', -s * 3, -102, 2); C('#111', s * 6.5, -102, 1.1); // loup noir
     LN('#8a3b2e', 1.4, s * 2, -95, s * 7, -94); LN('#8a3b2e', 1.2, s * 7, -94, s * 8, -96); // sourire en coin
     x.save(); x.translate(-s * 9, -116); x.rotate(-s * .6); x.fillStyle = P('#15181e'); x.beginPath(); x.ellipse(0, -9, 3.5, 11, 0, 0, 7); x.fill(); x.fillStyle = P('#3fb8c9'); x.beginPath(); x.ellipse(0, -14, 2, 5, 0, 0, 7); x.fill(); x.restore(); // plume de pie
+    if (lk === 'velours') { // Madame Velours : grand chapeau à plume, collier de perles, éventail
+      x.fillStyle = P('#4a1f5a'); x.beginPath(); x.ellipse(0, -116, 26, 6, -s * .12, 0, 7); x.fill(); x.beginPath(); x.arc(0, -118, 12, Math.PI, 0); x.fill();
+      x.save(); x.translate(-s * 10, -126); x.rotate(-s * .8); x.fillStyle = '#f8c8e8'; x.beginPath(); x.ellipse(0, -12, 4, 16, 0, 0, 7); x.fill(); x.restore();
+      for (let q = 0; q < 7; q++) C('#f4f4f6', -9 + q * 3, -88 + Math.sin(q / 6 * Math.PI) * 4, 1.8);
+    }
+    if (lk === 'corbeau') { // le Corbeau : capuche noire, masque à long bec, regard rouge
+      x.fillStyle = P('#1a1424'); x.beginPath(); x.arc(0, -106, 16, Math.PI * .85, Math.PI * 2.15); x.fill(); Y('#1a1424', [[-16, -104], [-18, -84], [-10, -92]]);
+      Y('#d9d2c2', [[s * 4, -108], [s * 32, -100], [s * 4, -95]]); LN('#7a7262', 1.2, s * 6, -102, s * 30, -100); C('#111', s * 10, -104, 1.2); C('#ff2d2d', s * 6, -104, 2.2); C('rgba(255,45,45,.3)', s * 6, -104, 6);
+      for (let q = 0; q < 5; q++) Y('#1a1424', [[-s * (8 + q * 3), -86], [-s * (16 + q * 4), -40 + q * 2], [-s * (10 + q * 3), -44]]);
+    }
+    if (lk === 'reine') { // Reine des Pies : couronne de plumes bleu-vert, collier de pièces
+      for (let q = 0; q < 5; q++) { x.save(); x.translate(-8 + q * 4, -114); x.rotate((q - 2) * .32); x.fillStyle = q % 2 ? P('#15181e') : '#3fb8c9'; x.beginPath(); x.ellipse(0, -10, 3, 11, 0, 0, 7); x.fill(); x.restore(); }
+      for (let q = 0; q < 5; q++) C('#f1c40f', -8 + q * 4, -86 + Math.sin(q / 4 * Math.PI) * 4, 2.2);
+    }
   } else if (n === 'Silas') { // Silas, le jardinier des cendres : chapeau de paille brûlé où pousse une pousse, barbe grise, tablier de toile plein de sachets de graines
     R('#5d6b3a', -16, -36, 14, 32); R('#5d6b3a', 2, -36, 14, 32); R('#4a3424', -18, -10, 17, 10); R('#4a3424', 1, -10, 17, 10); R('#2e2016', -18, -2, 17, 2); R('#2e2016', 1, -2, 17, 2);
     R('#6d7f4a', -21, -92, 42, 54); R('#8a7a5a', -16, -82, 32, 50); R('#8a7a5a', -14, -92, 5, 12); R('#8a7a5a', 9, -92, 5, 12); // tablier
@@ -1655,6 +1703,8 @@ function fighter(f, i) {
     C('#2e2016', s * 6, -106, 1.8); LN('#6d5a4a', 1.5, s * 2, -110, s * 10, -110); x.fillStyle = P('#d9967a'); x.beginPath(); x.arc(s * 11, -101, 2.4, 0, 7); x.fill();
     x.fillStyle = P('#c9a86a'); x.beginPath(); x.ellipse(0, -116, 28, 6, 0, 0, 7); x.fill(); x.beginPath(); x.moveTo(-14, -116); x.quadraticCurveTo(-13, -132, 0, -132); x.quadraticCurveTo(13, -132, 14, -116); x.fill();
     R('#5a3a1a', -14, -121, 28, 4); x.fillStyle = 'rgba(40,30,20,.55)'; x.beginPath(); x.arc(-24, -115, 4, 0, 7); x.arc(22, -117, 3, 0, 7); x.fill(); // bords brûlés
+    if (lk === 'printemps') { [-20, -10, 0, 10, 20].forEach((q, k) => { const fx2 = q, fy = -118 + Math.abs(q) * .1; for (let r2 = 0; r2 < 5; r2++) C(['#f8bbd0', '#fff59d', '#ce93d8', '#f8bbd0', '#ffffff'][k], fx2 + Math.cos(r2 * 1.26) * 3, fy + Math.sin(r2 * 1.26) * 3, 2.4); C('#f9a825', fx2, fy, 1.5); });
+      for (let q = 0; q < 3; q++) { const u = ((t / 2400 + q / 3) % 1); C('rgba(248,187,208,' + (1 - u) + ')', -20 + q * 18 + Math.sin(t / 300 + q) * 8, -120 + u * 110, 2.5); } }
     LN('#5d8a3a', 2, s * 8, -128, s * 10, -142); Y('#7cb342', [[s * 10, -140], [s * 20, -146 + Math.sin(t / 300) * 2], [s * 12, -136]]); Y('#7cb342', [[s * 10, -140], [s * 2, -148 + Math.sin(t / 340) * 2], [s * 8, -136]]); // pousse sur le chapeau
   } else if (n === 'Bryan') { // Bryan : cheveux noirs en pointes, t-shirt noir moulant (déchiré par l'ultime), pantalon blanc, baskets
     const kk = f.ak >= 0 && f.ak <= 2, rg = f.rg;
@@ -1794,7 +1844,11 @@ function fighter(f, i) {
     LN('#56565f', 10, s * 34, -88, s * (50 + punch), -66); C('#3d3d46', s * (54 + punch), -64, 12); C('#d4af37', s * (54 + punch), -64, 4);
     LN('#56565f', 10, -s * 34, -88, -s * 44, -60); R('#26262e', -s * 44 - 10, -64, 20, 16);
     if (lamp) { x.fillStyle = 'rgba(255,250,200,.35)'; x.beginPath(); x.moveTo(-s * 44, -56); x.lineTo(-s * 120, -10); x.lineTo(-s * 120, -110); x.fill(); C('#fffbe0', -s * 44, -56, 8); }
-  } else if (n === 'Golem') { // golem de pierre : blocs fissurés, mousse, rune et yeux bleus qui luisent
+  } else if (n === 'Golem') { // golem de pierre
+    if (lk === 'racine') { for (let q = 0; q < 6; q++) { const d = q < 3 ? -1 : 1, k = q % 3; x.strokeStyle = P('#4a3424'); x.lineWidth = 6 - k; x.beginPath(); x.moveTo(d * 10, -110); x.quadraticCurveTo(d * (22 + k * 10), -140 - k * 10, d * (16 + k * 16), -168 - k * 6); x.stroke(); C(['#f8bbd0', '#7cb342', '#ce93d8'][k], d * (16 + k * 16), -168 - k * 6, 5); }
+      for (let q = 0; q < 4; q++) { const u = ((t / 1800 + q / 4) % 1); C('rgba(124,179,66,' + (1 - u) + ')', -30 + q * 20, -100 + u * 100, 3); } }
+    if (lk === 'cristal') for (let q = 0; q < 5; q++) Y('rgba(159,211,232,.9)', [[-24 + q * 12, -96], [-20 + q * 12 + (q - 2) * 3, -136 - (q % 2) * 16], [-16 + q * 12, -96]]);
+    if (lk === 'chains') for (let q = 0; q < 2; q++) { const d = q ? 1 : -1; for (let k = 0; k < 7; k++) { x.strokeStyle = '#5d6168'; x.lineWidth = 3; x.beginPath(); x.ellipse(d * 34 + Math.sin(t / 300 + k) * 2, -70 + k * 10, 4, 6, k % 2 ? 0 : 1.5, 0, 7); x.stroke(); } } // golem de pierre : blocs fissurés, mousse, rune et yeux bleus qui luisent
     const gl = .55 + .4 * Math.sin(t / 260);
     R('#5f666b', -21, -34, 18, 34); R('#5f666b', 3, -34, 18, 34); R('#4b5155', -23, -8, 22, 8); R('#4b5155', 1, -8, 22, 8);
     Y('#7f8c8d', [[-28, -98], [28, -98], [23, -30], [-23, -30]]);
@@ -2629,6 +2683,33 @@ function drawMap(m) {
     for (let k = 0; k < 4; k++) { x.fillStyle = 'rgba(140,60,180,.15)'; x.beginPath(); x.ellipse(((t * 18 + k * 260) % 1100) - 100, 340 + k * 8, 220, 22, 0, 0, 7); x.fill(); }
     floor('#3a3046', '#7a6a90');
     x.fillStyle = '#7a1f2b'; x.fillRect(380, 382, 140, 260); x.fillStyle = '#d4af37'; x.fillRect(380, 382, 4, 260); x.fillRect(516, 382, 4, 260);
+  } else if (m === 19) { // Docks du Vieux-Port : nuit, grues, caisses, bateaux, réverbères
+    grad('#0b1424', '#2a3a5a'); C('rgba(240,240,220,.9)', 720, 80, 30); for (let k = 0; k < 40; k++) { x.fillStyle = 'rgba(255,255,255,' + (.3 + .4 * Math.abs(Math.sin(t + k))) + ')'; x.fillRect(rnd(k) * 900, rnd(k + 3) * 200, 2, 2); }
+    x.fillStyle = '#1a2436'; x.fillRect(0, 250, 900, 130); [[120, 1], [620, -1]].forEach(([cx, d]) => { x.fillStyle = '#2a3a50'; x.fillRect(cx, 90, 12, 290); x.fillRect(cx - (d < 0 ? 140 : 0), 90, 152, 10); LN('#2a3a50', 2, cx + d * 130, 100, cx + d * 130, 180 + Math.sin(t) * 6); x.fillRect(cx + d * 130 - 14, 180 + Math.sin(t) * 6, 28, 18); });
+    [[300, '#7a3b2a'], [400, '#2c5a7a'], [350, '#5a6a2a']].forEach(([cx, col], k) => { x.fillStyle = col; x.fillRect(cx, 330 - (k === 2 ? 50 : 0), 90, 50); x.fillStyle = 'rgba(0,0,0,.25)'; for (let q = 0; q < 90; q += 15) x.fillRect(cx + q, 330 - (k === 2 ? 50 : 0), 3, 50); });
+    [80, 520, 820].forEach(lx => { x.fillStyle = '#222'; x.fillRect(lx, 260, 5, 120); C('rgba(255,200,100,.95)', lx + 2, 256, 7); x.fillStyle = 'rgba(255,200,100,.12)'; x.beginPath(); x.arc(lx + 2, 256, 50, 0, 7); x.fill(); });
+    floor('#3a2e22', '#6a5a44'); x.fillStyle = 'rgba(0,0,0,.25)'; for (let k = 0; k < 900; k += 45) x.fillRect(k, 382, 3, 60);
+  } else if (m === 20) { // Forêt des Cendres : troncs calcinés, cendres qui tombent, pousses vertes
+    grad('#3a3a42', '#8a7a6a'); C('rgba(255,180,120,.5)', 450, 140, 70);
+    for (let k = 0; k < 14; k++) { const tx = rnd(k + 5) * 900, h = 150 + rnd(k + 9) * 140; x.fillStyle = k % 3 ? '#1e1a18' : '#2a2420'; x.fillRect(tx, 380 - h, 14 + rnd(k) * 10, h); LN(k % 3 ? '#1e1a18' : '#2a2420', 5, tx + 8, 380 - h * .7, tx + 8 + (k % 2 ? 30 : -30), 380 - h * .9); }
+    for (let k = 0; k < 40; k++) { const ax = (rnd(k + 20) * 900 + Math.sin(t + k) * 20), ay = ((t * 25 + rnd(k + 40) * 400) % 400); x.fillStyle = k % 7 ? 'rgba(200,200,200,.5)' : 'rgba(255,140,60,.8)'; x.fillRect(ax, ay, 2, 2); }
+    floor('#2a2420', '#4a4038'); for (let k = 0; k < 18; k++) { const gx = 30 + k * 50; LN('#7cb342', 2, gx, 382, gx + 3, 370); LN('#7cb342', 2, gx + 6, 382, gx + 4, 374); }
+  } else if (m === 21) { // Parvis de Solenne : marbre blanc, colonnes dorées, rosace de la cathédrale, ville haute baignée de lumière
+    grad('#e8d9a8', '#fff6dc'); x.fillStyle = 'rgba(255,255,255,.6)'; x.beginPath(); x.arc(450, 60, 120, 0, 7); x.fill();
+    x.fillStyle = '#efe8d8'; x.fillRect(250, 60, 400, 320); Y('#e2d8c0', [[230, 60], [450, -20], [670, 60]]); C('#6fc3ff', 450, 160, 52); for (let q = 0; q < 12; q++) { const an = q * .5236; LN('#d4af37', 3, 450, 160, 450 + Math.cos(an) * 52, 160 + Math.sin(an) * 52); } C('#d4af37', 450, 160, 12);
+    [60, 180, 720, 840].forEach(cx => { x.fillStyle = '#f4f1e8'; x.fillRect(cx - 16, 120, 32, 260); x.fillStyle = '#d4af37'; x.fillRect(cx - 22, 112, 44, 10); x.fillRect(cx - 22, 370, 44, 10); x.fillStyle = 'rgba(0,0,0,.06)'; for (let q = -10; q < 12; q += 8) x.fillRect(cx + q, 122, 3, 248); });
+    x.fillStyle = '#b8860b'; x.fillRect(420, 290, 60, 90); floor('#e8e2d0', '#d4af37'); x.fillStyle = 'rgba(212,175,55,.25)'; for (let k = 0; k < 900; k += 60) x.fillRect(k, 386, 2, 60);
+  } else if (m === 22) { // Chambre du Sceau : cristal géant fissuré, runes dorées, ombre qui suinte
+    grad('#0a0a18', '#1e2a44');
+    x.save(); x.translate(450, 210); for (let q = 0; q < 3; q++) { x.rotate(t * (q % 2 ? .2 : -.15)); x.strokeStyle = 'rgba(212,175,55,' + (.5 - q * .12) + ')'; x.lineWidth = 3; x.beginPath(); x.arc(0, 0, 120 + q * 40, 0, 7); x.stroke(); for (let k = 0; k < 12; k++) { const an = k * .5236; x.fillStyle = 'rgba(255,230,150,.6)'; x.fillRect(Math.cos(an) * (120 + q * 40) - 3, Math.sin(an) * (120 + q * 40) - 3, 6, 6); } } x.restore();
+    Y('rgba(160,220,255,.8)', [[450, 60], [510, 200], [450, 330], [390, 200]]); LN('rgba(255,255,255,.8)', 2, 450, 60, 450, 330); x.strokeStyle = '#0a0a18'; x.lineWidth = 3; x.beginPath(); x.moveTo(470, 110); x.lineTo(440, 190); x.lineTo(470, 240); x.lineTo(450, 300); x.stroke();
+    for (let k = 0; k < 6; k++) { x.fillStyle = 'rgba(20,10,30,' + (.3 + .2 * Math.sin(t * 2 + k)) + ')'; x.beginPath(); x.ellipse(450 + Math.sin(t + k) * 40, 260 + k * 14, 30 + k * 6, 8, 0, 0, 7); x.fill(); }
+    floor('#1a1a2a', '#d4af37');
+  } else if (m === 23) { // Les Fosses : ville d'en bas, maisons empilées, cordes à linge, lumière grise qui tombe d'un trou
+    grad('#14141a', '#2e2a2a'); x.fillStyle = 'rgba(255,240,200,.08)'; x.beginPath(); x.moveTo(380, -40); x.lineTo(520, -40); x.lineTo(620, 380); x.lineTo(280, 380); x.fill();
+    for (let k = 0; k < 9; k++) { const hx = k * 100 + (k % 2) * 20, hh = 120 + (k * 37) % 140; x.fillStyle = k % 2 ? '#2a2420' : '#332a24'; x.fillRect(hx, 380 - hh, 90, hh); for (let q = 0; q < 3; q++) { x.fillStyle = (k + q) % 3 ? 'rgba(255,170,90,.35)' : 'rgba(0,0,0,.5)'; x.fillRect(hx + 12 + q * 26, 380 - hh + 20, 14, 18); } }
+    for (let k = 0; k < 3; k++) { x.strokeStyle = '#5a4a3a'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(0, 200 + k * 40); x.quadraticCurveTo(450, 230 + k * 40, 900, 200 + k * 40); x.stroke(); for (let q = 0; q < 8; q++) { x.fillStyle = ['#7a3b2a', '#4a5a6a', '#8a7a5a'][q % 3]; x.fillRect(60 + q * 110, 206 + k * 40 + Math.sin(q) * 4, 18, 22); } }
+    floor('#2a2420', '#4a3a2e');
   } else if (m === 15) { // Couloirs de l'Académie Prisme : hautes fenêtres en arc, bannières au prisme, casiers, damier
     grad('#1a1438', '#3d3470');
     for (let k = 0; k < 4; k++) { const wx = 90 + k * 240; x.fillStyle = '#0e0b24'; x.fillRect(wx - 44, 60, 88, 200); x.beginPath(); x.arc(wx, 60, 44, Math.PI, 0); x.fill(); x.fillStyle = 'rgba(150,170,255,.35)'; x.fillRect(wx - 38, 64, 76, 190); x.beginPath(); x.arc(wx, 64, 38, Math.PI, 0); x.fill(); LN('#0e0b24', 3, wx, 26, wx, 254); LN('#0e0b24', 3, wx - 38, 150, wx + 38, 150); }
@@ -3058,7 +3139,11 @@ const ADV_CH = [
   { id: 'kairos', hero: 'Kairos', col: '#d9b84a', t: 'Les Heures Perdues', d: 'Remettre en marche la Grande Horloge de l’arène.' },
   // ===== Saison 2 (chapitres 7 et 8, débloqués après Kairos) =====
   { id: 'jumelles', hero: 'Jumelles', col: '#9f8cff', t: 'Deux Esprits, Un Cœur', d: 'Libérer l’Académie Prisme du Pr Vesper, le directeur qui vole les rêves.', s2: 1 },
-  { id: 'bryan', hero: 'Bryan', col: '#cfd2dc', t: 'Action !', d: 'Démasquer le producteur qui remplace les acteurs par des robots.', s2: 1 }
+  { id: 'bryan', hero: 'Bryan', col: '#cfd2dc', t: 'Action !', d: 'Démasquer le producteur qui remplace les acteurs par des robots.', s2: 1 },
+  { id: 'odile', hero: 'Odile', col: '#3fb8c9', t: 'La Pie et le Corbeau', d: 'Les enfants du Vieux-Port disparaissent. Et une plume noire revient.', s2: 1 },
+  { id: 'silas', hero: 'Silas', col: '#7cb342', t: 'Ce qui repousse', d: 'Dix ans après l’incendie, la forêt se réveille. Et elle se souvient.', s2: 1 },
+  { id: 'aster', hero: 'Aster', col: '#d4af37', t: 'Le Sceau', d: 'Un monstre des Fosses veut briser le Sceau. Sa Gardienne doit l’arrêter.', s2: 1 },
+  { id: 'malik', hero: 'Malik', col: '#e8692b', t: 'Les Chaînes', d: 'Sous la ville-lumière, on vous a menti. Ce que le Sceau mange, c’est nous.', s2: 1 }
 ];
 let advOn = false, advPending = false, advS = null, advRw = '';
 const ADV_LV = {};
@@ -3216,7 +3301,7 @@ function advStep() {
   const ropeOk = id => st.ropes.includes(id) && (A.cutAt[id] == null || A.fr - A.cutAt[id] > 22);
   if (A.y >= 380 && py <= 380.5 && !pit(A.x)) { A.y = 380; A.vy = 0; A.ground = true; A.safeX = A.x; A.safeY = 380; }
   else if (A.vy >= 0) {
-    for (const p of L.plats) if ((!p.rope || ropeOk(p.rope)) && !(p.g > 0) && (!p.nox || A.sis === 1) && A.x > p.x - 8 && A.x < p.x + p.w + 8 && py <= p.y + .5 && A.y >= p.y) { A.y = p.y; A.vy = 0; A.ground = true; A.on = p; break; } // plateformes traversables par dessous
+    for (const p of L.plats) if ((!p.rope || ropeOk(p.rope)) && !(p.g > 0) && (!p.nox || A.sis === 1) && (!p.req || st.gates.includes(p.req)) && A.x > p.x - 8 && A.x < p.x + p.w + 8 && py <= p.y + .5 && A.y >= p.y) { A.y = p.y; A.vy = 0; A.ground = true; A.on = p; break; } // plateformes traversables par dessous
     if (!A.ground) for (const w of walls) if (A.x > w.x1 - 14 && A.x < w.x2 + 14 && py <= w.top + .5 && A.y >= w.top) { A.y = w.top; A.vy = 0; A.ground = true; break; }
     if (A.ground && A.y < 380 && !(A.on && (A.on.mv || A.on.nox || A.on.tk))) { A.safeX = A.x; A.safeY = A.y; }
   }
@@ -3248,13 +3333,14 @@ function advStep() {
     else { st.gates.push(p.tk); persist(); A.shake = 6; advToast(p.msg || '✨ Télékinésie ! L’objet se déplace.'); }
     break;
   }
+  if (kp && L.onK) L.onK(st, A); // action propre au chapitre (planter, voler, allumer, libérer…)
   for (const cm of L.cams || []) { // caméras : la cascade doit être tournée entre « Action ! » et « Coupez ! »
     if (st.gates.includes(cm.id)) continue;
     const lit = (A.wt + (cm.off || 0)) % cm.per < cm.on, inZ = A.x > cm.x1 && A.x < cm.x2; cm.lit = lit;
-    if (inZ && !A.cam[cm.id]) { if (lit) A.cam[cm.id] = 1; else { A.x = cm.x1 - 18; if (A.vx > 0) A.vx = 0; advToast('✋ Attends le « Action ! » avant d’entrer dans le décor'); } }
+    if (inZ && !A.cam[cm.id]) { if (lit) A.cam[cm.id] = 1; else { A.x = cm.x1 - 18; if (A.vx > 0) A.vx = 0; advToast(cm.wMsg || '✋ Attends le « Action ! » avant d’entrer dans le décor'); } }
     else if (A.cam[cm.id] && A.x <= cm.x1) A.cam[cm.id] = 0;
-    else if (A.cam[cm.id] && !lit) { A.cam[cm.id] = 0; A.x = cm.x1 - 40; A.y = 380; A.vx = A.vy = 0; A.shake = 6; advToast('🎬 « Coupez ! » Trop lent… On la refait !'); }
-    else if (A.cam[cm.id] && A.x >= cm.x2) { st.gates.push(cm.id); A.cam[cm.id] = 0; if (!save.admin) save.coins += 10; persist(); advToast(cm.msg || '🎬 « Coupez ! C’est dans la boîte ! » +10 pièces'); }
+    else if (A.cam[cm.id] && !lit) { A.cam[cm.id] = 0; A.x = cm.x1 - 40; A.y = 380; A.vx = A.vy = 0; A.shake = 6; advToast(cm.cMsg || '🎬 « Coupez ! » Trop lent… On la refait !'); }
+    else if (A.cam[cm.id] && A.x >= cm.x2) { st.gates.push(cm.id); A.cam[cm.id] = 0; if (!save.admin && !cm.free) save.coins += 10; persist(); advToast(cm.msg || '🎬 « Coupez ! C’est dans la boîte ! » +10 pièces'); }
   }
   if (kp && L.timestop) { // arrêt du temps de Kairos
     if (A.tsCd > 0) advToast('⏳ Arrêt du temps en recharge… ' + Math.ceil(A.tsCd / 60) + ' s');
@@ -3381,6 +3467,19 @@ function advMech(L, st, A) {
       } else if (A.shatter && A.shatter.x === g.x) { const u = 1 - A.shatter.t / 45; for (let q = 0; q < 14; q++) { const a2 = q * .45, d = u * (60 + q * 8); x.fillStyle = 'rgba(200,240,255,' + (1 - u) + ')'; x.fillRect(g.x + Math.cos(a2) * d, 300 + Math.sin(a2) * d * .6 + u * u * 120, 7, 7); } }
       continue;
     }
+    if (g.look === 'chain' || g.look === 'bramble') { // grille de chaînes cadenassée (Malik) ou mur de ronces (Silas) : cède à coups de K
+      const ch = g.look === 'chain', h = A.hits[g.id] || 0, sh = A.shake > 0 && h ? (Math.random() - .5) * 4 : 0, tt = Date.now() / 300;
+      if (!open) {
+        if (ch) { x.fillStyle = '#2a2a30'; x.fillRect(g.x - 46, 200, 8, 180); x.fillRect(g.x + 38, 200, 8, 180); x.fillRect(g.x - 46, 196, 92, 10);
+          for (let q = 0; q < 5; q++) for (let k = 0; k < 14; k++) { if (h >= 1 && q === 1 && k > 7) continue; if (h >= 2 && q === 3 && k < 6) continue; x.strokeStyle = '#7a7f88'; x.lineWidth = 3; x.beginPath(); x.ellipse(g.x - 30 + q * 15 + sh, 214 + k * 12, 4, 6, k % 2 ? 0 : Math.PI / 2, 0, 7); x.stroke(); }
+          x.fillStyle = '#b8860b'; x.beginPath(); x.roundRect(g.x - 12 + sh, 284, 24, 22, 4); x.fill(); x.strokeStyle = '#b8860b'; x.lineWidth = 4; x.beginPath(); x.arc(g.x + sh, 284, 8, Math.PI, 0); x.stroke(); C('#3a2a10', g.x + sh, 294, 3); }
+        else { for (let q = 0; q < 9; q++) { const bx = g.x - 36 + q * 9 + sh; x.strokeStyle = q % 2 ? '#3e2a1a' : '#4a5a2a'; x.lineWidth = 4; x.beginPath(); x.moveTo(bx, 382); for (let k = 1; k <= 8; k++) x.lineTo(bx + Math.sin(k * 1.7 + q) * 10, 382 - k * 22); x.stroke();
+            for (let k = 1; k < 8; k++) LN('#c8d6a0', 1.5, bx + Math.sin(k * 1.7 + q) * 10, 382 - k * 22, bx + Math.sin(k * 1.7 + q) * 10 + (k % 2 ? 6 : -6), 378 - k * 22); }
+          if (h) { x.strokeStyle = '#8a2a1a'; x.lineWidth = 3; x.beginPath(); x.moveTo(g.x - 30, 240 + h * 20); x.lineTo(g.x + 30, 260 + h * 20); x.stroke(); } }
+        if (g.label) { x.font = 'bold 12px sans-serif'; x.textAlign = 'center'; x.lineWidth = 3; x.strokeStyle = '#000'; x.fillStyle = '#fff'; x.strokeText(g.label, g.x, 190); x.fillText(g.label, g.x, 190); }
+      } else if (A.shatter && A.shatter.x === g.x) { const u = 1 - A.shatter.t / 45; for (let q = 0; q < 14; q++) { const a2 = q * .45, d = u * (50 + q * 8); x.strokeStyle = ch ? 'rgba(122,127,136,' + (1 - u) + ')' : 'rgba(74,90,42,' + (1 - u) + ')'; x.lineWidth = 3; x.beginPath(); x.ellipse(g.x + Math.cos(a2) * d, 290 + Math.sin(a2) * d + u * u * 60, 5, 3, a2, 0, 7); x.stroke(); } }
+      continue;
+    }
     if (g.look === 'wood') { // décor en contreplaqué : se fend à chaque coup de pied
       if (!open) {
         const h = A.hits[g.id] || 0, sh = A.shake > 0 && A.hits[g.id] ? (Math.random() - .5) * 4 : 0;
@@ -3431,6 +3530,17 @@ function advMech(L, st, A) {
   if (A.beam) advBolt(A.beam.x1, A.beam.y1, A.beam.x2, A.beam.y2, sd, 6);
   for (const cm of L.cams || []) { // caméra sur trépied, voyant rouge, marquages au sol
     const done = st.gates.includes(cm.id), lit = !done && cm.lit, cx = cm.x1 - 70;
+    if (cm.look === 'guard') { // garde qui fait sa ronde : quand il regarde vers toi, sa lanterne balaie le passage
+      const gx = cm.x2 + 46, gs = lit ? 1 : -1, tt = Date.now(), col = cm.col || '#2c3e66';
+      if (!done && !lit) { const g2 = x.createLinearGradient(gx, 0, cm.x1, 0); g2.addColorStop(0, 'rgba(255,220,120,.45)'); g2.addColorStop(1, 'rgba(255,220,120,.05)'); x.fillStyle = g2; x.beginPath(); x.moveTo(gx - 14, 320); x.lineTo(cm.x1 - 10, 230); x.lineTo(cm.x1 - 10, 384); x.closePath(); x.fill(); }
+      x.save(); x.translate(gx, 380); R('#1e1e24', -10, -34, 8, 34); R('#1e1e24', 2, -34, 8, 34); R(col, -14, -88, 28, 56); R('#d4af37', -2, -80, 4, 4); C('#e8b48a', 0, -100, 12); R(col, -13, -116, 26, 8); R('#111', gs > 0 ? -2 : -16, -110, 18, 3);
+      C('#111', gs * 5, -101, 1.8); LN(col, 7, 0, -76, -gs * 22, -70); C('#e8b48a', -gs * 23, -69, 5); LN('#3a3a44', 2, -gs * 23, -66, -gs * 23, -56); x.fillStyle = '#3a3a44'; x.fillRect(-gs * 23 - 7, -56, 14, 18); C(done ? '#555' : 'rgba(255,220,120,.95)', -gs * 23, -47, 5); x.restore();
+      x.fillStyle = done ? 'rgba(46,204,113,.5)' : 'rgba(255,255,255,.35)'; x.fillRect(cm.x1, 380, 6, 8); x.fillRect(cm.x2 - 6, 380, 6, 8);
+      const lab = done ? (cm.lab && cm.lab[0] || '✓ PASSÉ') : lit ? (cm.lab && cm.lab[1] || '🌑 Il regarde ailleurs : FILE !') : (cm.lab && cm.lab[2] || '👁 Il surveille… attends');
+      x.font = 'bold 17px sans-serif'; x.textAlign = 'center'; x.lineWidth = 4; x.strokeStyle = '#000'; x.fillStyle = done ? '#2ecc71' : lit ? '#7fe0ff' : '#ffd36b'; x.strokeText(lab, (cm.x1 + cm.x2) / 2, 196); x.fillText(lab, (cm.x1 + cm.x2) / 2, 196);
+      if (!done && lit && A.cam[cm.id]) { const u = ((A.wt + (cm.off || 0)) % cm.per) / cm.on; x.fillStyle = '#000'; x.fillRect(cm.x1, 204, cm.x2 - cm.x1, 6); x.fillStyle = '#7fe0ff'; x.fillRect(cm.x1, 204, (cm.x2 - cm.x1) * (1 - u), 6); }
+      continue;
+    }
     LN('#3d3d46', 3, cx, 330, cx - 14, 380); LN('#3d3d46', 3, cx, 330, cx + 14, 380); LN('#3d3d46', 3, cx, 330, cx, 380);
     x.fillStyle = '#26262e'; x.fillRect(cx - 22, 300, 44, 30); C('#26262e', cx - 12, 296, 9); C('#26262e', cx + 8, 296, 9); x.fillStyle = '#111'; x.fillRect(cx + 22, 308, 14, 14);
     C(lit ? '#ff2d2d' : '#5a1a1a', cx - 14, 306, 4); if (lit) { x.fillStyle = 'rgba(255,45,45,.25)'; x.beginPath(); x.arc(cx - 14, 306, 12, 0, 7); x.fill(); }
@@ -3619,6 +3729,7 @@ function advHud(st) {
   x.fillStyle = '#fff'; x.font = '15px sans-serif'; x.fillText('🎯 ' + L.goal(st.step, st), 28, 61);
   x.fillText('🪙 Pièces cachées : ' + st.coins.length + ' / ' + L.coins.length, 28, 83);
   x.textAlign = 'right'; x.font = '14px sans-serif'; x.fillStyle = 'rgba(255,255,255,.85)';
+  { const hint = (isTouch ? '✕ : quitter · J : parler' : 'Échap : quitter · J / Entrée : parler') + (L.kHint ? ' · ' + L.kHint : L.rods ? ' · K : sceptre' : ''), hw = x.measureText(hint).width; x.save(); x.fillStyle = 'rgba(0,0,0,.45)'; x.beginPath(); x.roundRect(WW - 26 - hw, 10, hw + 20, 26, 8); x.fill(); x.restore(); }
   x.fillText((isTouch ? '✕ : quitter · J : parler' : 'Échap : quitter · J / Entrée : parler') + (L.kHint ? ' · ' + L.kHint : L.rods ? ' · K : sceptre' : ''), WW - 16, 28);
   if (L.timestop) { x.textAlign = 'right'; x.font = 'bold 15px sans-serif'; x.fillStyle = A.ts > 0 ? '#a8c8ff' : A.tsCd > 0 ? '#bbb' : '#ffe28a'; x.fillText(A.ts > 0 ? '⏸️ Temps arrêté : ' + Math.ceil(A.ts / 60) + ' s' : A.tsCd > 0 ? '⏳ Arrêt du temps dans ' + Math.ceil(A.tsCd / 60) + ' s' : '⏱️ Arrêt du temps prêt (K)', WW - 16, 52); }
   if (A.busy) { x.textAlign = 'center'; x.font = 'bold 30px sans-serif'; x.fillStyle = '#fff'; x.strokeStyle = '#000'; x.lineWidth = 5; x.strokeText('🥊 Direction le ring…', WW / 2, 250); x.fillText('🥊 Direction le ring…', WW / 2, 250); }
@@ -4860,6 +4971,25 @@ ADV_LOOK['Shérif robot'] = { base: 'Bryan', look: 'sheriff', pal: { '#f5cba7': 
 ADV_LOOK['Capitaine Boulon'] = { base: 'Bryan', look: 'pirate', pal: { '#f5cba7': '#9aa4ae', '#16161b': '#7a1f1f', '#f4f4f6': '#2c2c34', '#e9e9ee': '#22222a', '#0f0f14': '#3a3f48' } };
 ADV_LOOK['Bryan-X'] = { base: 'Bryan', look: 'bx', pal: { '#f5cba7': '#c0c6d0', '#16161b': '#3a3f48', '#f4f4f6': '#5d6670', '#e9e9ee': '#4f5862', '#0f0f14': '#2a2e36' } };
 ADV_LOOK['Max Silver'] = { base: 'Mecha' };
+// ---- adversaires des chapitres 3 à 6 de la saison 2
+ADV_LOOK['Douanier'] = { base: 'Bruno', look: 'douane', pal: { '#e74c3c': '#2c3e66', '#ff7675': '#4a6aa0', '#b03a2e': '#1f2d4d', '#d9534f': '#3a5590', '#1a1a1a': '#3a2414' } };
+ADV_LOOK['Madame Velours'] = { base: 'Odile', look: 'velours', pal: { '#15181e': '#4a1f5a', '#3fb8c9': '#e8a0d0', '#2a8a99': '#8e44ad', '#f4f4f6': '#f8e8f0', '#22303f': '#2a1430', '#111318': '#5a2a14' } };
+ADV_LOOK['Le Molosse'] = { base: 'Viking', look: 'draugr', pal: { '#e0ac69': '#c08a5a', '#6d4c41': '#2a2a2a', '#4e342e': '#1a1a1a', '#d35400': '#3a3a3a', '#95a5a6': '#4a3a2e', '#ecf0f1': '#2a2a2a', '#f1c40f': '#7a6a3a', '#3e2723': '#111', '#7f8c8d': '#3a3a3a' } };
+ADV_LOOK['Le Corbeau'] = { base: 'Odile', look: 'corbeau', pal: { '#15181e': '#1a1424', '#3fb8c9': '#6a2a8a', '#2a8a99': '#3a1a4a', '#f4f4f6': '#2b2b33', '#22303f': '#14101a', '#111318': '#1a1424', '#3b2a22': '#0a0a0e' } };
+ADV_LOOK['Loup de cendre'] = { base: 'Loup', pal: { '#7f8b97': '#3a3a3e', '#9aa7b4': '#55555c', '#dfe6ec': '#8a8a90', '#8a96a2': '#4a4a50', '#5d6873': '#2a2a2e', '#f1c40f': '#ff7a2f' } };
+ADV_LOOK['Bûcheron mécanique'] = { base: 'Golem', pal: { '#5f666b': '#7a5a3a', '#4b5155': '#5a3a20', '#7f8c8d': '#b07a43', '#8f9a9c': '#c9a06a', '#6d7377': '#8a6a3e', '#8b9196': '#d9b07a', '#737a7f': '#8a6a3e' } };
+ADV_LOOK['Baron Vautrin'] = { base: 'Chevalier', look: 'baron', pal: { '#b0bec5': '#2e4a3a', '#cfd8dc': '#4a6a5a', '#78909c': '#1e3228', '#455a64': '#14201a', '#90a4ae': '#3a5a4a', '#2c5fa8': '#7a5a2a', '#c0392b': '#8a2a1a' } };
+ADV_LOOK['Dragonneau de braise'] = { base: 'Dragon', pal: { '#c0392b': '#e67e22', '#7b241c': '#a04000', '#a93226': '#d35400', '#922b21': '#ba4a00', '#5b1a12': '#6e2c00' } };
+ADV_LOOK['Mère-Racine'] = { base: 'Golem', look: 'racine', pal: { '#5f666b': '#4a3424', '#4b5155': '#3a2414', '#7f8c8d': '#3e6b2a', '#8f9a9c': '#5d8a3a', '#6d7377': '#5a4030', '#8b9196': '#7cb342', '#737a7f': '#4a3424' } };
+ADV_LOOK['Brûleur des Fosses'] = { base: 'Malik', look: 'brule', pal: { '#b0302a': '#3a3a3a', '#5a5550': '#4a3a30' } };
+ADV_LOOK['Le Colosse enchaîné'] = { base: 'Golem', look: 'chains', pal: { '#5f666b': '#3a3d42', '#4b5155': '#2a2c30', '#7f8c8d': '#5d6168', '#8f9a9c': '#6d7178', '#6d7377': '#4a4e55', '#8b9196': '#8a7060', '#737a7f': '#4a4e55' } };
+ADV_LOOK['Sœur Cendre'] = { base: 'Kaze', look: 'cendre', pal: { '#1c1c28': '#3a2a28', '#2ecc71': '#e8692b' } };
+ADV_LOOK['Écho de la Bête'] = { base: 'Loup', pal: { '#7f8b97': '#1a1424', '#9aa7b4': '#2a2036', '#dfe6ec': '#4a3a5a', '#8a96a2': '#221a2e', '#5d6873': '#0e0a14', '#f1c40f': '#ff2d6a' } };
+ADV_LOOK['Inquisiteur'] = { base: 'Aster', look: 'inquis', pal: { '#f4f1e8': '#3a3a44', '#e8e4d8': '#2e2e36', '#c9c2ae': '#222228', '#d4af37': '#7a1f2a', '#2f5f9a': '#5a1a22', '#f0e2b0': '#2a2a30', '#6fc3ff': '#c0392b' } };
+ADV_LOOK['Sentinelle de cristal'] = { base: 'Golem', look: 'cristal', pal: { '#5f666b': '#6fb7d6', '#4b5155': '#4a8fb0', '#7f8c8d': '#bfe6f5', '#8f9a9c': '#e0f4fb', '#6d7377': '#8cc8e0', '#8b9196': '#f4fcff', '#737a7f': '#8cc8e0' } };
+ADV_LOOK['Grand Inquisiteur Varn'] = { base: 'Chevalier', look: 'varn', pal: { '#b0bec5': '#e8e4d8', '#cfd8dc': '#f4f1e8', '#78909c': '#c9c2ae', '#455a64': '#8a8270', '#90a4ae': '#d9d4c4', '#2c5fa8': '#7a1f2a', '#c0392b': '#7a1f2a' } };
+ADV_LOOK['L’Ombre blanche'] = { base: 'Kaze', look: 'ombre', pal: { '#1c1c28': '#e8e8ee', '#2ecc71': '#d4af37' } };
+
 
 // PNJ de la saison 2
 {
@@ -5333,6 +5463,810 @@ ADV_LV.bryan = (() => {
     const t = Date.now() / 1000;
     if (st.step >= 1) for (const c of L.clues) if (!st.clues.includes(c.id)) { x.save(); x.translate(c.x, c.y + Math.sin(t * 2 + c.id) * 4); x.rotate(t * 1.5); x.fillStyle = '#7f8c8d'; x.beginPath(); x.arc(0, 0, 13, 0, 7); x.fill(); x.fillStyle = '#2c2c34'; for (let q = 0; q < 5; q++) { x.beginPath(); x.arc(Math.cos(q * 1.26) * 7, Math.sin(q * 1.26) * 7, 2.6, 0, 7); x.fill(); } C('#bdc3c7', 0, 0, 3); x.restore(); }
   };
+  return L;
+})();
+
+// ===================== SAISON 2 · CHAPITRES 3 À 6 =====================
+// 3 · Odile « La Pie et le Corbeau » — 4 · Silas « Ce qui repousse » — 5 · Aster « Le Sceau » — 6 · Malik « Les Chaînes »
+// Les chapitres 5 et 6 racontent les mêmes jours, vus d'en haut puis d'en bas : chacun est le monstre de l'histoire de l'autre.
+
+// personnage générique des PNJ : o = { sk peau, top haut, bot bas, hair cheveux, hat chapeau, h taille, dress robe, beard barbe, cane canne, sit assis, lie allongé }
+function advPerson(px, py, s, o) {
+  const t = Date.now(), h = o.h || 1, br = Math.sin(t / 500 + px) * 1.2;
+  x.save(); x.translate(px, py); if (o.lie) { x.translate(0, -8); x.rotate(-s * Math.PI / 2); } x.scale(h, h);
+  if (o.dress) { Y(o.bot, [[-14, -40], [14, -40], [20, 0], [-20, 0]]); R('#2a2420', -12, -4, 10, 4); R('#2a2420', 2, -4, 10, 4); }
+  else { R(o.bot, -12, -36, 10, 34); R(o.bot, 2, -36, 10, 34); R(o.shoe || '#2a2420', -13, -6, 12, 6); R(o.shoe || '#2a2420', 1, -6, 12, 6); }
+  R(o.top, -15, -86 + br, 30, 50 - br); if (o.apron) R(o.apron, -11, -70, 22, 34); if (o.belt) R(o.belt, -15, -46, 30, 4);
+  if (o.shawl) Y(o.shawl, [[-17, -88], [17, -88], [12, -62], [0, -56], [-12, -62]]);
+  LN(o.top, 7, -s * 14, -80, -s * 18, -52); C(o.sk, -s * 18, -50, 4.5);
+  if (o.cane) { LN(o.top, 7, s * 14, -80, s * 22, -56); C(o.sk, s * 22, -54, 4.5); LN('#5a3d26', 3, s * 24, -56, s * 28, 0); }
+  else if (o.hold) { LN(o.top, 7, s * 14, -80, s * 20, -62); C(o.sk, s * 21, -60, 4.5); o.hold(s); }
+  else { LN(o.top, 7, s * 14, -80, s * 18, -52); C(o.sk, s * 18, -50, 4.5); }
+  R(o.sk, -3, -92, 6, 6); C(o.sk, 0, -102, 12);
+  if (o.hair) { x.fillStyle = P(o.hair); x.beginPath(); x.arc(0, -104, 12.5, Math.PI * .95, Math.PI * 2.05); x.fill(); if (o.long) { R(o.hair, -13, -104, 5, 22); R(o.hair, 8, -104, 5, 22); } }
+  if (o.beard) Y(o.beard, [[-10, -100], [10, -100], [7, -86], [0, -82], [-7, -86]]);
+  C('#1a1a1a', s * 6, -103, 1.7); if (!o.sad) LN('#7a3b2e', 1.3, s * 2, -95, s * 7, -95); else LN('#7a3b2e', 1.3, s * 2, -94, s * 7, -96);
+  const hc = o.hatc || '#2a2a2a';
+  if (o.hat === 'cap') { R(hc, -12, -116, 24, 8); R(hc, s > 0 ? 0 : -20, -110, 20, 3); }
+  else if (o.hat === 'beanie') { x.fillStyle = P(hc); x.beginPath(); x.arc(0, -108, 13, Math.PI, 0); x.fill(); C(hc, 0, -122, 3); }
+  else if (o.hat === 'top') { R(hc, -11, -138, 22, 26); R(hc, -18, -114, 36, 4); R('#d4af37', -11, -118, 22, 3); }
+  else if (o.hat === 'veil') { Y(hc, [[-16, -112], [16, -112], [22, -60], [-22, -60]]); C(hc, 0, -108, 13); x.fillStyle = 'rgba(0,0,0,.35)'; x.fillRect(-12, -108, 24, 14); }
+  else if (o.hat === 'hood') { x.fillStyle = P(hc); x.beginPath(); x.arc(0, -105, 15, Math.PI * .8, Math.PI * 2.2); x.fill(); }
+  else if (o.hat === 'mitre') { Y('#f4f1e8', [[-12, -112], [0, -140], [12, -112]]); LN('#d4af37', 2, 0, -138, 0, -114); LN('#d4af37', 2, -8, -122, 8, -122); }
+  else if (o.hat === 'helm') { x.fillStyle = P(hc); x.beginPath(); x.arc(0, -106, 14, Math.PI, 0); x.fill(); R(hc, -14, -108, 28, 4); R('#d4af37', -2, -122, 4, 10); }
+  else if (o.hat === 'scarf') { R(hc, -13, -116, 26, 8); Y(hc, [[-s * 12, -112], [-s * 20, -100], [-s * 10, -104]]); }
+  if (o.extra) o.extra(s);
+  x.restore();
+}
+const ADV_PPL = {
+  // chapitre 3
+  grive: { sk: '#e8c4a0', top: '#5a4a6a', bot: '#3a3040', hair: '#d8d8d8', hat: 'scarf', hatc: '#7a3b5a', dress: 1, cane: 1, shawl: '#8a6a8a', h: .92, sad: 1 },
+  pie1: { sk: '#f1d1b5', top: '#3a5a7a', bot: '#3a3040', hair: '#3a2414', hat: 'cap', hatc: '#15181e', h: .66 },
+  pie2: { sk: '#c68e5e', top: '#7a3b2a', bot: '#2a2a34', hair: '#111', hat: 'beanie', hatc: '#3fb8c9', h: .6 },
+  pie3: { sk: '#f1d6bf', top: '#d8c8a0', bot: '#5a4a3a', hair: '#c0862e', long: 1, h: .55, dress: 1 },
+  salin: { sk: '#e8b48a', top: '#2e4a3a', bot: '#1e2a24', hat: 'top', hatc: '#14201a', beard: '#6a4a2a', h: 1.08, belt: '#d4af37' },
+  clerc: { sk: '#f1d1b5', top: '#4a4a52', bot: '#2a2a30', hair: '#2a2a2a', h: .95, extra: s => { x.strokeStyle = '#222'; x.lineWidth = 1.5; x.beginPath(); x.arc(s * 6, -103, 4, 0, 7); x.stroke(); } },
+  marin: { sk: '#c8956a', top: '#2c4a6a', bot: '#3a3a44', hat: 'beanie', hatc: '#8a2a1a', beard: '#7a6a5a' },
+  // chapitre 4
+  lise: { sk: '#f1d6bf', top: '#c0392b', bot: '#5a3a2a', hair: '#8a5a2a', long: 1, dress: 1, h: .62, hold: s => { R('#7f8c8d', s * 16, -64, 10, 12); R('#5dade2', s * 17, -62, 8, 4); } },
+  aubepine: { sk: '#e0b890', top: '#4a5a3a', bot: '#3a3a2a', hair: '#e8e8e8', hat: 'scarf', hatc: '#6a4a3a', dress: 1, cane: 1, h: .9, sad: 1 },
+  bucheron: { sk: '#d9a07a', top: '#8a2a1a', bot: '#3a3a44', hat: 'cap', hatc: '#3a3a3a', beard: '#5a3a1a', h: 1.05 },
+  villag: { sk: '#e8b48a', top: '#6a7a4a', bot: '#4a3a2a', hair: '#5a3a1a', long: 1, dress: 1, apron: '#e8e0d0' },
+  // chapitres 5 et 6
+  solen: { sk: '#f1d6bf', top: '#f4f1e8', bot: '#e8e4d8', hat: 'mitre', beard: '#e8e8e8', dress: 1, h: 1.06, belt: '#d4af37' },
+  oguard: { sk: '#f1d6bf', top: '#e8e4d8', bot: '#c9c2ae', hat: 'helm', hatc: '#d4af37', belt: '#d4af37' },
+  blesse: { sk: '#f1d6bf', top: '#e8e4d8', bot: '#c9c2ae', hat: 'helm', hatc: '#d4af37', lie: 1, sad: 1 },
+  veuve: { sk: '#f1d6bf', top: '#1a1a20', bot: '#1a1a20', hat: 'veil', hatc: '#111', dress: 1, sad: 1 },
+  anselme: { sk: '#f1d1b5', top: '#e8e4d8', bot: '#c9c2ae', hair: '#bbb', dress: 1, belt: '#7a5a2a', sad: 1, h: .95 },
+  mereh: { sk: '#f1d6bf', top: '#d8c8e8', bot: '#a898c8', hair: '#c0862e', long: 1, dress: 1, shawl: '#f4f1e8' },
+  enfanth: { sk: '#f1d6bf', top: '#6fc3ff', bot: '#e8e4d8', hair: '#d8b070', h: .6 },
+  oriane: { sk: '#b57a52', top: '#5a4a40', bot: '#3a3030', hair: '#1a1410', long: 1, dress: 1, shawl: '#8a3a2a', sad: 1 },
+  bastien: { sk: '#a87a5a', top: '#4a4038', bot: '#2e2a28', hair: '#9a9a9a', beard: '#c8c8c8', cane: 1, h: .9, sad: 1 },
+  ilse: { sk: '#d9a07a', top: '#e8e0d0', bot: '#4a4038', hair: '#3a2414', apron: '#6a8a5a', h: .98 },
+  gosse: { sk: '#b57a52', top: '#6a5a4a', bot: '#3a3030', hair: '#1a1410', h: .58, sad: 1 },
+  captif: { sk: '#b57a52', top: '#5a5550', bot: '#2e2a28', hair: '#1a1410', sad: 1 },
+  libre: { sk: '#b57a52', top: '#5a5550', bot: '#2e2a28', hair: '#1a1410' },
+  nalia: { sk: '#b57a52', top: '#e8e4d8', bot: '#c9c2ae', hair: '#16120f', long: 1, dress: 1, h: .74 }
+};
+{
+  const baseNpc3 = advNpc;
+  advNpc = (k, px, s, py = 380) => {
+    const o = ADV_PPL[k];
+    if (o) {
+      if (k === 'captif') { advPerson(px, py, s, o); const t = Date.now(); for (let q = 0; q < 2; q++) for (let r2 = 0; r2 < 8; r2++) { x.strokeStyle = '#7a7f88'; x.lineWidth = 2.5; x.beginPath(); x.ellipse(px + (q ? 16 : -16) + Math.sin(t / 400 + r2) * 1.5, py - 52 + r2 * 7, 3, 4.5, r2 % 2 ? 0 : 1.5, 0, 7); x.stroke(); } R('#4a4e55', px - 22, py - 56, 12, 6); R('#4a4e55', px + 10, py - 56, 12, 6); return; }
+      if (k === 'nalia' && advS && advS.L.cryst && !advS.L.cryst(advCh(advS.id))) { x.fillStyle = 'rgba(160,220,255,.35)'; x.beginPath(); x.moveTo(px, py - 140); x.lineTo(px + 34, py - 70); x.lineTo(px, py); x.lineTo(px - 34, py - 70); x.fill(); advPerson(px, py, s, Object.assign({}, o, { sad: 1 })); x.strokeStyle = 'rgba(255,255,255,.7)'; x.lineWidth = 2; x.beginPath(); x.moveTo(px, py - 140); x.lineTo(px + 34, py - 70); x.lineTo(px, py); x.lineTo(px - 34, py - 70); x.closePath(); x.stroke(); return; }
+      advPerson(px, py, s, o); return;
+    }
+    baseNpc3(k, px, s, py);
+  };
+}
+// plateformes des chapitres 3 à 6 (les « req » n'existent que lorsqu'on a déclenché l'action correspondante)
+{
+  const basePlats3 = advPlats;
+  advPlats = L => {
+    basePlats3(L);
+    const t = Date.now() / 1000, st = advS && advCh(advS.id);
+    for (const p of L.plats) {
+      const on = !p.req || (st && st.gates.includes(p.req));
+      if (p.k === 'vine') { // lianes et racines que Silas fait pousser
+        if (!on) { x.strokeStyle = 'rgba(124,179,66,.18)'; x.setLineDash([4, 6]); x.lineWidth = 2; x.strokeRect(p.x, p.y, p.w, 10); x.setLineDash([]); continue; }
+        x.fillStyle = '#4a3424'; x.beginPath(); x.roundRect(p.x, p.y, p.w, 11, 5); x.fill(); x.strokeStyle = '#5d8a3a'; x.lineWidth = 3; x.beginPath(); for (let q = 0; q <= p.w; q += 8) x.lineTo(p.x + q, p.y + 5 + Math.sin(q / 9 + t) * 3); x.stroke();
+        for (let q = 6; q < p.w; q += 22) { Y('#7cb342', [[p.x + q, p.y], [p.x + q + 8, p.y - 7], [p.x + q + 3, p.y + 2]]); if ((q / 22 | 0) % 3 === 0) C('#f8bbd0', p.x + q + 10, p.y - 3, 2.5); }
+        if (p.y < 370) { x.strokeStyle = '#4a3424'; x.lineWidth = 4; x.beginPath(); x.moveTo(p.x + 10, p.y + 10); x.quadraticCurveTo(p.x + 4, (p.y + 380) / 2, p.x + 14, 382); x.stroke(); }
+      } else if (p.k === 'lightb') { // pont de lumière du Sceau
+        if (!on) { x.strokeStyle = 'rgba(212,175,55,.2)'; x.setLineDash([4, 6]); x.lineWidth = 2; x.strokeRect(p.x, p.y, p.w, 8); x.setLineDash([]); continue; }
+        x.fillStyle = 'rgba(255,230,140,.25)'; x.fillRect(p.x - 4, p.y - 6, p.w + 8, 20); x.fillStyle = '#fff1b8'; x.beginPath(); x.roundRect(p.x, p.y, p.w, 8, 4); x.fill(); x.strokeStyle = '#d4af37'; x.lineWidth = 1.5; x.strokeRect(p.x, p.y, p.w, 8);
+        for (let q = 0; q < p.w; q += 24) { const u = (t + q / 50) % 1; C('rgba(255,250,220,' + (1 - u) + ')', p.x + q + 10, p.y - u * 16, 2); }
+      } else if (p.k === 'marble') { // corniche de marbre de Solenne
+        x.fillStyle = '#e8e2d0'; x.fillRect(p.x, p.y, p.w, 12); x.fillStyle = '#d4af37'; x.fillRect(p.x, p.y + 10, p.w, 3); x.fillStyle = 'rgba(0,0,0,.08)'; for (let q = p.x; q < p.x + p.w; q += 20) x.fillRect(q, p.y + 2, 2, 8);
+      } else if (p.k === 'rubble') { // gravats et poutres des Fosses
+        x.fillStyle = '#3a322c'; x.beginPath(); x.moveTo(p.x, p.y + 10); x.lineTo(p.x + 6, p.y); x.lineTo(p.x + p.w - 8, p.y + 2); x.lineTo(p.x + p.w, p.y + 12); x.lineTo(p.x + p.w * .6, p.y + 24); x.lineTo(p.x + p.w * .2, p.y + 20); x.fill();
+        x.fillStyle = '#5a4a3e'; x.fillRect(p.x + 4, p.y, p.w - 10, 4);
+      } else if (p.k === 'cage') { // cage suspendue à une chaîne (on peut monter dessus)
+        LN('#5d6168', 2, p.x + p.w / 2, p.y - 200, p.x + p.w / 2, p.y - 40); x.strokeStyle = '#5d6168'; x.lineWidth = 2; for (let q = 0; q <= p.w; q += 10) { x.beginPath(); x.moveTo(p.x + q, p.y - 40); x.lineTo(p.x + q, p.y); x.stroke(); }
+        x.fillStyle = '#3a3d42'; x.fillRect(p.x - 2, p.y - 44, p.w + 4, 6); x.fillRect(p.x - 2, p.y, p.w + 4, 8);
+      }
+    }
+  };
+}
+// touche K des chapitres 3 à 6 : action sur un PNJ (voler, soigner, libérer) ou sur un point du décor (planter, allumer)
+function advKAct(L, st, A) {
+  const go = a => { if (a.ok && !a.ok(st)) { advToast(a.no || '…'); return true; } st.gates.push(a.id); if (a.coins && !save.admin) save.coins += a.coins; persist(); A.puff = { x: A.x + A.face * 20, y: A.y - 50, t: 14 }; if (a.toast) advToast(a.toast); if (a.lines) advSay(a.lines, a.then ? () => a.then(st) : undefined); else if (a.then) a.then(st); return true; };
+  for (const n of L.npcs) if (n.act && (!n.show || n.show(st.step)) && Math.abs(A.x - n.x) < 74 && !st.gates.includes(n.act.id)) return go(n.act);
+  for (const sp of L.spots || []) if (Math.abs(A.x - sp.x) < 84 && !st.gates.includes(sp.id)) return go(sp);
+  return false;
+}
+// bulle « K : … » au-dessus des actions possibles
+function advKHints(L, st, A, label) {
+  for (const n of L.npcs) if (n.act && (!n.show || n.show(st.step)) && !st.gates.includes(n.act.id) && Math.abs(A.x - n.x) < 74 && !A.dlg) advTag(n.x, (n.py || 380) - 150, n.act.lab || label);
+  for (const sp of L.spots || []) if (!st.gates.includes(sp.id) && Math.abs(A.x - sp.x) < 84 && !A.dlg) advTag(sp.x, (sp.y || 380) - 70, sp.lab || label);
+}
+function advTag(px, py, txt) { x.font = 'bold 13px sans-serif'; const w = x.measureText(txt).width + 20; x.fillStyle = 'rgba(0,0,0,.72)'; x.beginPath(); x.roundRect(px - w / 2, py - 18, w, 24, 8); x.fill(); x.fillStyle = '#ffe9a8'; x.textAlign = 'center'; x.fillText(txt, px, py - 1); }
+// sol de base d'un chapitre découpé en zones, avec trous
+function advGround(L, ZONES, a, b, col, top) {
+  for (const z of ZONES) { const L0 = Math.max(a, z[0]), R0 = Math.min(b, z[1]); if (R0 <= L0) continue; x.fillStyle = advLerp(col, z[3], .18); x.fillRect(L0, 380, R0 - L0, 260); x.fillStyle = advLerp(top, z[3], .35); x.fillRect(L0, 380, R0 - L0, 5); }
+}
+
+// ---------------------------------------------------------------- CHAPITRE 3 (saison 2) : ODILE · La Pie et le Corbeau
+ADV_LV.odile = (() => {
+  const ZONES = [[0, 900, 'LE VIEUX-PORT', '#3fb8c9'], [900, 1880, 'LES QUAIS DE LA DOUANE', '#5d7fa8'], [1880, 2900, 'LE MARCHÉ NOIR', '#9b59b6'], [2900, 3950, 'LES TOITS', '#f1c40f'], [3950, 4800, 'LE CLUB DE BOXE DU PORT', '#e74c3c'], [4800, 5800, 'L’ENTREPÔT DE LA GUILDE DU SEL', '#ecf0f1']];
+  const L = {
+    hero: 'Odile', title: 'Chapitre 9 · La Pie et le Corbeau', len: 5800, start: 160, skin: 'skin_odile_reine', kHint: 'K : faire les poches',
+    fall: '↩ Plouf ! Odile ressort du port, trempée, et remonte sur le quai.', clueTxt: '🐦 Petite Pie retrouvée — ',
+    colors: { Odile: '#3fb8c9', 'Mamie Grive': '#c39bd3', Marin: '#7f8c8d', Douanier: '#5d7fa8', 'Maître Salin': '#7cb342', 'Le clerc': '#bdc3c7', 'Madame Velours': '#c39bd3', Bruno: '#e74c3c', 'Le Molosse': '#a1887f', 'Le Corbeau': '#8e44ad', Tic: '#5dade2', Moineau: '#e67e22', Bise: '#f5cba7', '📄': '#f4ead0', '📒': '#f4ead0', '🏆': '#d4ac0d', '🎭': '#d4ac0d', '🌊': '#5dade2' },
+    pits: [[1880, 2060], [3330, 3420], [3790, 3880]],
+    walls: [{ x1: 3120, x2: 3150, top: 340, c: '#7a3b2a', cap: '#4a2418' }, { x1: 3600, x2: 3630, top: 340, c: '#7a3b2a', cap: '#4a2418' }],
+    plats: [
+      { x: 560, y: 300, w: 110, h: 80, k: 'crate' },
+      { x: 1080, y: 300, w: 130, h: 80, k: 'cont', c: '#7a3b2a' }, { x: 1230, y: 230, w: 110, h: 150, k: 'cont', c: '#2c5a7a' }, { x: 1250, y: 160, w: 70, h: 70, k: 'cont', c: '#5a6a2a' },
+      { x: 1900, y: 362, w: 70, k: 'barrel', mv: { dx: 80, dy: 0, per: 220, off: 0 } },
+      { x: 2420, y: 300, w: 100, h: 80, k: 'crate' }, { x: 2540, y: 230, w: 80, h: 70, k: 'crate' },
+      { x: 3880, y: 260, w: 60, h: 120, k: 'cont', c: '#8a4a3a' },
+      { x: 4100, y: 300, w: 120, k: 'scaff' }, { x: 4950, y: 300, w: 100, h: 80, k: 'crate' }, { x: 5070, y: 230, w: 90, h: 70, k: 'crate' }
+    ],
+    cams: [
+      { id: 'g1', look: 'guard', col: '#2e4a3a', x1: 3000, x2: 3300, per: 300, on: 170, wMsg: '🏮 Le garde de la Guilde regarde par ici ! Reste dans l’ombre et attends.', cMsg: '🏮 Repérée ! Odile replonge dans l’ombre de la cheminée…', msg: '🌑 Passée sans un bruit. +10 pièces' },
+      { id: 'g2', look: 'guard', col: '#2e4a3a', x1: 3470, x2: 3760, per: 280, on: 160, off: 70, wMsg: '🏮 Le garde de la Guilde regarde par ici ! Reste dans l’ombre et attends.', cMsg: '🏮 Repérée ! Odile replonge dans l’ombre de la cheminée…', msg: '🌑 Passée sans un bruit. +10 pièces' }
+    ],
+    clues: [
+      { id: 1, x: 615, y: 265, n: 'Tic, recroquevillé dans un tonneau : « Le monsieur au bec… il compte nos dents, Odile. Comme pour les chevaux. »' },
+      { id: 2, x: 1285, y: 125, n: 'Moineau, tout en haut des conteneurs : « Il a dit qu’il te connaissait. Qu’il t’avait appris à marcher sur les toits. »' },
+      { id: 3, x: 2180, y: 360, n: 'Bise, sous un étal : « Il sent la plume mouillée. Il m’a donné un bonbon salé. »' },
+      { id: 4, x: 3910, y: 225, n: 'Pinson, derrière une cheminée : « Il a demandé laquelle de nous était la plus petite. Pour les galeries. »' }
+    ],
+    coins: [{ id: 1, x: 300, y: 300 }, { id: 2, x: 1145, y: 265 }, { id: 3, x: 1980, y: 300 }, { id: 4, x: 2580, y: 195 }, { id: 5, x: 3375, y: 300 }, { id: 6, x: 3540, y: 300 }, { id: 7, x: 4160, y: 265 }, { id: 8, x: 5115, y: 195 }]
+  };
+  L.clueOn = st => st.step >= 1;
+  L.onClues = st => { st.kids = 1; if (!save.admin) save.coins += 20; persist(); advSay([
+    ['Odile', 'Un masque à bec. Les toits. Les galeries. Quelqu’un qui me connaît…'],
+    ['Odile', 'Non. Non, il est mort. J’ai creusé moi-même. Il y avait sa plume sur le cercueil.'],
+    ['🐦', 'Toutes les petites Pies cachées sont retrouvées : +20 pièces. Elles rentrent chez Mamie Grive.']
+  ]); };
+  const G = ['Parle à Mamie Grive, sur le Vieux-Port', 'Passe les quais de la douane', 'Fais les poches de Maître Salin (K) pour lire ses papiers', 'Trouve Madame Velours au marché noir', 'Traverse les toits sans te faire voir et va au club de boxe', 'Entre dans l’entrepôt de la Guilde du Sel', 'Au fond de l’entrepôt, quelqu’un t’attend', 'Les Pies sont libres. Parle-leur'];
+  L.goal = (s, st) => {
+    st = st || advCh('odile'); const ax = advS ? advS.x : 0, pg = s >= 1 && s < 7 ? ' (Pies cachées ' + st.clues.length + '/4)' : '';
+    const cm = L.cams.find(c => !st.gates.includes(c.id) && ax > c.x1 - 260 && ax < c.x2);
+    if (s >= 4 && cm) return (advS.cam[cm.id] ? '🌑 File jusqu’au bout du toit avant qu’il se retourne !' : 'Attends que le garde regarde ailleurs, puis traverse le toit') + pg;
+    return G[Math.min(s, 7)] + pg;
+  };
+  L.target = s => ['grive', 'p0', 'salin', 'p1', 'p3', 'p2', 'p4'][s] || '';
+  L.intro = [
+    ['', 'Le Vieux-Port, la nuit. Ici, les orphelins qui volent pour manger s’appellent les Pies. Celui qui les a réunis s’appelait le Corbeau.'],
+    ['', 'Il y a deux ans, le Corbeau est mort sur un cambriolage. Odile, sa meilleure élève, porte depuis sa plume noire dans les cheveux.'],
+    ['Odile', 'Règle n°1 : on ne vole que ceux qui volent les autres. Règle n°2 : les Pies ne laissent personne derrière.'],
+    ['', 'Flèches : bouger · Haut : sauter · J : parler · K : faire les poches (seulement à ceux qui le méritent).']
+  ];
+  L.lose = [['Mamie Grive', 'Relève-toi, ma grande. Il a toujours dit que tu étais la plus têtue de toutes.']];
+  L.reward = [
+    ['🏆', 'Chapitre terminé ! +100 pièces et +5 cristaux.'],
+    ['🎭', 'Nouveau skin : « Odile Reine des Pies » : queue-de-pie blanche, couronne de plumes et collier de pièces rendues à leurs propriétaires.'],
+    ['🌊', 'On n’a jamais retrouvé le corps du Corbeau.']
+  ];
+  L.npcs = [
+    { id: 'grive', name: 'Mamie Grive', look: 'grive', x: 300, show: s => s < 7, talk: st => {
+      if (st.step === 0) return { lines: [
+        ['Mamie Grive', 'Odile… Trois de mes petits ne sont pas rentrés cette nuit. Tic, Moineau et la petite Bise.'],
+        ['Mamie Grive', 'Ça fait le neuvième ce mois-ci. Les gardes disent qu’ils se sont enfuis. Bise a six ans, Odile. Elle ne s’enfuit pas. Elle a peur du noir.'],
+        ['Odile', 'Je les retrouve, Mamie. Les Pies ne laissent personne derrière.'],
+        ['Mamie Grive', 'C’est ce qu’il disait, lui. Le Corbeau. Paix à son âme…'],
+        ['Odile', '(Elle touche la plume noire qu’elle porte depuis deux ans.) Paix à son âme.'],
+        ['', 'Les petites Pies se cachent quand elles ont peur. Cherche partout : dans les tonneaux, tout en haut, sous les étals…']
+      ], then: () => advSetStep(1) };
+      return { lines: [['Mamie Grive', st.kids ? 'Tic, Moineau, Bise et Pinson sont rentrés ! Mais il en manque encore tant…' : 'Les petits se cachent comme toi tu te cachais. En hauteur, toujours en hauteur.']] };
+    } },
+    { id: 'marin', name: 'Marin', look: 'marin', x: 720, talk: () => ({ lines: [['Marin', 'Hic… Les gamins ? Ils montent dans les bateaux de la Guilde, la nuit. Mais chut. Moi j’ai rien vu. Hic.']] }),
+      act: { id: 'pk_marin', lab: 'K : faire les poches', lines: [['Odile', '(Elle lui chipe sa bourse en passant… puis la lui remet dans la poche.)'], ['Odile', 'Règle n°1. Il ne vole personne, lui. Il boit, c’est tout.'], ['Marin', 'Hein ? Qui m’a touché ?']] } },
+    advMkFight({ id: 'p0', name: 'Douanier', x: 1460, fight: 'p0', need: 1,
+      wait: [['Douanier', 'Circulez.']],
+      pre: [['Douanier', 'Hé, toi ! Les quais sont fermés aux gens de ton espèce. Ordre de la Guilde.'], ['Odile', 'Depuis quand la douane obéit à la Guilde du Sel ?'], ['Douanier', 'Depuis qu’elle paie mieux que la mairie. Allez, ouste — ou je t’embarque avec les autres.'], ['Odile', '« Les autres » ?']],
+      win: [['Douanier', 'Aïe… D’accord, d’accord ! Les gamins, on les fait passer la nuit. Moi, je regarde ailleurs, c’est tout. C’est Maître Salin qui a les papiers.'], ['Odile', 'Maître Salin. Celui avec le haut-de-forme. Merci du renseignement.']],
+      idle: [['Douanier', 'J’ai rien dit, hein. J’ai rien dit.']] }),
+    { id: 'salin', name: 'Maître Salin', look: 'salin', x: 1720, talk: st => ({ lines: st.gates.includes('pk_salin') ? [['Maître Salin', 'Où est passé mon… ? Garde ! GARDE !']] : st.step >= 2 ? [['Maître Salin', 'Circulez, la gamine. Je compte.'], ['', '(Approche-toi et appuie sur K pour lui faire les poches.)']] : [['Maître Salin', 'Hm ? Va mendier ailleurs.']] }),
+      act: { id: 'pk_salin', lab: 'K : faire les poches', ok: st => st.step >= 2, no: '🚨 Le douanier te surveille… Débarrasse-toi de lui d’abord.', lines: [
+        ['📄', 'Manifeste de la Guilde du Sel — Cargaison n°12 : « douze moineaux, petite taille ». Livraison : mines de Sel-Noir.'],
+        ['📄', 'Paiement : « au C. », quarante pièces la tête. Les galeries des mines sont trop étroites pour les adultes.'],
+        ['Odile', 'Douze moineaux. Douze Pies… Quarante pièces la tête.'],
+        ['Odile', '« Au C. »… Qui est C. ? Madame Velours le saura. Elle sait tout ce qui se vend au Vieux-Port.']
+      ], then: () => advSetStep(3) } },
+    { id: 'clerc', name: 'Le clerc', look: 'clerc', x: 2330, talk: () => ({ lines: [['Le clerc', 'Les comptes de la Guilde ne regardent personne. Surtout pas une Pie.']] }),
+      act: { id: 'pk_clerc', lab: 'K : faire les poches', coins: 15, lines: [
+        ['📒', 'Livre de comptes : « Rendu au C., sur sa demande : un carnet de cuir, un loup de soie, une plume noire taillée au couteau. »'],
+        ['Odile', 'Un loup de soie. Une plume taillée au couteau. Ce sont SES affaires… celles qu’on a mises dans le cercueil.'],
+        ['📒', 'Vol réussi : +15 pièces.']
+      ] } },
+    advMkFight({ id: 'p1', name: 'Madame Velours', x: 2780, fight: 'p1', need: 3,
+      wait: [['Madame Velours', 'Reviens quand tu auras quelque chose à vendre, ma chérie.']],
+      pre: [['Madame Velours', 'Odile, ma chérie ! La petite Pie du Corbeau. Tu viens vendre, ou tu viens voler ?'], ['Odile', 'Je viens demander. « Au C. ». Qui touche quarante pièces par enfant ?'], ['Madame Velours', 'Oh, ma chérie… Il y a des questions qui coûtent plus cher qu’on ne peut payer.'], ['Madame Velours', 'Mais je suis commerçante. Bats-moi, et je te fais un prix.']],
+      win: [['Madame Velours', 'Aïe, aïe… Tu frappes comme lui. Il t’a bien formée.'], ['Odile', 'Qui est C. ?'], ['Madame Velours', 'Il y a deux mois, un homme m’a vendu une plume noire. Une vraie, de corbeau, taillée au couteau. Comme la tienne.'], ['Madame Velours', 'Il portait un masque à bec. Il a demandé des nouvelles de « sa meilleure Pie ». Il a souri quand j’ai dit ton nom.'], ['Odile', '…'], ['Madame Velours', 'Les cargaisons partent du club de boxe, ma chérie. Chez le gros boxeur. Bruno. Passe par les toits : la Guilde surveille les rues.']],
+      idle: [['Madame Velours', 'Je n’ai rien vendu, moi. Je ne vends jamais rien. Je… facilite.']] }),
+    advMkFight({ id: 'p3', name: 'Bruno', x: 4460, fight: 'p3', need: 4,
+      wait: [['Bruno', 'Le club est fermé ce soir. Rentre chez toi, petite.']],
+      pre: [['Bruno', 'Toi ! C’est toi qui rôdes autour de mon club depuis trois nuits ? Deux de mes gamins ont disparu. Si tu es avec ceux qui les prennent…'], ['Odile', 'Je les cherche. Les miens aussi ont disparu. On dit que les cargaisons partent de chez toi.'], ['Bruno', 'On dit beaucoup de choses. Moi, je crois ce que mes poings me disent. Gants en l’air.']],
+      win: [['Bruno', '… Tu te bats pour quelqu’un. Ça se sent dans les coups.'], ['Odile', 'Douze enfants. Les tiens, les miens. Une Guilde. Et un homme masqué qui touche quarante pièces la tête.'], ['Bruno', 'L’entrepôt de la Guilde, au bout du quai. J’ai vu un homme en noir y entrer avec Lucas, mon plus petit. Je croyais qu’il le raccompagnait chez lui.'], ['Bruno', 'J’y vais avec toi. Je tiens les gardes. Toi, tu vas chercher les gosses.']],
+      idle: [['Bruno', 'On y va quand tu veux. Personne ne touche aux gamins de mon club.']] }),
+    advMkFight({ id: 'p2', name: 'Le Molosse', x: 5190, fight: 'p2', need: 5, sz: 1.25,
+      wait: [['Le Molosse', 'Entrepôt. Fermé.']],
+      pre: [['Le Molosse', 'Entrepôt fermé.'], ['Odile', 'J’entends des enfants pleurer derrière la porte.'], ['Le Molosse', 'Entrepôt. Fermé.'], ['Bruno', 'Vas-y, Odile ! Je m’occupe des autres !']],
+      win: [['', 'Le Molosse s’écroule contre la porte de l’entrepôt, qui cède sous son poids.'], ['Odile', 'Bise ? Tic ? … Les cages sont vides. Il y a de la lumière, tout au fond.']],
+      idle: [['', '(Le Molosse ronfle contre une caisse de sel.)']] }),
+    Object.assign(advMkFight({ id: 'p4', name: 'Le Corbeau', x: 5620, fight: 'p4', need: 6,
+      wait: [['', '(Au fond de l’entrepôt, une silhouette noire, immobile, compte des pièces à la lueur d’une lanterne.)']],
+      pre: [['Le Corbeau', 'Bonsoir, ma petite Pie. Tu as grandi. Tu marches encore trop lourd sur les toits.'],
+        ['Odile', '… Corbeau ? On t’a enterré. J’ai creusé moi-même. Il y avait ta plume sur le cercueil.'],
+        ['Le Corbeau', 'Il y avait une plume. Le reste, c’était du sable. Il fallait bien que je disparaisse : on ne vend pas ses enfants sous son vrai nom.'],
+        ['Odile', 'Tu… vends…'],
+        ['Le Corbeau', 'Je vous ai appris à voler, Odile. Je ne vous ai jamais dit pour qui. Douze ans que j’élève des Pies. Les plus douées volent pour moi. Les autres… la Guilde paie quarante pièces la tête, et le sel ne pose pas de questions.'],
+        ['Odile', 'Bise a six ans.'],
+        ['Le Corbeau', 'Bise est petite. Les galeries de Sel-Noir sont étroites. Tu vois ? Chacun a sa place.'],
+        ['Le Corbeau', 'Rejoins-moi. Tu es la meilleure que j’aie formée. Ou bats-toi… et je te volerai tout ce que je t’ai appris, une dernière fois.'],
+        ['Odile', 'Règle n°1, Corbeau. On ne vole que ceux qui volent les autres.'], ['Odile', 'Ce soir, je te vole tout.'],
+        ['', 'Attention : le Corbeau copie tes techniques, comme toi. Et son ultime vole ta jauge !']],
+      win: [['Le Corbeau', '… Tu m’as volé ma dernière leçon, petite Pie. Je n’ai plus rien à t’apprendre.'],
+        ['Odile', 'Si. Une chose. Pourquoi moi ? Pourquoi je n’ai jamais été vendue ?'],
+        ['Le Corbeau', 'Parce que tu étais trop douée pour être de la marchandise. Ce n’était pas de l’amour, Odile. C’était de la comptabilité.'],
+        ['', 'Le Corbeau recule jusqu’au bord du quai… et se laisse tomber dans l’eau noire du port. Seul son masque remonte à la surface.'],
+        ['', 'Derrière les sacs de sel, douze enfants attendent dans le noir. Tic. Moineau. Bise. Lucas. Tous.'],
+        ['Odile', 'C’est fini. On rentre à la maison. … On va s’en construire une, de maison. Une vraie.']],
+      idle: [['', '…']], after: () => { advFinish(); } }), { show: s => s < 7 }),
+    { id: 'e1', name: 'Mamie Grive', look: 'grive', x: 5380, show: s => s >= 7, talk: () => ({ lines: [['Mamie Grive', 'Douze lits. Je les ai tous refaits. Tu restes dîner, ma grande ? … Tu es chez toi, maintenant. Ici, c’est chez toi.']] }) },
+    { id: 'e2', name: 'Tic', look: 'pie1', x: 5470, show: s => s >= 7, talk: () => ({ lines: [['Tic', 'Tu nous apprends à marcher sur les toits ? … Juste pour regarder les étoiles, promis !']] }) },
+    { id: 'e3', name: 'Moineau', look: 'pie2', x: 5540, show: s => s >= 7, talk: () => ({ lines: [['Moineau', 'Le monsieur au bec, il reviendra ?'], ['Odile', 'S’il revient, il trouvera douze Pies qui ne dorment que d’un œil.']] }) },
+    { id: 'e4', name: 'Bise', look: 'pie3', x: 5610, show: s => s >= 7, talk: () => ({ lines: [['Bise', 'J’ai plus peur du noir. T’étais dedans aussi.']] }) },
+    { id: 'e5', name: 'Bruno', fighter: 'Bruno', x: 5720, show: s => s >= 7, talk: () => ({ lines: [['Bruno', 'Mon club ouvrira le soir pour tes Pies. Elles apprendront à se défendre. Plus personne ne comptera leurs dents.']] }) }
+  ];
+  L.onK = st => advKAct(L, st, advS);
+  L.bg = cam => { // nuit sur le port : lune, mer au loin, mâts de bateaux
+    const t = Date.now() / 1000, g = x.createLinearGradient(0, -OFF, 0, 380); g.addColorStop(0, '#060a16'); g.addColorStop(1, '#22304a'); x.fillStyle = g; x.fillRect(0, -OFF, WW, 470);
+    for (let k = 0; k < 60; k++) { x.fillStyle = 'rgba(255,255,255,' + (.2 + .5 * Math.abs(Math.sin(t + k))) + ')'; x.fillRect(((arnd(k) * 1500 - cam * .03) % 1250 + 1250) % 1250, arnd(k + 30) * 260 - 80, 2, 2); }
+    C('rgba(240,240,220,.9)', 900 - cam * .02, 30, 28);
+    x.fillStyle = '#16233a'; x.fillRect(0, 200, WW, 30); for (let k = 0; k < 6; k++) { const bx = ((k * 330 - cam * .1) % 1980 + 1980) % 1980 - 200; x.fillStyle = '#0e1626'; x.beginPath(); x.moveTo(bx, 200); x.lineTo(bx + 160, 200); x.lineTo(bx + 140, 222); x.lineTo(bx + 20, 222); x.fill(); x.fillRect(bx + 70, 110, 4, 90); Y('#0e1626', [[bx + 74, 115], [bx + 120, 190], [bx + 74, 190]]); }
+  };
+  L.scene = (cam, st) => {
+    const t = Date.now() / 1000, a = cam - 60, b = cam + WW + 60, vis = (l, r) => r > a && l < b;
+    if (vis(0, 900)) { for (let q = 0; q < 900; q += 150) { x.fillStyle = q % 300 ? '#2a2f3e' : '#33384a'; x.fillRect(q, 180, 140, 200); Y('#1e222e', [[q - 6, 180], [q + 70, 140], [q + 146, 180]]); x.fillStyle = 'rgba(255,200,110,.5)'; x.fillRect(q + 30, 230, 24, 30); x.fillRect(q + 86, 230, 24, 30); }
+      x.fillStyle = '#4a3a2a'; x.fillRect(240, 330, 60, 50); x.fillStyle = '#f4ead0'; x.font = 'bold 11px serif'; x.textAlign = 'center'; x.fillText('SOUPE', 270, 350); }
+    if (vis(900, 1880)) { [1020, 1500].forEach((cx, k) => { x.fillStyle = '#2a3a50'; x.fillRect(cx, 60, 14, 320); x.fillRect(cx - 100, 60, 260, 12); LN('#2a3a50', 2, cx + 140, 72, cx + 140, 160 + Math.sin(t + k) * 8); x.fillRect(cx + 126, 160 + Math.sin(t + k) * 8, 28, 20); });
+      x.fillStyle = '#e8e0d0'; x.font = 'bold 18px serif'; x.textAlign = 'center'; x.fillText('DOUANE', 1700, 210); x.fillStyle = '#3a3a44'; x.fillRect(1640, 220, 120, 160); x.fillStyle = 'rgba(255,220,120,.6)'; x.fillRect(1660, 240, 30, 30); x.fillRect(1710, 240, 30, 30); }
+    if (vis(1880, 2900)) { for (let q = 2080; q < 2900; q += 170) { x.fillStyle = ['#5a2a4a', '#2a4a5a', '#5a4a2a'][(q / 170 | 0) % 3]; x.beginPath(); x.moveTo(q, 280); x.lineTo(q + 130, 280); x.lineTo(q + 140, 300); x.lineTo(q - 10, 300); x.fill(); x.fillStyle = '#3a2a1e'; x.fillRect(q, 330, 130, 50); x.fillRect(q + 4, 300, 4, 30); x.fillRect(q + 122, 300, 4, 30);
+        for (let k = 0; k < 5; k++) C(['#f1c40f', '#e74c3c', '#ecf0f1', '#3fb8c9', '#9b59b6'][(k + q) % 5], q + 15 + k * 25, 325, 5); }
+      for (let k = 0; k < 8; k++) { const lx = 2100 + k * 100; LN('#222', 1, lx, 150, lx + 100, 160); C('rgba(255,180,80,' + (.6 + .3 * Math.sin(t * 3 + k)) + ')', lx + 50, 160, 5); } }
+    if (vis(2900, 3950)) { x.fillStyle = '#1a1424'; x.fillRect(2900, 0, 1050, 380); for (let k = 0; k < 9; k++) { const rx = 2900 + k * 120; x.fillStyle = k % 2 ? '#3a2a2a' : '#4a3030'; x.beginPath(); x.moveTo(rx, 380); x.lineTo(rx, 300); x.lineTo(rx + 60, 260); x.lineTo(rx + 120, 300); x.lineTo(rx + 120, 380); x.fill(); x.fillStyle = 'rgba(0,0,0,.25)'; for (let q = 0; q < 6; q++) x.fillRect(rx + q * 20, 300 + (q % 2) * 6, 2, 80); }
+      x.strokeStyle = '#5a4a3a'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(2950, 230); x.quadraticCurveTo(3400, 270, 3900, 230); x.stroke(); for (let q = 0; q < 8; q++) { x.fillStyle = ['#ecf0f1', '#c0392b', '#3fb8c9'][q % 3]; x.fillRect(3000 + q * 110, 238 + Math.sin(q) * 5, 16, 20); } }
+    if (vis(3950, 4800)) { x.fillStyle = '#3a2a24'; x.fillRect(3950, 120, 850, 260); x.fillStyle = '#e8e0d0'; x.font = 'bold 22px sans-serif'; x.textAlign = 'center'; x.fillText('CLUB DE BOXE DU PORT', 4380, 165);
+      for (let q = 0; q < 3; q++) LN(['#c0392b', '#ecf0f1', '#2980b9'][q], 3, 4300, 300 + q * 20, 4650, 300 + q * 20); [4300, 4650].forEach(px2 => { x.fillStyle = '#7f8c8d'; x.fillRect(px2 - 4, 290, 8, 90); });
+      [4050, 4200].forEach((bx, k) => { LN('#222', 2, bx, 190, bx, 230); x.fillStyle = '#8a2a1a'; x.beginPath(); x.roundRect(bx - 14 + Math.sin(t * 2 + k) * 4, 230, 28, 60, 10); x.fill(); }); }
+    if (vis(4800, 5800)) { x.fillStyle = '#2a2a30'; x.fillRect(4800, 60, 1000, 320); x.fillStyle = '#1e1e24'; for (let q = 4800; q < 5800; q += 90) x.fillRect(q, 60, 8, 320);
+      for (let k = 0; k < 10; k++) { const sx = 5250 + (k % 5) * 60, sy = 340 - (k / 5 | 0) * 34; x.fillStyle = '#e8e4d8'; x.beginPath(); x.roundRect(sx, sy, 52, 32, 6); x.fill(); x.fillStyle = '#7f8c8d'; x.font = 'bold 9px sans-serif'; x.textAlign = 'center'; x.fillText('SEL', sx + 26, sy + 20); }
+      if (st.step < 7) for (let k = 0; k < 3; k++) { const cx2 = 4880 + k * 80; x.strokeStyle = '#5d6168'; x.lineWidth = 2; for (let q = 0; q <= 50; q += 10) { x.beginPath(); x.moveTo(cx2 + q, 300); x.lineTo(cx2 + q, 380); x.stroke(); } x.fillStyle = '#3a3d42'; x.fillRect(cx2 - 2, 296, 54, 6); }
+      C('rgba(255,200,100,.9)', 5700, 300, 6); x.fillStyle = 'rgba(255,200,100,.12)'; x.beginPath(); x.arc(5700, 300, 70, 0, 7); x.fill(); }
+    advGround(L, ZONES, a, b, '#2a2420', '#5a4a3a');
+    for (const [l, r] of L.pits) { const L0 = Math.max(a, l), R0 = Math.min(b, r); if (R0 <= L0) continue; if (l < 2500) { x.fillStyle = '#0e2a44'; x.fillRect(L0, 388, R0 - L0, 252); x.fillStyle = 'rgba(255,255,255,.25)'; for (let q = l; q < r; q += 26) x.fillRect(q + Math.sin(t * 2 + q) * 5, 392, 14, 2); } else { x.fillStyle = '#05050a'; x.fillRect(L0, 380, R0 - L0, 260); } }
+    advZoneTag(ZONES, a, b, '🪶');
+  };
+  L.fg = (cam, st) => { advKHints(L, st, advS, 'K : faire les poches'); };
+  return L;
+})();
+
+// ---------------------------------------------------------------- CHAPITRE 4 (saison 2) : SILAS · Ce qui repousse
+ADV_LV.silas = (() => {
+  const ZONES = [[0, 1000, 'BOURG-CLAIR', '#c9a86a'], [1000, 2100, 'LA LISIÈRE BRÛLÉE', '#8a7a6a'], [2100, 3200, 'LE CHANTIER DU BARON', '#b07a43'], [3200, 4300, 'LES RUINES DE SOUS-BOIS', '#9a948a'], [4300, 5800, 'L’ARBRE-MÈRE', '#7cb342']];
+  const MEM = ['m1', 'm2', 'm3', 'm4', 'm5'];
+  const memDone = st => MEM.every(id => st.gates.includes(id));
+  const memThen = st => { if (memDone(st) && !st.mem) { st.mem = 1; if (!save.admin) save.coins += 25; persist(); setTimeout(() => advSay([['Silas', 'Cinq arbres. Ce n’est pas assez. Ce ne sera jamais assez.'], ['Silas', 'Mais ils auront de l’ombre, l’été.'], ['🌳', 'Quête « Cinq arbres » terminée : +25 pièces.']]), 50); } };
+  const L = {
+    hero: 'Silas', title: 'Chapitre 10 · Ce qui repousse', len: 5800, start: 160, skin: 'skin_silas_printemps', kHint: 'K : planter · coup de bêche',
+    fall: '↩ Silas remonte du ravin en s’agrippant aux racines.', clueTxt: '',
+    colors: { Silas: '#7cb342', Lise: '#e74c3c', 'Mère Aubépine': '#a1887f', Bûcheron: '#e67e22', 'Loup de cendre': '#95a5a6', 'Bûcheron mécanique': '#b07a43', 'Baron Vautrin': '#27ae60', 'Dragonneau de braise': '#e67e22', 'Mère-Racine': '#7cb342', '🌳': '#7cb342', '🏆': '#d4ac0d', '🎭': '#d4ac0d', '🌸': '#f8bbd0' },
+    pits: [[1700, 1900], [3800, 3990]],
+    walls: [{ x1: 2700, x2: 2770, top: 240, c: '#6d4423', cap: '#8a5a34' }],
+    gates: [{ id: 'b1', x: 4260, look: 'bramble', hits: 3, label: 'RONCES', msg: '🪓 La bêche tranche les ronces. Le passage vers l’Arbre-Mère est ouvert.' }],
+    plats: [
+      { x: 520, y: 300, w: 100, k: 'scaff' },
+      { x: 1250, y: 330, w: 60, h: 50, k: 'stump' }, { x: 1380, y: 280, w: 60, h: 100, k: 'stump' },
+      { x: 1695, y: 380, w: 210, k: 'vine', req: 's1' },
+      { x: 2400, y: 320, w: 120, h: 60, k: 'crate' },
+      { x: 2580, y: 320, w: 80, k: 'vine', req: 's2' }, { x: 2630, y: 260, w: 70, k: 'vine', req: 's2' },
+      { x: 3810, y: 330, w: 80, k: 'vine', req: 's3' }, { x: 3900, y: 290, w: 90, k: 'vine', req: 's3' },
+      { x: 4700, y: 300, w: 80, h: 80, k: 'stump' }, { x: 4820, y: 230, w: 120, k: 'vine' }
+    ],
+    spots: [
+      { id: 's1', x: 1640, lab: 'K : planter une graine', toast: '🌱 La graine germe à toute vitesse : une liane enjambe le ravin !' },
+      { id: 's2', x: 2560, lab: 'K : planter une graine', toast: '🌱 Des racines grimpent le long des troncs abattus : un escalier !' },
+      { id: 's3', x: 3740, lab: 'K : planter une graine', toast: '🌱 Deux lianes jaillissent au-dessus du gouffre de cendres.' },
+      { id: 'm1', x: 3270, mem: 'Fauvel', lab: 'K : planter un arbre', toast: '🌳 Un jeune chêne pour les Fauvel.', lines: [['Silas', 'La maison des Fauvel. Jeanne chantait faux en étendant le linge. Toute la vallée l’entendait. Personne ne s’en plaignait.']], then: st => memThen(st) },
+      { id: 'm2', x: 3420, mem: 'Mercier', lab: 'K : planter un arbre', toast: '🌳 Un jeune hêtre pour les Mercier.', lines: [['Silas', 'Les Mercier. Paul m’avait prêté sa scie le matin même. Je ne la lui ai jamais rendue.']], then: st => memThen(st) },
+      { id: 'm3', x: 3570, mem: 'Arnaud', lab: 'K : planter un arbre', toast: '🌳 Un cerisier pour la petite Arnaud.', lines: [['Silas', 'La petite Arnaud. Six ans. Elle m’appelait « le monsieur des arbres ».'], ['Silas', 'Elle avait l’âge de Lise.']], then: st => memThen(st) },
+      { id: 'm4', x: 4030, mem: 'Brun', lab: 'K : planter un arbre', toast: '🌳 Un tilleul pour le vieux Brun.', lines: [['Silas', 'Le vieux Brun et son chien. Il disait que le chien était plus malin que le maire. Il avait raison.']], then: st => memThen(st) },
+      { id: 'm5', x: 4110, mem: 'Delorme', lab: 'K : planter un arbre', toast: '🌳 Un saule pour les Delorme.', lines: [['Silas', 'Les Delorme. Ils venaient d’avoir un bébé. Ils ne lui avaient pas encore trouvé de prénom.']], then: st => memThen(st) }
+    ],
+    clues: [],
+    coins: [{ id: 1, x: 570, y: 265 }, { id: 2, x: 1410, y: 245 }, { id: 3, x: 1800, y: 340 }, { id: 4, x: 2460, y: 285 }, { id: 5, x: 2735, y: 205 }, { id: 6, x: 3945, y: 255 }, { id: 7, x: 4740, y: 265 }, { id: 8, x: 4880, y: 195 }]
+  };
+  L.clueOn = () => false; // pas d'objets cachés dans ce chapitre : les arbres du souvenir les remplacent
+  const G = ['Parle à Lise, qui t’apporte de l’eau', 'Chasse les loups de cendre de la lisière', 'Plante des graines pour franchir le ravin (K), puis arrête la machine du Baron', 'Le Baron Vautrin t’attend au bout du chantier', 'Retrouve Lise dans les ruines de Sous-Bois', 'Au cœur des cendres, quelque chose bouge', 'L’Arbre-Mère s’est réveillée', 'La forêt fleurit. Parle à tout le monde'];
+  L.goal = (s, st) => {
+    st = st || advCh('silas'); const ax = advS ? advS.x : 0, mm = s >= 4 && s < 7 ? ' (arbres du souvenir ' + MEM.filter(id => st.gates.includes(id)).length + '/5)' : '';
+    if (!st.gates.includes('s1') && ax > 1450 && ax < 1700) return 'Le ravin est trop large : plante une graine dans la terre fertile (K)' + mm;
+    if (!st.gates.includes('s2') && ax > 2300 && ax < 2700) return 'Le tas de troncs est trop haut : plante une graine au pied (K)' + mm;
+    if (!st.gates.includes('s3') && ax > 3600 && ax < 3800) return 'Un gouffre de cendres : plante une graine au bord (K)' + mm;
+    if (!st.gates.includes('b1') && ax > 4050 && ax < 4260 && s >= 5) return 'Des ronces bloquent le chemin : coups de bêche (K)' + mm;
+    return G[Math.min(s, 7)] + mm;
+  };
+  L.target = s => ['lise', 'r0', 'r1', 'r2', 'lise2', 'r3', 'r4'][s] || '';
+  L.intro = [
+    ['', 'Il y a dix ans, le dragon du pic est descendu dans la vallée, et la grande forêt de Brumevert a brûlé. Le hameau de Sous-Bois aussi.'],
+    ['', 'Depuis, un vieux jardinier replante chaque jour, graine après graine, dans les cendres. Les gens de Bourg-Clair l’appellent « le saint homme ».'],
+    ['Silas', 'Encore un rang de chênes. Et demain, des noisetiers. La terre est bonne, sous la cendre. Elle n’attend que ça.'],
+    ['', 'Flèches : bouger · Haut : sauter · J : parler · K : planter une graine dans la terre fertile, ou donner un coup de bêche.']
+  ];
+  L.lose = [['Lise', 'Monsieur Silas ! Relevez-vous ! … Les arbres ont besoin de vous.']];
+  L.reward = [
+    ['🏆', 'Chapitre terminé ! +100 pièces et +5 cristaux.'],
+    ['🎭', 'Nouveau skin : « Silas du Printemps » : chapeau fleuri, tablier vert tendre et pétales qui tombent derrière lui.'],
+    ['🌸', 'Chaque printemps, les enfants de Bourg-Clair viennent arroser cinq arbres, dans les ruines de Sous-Bois.']
+  ];
+  L.npcs = [
+    { id: 'lise', name: 'Lise', look: 'lise', x: 320, show: s => s < 4, talk: st => {
+      if (st.step === 0) return { lines: [
+        ['Lise', 'Monsieur Silas ! Je vous ai apporté de l’eau. Et j’ai planté mes trois glands, comme vous m’avez montré !'],
+        ['Silas', 'Merci, Lise. Trois glands, ça fait trois chênes. Dans cent ans, tes arrière-petits-enfants joueront à l’ombre.'],
+        ['Lise', 'Dans cent ans ? C’est long…'],
+        ['Silas', 'C’est le temps des arbres. Il faut le leur laisser.'],
+        ['Lise', 'Monsieur Silas… la terre a bougé, cette nuit. Comme si la forêt respirait. Et les loups gris sont revenus à la lisière.'],
+        ['Silas', '… Reste au village aujourd’hui, d’accord ? Je vais voir.']
+      ], then: () => advSetStep(1) };
+      return { lines: [['Lise', st.step >= 3 ? 'Le Baron est arrivé avec des machines… Il dit que la forêt est maudite.' : 'Je garde vos semis, promis ! Je les arrose tous les matins.']] };
+    } },
+    { id: 'aubepine', name: 'Mère Aubépine', look: 'aubepine', x: 680, talk: st => ({ lines: st.step >= 7 ? [['Mère Aubépine', 'Tu leur as rendu leurs noms, Silas. C’était tout ce qu’il leur fallait.']] : [
+      ['Mère Aubépine', 'Dix ans, Silas. Dix ans que tu plantes. Tu crois que la forêt te pardonnera ?'],
+      ['Silas', 'Je ne plante pas pour qu’on me pardonne.'],
+      ['Mère Aubépine', 'Mon mari disait que le feu avait sauté la rivière tout seul, cette nuit-là. Le feu ne saute pas les rivières, Silas. Quelqu’un l’a aidé.']] }) },
+    advMkFight({ id: 'r0', name: 'Loup de cendre', x: 1520, fight: 'r0', need: 1,
+      wait: [['', '(Des yeux rouges brillent entre les troncs calcinés.)']],
+      pre: [['', 'Un loup gris surgit des cendres, les yeux comme deux braises.'], ['Silas', 'Encore un… La forêt en fabrique de plus en plus. Elle a mal.']],
+      win: [['', 'Le loup se défait en poussière grise. Au fond de la cendre, une graine luit faiblement.'], ['Silas', 'Des graines de lumière… La terre bouge sous la lisière. Quelque chose se réveille dans l’Arbre-Mère.']],
+      idle: [['', '(Il ne reste qu’un petit tas de cendre tiède.)']] }),
+    { id: 'buch', name: 'Bûcheron', look: 'bucheron', x: 2230, talk: st => ({ lines: [['Bûcheron', 'Le Baron paie double pour chaque arbre qui a repoussé. Il dit que cette forêt est maudite.'], ['Bûcheron', 'Il dit que c’est le jardinier qui l’a maudite. Toi, là. Avec tes graines.']] }) },
+    advMkFight({ id: 'r1', name: 'Bûcheron mécanique', x: 3020, fight: 'r1', need: 2,
+      wait: [['', '(Une machine hérissée de scies abat tout ce qui dépasse du sol.)']],
+      pre: [['', 'La machine avance en rugissant. Derrière elle, des rangs entiers de jeunes chênes gisent coupés.'], ['Silas', 'Ces arbres ont trois ans. Trois ans ! Arrête-toi !']],
+      win: [['', 'La machine s’effondre. Sur sa carcasse : « Propriété du Baron Vautrin — Défrichage ».'], ['Silas', 'Vautrin. Évidemment.']],
+      idle: [['', '(Les scies tournent encore un peu, puis s’arrêtent.)']] }),
+    advMkFight({ id: 'r2', name: 'Baron Vautrin', x: 3140, fight: 'r2', need: 3,
+      wait: [['Baron Vautrin', 'Jardinier.']],
+      pre: [['Baron Vautrin', 'Ah ! Le jardinier. Le saint homme qui replante ce qu’il a brûlé.'], ['Silas', 'Remballez vos machines, Baron. Cette terre n’est pas à vendre.'],
+        ['Baron Vautrin', 'Elle n’est à personne : ses propriétaires sont morts. Les Fauvel, les Mercier, les Arnaud… Cinq familles. Vous vous rappelez leurs noms, n’est-ce pas ? Vous étiez là.'],
+        ['Lise', '… Monsieur Silas ?'],
+        ['Baron Vautrin', 'Demande-lui, petite. Demande-lui qui a allumé le second feu, cette nuit-là. Demande-lui pourquoi il avait une torche à la main quand on l’a retrouvé.'],
+        ['Silas', '… Lise, recule.']],
+      win: [['Baron Vautrin', 'Frappez-moi tant que vous voulez. Ça ne les fera pas revenir.'], ['', 'Lise s’est enfuie en courant vers les ruines.'],
+        ['Silas', 'Le dragon descendait du pic. Le feu allait prendre Bourg-Clair, avec ses trois cents âmes. J’ai allumé un contre-feu, pour lui couper la route.'],
+        ['Silas', 'Le vent a tourné. Il a pris Sous-Bois à la place. Cinq maisons. Je les entendais appeler, de l’autre côté des flammes, et je ne pouvais pas traverser.'],
+        ['Silas', 'Dix ans que je plante. Je ne sais rien faire d’autre.']],
+      idle: [['Baron Vautrin', 'Plantez, jardinier. Plantez. Ça occupe les mains.']] }),
+    { id: 'lise2', name: 'Lise', look: 'lise', x: 3500, show: s => s === 4 || s === 5, talk: st => ({ lines: st.lise2 ? [['Lise', 'Je reste avec vous. Les arbres, c’est pour tout le monde.']] : [
+      ['Lise', 'Tu l’as fait exprès ?'], ['Silas', 'Non. Mais ça ne change rien, pour eux.'],
+      ['Lise', 'Ma maman dit que quand on casse quelque chose, on doit le réparer. Même si on ne peut pas.'],
+      ['Lise', 'Alors répare. Plante-leur un arbre. Un pour chacun. … Je viens avec toi.']], then: () => { st.lise2 = 1; persist(); } }) },
+    advMkFight({ id: 'r3', name: 'Dragonneau de braise', x: 4000, fight: 'r3', need: 4, sz: .8,
+      wait: [['', '(Dans les ruines, quelque chose crépite et gémit.)']],
+      pre: [['', 'Au milieu des braises, un petit dragon crache des étincelles en tremblant.'], ['Silas', 'Un dragonneau. Le petit du dragon du pic… Il est né dans ce que sa mère a brûlé.'], ['Dragonneau de braise', 'Krrr… KRAAA !'], ['Silas', 'Doucement, petit. Je ne te veux pas de mal. Mais tu as peur. Et ce qui a peur, brûle.']],
+      win: [['', 'Le dragonneau s’écroule, épuisé, ses flammes réduites à un filet de fumée.'], ['Bûcheron', '(au loin) Le voilà ! Le Baron paie cent pièces pour sa tête !'],
+        ['Silas', 'Personne ne touchera à celui-là. Il a perdu sa mère dans le même feu que les autres.'], ['', 'Silas lui verse l’eau de sa gourde. Le dragonneau s’endort contre sa jambe. Au loin, l’Arbre-Mère gronde.']],
+      idle: [['', '(Le dragonneau ronronne comme un poêle.)']] }),
+    Object.assign(advMkFight({ id: 'r4', name: 'Mère-Racine', x: 5360, fight: 'r4', need: 5, sz: 1.5,
+      wait: [['', '(L’Arbre-Mère est immense. Son écorce bat comme un cœur.)']],
+      pre: [['', 'L’Arbre-Mère s’ouvre. Une silhouette immense se lève de l’écorce, couronnée de branches fleuries et de racines noires.'],
+        ['Mère-Racine', 'Silas. Le gardien. Celui qui m’a fait brûler pour sauver les autres.'],
+        ['Mère-Racine', 'J’ai gardé leurs cendres dans mes racines. Les Fauvel. Les Mercier. La petite Arnaud. Ils dorment en moi depuis dix ans, et ils ne rêvent que de feu.'],
+        ['Mère-Racine', 'Les hommes du Baron coupent mes enfants. Toi, tu plantes. Mais tu plantes comme on s’excuse : à genoux.'],
+        ['Mère-Racine', 'Cette nuit, je recouvre Bourg-Clair de ronces. Trois cents âmes, Silas. Celles que tu as choisies, ce soir-là. Choisis encore.'],
+        ['Silas', 'Non. Cette fois, je ne choisis personne. Je reste.']],
+      win: [['', 'La Mère-Racine s’agenouille. Ses ronces se détendent, et des fleurs s’ouvrent partout où elles touchaient le sol.'],
+        ['Silas', 'Prends-moi, si tu as besoin d’un gardien. Pas eux. Je resterai ici, et je planterai jusqu’à ce que mes mains ne puissent plus.'],
+        ['Mère-Racine', '… Un gardien qui plante debout. Voilà ce qu’il me manquait.'],
+        ['Lise', 'Je reviendrai demain. Avec de l’eau. Et après-demain aussi.'],
+        ['', 'Pour la première fois depuis dix ans, la forêt de Brumevert fleurit.']],
+      idle: [['', '…']], after: () => { advFinish(); } }), { show: s => s < 7 }),
+    { id: 'f1', name: 'Lise', look: 'lise', x: 5300, show: s => s >= 7, talk: () => ({ lines: [['Lise', 'J’ai donné un nom au dragonneau : Brindille. Il mange des pommes de pin. Il a le hoquet quand il crache du feu.']] }) },
+    { id: 'f2', name: 'Dragonneau de braise', fighter: 'Dragonneau de braise', x: 5420, sz: .6, show: s => s >= 7, talk: () => ({ lines: [['Dragonneau de braise', 'Krrr… hic !']] }) },
+    { id: 'f3', name: 'Mère Aubépine', look: 'aubepine', x: 5560, show: s => s >= 7, talk: st => ({ lines: st.mem ? [['Mère Aubépine', 'Cinq arbres, dans les ruines. Avec leurs noms gravés au pied. Je suis allée m’asseoir sous celui des Fauvel. Il chante faux, quand le vent passe.']] : [['Mère Aubépine', 'Tu n’as pas planté pour eux, dans les ruines ? Il est encore temps, tu sais.']] }) }
+  ];
+  // si les cinq arbres sont plantés, la Mère-Racine le sent avant le combat
+  { const r4 = L.npcs.find(n => n.id === 'r4'), t0 = r4.talk; r4.talk = st => { const res = t0(st); if (st.step === 5 && st.mem && res.lines === r4.pre) res.lines = [...r4.pre.slice(0, 5), ['Mère-Racine', '… Attends. Tu as planté leurs noms. Cinq arbres, dans les ruines. Je les sens pousser.'], ['Mère-Racine', 'Ça ne change rien à ce qui s’est passé. Mais ça change ce qui va pousser. Montre-moi ce que vaut un gardien.'], ...r4.pre.slice(5)]; return res; }; }
+  L.onK = st => advKAct(L, st, advS);
+  L.bg = cam => { // ciel gris-orangé, troncs morts au loin qui verdissent vers l'Arbre-Mère
+    const t = Date.now() / 1000, mid = cam + WW / 2, gr = Math.max(0, Math.min(1, (mid - 3800) / 1500)), g = x.createLinearGradient(0, -OFF, 0, 380);
+    g.addColorStop(0, advLerp('#3a3a44', '#3a6a8a', gr)); g.addColorStop(1, advLerp('#a88a6a', '#c8e0a0', gr)); x.fillStyle = g; x.fillRect(0, -OFF, WW, 470);
+    C('rgba(255,200,140,.6)', 700 - cam * .02, 50, 40);
+    for (let k = 0; k < 16; k++) { const tx = ((k * 140 - cam * .2) % 2240 + 2240) % 2240 - 200, h = 120 + (k * 37) % 120; x.fillStyle = advLerp('#2a2420', '#3e6b2a', gr * (k % 2)); x.fillRect(tx, 380 - h, 12, h); LN(advLerp('#2a2420', '#3e6b2a', gr * (k % 2)), 4, tx + 6, 380 - h * .7, tx + 6 + (k % 2 ? 26 : -26), 380 - h * .95); if (gr > .3 && k % 2) C('rgba(124,179,66,' + gr + ')', tx + 6, 380 - h, 22); }
+    for (let k = 0; k < 30; k++) { const ax = (arnd(k + 3) * WW + Math.sin(t + k) * 20), ay = ((t * 20 + arnd(k + 9) * 400) % 400) - 20; x.fillStyle = gr > .5 ? 'rgba(248,187,208,.7)' : 'rgba(210,210,210,.5)'; x.fillRect(ax, ay, 2, 2); }
+  };
+  L.scene = (cam, st) => {
+    const t = Date.now() / 1000, a = cam - 60, b = cam + WW + 60, vis = (l, r) => r > a && l < b;
+    if (vis(0, 1000)) { for (let q = 60; q < 1000; q += 230) { x.fillStyle = '#c9a86a'; x.fillRect(q, 250, 150, 130); Y('#7a3b2a', [[q - 12, 250], [q + 75, 196], [q + 162, 250]]); x.fillStyle = '#5a3a1a'; x.fillRect(q + 60, 320, 30, 60); x.fillStyle = 'rgba(255,220,140,.6)'; x.fillRect(q + 18, 280, 24, 22); }
+      for (let q = 0; q < 6; q++) { const sx = 420 + q * 18; LN('#5d8a3a', 2, sx, 380, sx, 368 - (q % 3) * 3); C('#7cb342', sx, 366 - (q % 3) * 3, 3); } }
+    if (vis(1000, 2100)) { for (let k = 0; k < 9; k++) { const tx = 1040 + k * 120; x.fillStyle = '#1e1a18'; x.fillRect(tx, 200 + (k % 3) * 30, 14, 180 - (k % 3) * 30); LN('#1e1a18', 4, tx + 7, 260, tx + (k % 2 ? 40 : -30), 220); }
+      for (let k = 0; k < 8; k++) C('rgba(255,120,50,' + (.3 + .3 * Math.sin(t * 3 + k)) + ')', 1060 + k * 130, 376, 4); }
+    if (vis(2100, 3200)) { for (let k = 0; k < 14; k++) { const sx = 2150 + k * 75; x.fillStyle = '#c9a26b'; x.beginPath(); x.ellipse(sx, 376, 14, 6, 0, 0, 7); x.fill(); x.strokeStyle = '#8a6a40'; x.lineWidth = 1; x.beginPath(); x.ellipse(sx, 376, 8, 3, 0, 0, 7); x.stroke(); }
+      for (let k = 0; k < 4; k++) { const ly = 330 - k * 22; x.fillStyle = '#6d4423'; x.beginPath(); x.roundRect(2780, ly, 180, 20, 10); x.fill(); x.fillStyle = '#c9a26b'; x.beginPath(); x.ellipse(2780, ly + 10, 8, 10, 0, 0, 7); x.fill(); }
+      x.fillStyle = '#e8e0d0'; x.fillRect(2200, 230, 110, 60); x.fillStyle = '#2e4a3a'; x.font = 'bold 11px serif'; x.textAlign = 'center'; x.fillText('PROPRIÉTÉ', 2255, 254); x.fillText('VAUTRIN', 2255, 272); x.fillStyle = '#5a3a1a'; x.fillRect(2252, 290, 6, 90); }
+    if (vis(3200, 4300)) { for (let q = 3220; q < 4300; q += 190) { x.fillStyle = '#4a4440'; x.fillRect(q, 300, 20, 80); x.fillRect(q + 90, 280, 16, 100); x.fillRect(q, 300, 100, 10); x.fillStyle = '#2a2420'; x.fillRect(q + 30, 330, 40, 50); }
+      for (const sp of L.spots) { if (!sp.mem || !vis(sp.x - 40, sp.x + 40)) continue; for (let q = 0; q < 6; q++) { const an = q * 1.047; x.fillStyle = '#7a746a'; x.beginPath(); x.ellipse(sp.x + Math.cos(an) * 26, 380 + Math.sin(an) * 5, 7, 5, 0, 0, 7); x.fill(); }
+        x.fillStyle = '#e8e4dc'; x.font = 'bold 10px serif'; x.textAlign = 'center'; x.fillText(sp.mem.toUpperCase(), sp.x, 398);
+        if (st.gates.includes(sp.id)) { LN('#5a3d26', 4, sp.x, 380, sp.x, 330); C('#5d8a3a', sp.x, 322, 18); C('#7cb342', sp.x - 8, 314, 11); C('#7cb342', sp.x + 9, 316, 10); if (sp.mem === 'Arnaud') for (let q = 0; q < 6; q++) C('#f8bbd0', sp.x + Math.cos(q) * 14, 318 + Math.sin(q) * 8, 2.5); } } }
+    if (vis(4300, 5800)) { const done = st.step >= 7; x.fillStyle = done ? '#4a3424' : '#2a1e16'; x.beginPath(); x.moveTo(5160, 380); x.quadraticCurveTo(5240, 220, 5200, 40); x.lineTo(5520, 40); x.quadraticCurveTo(5480, 220, 5560, 380); x.fill();
+      for (let k = 0; k < 8; k++) { x.strokeStyle = done ? '#5a4030' : '#2a1e16'; x.lineWidth = 10 - k; x.beginPath(); x.moveTo(5360, 60); x.quadraticCurveTo(5360 + (k - 3.5) * 80, -20, 5360 + (k - 3.5) * 140, 40 + (k % 3) * 20); x.stroke(); }
+      for (let k = 0; k < 14; k++) C(done ? ['#7cb342', '#5d8a3a', '#f8bbd0'][k % 3] : '#3a3a30', 5360 + Math.cos(k * 1.3) * (90 + k * 8), 30 + Math.sin(k * 1.7) * 40, done ? 34 : 26);
+      for (let k = 0; k < 6; k++) { x.strokeStyle = '#2a1e16'; x.lineWidth = 6; x.beginPath(); x.moveTo(5200 + k * 30, 380); x.quadraticCurveTo(5100 - k * 60, 360, 4900 - k * 80, 384); x.stroke(); } }
+    advGround(L, ZONES, a, b, '#2a2420', '#4a4038');
+    for (const [l, r] of L.pits) { const L0 = Math.max(a, l), R0 = Math.min(b, r); if (R0 <= L0) continue; x.fillStyle = l > 3000 ? '#1a1410' : '#120e0c'; x.fillRect(L0, 380, R0 - L0, 260); if (l > 3000) for (let q = 0; q < 6; q++) C('rgba(255,120,50,' + (.3 + .3 * Math.sin(t * 2 + q)) + ')', l + (r - l) * (q + .5) / 6, 430 + Math.sin(t + q) * 8, 6); }
+    for (const sp of L.spots) { if (sp.mem || !vis(sp.x - 40, sp.x + 40)) continue; const on = st.gates.includes(sp.id); x.fillStyle = '#3a2a1a'; x.beginPath(); x.ellipse(sp.x, 382, 34, 7, 0, 0, 7); x.fill(); x.fillStyle = '#5a3d26'; for (let q = -24; q <= 24; q += 12) x.fillRect(sp.x + q - 3, 378, 6, 3);
+      if (on) { LN('#5d8a3a', 3, sp.x, 380, sp.x, 352); Y('#7cb342', [[sp.x, 356], [sp.x + 12, 346], [sp.x + 3, 360]]); } else { C('rgba(124,179,66,' + (.3 + .25 * Math.sin(t * 3)) + ')', sp.x, 374, 7); } }
+    advZoneTag(ZONES, a, b, '🌱');
+  };
+  L.fg = (cam, st) => { advKHints(L, st, advS, 'K : planter'); };
+  return L;
+})();
+
+// décor commun aux chapitres 5 et 6 : la ville haute de Solenne (marbre, or, lumière) et les Fosses (ombre, cordes à linge, lumière grise)
+function advSolenneBg(cam, dark) {
+  const t = Date.now() / 1000, g = x.createLinearGradient(0, -OFF, 0, 380);
+  if (!dark) { g.addColorStop(0, '#f6e7b8'); g.addColorStop(1, '#fff8e6'); } else { g.addColorStop(0, '#0e0c10'); g.addColorStop(1, '#2a2622'); }
+  x.fillStyle = g; x.fillRect(0, -OFF, WW, 470);
+  if (!dark) { C('rgba(255,255,255,.7)', 700 - cam * .02, 40, 70); for (let k = 0; k < 7; k++) { const tx = ((k * 260 - cam * .12) % 1820 + 1820) % 1820 - 200; x.fillStyle = 'rgba(232,226,208,.9)'; x.fillRect(tx, 120, 90, 300); Y('rgba(226,216,192,.9)', [[tx - 8, 120], [tx + 45, 40], [tx + 98, 120]]); C('rgba(111,195,255,.5)', tx + 45, 170, 14); } }
+  else { x.fillStyle = 'rgba(255,240,200,' + (.05 + .02 * Math.sin(t)) + ')'; x.beginPath(); x.moveTo(500 - cam * .05, -OFF); x.lineTo(640 - cam * .05, -OFF); x.lineTo(760 - cam * .05, 380); x.lineTo(380 - cam * .05, 380); x.fill();
+    for (let k = 0; k < 10; k++) { const hx = ((k * 170 - cam * .15) % 1700 + 1700) % 1700 - 150, hh = 140 + (k * 47) % 160; x.fillStyle = k % 2 ? '#1e1a18' : '#26201c'; x.fillRect(hx, 380 - hh, 120, hh); for (let q = 0; q < 3; q++) { x.fillStyle = (k + q) % 3 ? 'rgba(255,160,80,.28)' : 'rgba(0,0,0,.4)'; x.fillRect(hx + 14 + q * 34, 400 - hh, 14, 16); } }
+    for (let k = 0; k < 30; k++) { x.fillStyle = 'rgba(180,180,180,.35)'; x.fillRect(arnd(k) * WW, ((t * 12 + arnd(k + 4) * 400) % 400) - 20, 2, 2); } }
+}
+function advSealRoom(x0, st, broken) { // la Chambre du Sceau : grand cristal, cercles de runes
+  const t = Date.now() / 1000; x.fillStyle = '#0a0a18'; x.fillRect(x0, 0, 1000, 380);
+  x.save(); x.translate(x0 + 600, 200); for (let q = 0; q < 3; q++) { x.rotate(t * (q % 2 ? .2 : -.15)); x.strokeStyle = 'rgba(212,175,55,' + (broken ? .15 : .5 - q * .12) + ')'; x.lineWidth = 3; x.beginPath(); x.arc(0, 0, 120 + q * 40, 0, 7); x.stroke(); } x.restore();
+  if (!broken) { Y('rgba(160,220,255,.75)', [[x0 + 600, 40], [x0 + 680, 200], [x0 + 600, 370], [x0 + 520, 200]]); LN('rgba(255,255,255,.8)', 2, x0 + 600, 40, x0 + 600, 370);
+    for (let k = 0; k < 7; k++) { const cx = x0 + 600 + Math.sin(k * 2.1) * 40, cy = 120 + k * 32; x.fillStyle = 'rgba(255,255,255,' + (.25 + .15 * Math.sin(t * 2 + k)) + ')'; x.beginPath(); x.ellipse(cx, cy, 6, 9, 0, 0, 7); x.fill(); } // petites silhouettes endormies dans le cristal
+    if (st.step >= 5) { x.strokeStyle = '#0a0a18'; x.lineWidth = 3; x.beginPath(); x.moveTo(x0 + 620, 90); x.lineTo(x0 + 590, 170); x.lineTo(x0 + 620, 230); x.lineTo(x0 + 600, 300); x.stroke(); } }
+  else { for (let k = 0; k < 12; k++) { const an = k * .52; Y('rgba(160,220,255,.5)', [[x0 + 600 + Math.cos(an) * 150, 360 - Math.abs(Math.sin(an)) * 40], [x0 + 600 + Math.cos(an) * 170, 380], [x0 + 600 + Math.cos(an) * 130, 380]]); }
+    x.fillStyle = 'rgba(255,240,180,.18)'; x.beginPath(); x.moveTo(x0 + 520, 0); x.lineTo(x0 + 680, 0); x.lineTo(x0 + 900, 380); x.lineTo(x0 + 300, 380); x.fill(); }
+}
+
+// ---------------------------------------------------------------- CHAPITRE 5 (saison 2) : ASTER · Le Sceau
+ADV_LV.aster = (() => {
+  const ZONES = [[0, 1000, 'LA VILLE HAUTE DE SOLENNE', '#d4af37'], [1000, 2000, 'LE QUARTIER DES CLOCHES', '#e8c35a'], [2000, 3100, 'L’AQUEDUC BRISÉ', '#6fc3ff'], [3100, 4200, 'LES MARCHES DES FOSSES', '#8a7a6a'], [4200, 5000, 'LA CRYPTE', '#5a4a6a'], [5000, 6000, 'LA CHAMBRE DU SCEAU', '#9fd3e8']];
+  const HEAL = ['h1', 'h2', 'h3'];
+  const healThen = st => { if (HEAL.every(id => st.gates.includes(id)) && !st.healed) { st.healed = 1; if (!save.admin) save.coins += 20; persist(); setTimeout(() => advSay([['Aster', 'Trois vies. Trois gardiens qui rentreront chez eux ce soir.'], ['✨', 'Quête « Mains de lumière » terminée : +20 pièces.']]), 50); } };
+  const L = {
+    hero: 'Aster', title: 'Chapitre 11 · Le Sceau', len: 6000, start: 160, skin: 'skin_aster_aube', kHint: 'K : soigner · allumer les braseros',
+    fall: '↩ Aster se rattrape à une corniche et remonte.', clueTxt: '📜 Une page de la liste de Malik : ',
+    colors: { Aster: '#d4af37', 'Grand Prêtre Solen': '#f4f1e8', 'Une mère': '#c39bd3', 'Un enfant': '#6fc3ff', 'Garde blessé': '#e8e4d8', 'Une veuve': '#95a5a6', 'Frère Anselme': '#c9c2ae', 'Brûleur des Fosses': '#e67e22', 'Le Colosse enchaîné': '#7f8c8d', 'Sœur Cendre': '#e8692b', 'Écho de la Bête': '#ff2d6a', Malik: '#e8692b', '📜': '#f4ead0', '✨': '#ffe9a8', '🏆': '#d4ac0d', '🎭': '#d4ac0d', '🌑': '#9fd3e8' },
+    pits: [[2250, 2450], [2650, 2850], [4450, 4650]],
+    plats: [
+      { x: 520, y: 300, w: 110, k: 'marble' }, { x: 640, y: 230, w: 90, k: 'marble' },
+      { x: 1350, y: 320, w: 100, k: 'rubble' }, { x: 1600, y: 300, w: 90, k: 'rubble' },
+      { x: 2245, y: 380, w: 210, k: 'lightb', req: 'l1' },
+      { x: 2660, y: 330, w: 80, k: 'lightb', req: 'l2' }, { x: 2765, y: 290, w: 90, k: 'lightb', req: 'l2' }, { x: 2900, y: 220, w: 110, k: 'marble' },
+      { x: 3600, y: 300, w: 100, k: 'rubble' }, { x: 3720, y: 230, w: 90, k: 'rubble' },
+      { x: 4460, y: 330, w: 80, k: 'lightb', req: 'l3' }, { x: 4560, y: 300, w: 90, k: 'lightb', req: 'l3' },
+      { x: 4740, y: 280, w: 100, k: 'marble' }
+    ],
+    spots: [
+      { id: 'l1', x: 2180, lab: 'K : allumer le brasero', toast: '🔥 Le brasero du Sceau s’embrase : un pont de lumière enjambe l’aqueduc !' },
+      { id: 'l2', x: 2590, lab: 'K : allumer le brasero', toast: '🔥 Deux marches de lumière apparaissent au-dessus du vide.' },
+      { id: 'l3', x: 4380, lab: 'K : allumer le brasero', toast: '🔥 La crypte s’éclaire : un passage de lumière s’ouvre.' }
+    ],
+    clues: [
+      { id: 1, x: 2950, y: 185, n: '« Frère Anselme — les registres. ✗ »' },
+      { id: 2, x: 3765, y: 195, n: '« Grand Inquisiteur Varn — le puits nord. Vingt-trois. ✗ »' },
+      { id: 3, x: 4790, y: 245, n: '« Solen. » — souligné trois fois. Et tout en bas, d’une écriture qui tremble : « Aster ? »' }
+    ],
+    coins: [{ id: 1, x: 685, y: 195 }, { id: 2, x: 1400, y: 285 }, { id: 3, x: 1645, y: 265 }, { id: 4, x: 2350, y: 330 }, { id: 5, x: 2810, y: 255 }, { id: 6, x: 3650, y: 265 }, { id: 7, x: 4600, y: 265 }, { id: 8, x: 5250, y: 330 }]
+  };
+  L.clueOn = st => st.step >= 1;
+  L.onClues = st => { st.list = 1; if (!save.admin) save.coins += 20; persist(); advSay([
+    ['Aster', 'Mon nom est sur sa liste. Avec un point d’interrogation.'],
+    ['Aster', '« Vingt-trois », à côté du puits nord… Il n’y avait que six gardiens au fond de ce puits. Qui sont les vingt-trois autres ?'],
+    ['📜', 'Liste complète : +20 pièces.']
+  ]); };
+  const G = ['Rejoins le Grand Prêtre Solen sur le parvis', 'Le quartier des Cloches brûle : arrête les Brûleurs', 'Allume les braseros (K) pour traverser l’aqueduc brisé', 'Descends les marches vers les Fosses', 'Entre dans la crypte, sous la cathédrale', 'Malik est dans la Chambre du Sceau', 'La ville est sauve. … Est-ce qu’elle l’est ?'];
+  L.goal = (s, st) => {
+    st = st || advCh('aster'); const ax = advS ? advS.x : 0, extra = s >= 1 && s < 6 ? ' (liste ' + st.clues.length + '/3 · blessés ' + HEAL.filter(id => st.gates.includes(id)).length + '/3)' : '';
+    const sp = L.spots.find(p => !st.gates.includes(p.id) && ax > p.x - 260 && ax < p.x + 120);
+    if (sp) return 'Le passage est effondré : allume le brasero du Sceau (K)' + extra;
+    return G[Math.min(s, 6)] + extra;
+  };
+  L.target = s => ['solen', 'a0', 'a1', 'a2', 'a3', 'a4'][s] || '';
+  L.intro = [
+    ['', 'Solenne, la ville-lumière. Depuis trois siècles, le Grand Sceau retient la Bête endormie sous la cathédrale. Depuis trois ans, Aster en est la Gardienne.'],
+    ['Aster', 'La fête de la Lumière… Tout le monde est dehors. Je n’ai jamais vu la ville aussi belle.'],
+    ['', 'Un grondement. Puis un deuxième. Au loin, le clocher du quartier des Cloches s’effondre dans un nuage de poussière.'],
+    ['', 'Flèches : bouger · Haut : sauter · J : parler · K : soigner les blessés et allumer les braseros du Sceau.']
+  ];
+  L.lose = [['Grand Prêtre Solen', 'Relève-toi, Gardienne. La lumière ne s’agenouille pas.']];
+  L.reward = [
+    ['🏆', 'Chapitre terminé ! +100 pièces et +5 cristaux.'],
+    ['🎭', 'Nouveau skin : « Aster Aube brisée » : armure fendue de lumière, cape de deuil, cercle du Sceau cassé en deux.'],
+    ['🌑', 'Joue le chapitre suivant pour entendre l’autre version de cette histoire.']
+  ];
+  const heal = (id, lines) => ({ id, lab: 'K : soigner', toast: '✨ Les mains d’Aster s’illuminent. La plaie se referme.', lines, then: st => healThen(st) });
+  L.npcs = [
+    { id: 'solen', name: 'Grand Prêtre Solen', look: 'solen', x: 300, show: s => s < 6, talk: st => {
+      if (st.step === 0) return { lines: [
+        ['Grand Prêtre Solen', 'Gardienne. C’est lui. Malik des Fosses.'],
+        ['Aster', 'Malik… On a grandi dans la même rue, avant que je sois appelée. Il m’a appris à grimper aux toits.'],
+        ['Grand Prêtre Solen', 'Il n’est plus ce garçon. Le mois dernier, au puits nord, il a enchaîné six gardiens au fond. Il les a laissés trois jours. Deux d’entre eux ne parleront plus jamais.'],
+        ['Grand Prêtre Solen', 'Il veut briser le Sceau. Si la Bête se réveille, Solenne tout entière ne sera plus qu’une tombe.'],
+        ['Aster', 'Alors je l’arrêterai. Et je ramènerai tout le monde à la lumière.'],
+        ['Grand Prêtre Solen', 'Que la lumière te garde, mon enfant. Et s’il te parle, ne l’écoute pas. Il ment comme il respire.']
+      ], then: () => advSetStep(1) };
+      return { lines: [['Grand Prêtre Solen', 'Va. Le Sceau compte sur toi. Nous comptons tous sur toi.']] };
+    } },
+    { id: 'mere', name: 'Une mère', look: 'mereh', x: 640, talk: () => ({ lines: [
+      ['Une mère', 'Gardienne ! Mon petit Elio a été consacré l’an dernier, grâce à vous. Il sert la lumière, maintenant, là-haut, au temple.'],
+      ['Aster', 'Je me souviens de lui. Il avait peur. Je lui ai tenu la main jusqu’à ce qu’il s’endorme.'],
+      ['Une mère', 'Je ne l’ai pas revu depuis. On dit que les consacrés sont si heureux qu’ils oublient leur famille. C’est beau, non ?'],
+      ['Aster', '… C’est beau.']] }) },
+    { id: 'enf', name: 'Un enfant', look: 'enfanth', x: 860, talk: () => ({ lines: [['Un enfant', 'Gardienne, Gardienne ! C’est vrai que le monsieur des Fosses mange les enfants ?'], ['Aster', 'Non. Personne ne mange personne. Rentre chez toi, d’accord ? Et ferme bien la porte.']] }) },
+    { id: 'w1', name: 'Garde blessé', look: 'blesse', x: 1180, talk: st => ({ lines: [[ 'Garde blessé', st.gates.includes('h1') ? 'Merci, Gardienne… Je sens mes jambes, maintenant.' : 'Gardienne… J’ai froid…' ]] }),
+      act: heal('h1', [['Garde blessé', 'Gardienne… il est passé par le clocher. Il riait. Il riait en serrant la chaîne autour du cou de Brennus.'], ['Aster', 'Chut. Ne parle pas. La lumière va refermer ça.']]) },
+    advMkFight({ id: 'a0', name: 'Brûleur des Fosses', x: 1500, fight: 'a0', need: 1,
+      wait: [['', '(Un homme cagoulé jette des torches sur les toits.)']],
+      pre: [['Brûleur des Fosses', 'La Dame en blanc ! La Dame en blanc est descendue !'], ['Aster', 'Pose cette torche. Personne n’a besoin de mourir ce soir.'], ['Brûleur des Fosses', 'Toi, tu dis ça ? TOI ?']],
+      win: [['Brûleur des Fosses', 'Malik… Malik va tout ouvrir… Et tu vas voir… tu vas voir ce que tu as fait…'], ['Aster', 'Ce que j’ai fait ? … Il délire.']],
+      idle: [['', '(Le Brûleur marmonne des noms, encore et encore.)']] }),
+    { id: 'w2', name: 'Garde blessé', look: 'blesse', x: 1700, talk: st => ({ lines: [[ 'Garde blessé', st.gates.includes('h2') ? 'Je peux me relever. Merci.' : '… Gardienne ?' ]] }),
+      act: heal('h2', [['Garde blessé', 'Il cherchait les registres de la dîme. Il demandait des noms. Des noms d’enfants.'], ['Aster', 'Des enfants… ? Pourquoi des enfants ?'], ['Garde blessé', 'Je ne sais pas, Gardienne. Je ne lis pas les registres. Personne ne les lit.']]) },
+    { id: 'veuve', name: 'Une veuve', look: 'veuve', x: 1880, talk: () => ({ lines: [
+      ['Une veuve', 'L’orphelinat Sainte-Clarté. Vous vous souvenez, Gardienne ? C’était l’hiver dernier.'],
+      ['Une veuve', 'Il est entré avec ses chaînes. Et après, il y a eu le feu. Trente lits. Ma sœur était la surveillante de nuit.'],
+      ['Une veuve', 'Je compte encore les lits, la nuit. Trente. Ils n’ont retrouvé personne. Pas un seul enfant. Comme s’ils s’étaient envolés.'],
+      ['Aster', 'Je suis désolée. Je vous promets qu’il paiera.']] }) },
+    advMkFight({ id: 'a1', name: 'Le Colosse enchaîné', x: 3030, fight: 'a1', need: 2, sz: 1.3,
+      wait: [['', '(Une silhouette énorme garde le bout de l’aqueduc.)']],
+      pre: [['', 'Une silhouette énorme barre l’aqueduc. Des fers rouillés pendent à ses poignets, à ses chevilles, à son cou.'], ['Le Colosse enchaîné', '… Lu… mière… brûle…'], ['Aster', 'Ces fers… Ce sont les fers de l’Ordre. Qui t’a fait ça ?'], ['Le Colosse enchaîné', 'TOI !']],
+      win: [['', 'Le Colosse tombe à genoux. Sur un de ses fers, gravé dans le métal : « Sujet 7 — exposition au cristal ».'], ['Aster', '« Sujet 7 »… Qu’est-ce que ça veut dire ?']],
+      idle: [['', '(Le Colosse fixe la ville haute sans la voir.)']] }),
+    { id: 'w3', name: 'Garde blessé', look: 'blesse', x: 3300, talk: st => ({ lines: [[ 'Garde blessé', st.gates.includes('h3') ? 'Ne descendez pas trop bas, Gardienne.' : 'Ils… chantent… en bas…' ]] }),
+      act: heal('h3', [['Garde blessé', 'En bas, dans les Fosses… ils l’acclament, Gardienne. Comme un saint. Ils peignent son nom sur les murs.'], ['Garde blessé', 'Et le vôtre aussi. Mais pas pareil.']]) },
+    { id: 'anselme', name: 'Frère Anselme', look: 'anselme', x: 3500, talk: () => ({ lines: [
+      ['Frère Anselme', 'Gardienne… Ne descendez pas. Il m’a trouvé ici, il y a trois nuits.'],
+      ['Frère Anselme', 'Il voulait les registres de la dîme. J’ai refusé. Alors il a pris ma main, il a passé la chaîne autour… et il a serré, doucement, un peu plus à chaque nom que je ne donnais pas.'],
+      ['Frère Anselme', 'J’ai tout donné. Que la lumière me pardonne. J’ai tout donné.'],
+      ['Aster', 'Vous n’avez rien fait de mal, mon frère.'], ['Frère Anselme', '… Vous croyez, Gardienne ?']] }) },
+    advMkFight({ id: 'a2', name: 'Sœur Cendre', x: 4080, fight: 'a2', need: 3,
+      wait: [['', '(Une femme aux lunettes de forge attend en bas des marches.)']],
+      pre: [['Sœur Cendre', 'La Gardienne en personne. Tu sais combien il y a de marches, entre ta ville et la nôtre ?'], ['Aster', 'Laisse-moi passer. Je cherche Malik, pas toi.'], ['Sœur Cendre', 'Mille deux cents. On les a toutes descendues un jour, en tenant la main d’un petit frère qui n’est jamais remonté.']],
+      win: [['Sœur Cendre', 'Tu crois que la lumière tombe du ciel, Gardienne ? Descends voir d’où elle vient.'], ['', 'Sœur Cendre disparaît dans la fumée.']],
+      idle: [['', '(Il ne reste que l’odeur de la suie.)']] }),
+    advMkFight({ id: 'a3', name: 'Écho de la Bête', x: 4950, fight: 'a3', need: 4, sz: 1.3,
+      wait: [['', '(De l’ombre suinte des fissures du mur.)']],
+      pre: [['', 'Les fissures du Sceau suintent d’une ombre épaisse. Elle prend la forme d’une bête immense… et elle pleure.'], ['Écho de la Bête', '… Rends… les… rends-les…'], ['Aster', 'La Bête parle ? … Recule ! Je suis la Gardienne du Sceau !']],
+      win: [['', 'L’ombre se dissout. Dans le silence, Aster croit entendre une petite voix, très loin dans le cristal : « …Aster ? »'], ['Aster', 'Qui est là ? … Personne. Il n’y a personne.']],
+      idle: [['', '(Silence.)']] }),
+    Object.assign(advMkFight({ id: 'a4', name: 'Malik', x: 5560, fight: 'a4', need: 5,
+      wait: [['', '(Devant le cristal, un homme aux poignets enchaînés frappe le Sceau, encore et encore.)']],
+      pre: [['Malik', 'Tu as gardé la cicatrice au pouce. Celle du jour où tu m’as sorti du puits, quand on avait huit ans.'],
+        ['Aster', 'Six gardiens dans le puits nord. Sainte-Clarté. Frère Anselme. Le quartier des Cloches. Malik… combien ?'],
+        ['Malik', 'Pas assez.'],
+        ['Malik', 'Pousse-toi, Aster. Je vais ouvrir le Sceau, et tu vas voir ce qu’il y a dedans.'],
+        ['Aster', 'Il y a la Bête. Si tu ouvres, elle dévore la ville.'],
+        ['Malik', 'La ville dévore déjà quelqu’un. Tu n’as juste jamais demandé qui.'],
+        ['Aster', 'Je t’ai aimé comme un frère. Ne m’oblige pas à faire ça.'],
+        ['Malik', 'Personne ne t’oblige jamais à rien, Aster. C’est bien ça, le problème.'],
+        ['', 'Attention : son ultime le rend inarrêtable et efface tes sceaux. Ton rempart arrête sa chaîne, mais son Arrachement le brise.']],
+      win: [['', 'Malik tombe à genoux. Mais le combat a fendu le cristal : une longue fissure le parcourt de haut en bas, et toute la lumière de Solenne vacille.'],
+        ['Malik', 'Écoute-le. Écoute le cristal, Aster. Juste une seconde.'],
+        ['', 'Dans le cristal, très loin, quelque chose frappe. Doucement. Comme une petite main contre une vitre.'],
+        ['Malik', 'Demande-leur ce que le Sceau mange.'],
+        ['', 'Les chaînes de Malik se tendent vers la voûte : il disparaît dans les ténèbres.'],
+        ['Grand Prêtre Solen', 'Bien joué, Gardienne. La ville est sauve.'],
+        ['Grand Prêtre Solen', 'Ne regarde pas trop le cristal. Il fatigue les yeux.'],
+        ['Aster', '… Oui, Grand Prêtre.']],
+      idle: [['', '…']], after: () => { advFinish(); } }), { show: s => s < 6 }),
+    { id: 'z1', name: 'Grand Prêtre Solen', look: 'solen', x: 5300, show: s => s >= 6, talk: () => ({ lines: [['Grand Prêtre Solen', 'Demain, nous ferons réparer le cristal. Ce n’est qu’une fissure. Rentre te reposer, Gardienne.'], ['Aster', '(Elle regarde le cristal. Quelque chose, à l’intérieur, ne bouge plus.)']] }) }
+  ];
+  L.onK = st => advKAct(L, st, advS);
+  L.bg = cam => advSolenneBg(cam, cam + WW / 2 > 3300);
+  L.scene = (cam, st) => {
+    const t = Date.now() / 1000, a = cam - 60, b = cam + WW + 60, vis = (l, r) => r > a && l < b;
+    if (vis(0, 1000)) { x.fillStyle = '#efe8d8'; x.fillRect(120, 80, 500, 300); Y('#e2d8c0', [[100, 80], [370, -10], [640, 80]]); C('#6fc3ff', 370, 170, 50); for (let q = 0; q < 12; q++) { const an = q * .5236; LN('#d4af37', 3, 370, 170, 370 + Math.cos(an) * 50, 170 + Math.sin(an) * 50); }
+      for (let k = 0; k < 12; k++) { const fx2 = 60 + k * 80; LN('#d4af37', 1, fx2, 110, fx2 + 80, 120); x.fillStyle = ['#fff1b8', '#6fc3ff', '#f4f1e8'][k % 3]; Y(x.fillStyle, [[fx2 + 30, 116], [fx2 + 42, 116], [fx2 + 36, 128]]); } }
+    if (vis(1000, 2000)) { x.fillStyle = '#d9d0b8'; x.fillRect(1050, 140, 140, 240); x.fillStyle = '#c9c0a8'; x.beginPath(); x.moveTo(1050, 140); x.lineTo(1100, 80); x.lineTo(1150, 120); x.lineTo(1190, 140); x.fill();
+      for (let k = 0; k < 6; k++) { const sx = 1100 + k * 140; x.fillStyle = 'rgba(80,70,60,' + (.3 + .2 * Math.sin(t + k)) + ')'; x.beginPath(); x.arc(sx + Math.sin(t + k) * 10, 120 - ((t * 20 + k * 30) % 100), 20, 0, 7); x.fill(); C('rgba(255,140,60,' + (.4 + .3 * Math.sin(t * 4 + k)) + ')', sx, 370, 8); }
+      x.fillStyle = '#b8a888'; x.beginPath(); x.ellipse(1400, 380, 60, 14, 0, Math.PI, 0); x.fill(); x.fillStyle = '#a89878'; x.beginPath(); x.ellipse(1800, 380, 40, 10, 0, Math.PI, 0); x.fill(); }
+    if (vis(2000, 3100)) { for (let q = 2000; q < 3100; q += 110) { if ((q > 2230 && q < 2460) || (q > 2630 && q < 2860)) continue; x.fillStyle = '#e8e2d0'; x.fillRect(q, 230, 20, 150); x.beginPath(); x.arc(q + 55, 230, 55, Math.PI, 0); x.lineTo(q + 90, 230); x.arc(q + 55, 230, 35, 0, Math.PI, true); x.fill(); }
+      x.fillStyle = '#e8e2d0'; x.fillRect(2000, 160, 1100, 18); for (let k = 0; k < 10; k++) { x.fillStyle = 'rgba(111,195,255,.5)'; x.fillRect(2240 + k * 4, 178 + ((t * 120 + k * 30) % 200), 3, 10); }
+      for (const sp of L.spots.slice(0, 2)) brazier(sp); }
+    if (vis(3100, 4200)) { for (let q = 0; q < 12; q++) { x.fillStyle = q % 2 ? '#3a322c' : '#4a4038'; x.fillRect(3100 + q * 92, 380 - q * 4, 92, 4 + q * 4); }
+      x.fillStyle = '#2a2420'; x.fillRect(3300, 150, 260, 230); x.fillRect(3850, 170, 300, 210); x.font = 'bold 26px sans-serif'; x.textAlign = 'center'; x.fillStyle = '#c0392b'; x.save(); x.translate(3430, 240); x.rotate(-.06); x.fillText('LE SCEAU MANGE', 0, 0); x.restore();
+      x.fillStyle = '#e8e4d8'; x.font = 'bold 18px sans-serif'; x.save(); x.translate(4000, 230); x.rotate(.05); x.fillText('LA DAME EN BLANC', 0, 0); x.fillStyle = '#c0392b'; x.fillText('✗', 110, 0); x.restore(); }
+    if (vis(4200, 5000)) { x.fillStyle = '#16121e'; x.fillRect(4200, 40, 800, 340); for (let q = 4220; q < 5000; q += 120) { x.fillStyle = '#2a2236'; x.fillRect(q, 40, 30, 340); x.beginPath(); x.arc(q + 75, 120, 45, Math.PI, 0); x.lineTo(q + 120, 120); x.arc(q + 75, 120, 30, 0, Math.PI, true); x.fill(); }
+      for (let k = 0; k < 8; k++) { x.fillStyle = 'rgba(10,0,20,' + (.4 + .2 * Math.sin(t * 2 + k)) + ')'; x.beginPath(); x.ellipse(4300 + k * 90 + Math.sin(t + k) * 10, 350, 30, 10, 0, 0, 7); x.fill(); } brazier(L.spots[2]); }
+    if (vis(5000, 6000)) advSealRoom(5000, st, false);
+    advGround(L, ZONES, a, b, '#c9c2ae', '#e8e2d0');
+    for (const [l, r] of L.pits) { const L0 = Math.max(a, l), R0 = Math.min(b, r); if (R0 <= L0) continue; x.fillStyle = '#0a0a14'; x.fillRect(L0, 380, R0 - L0, 260); x.fillStyle = '#c9c2ae'; for (let q = 0; q < 3; q++) Y('#c9c2ae', [[l + q * 60, 380], [l + q * 60 + 30, 380], [l + q * 60 + 16, 400]]); }
+    advZoneTag(ZONES, a, b, '☀️');
+    function brazier(sp) { const on = st.gates.includes(sp.id); x.fillStyle = '#7a6a4a'; x.fillRect(sp.x - 4, 330, 8, 50); x.fillStyle = '#d4af37'; x.beginPath(); x.moveTo(sp.x - 22, 316); x.lineTo(sp.x + 22, 316); x.lineTo(sp.x + 12, 334); x.lineTo(sp.x - 12, 334); x.fill();
+      if (on) { for (let q = 0; q < 4; q++) Y('rgba(255,' + (200 - q * 30) + ',80,.9)', [[sp.x - 12 + q * 8, 316], [sp.x - 8 + q * 8 + Math.sin(t * 9 + q) * 3, 286 - (q % 2) * 10], [sp.x - 4 + q * 8, 316]]); x.fillStyle = 'rgba(255,220,120,.18)'; x.beginPath(); x.arc(sp.x, 300, 70, 0, 7); x.fill(); }
+      else { C('rgba(212,175,55,' + (.3 + .2 * Math.sin(t * 3)) + ')', sp.x, 310, 6); } }
+  };
+  L.fg = (cam, st) => { advKHints(L, st, advS, 'K'); };
+  return L;
+})();
+
+// ---------------------------------------------------------------- CHAPITRE 6 (saison 2) : MALIK · Les Chaînes
+ADV_LV.malik = (() => {
+  const ZONES = [[0, 1000, 'LES FOSSES', '#e8692b'], [1000, 2000, 'LE PUITS NORD', '#7a7f88'], [2000, 3000, 'SAINTE-CLARTÉ', '#8a3a2a'], [3000, 4000, 'LE GRAND ESCALIER', '#c9a86a'], [4000, 5000, 'LES ARCHIVES DE LA DÎME', '#7a1f2a'], [5000, 6000, 'LA CHAMBRE DU SCEAU', '#9fd3e8']];
+  const FREE = ['fr1', 'fr2', 'fr3', 'fr4'];
+  const freeThen = st => { if (FREE.every(id => st.gates.includes(id)) && !st.freed) { st.freed = 1; if (!save.admin) save.coins += 20; persist(); setTimeout(() => advSay([['Malik', 'Quatre. Il y en a des centaines, là-haut. Mais ça fait quatre.'], ['⛓️', 'Quête « Briser les fers » terminée : +20 pièces.']]), 50); } };
+  const prisoner = (id, x0, lines) => ({ id: 'p_' + id, name: 'Captif', x: x0, get look() { return advCh('malik').gates.includes(id) ? 'libre' : 'captif'; },
+    talk: st => ({ lines: st.gates.includes(id) ? [['Captif', 'Merci, Malik. Je redescends prévenir les autres.']] : [['Captif', '… Malik ? C’est toi ?'], ['', '(Appuie sur K pour briser ses fers.)']] }),
+    act: { id, lab: 'K : briser les fers', toast: '⛓️ Les fers tombent.', lines, then: st => freeThen(st) } });
+  const L = {
+    hero: 'Malik', title: 'Chapitre 12 · Les Chaînes', len: 6000, start: 160, skin: 'skin_malik_aurore', kHint: 'K : briser les chaînes',
+    fall: '↩ Malik lance sa chaîne, s’accroche à une poutre et remonte.', clueTxt: '📕 Page du registre de la dîme : ',
+    colors: { Malik: '#e8692b', 'Mère Oriane': '#c0392b', 'Docteure Ilse': '#7cb342', 'Un gosse': '#a1887f', 'Vieux Bastien': '#95a5a6', 'Sœur Cendre': '#e8692b', 'Le Colosse enchaîné': '#7f8c8d', Captif: '#a1887f', Inquisiteur: '#c0392b', 'Sentinelle de cristal': '#9fd3e8', 'Grand Inquisiteur Varn': '#f4f1e8', 'L’Ombre blanche': '#dcdde1', Aster: '#d4af37', Nalia: '#f4f1e8', 'Grand Prêtre Solen': '#f4f1e8', '📕': '#c0392b', '⛓️': '#bdc3c7', '🏆': '#d4ac0d', '🎭': '#d4ac0d', '☀️': '#ffe082' },
+    pits: [[2350, 2500], [3150, 3300]],
+    gates: [
+      { id: 'c1', x: 1720, look: 'chain', hits: 3, label: 'PUITS NORD', msg: '⛓️ Les chaînes du puits cèdent dans un fracas de métal.' },
+      { id: 'c2', x: 2140, look: 'chain', hits: 2, label: 'SAINTE-CLARTÉ', msg: '⛓️ La grille de Sainte-Clarté s’ouvre.' },
+      { id: 'c3', x: 4160, look: 'chain', hits: 2, label: 'ARCHIVES', msg: '⛓️ Le cadenas des archives éclate.' }
+    ],
+    cams: [
+      { id: 'g1', look: 'guard', col: '#7a1f2a', x1: 3420, x2: 3720, per: 300, on: 170, wMsg: '🏮 Un Inquisiteur regarde par ici ! Attends qu’il se retourne.', cMsg: '🏮 Repéré ! Malik recule dans l’ombre de l’escalier…', msg: '🌑 Passé sous leur nez. +10 pièces', lab: ['✓ PASSÉ', '🌑 Il regarde ailleurs : FONCE !', '🏮 L’Inquisiteur surveille…'] },
+      { id: 'g2', look: 'guard', col: '#7a1f2a', x1: 4320, x2: 4620, per: 280, on: 160, off: 60, wMsg: '🏮 Un Inquisiteur regarde par ici ! Attends qu’il se retourne.', cMsg: '🏮 Repéré ! Malik recule dans l’ombre des rayonnages…', msg: '🌑 Passé sous leur nez. +10 pièces', lab: ['✓ PASSÉ', '🌑 Il regarde ailleurs : FONCE !', '🏮 L’Inquisiteur surveille…'] }
+    ],
+    plats: [
+      { x: 520, y: 300, w: 100, k: 'rubble' },
+      { x: 1250, y: 300, w: 60, k: 'cage' }, { x: 1380, y: 240, w: 60, k: 'cage' },
+      { x: 2370, y: 330, w: 70, k: 'rubble' }, { x: 2560, y: 290, w: 90, k: 'rubble' }, { x: 2640, y: 220, w: 80, k: 'rubble' },
+      { x: 3170, y: 320, w: 60, k: 'cage' }, { x: 3250, y: 290, w: 60, k: 'cage' },
+      { x: 3680, y: 250, w: 90, k: 'marble' }, { x: 4700, y: 290, w: 100, k: 'rubble' }, { x: 5150, y: 300, w: 90, k: 'marble' }
+    ],
+    clues: [
+      { id: 1, x: 2680, y: 185, n: '« Tomas Oriane, 9 ans. Consacré. — Signé : la Gardienne. »' },
+      { id: 2, x: 3725, y: 215, n: '« Puits nord : 23 âmes. Scellé. — Signé : la Gardienne. »' },
+      { id: 3, x: 4750, y: 255, n: '« Nalia, 12 ans. Consacrée. Rendement : excellent. — Signé : la Gardienne. »' }
+    ],
+    coins: [{ id: 1, x: 570, y: 265 }, { id: 2, x: 1410, y: 205 }, { id: 3, x: 2425, y: 300 }, { id: 4, x: 2600, y: 255 }, { id: 5, x: 3280, y: 255 }, { id: 6, x: 3560, y: 330 }, { id: 7, x: 4470, y: 330 }, { id: 8, x: 5195, y: 265 }]
+  };
+  L.cryst = st => st.step >= 6;
+  L.clueOn = st => st.step >= 1;
+  L.onClues = st => { st.regs = 1; if (!save.admin) save.coins += 20; persist(); advSay([
+    ['Malik', 'Chaque page. Son écriture. La petite boucle sur le « G », celle que je lui ai vue faire mille fois sur nos ardoises.'],
+    ['Malik', 'Elle a écrit le nom de ma sœur. Elle l’a écrit proprement.'],
+    ['📕', 'Registres complets : +20 pièces.']
+  ]); };
+  const G = ['Parle à Mère Oriane, dans les Fosses', 'Un Inquisiteur emmène un enfant : arrête-le', 'Brise les chaînes du puits nord (K) et traverse Sainte-Clarté', 'Monte le grand escalier vers la ville haute', 'Fouille les archives de la dîme', 'Brise le Sceau', 'Le soleil se lève sur les Fosses'];
+  L.goal = (s, st) => {
+    st = st || advCh('malik'); const ax = advS ? advS.x : 0, extra = s >= 1 && s < 6 ? ' (registres ' + st.clues.length + '/3 · captifs ' + FREE.filter(id => st.gates.includes(id)).length + '/4)' : '';
+    const cm = L.cams.find(c => !st.gates.includes(c.id) && ax > c.x1 - 260 && ax < c.x2);
+    if (cm) return (advS.cam[cm.id] ? '🌑 Fonce avant qu’il se retourne !' : 'Attends que l’Inquisiteur regarde ailleurs, puis traverse') + extra;
+    const gt = L.gates.find(g => !st.gates.includes(g.id) && ax > g.x - 300 && ax < g.x);
+    if (gt) return 'Des chaînes ferment le passage : frappe-les (K)' + extra;
+    return G[Math.min(s, 6)] + extra;
+  };
+  L.target = s => ['oriane', 'q0', 'q1', 'q2', 'q3', 'q4'][s] || '';
+  L.intro = [
+    ['', 'Sous Solenne, la ville-lumière, il y a les Fosses. Ici, il ne fait jamais tout à fait jour. Les enfants toussent une poussière grise, et chaque saison, l’Ordre vient prélever la dîme.'],
+    ['', 'La dîme, ce ne sont pas des pièces. Ce sont des enfants. On les appelle « les consacrés ». On ne les revoit jamais.'],
+    ['Malik', 'Il y a trois mois, ils ont pris Nalia. Elle avait douze ans. Elle voulait apprendre à lire les oiseaux dans les livres.'],
+    ['Malik', 'Ce soir, je remonte les mille deux cents marches. Et je casse tout ce qui me barre la route.'],
+    ['', 'Flèches : bouger · Haut : sauter · J : parler · K : briser les chaînes et les fers des captifs.']
+  ];
+  L.lose = [['Mère Oriane', 'Relève-toi, Malik. On n’a personne d’autre.']];
+  L.reward = [
+    ['🏆', 'Chapitre terminé ! +100 pièces et +5 cristaux.'],
+    ['🎭', 'Nouveau skin : « Malik Aurore » : foulard blanc, et la lumière rendue aux Fosses coule dans ses fissures.'],
+    ['☀️', 'Fin de la Saison 2. Pour la première fois depuis trois siècles, le soleil se lève sur les Fosses. Mais le Grand Prêtre Solen court toujours…']
+  ];
+  L.npcs = [
+    { id: 'oriane', name: 'Mère Oriane', look: 'oriane', x: 300, show: s => s < 6, talk: st => {
+      if (st.step === 0) return { lines: [
+        ['Mère Oriane', 'Malik… Tu es revenu. Ils sont encore passés pour la dîme, ce matin.'],
+        ['Mère Oriane', 'La Dame en blanc était avec eux. Elle a posé la main sur le front du petit Lebrun. Il s’est endormi debout, comme une bougie qu’on souffle.'],
+        ['Mère Oriane', 'Elle ne l’a même pas regardé. Elle regardait le registre. Elle a signé, et ils l’ont emporté.'],
+        ['Malik', 'Comme Tomas. Comme Nalia.'],
+        ['Mère Oriane', 'On dit que la lumière, là-haut, la belle lumière de Solenne… c’est eux. Que le Sceau les boit.'],
+        ['Malik', 'Ce soir, je remonte toutes les marches, Oriane. Et je reviens avec eux. Tous.']
+      ], then: () => advSetStep(1) };
+      return { lines: [['Mère Oriane', 'Si tu vois mon Tomas… dis-lui que sa mère a gardé son lit. Qu’il n’a pas bougé.']] };
+    } },
+    { id: 'ilse', name: 'Docteure Ilse', look: 'ilse', x: 620, talk: () => ({ lines: [['Docteure Ilse', 'Trois enfants cette semaine. Ils toussent de la poussière grise, puis ils s’endorment, et ils ne se réveillent plus.'], ['Docteure Ilse', 'Ce n’est pas une maladie, Malik. C’est une saignée. Plus la ville haute brille, plus les Fosses s’éteignent.']] }) },
+    { id: 'gosse', name: 'Un gosse', look: 'gosse', x: 820, talk: () => ({ lines: [['Un gosse', 'Si tu pleures trop fort la nuit, la Dame en blanc vient te prendre. C’est ma sœur qui l’a dit.'], ['Malik', 'Elle ne viendra plus. Promis.'], ['Un gosse', 'Ta sœur aussi, elle l’a prise ?'], ['Malik', '… Oui.']] }) },
+    advMkFight({ id: 'q0', name: 'Inquisiteur', x: 1480, fight: 'q0', need: 1,
+      wait: [['', '(Un Inquisiteur traîne un petit garçon vers les marches.)']],
+      pre: [['', 'Un Inquisiteur traîne un petit garçon par le col vers le grand escalier.'], ['Inquisiteur', 'Dîme en retard. Le Sceau n’attend pas.'], ['Malik', 'Lâche-le.'], ['Inquisiteur', 'Malik des Fosses. On a une cellule à ton nom, là-haut. Et un joli procès-verbal : l’incendie de Sainte-Clarté.']],
+      win: [['', 'Le garçon court se cacher derrière Malik.'], ['Malik', 'Rentre chez ta mère. Dis-lui que plus personne ne montera les marches.']],
+      idle: [['', '(L’Inquisiteur ne bouge plus. Ses fers sont tout neufs.)']] }),
+    { id: 'bastien', name: 'Vieux Bastien', look: 'bastien', x: 1880, talk: () => ({ lines: [
+      ['Vieux Bastien', 'Le puits nord. Ici, ils ont descendu les familles qui refusaient la dîme. Vingt-trois âmes. Ma fille, mon gendre, leurs jumeaux.'],
+      ['Vieux Bastien', 'La Gardienne a tracé le sceau elle-même, sur la margelle. Avec sa belle lumière dorée. Certaines nuits, on entend encore frapper.'],
+      ['Malik', 'Les six gardiens qui tenaient les chaînes ce jour-là… je les ai descendus au fond, le mois dernier. Trois jours. Là où ils en avaient laissé dix.'],
+      ['Vieux Bastien', 'Et tu te sens mieux ?'], ['Malik', 'Non.']] }) },
+    prisoner('fr1', 1980, [['Captif', 'Ils m’ont mis aux fers pour une dîme de retard. Une seule. Ma fille était malade, je l’ai cachée.']]),
+    { id: 'colosse', name: 'Le Colosse enchaîné', fighter: 'Le Colosse enchaîné', x: 2060, sz: 1.2, talk: () => ({ lines: [['Le Colosse enchaîné', 'Ma… lik… Fers… enlevés… merci.'], ['Malik', 'Garo. Ils l’ont gardé trois ans près du cristal, pour voir ce qu’il fait aux adultes. Il était forgeron. Il chantait en travaillant.'], ['Malik', 'Il ne chante plus.']] }) },
+    { id: 'cendre', name: 'Sœur Cendre', fighter: 'Sœur Cendre', x: 2260, talk: () => ({ lines: [
+      ['Sœur Cendre', 'Sainte-Clarté. Là-haut, ils racontent que tu as brûlé un orphelinat.'], ['Malik', 'Je sais ce qu’ils racontent.'],
+      ['Sœur Cendre', 'Ce n’était pas un orphelinat. C’était l’antichambre. Les enfants de la dîme y dormaient une nuit, avant qu’on les monte au Sceau. Les lits étaient vides parce qu’ils venaient de partir.'],
+      ['Sœur Cendre', 'Le feu, c’est l’Ombre blanche, sur ordre du Prêtre : brûler les registres avant que quelqu’un les lise. Et ils l’ont mis sur ton nom.'],
+      ['Sœur Cendre', 'Tu fais un si bon monstre, Malik. Tu leur facilites le travail.']] }) },
+    prisoner('fr2', 2530, [['Captive', 'Ma fille est montée il y a un an. J’ai crié sur les marches. Ils m’ont enchaînée ici pour « trouble à la lumière ».']]),
+    advMkFight({ id: 'q1', name: 'Sentinelle de cristal', x: 2860, fight: 'q1', need: 2,
+      wait: [['', '(Une statue de cristal veille sur les ruines.)']],
+      pre: [['', 'Au milieu des ruines de Sainte-Clarté, une statue de cristal s’anime.'], ['Malik', 'Le même cristal que le Sceau… Ils en font des gardiens, maintenant.']],
+      win: [['', 'La Sentinelle éclate. Dans les éclats, Malik aperçoit des reflets… des visages d’enfants, endormis.'], ['Malik', '… Nalia ?']],
+      idle: [['', '(Des éclats de cristal brillent encore dans la cendre.)']] }),
+    prisoner('fr3', 3360, [['Captif', 'J’étais garde, là-haut. J’ai demandé où allaient les enfants. Voilà ma réponse.']]),
+    advMkFight({ id: 'q2', name: 'Grand Inquisiteur Varn', x: 3880, fight: 'q2', need: 3,
+      wait: [['Grand Inquisiteur Varn', 'Le chien des Fosses.']],
+      pre: [['Grand Inquisiteur Varn', 'Le chien des Fosses. Tu viens chercher tes registres ? Tiens, je les ai sur moi.'], ['Malik', 'Le puits nord. Vingt-trois. C’est toi qui as donné l’ordre.'],
+        ['Grand Inquisiteur Varn', 'J’ai demandé. La Gardienne a scellé. Elle signe tout ce que je lui tends, tu sais ? La meilleure que nous ayons eue : elle croit.'],
+        ['Grand Inquisiteur Varn', 'Les autres Gardiennes posaient des questions. Elle, jamais. Elle a des yeux si purs qu’ils ne voient rien.']],
+      win: [['Grand Inquisiteur Varn', 'Tu peux me tuer… Le Sceau continuera… Il a toujours faim…'], ['Malik', 'Je ne vais pas te tuer, Varn. Je vais t’enchaîner au pied de l’escalier, et laisser les Fosses décider.'], ['', 'Malik ramasse le registre de Varn. Il pèse lourd.']],
+      idle: [['', '(Varn, enchaîné, fixe le vide.)']] }),
+    { id: 'anselme2', name: 'Frère Anselme', look: 'anselme', x: 4060, talk: () => ({ lines: [
+      ['Frère Anselme', '… Toi. Tu reviens finir ?'],
+      ['Malik', 'Non. Je voulais te dire que les noms que tu m’as donnés… ils sont vivants, peut-être. Grâce à toi.'],
+      ['Frère Anselme', 'Tu m’as serré la main avec une chaîne jusqu’à ce que je les donne.'],
+      ['Malik', 'Je sais. Je ne suis pas fier. Mais j’ai eu les noms.'],
+      ['Frère Anselme', 'C’est exactement ce que disait Varn, en signant les registres.']] }) },
+    prisoner('fr4', 4250, [['Captive', 'Ils allaient me consacrer demain. J’ai seize ans : « un peu vieille », disaient-ils, « mais le rendement reste correct ».']]),
+    advMkFight({ id: 'q3', name: 'L’Ombre blanche', x: 4880, fight: 'q3', need: 4,
+      wait: [['', '(Entre les rayonnages, une silhouette blanche attend sans bruit.)']],
+      pre: [['L’Ombre blanche', '…'], ['Malik', 'C’est toi. L’odeur d’huile. Sainte-Clarté.'],
+        ['L’Ombre blanche', 'Le Grand Prêtre voulait que les registres disparaissent. Les registres ont disparu. Et ton nom est sur l’incendie. C’était élégant.'],
+        ['Malik', 'Trente lits. La surveillante de nuit était encore à l’intérieur.'], ['L’Ombre blanche', 'Elle avait lu les registres.']],
+      win: [['L’Ombre blanche', '… Le Prêtre ne descend jamais lui-même… Tu ne l’auras pas…'], ['Malik', 'Pas ce soir. Ce soir, il ne reste qu’un nom sur ma liste.']],
+      idle: [['', '(Il ne reste qu’un masque de porcelaine fendu.)']] }),
+    Object.assign(advMkFight({ id: 'q4', name: 'Aster', x: 5480, fight: 'q4', need: 5,
+      wait: [['', '(Devant le cristal, une silhouette blanche et or, l’épée de lumière à la main.)']],
+      pre: [['Aster', 'Malik des Fosses. Tu as mis le Grand Inquisiteur aux fers.'],
+        ['Malik', 'Vingt-trois, Aster. Dans le puits nord. Tu as tracé le sceau toi-même.'],
+        ['Aster', 'Le puits était vide. Le Grand Inquisiteur l’a juré.'],
+        ['Malik', 'Tu as regardé ?'],
+        ['Aster', '… La foi, c’est de ne pas avoir besoin de regarder.'],
+        ['Malik', 'Et Nalia ? Tu l’as regardée, elle ? Tu lui as posé la main sur le front. Elle t’a appelée par ton prénom. C’est toi qui lui as appris à lire, quand on avait dix ans.'],
+        ['Aster', 'Les consacrés servent la lumière. Ta sœur est en paix.'],
+        ['Malik', 'Ma sœur est DANS LE CRISTAL.'],
+        ['Aster', 'Recule. Je ne te le demanderai pas deux fois. Si le Sceau tombe, tout Solenne tombe avec lui.'],
+        ['', 'Attention : ses sceaux te réduisent au silence. Ton ultime « Les chaînes tombent » les efface. Son rempart arrête ta chaîne : brise-le avec l’Arrachement (L).']],
+      win: [['', 'Les chaînes de Malik tombent. Il frappe le cristal du Sceau une fois, deux fois… et le Sceau se brise.'],
+        ['', 'Il n’y a pas de Bête. Dans le cristal, des centaines d’enfants dorment, et leur souffle s’est changé en lumière. Elle coule maintenant vers le bas, vers les Fosses, comme une aube qui tombe.'],
+        ['Aster', 'Le temple… Ils m’avaient dit… que les consacrés servaient au temple…'],
+        ['Malik', 'Tu n’as jamais demandé à les voir.'],
+        ['Nalia', '… Aster ? Tu m’avais promis un livre. Celui avec les oiseaux.'],
+        ['', 'Aster tombe à genoux. Pour la première fois, la Gardienne du Sceau pleure.'],
+        ['Malik', 'Nalia. On rentre.'],
+        ['', 'Tout en haut de la cathédrale, une silhouette blanche regarde la lumière s’éteindre sur Solenne.'],
+        ['Grand Prêtre Solen', 'Quel dommage. Il faudra tout recommencer.']],
+      idle: [['', '…']], after: () => { advFinish(); } }), { show: s => s < 6 }),
+    { id: 'nalia', name: 'Nalia', look: 'nalia', x: 5760, talk: st => ({ lines: st.step >= 6 ? [['Nalia', 'Il fait jour, en bas ? Pour de vrai ? … Je veux voir le soleil sur les toits des Fosses.'], ['Malik', 'Je te porte, si tu veux. Il y a mille deux cents marches.'], ['Nalia', 'Je sais compter, Malik. C’est elle qui m’a appris.']] : [['', '(Dans le cristal, une petite fille dort, les mains serrées sur un livre imaginaire.)'], ['Malik', 'Nalia… Tiens bon. J’arrive.']] }) },
+    { id: 'z1', name: 'Aster', fighter: 'Aster', x: 5340, show: s => s >= 6, talk: () => ({ lines: [['Aster', 'J’ai signé. Chaque page. Je ne les ai jamais lues. … Je vais tous les lire, maintenant. Chacun des noms.'], ['Malik', 'Ça ne les ramènera pas.'], ['Aster', 'Non. Mais je ne fermerai plus jamais les yeux.']] }) },
+    { id: 'z2', name: 'Mère Oriane', look: 'oriane', x: 5600, show: s => s >= 6, talk: () => ({ lines: [['Mère Oriane', 'Tomas est là. Il m’a reconnue. Il a dit : « Maman, j’ai fait un rêve très long. »']] }) },
+    { id: 'z3', name: 'Sœur Cendre', fighter: 'Sœur Cendre', x: 5880, show: s => s >= 6, talk: () => ({ lines: [['Sœur Cendre', 'Solen a filé par les toits de la cathédrale. On le retrouvera.'], ['Malik', 'Oui. Mais pas cette nuit. Cette nuit, on ramène les enfants chez eux.']] }) }
+  ];
+  L.onK = st => advKAct(L, st, advS);
+  L.bg = cam => advSolenneBg(cam, cam + WW / 2 < 3500);
+  L.scene = (cam, st) => {
+    const t = Date.now() / 1000, a = cam - 60, b = cam + WW + 60, vis = (l, r) => r > a && l < b, dawn = st.step >= 6;
+    if (vis(0, 1000)) { for (let q = 0; q < 1000; q += 125) { const hh = 160 + (q * 7) % 90; x.fillStyle = q % 250 ? '#2a2420' : '#332a24'; x.fillRect(q, 380 - hh, 115, hh); x.fillStyle = dawn ? 'rgba(255,224,130,.6)' : 'rgba(255,160,80,.3)'; x.fillRect(q + 20, 400 - hh, 16, 18); x.fillRect(q + 70, 400 - hh, 16, 18); }
+      x.strokeStyle = '#5a4a3a'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(0, 200); x.quadraticCurveTo(500, 240, 1000, 200); x.stroke(); for (let q = 0; q < 8; q++) { x.fillStyle = ['#7a3b2a', '#4a5a6a', '#8a7a5a'][q % 3]; x.fillRect(60 + q * 120, 214 + Math.sin(q) * 4, 18, 22); }
+      x.fillStyle = '#c0392b'; x.font = 'bold 18px sans-serif'; x.textAlign = 'center'; x.fillText('MALIK ✊', 760, 260); x.fillStyle = '#e8e4d8'; x.fillText('LA DAME EN BLANC REGARDE', 300, 150); }
+    if (vis(1000, 2000)) { x.fillStyle = '#3a3a40'; x.beginPath(); x.ellipse(1850, 380, 90, 22, 0, Math.PI, 0); x.fill(); x.fillStyle = '#05050a'; x.beginPath(); x.ellipse(1850, 372, 70, 12, 0, 0, 7); x.fill();
+      x.strokeStyle = 'rgba(212,175,55,' + (dawn ? .1 : .5) + ')'; x.lineWidth = 2; x.beginPath(); x.ellipse(1850, 372, 80, 16, 0, 0, 7); x.stroke(); for (let q = 0; q < 8; q++) { const an = q * .785; C('rgba(212,175,55,.5)', 1850 + Math.cos(an) * 80, 372 + Math.sin(an) * 16, 2); }
+      LN('#3a3a40', 6, 1780, 380, 1780, 250); LN('#3a3a40', 6, 1920, 380, 1920, 250); LN('#3a3a40', 6, 1770, 250, 1930, 250); }
+    if (vis(2000, 3000)) { x.fillStyle = '#2a1a16'; x.fillRect(2150, 120, 700, 260); x.fillStyle = '#1a100c'; for (let q = 0; q < 6; q++) x.fillRect(2190 + q * 110, 170, 50, 80);
+      for (let q = 0; q < 10; q++) { x.fillStyle = '#4a3a30'; x.fillRect(2200 + q * 60, 350, 46, 8); x.fillRect(2202 + q * 60, 358, 4, 22); x.fillRect(2240 + q * 60, 358, 4, 22); } // les lits de l'« orphelinat »
+      x.fillStyle = '#d9d0b8'; x.font = 'bold 16px serif'; x.textAlign = 'center'; x.fillText('SAINTE-CLARTÉ', 2500, 145); for (let k = 0; k < 6; k++) { x.fillStyle = 'rgba(60,50,40,' + (.3 + .2 * Math.sin(t + k)) + ')'; x.beginPath(); x.arc(2200 + k * 120, 110 - ((t * 15 + k * 30) % 80), 18, 0, 7); x.fill(); } }
+    if (vis(3000, 4000)) { for (let q = 0; q < 12; q++) { x.fillStyle = q % 2 ? '#c9c2ae' : '#d9d0b8'; x.fillRect(3000 + q * 84, 380 - q * 6, 84, 6 + q * 6); }
+      x.fillStyle = '#e8e2d0'; x.fillRect(3800, 100, 200, 280); x.fillStyle = '#d4af37'; x.fillRect(3800, 100, 200, 10); }
+    if (vis(4000, 5000)) { x.fillStyle = '#2a1a1e'; x.fillRect(4000, 60, 1000, 320); for (let q = 4020; q < 5000; q += 100) { x.fillStyle = '#3a2226'; x.fillRect(q, 80, 80, 300); for (let r2 = 0; r2 < 6; r2++) { x.fillStyle = '#1a1014'; x.fillRect(q, 110 + r2 * 45, 80, 4); for (let k = 0; k < 7; k++) { x.fillStyle = ['#7a1f2a', '#5a3a1a', '#4a3a30'][(k + r2) % 3]; x.fillRect(q + 4 + k * 11, 84 + r2 * 45, 9, 26); } } } }
+    if (vis(5000, 6000)) advSealRoom(5000, st, dawn);
+    advGround(L, ZONES, a, b, '#2a2420', '#4a3a2e');
+    for (const [l, r] of L.pits) { const L0 = Math.max(a, l), R0 = Math.min(b, r); if (R0 <= L0) continue; x.fillStyle = '#05050a'; x.fillRect(L0, 380, R0 - L0, 260); }
+    if (dawn) { x.fillStyle = 'rgba(255,224,130,.08)'; x.fillRect(a, -OFF, b - a, 470); }
+    advZoneTag(ZONES, a, b, '⛓️');
+  };
+  L.fg = (cam, st) => { advKHints(L, st, advS, 'K : briser les fers'); };
   return L;
 })();
 
