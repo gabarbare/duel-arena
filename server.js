@@ -353,7 +353,7 @@ const ADV = {
   r0: { p: 'Silas', o: 'Loup de cendre', lvl: 1, map: 20, noUlt: 1 },
   r1: { p: 'Silas', o: 'Bûcheron mécanique', lvl: 1, map: 20, noUlt: 1 },
   r2: { p: 'Silas', o: 'Baron Vautrin', lvl: 1, map: 20, noUlt: 1 },
-  r3: { p: 'Silas', o: 'Dragonneau de braise', lvl: 1, map: 12, noUlt: 1 },
+  r3: { p: 'Silas', o: 'Dragonneau de braise', lvl: 0, map: 12, noUlt: 1 },
   r4: { p: 'Silas', o: 'Mère-Racine', lvl: 2, map: 20, noUlt: 0 },
   a0: { p: 'Aster', o: 'Brûleur des Fosses', lvl: 1, map: 21, noUlt: 1 },
   a1: { p: 'Aster', o: 'Le Colosse enchaîné', lvl: 1, map: 23, noUlt: 1 },
