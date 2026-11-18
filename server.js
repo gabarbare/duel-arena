@@ -225,7 +225,7 @@ const CH = [
   // Odile « la Pie » (perso original, admin seulement) : voleuse de techniques. K = larcin (si ça touche, elle copie la dernière technique de l'ennemi),
   // L = utilise la technique volée (une seule fois, dans les 12 s), ultime = grand cambriolage (vole la jauge d'ultime, les bonus et les projectiles de l'ennemi)
   { name: 'Odile', hidden: 1, desc: 'Voleuse de techniques : copie l’attaque de l’ennemi, vole sa jauge d’ultime et ses bonus', hp: 100, spd: 5.4, jmp: 14.5, color: '#3fb8c9', atk: [
-    { n: 'Griffes de pie', type: 'm', su: 4, ac: 3, rc: 8, cd: 4, dmg: 6, rng: 66, h: 42, kb: 4, st: 13 },
+    { n: 'Griffes de pie', type: 'm', su: 4, ac: 3, rc: 8, cd: 4, dmg: 6, rng: 70, h: 42, kb: 4, st: 13 },
     { n: 'Larcin (copie la technique ennemie)', type: 'm', steal: 1, su: 6, ac: 5, rc: 14, cd: 150, dmg: 5, rng: 82, h: 60, kb: 3, st: 16, spd0: 9 },
     { n: 'Technique volée (1 utilisation)', type: 'stolen', su: 0, ac: 0, rc: 0, cd: 20 },
     { n: 'Grand cambriolage (vole ultime, bonus et projectiles)', ult: 1, ub: 1, type: 'heist', su: 12, ac: 1, rc: 18, cd: 0, rng: 560, dmg: 14, st: 40 }] },
@@ -349,7 +349,7 @@ const ADV = {
   p1: { p: 'Odile', o: 'Madame Velours', lvl: 0, map: 19, noUlt: 1 },
   p2: { p: 'Odile', o: 'Le Molosse', lvl: 0, map: 19, noUlt: 1 },
   p3: { p: 'Odile', o: 'Bruno', lvl: 1, map: 0, noUlt: 1 },
-  p4: { p: 'Odile', o: 'Le Corbeau', lvl: 1, map: 2, noUlt: 0 },
+  p4: { p: 'Odile', o: 'Le Corbeau', lvl: 0, map: 2, noUlt: 0 },
   r0: { p: 'Silas', o: 'Loup de cendre', lvl: 1, map: 20, noUlt: 1 },
   r1: { p: 'Silas', o: 'Bûcheron mécanique', lvl: 1, map: 20, noUlt: 1 },
   r2: { p: 'Silas', o: 'Baron Vautrin', lvl: 1, map: 20, noUlt: 1 },
