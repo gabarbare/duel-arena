@@ -268,7 +268,7 @@ CH.push({ ...CH.find(q => q.name === 'Kairos'), name: 'Horloger Noir', adv: 1, d
       { n: 'Charge', type: 'd', su: 8, ac: 10, rc: 16, cd: 75, dmg: 11, rng: 34, h: 60, kb: 10, st: 20, spd: 13 }] },
     { ...G, name: 'Golem de livres', adv: 1, desc: 'Gardien de la bibliothèque interdite', hp: 140, color: '#c9a66b' },
     { name: 'Iris', adv: 1, desc: 'Meilleure élève de Vesper, copie les pouvoirs', hp: 100, spd: 4.6, jmp: 13.5, color: '#2ecc9a', atk: [
-      { ...J.atk[0], n: 'Onde copiée', cd: 40 }, { ...J.alt[0], n: 'Orbe copié', cd: 120 }, { ...J.alt[1], n: 'Météore copié', cd: 170 },
+      { ...J.atk[0], n: 'Onde copiée' }, { ...J.alt[0], n: 'Orbe copié' }, { ...J.alt[1], n: 'Météore copié', cd: 170 },
       { n: 'Pas éclair', type: 'tpb', su: 3, ac: 1, rc: 9, cd: 160 }] },
     { name: 'Cauchemar', adv: 1, desc: 'L’ombre des peurs de Nox', hp: 110, spd: 4.4, jmp: 13.5, color: '#3a1f5c', atk: [
       { ...J.alt[0], n: 'Orbe de peur' }, { ...J.alt[1], n: 'Chute de cauchemar', cd: 140 },
@@ -344,7 +344,27 @@ const ADV = {
   y1: { p: 'Bryan', o: 'Shérif robot', lvl: 1, map: 17, noUlt: 1 },
   y2: { p: 'Bryan', o: 'Capitaine Boulon', lvl: 1, map: 18, noUlt: 1 },
   y3: { p: 'Bryan', o: 'Bryan-X', lvl: 1, map: 18, noUlt: 1 },
-  y4: { p: 'Bryan', o: 'Max Silver', lvl: 2, map: 18, noUlt: 0 } // boss : chemise déchirée autorisée
+  y4: { p: 'Bryan', o: 'Max Silver', lvl: 2, map: 18, noUlt: 0 },
+  p0: { p: 'Odile', o: 'Douanier', lvl: 1, map: 19, noUlt: 1 },
+  p1: { p: 'Odile', o: 'Madame Velours', lvl: 1, map: 19, noUlt: 1 },
+  p2: { p: 'Odile', o: 'Le Molosse', lvl: 1, map: 19, noUlt: 1 },
+  p3: { p: 'Odile', o: 'Bruno', lvl: 1, map: 0, noUlt: 1 },
+  p4: { p: 'Odile', o: 'Le Corbeau', lvl: 2, map: 2, noUlt: 0 },
+  r0: { p: 'Silas', o: 'Loup de cendre', lvl: 1, map: 20, noUlt: 1 },
+  r1: { p: 'Silas', o: 'Bûcheron mécanique', lvl: 1, map: 20, noUlt: 1 },
+  r2: { p: 'Silas', o: 'Baron Vautrin', lvl: 1, map: 20, noUlt: 1 },
+  r3: { p: 'Silas', o: 'Dragonneau de braise', lvl: 1, map: 12, noUlt: 1 },
+  r4: { p: 'Silas', o: 'Mère-Racine', lvl: 2, map: 20, noUlt: 0 },
+  a0: { p: 'Aster', o: 'Brûleur des Fosses', lvl: 1, map: 21, noUlt: 1 },
+  a1: { p: 'Aster', o: 'Le Colosse enchaîné', lvl: 1, map: 23, noUlt: 1 },
+  a2: { p: 'Aster', o: 'Sœur Cendre', lvl: 1, map: 23, noUlt: 1 },
+  a3: { p: 'Aster', o: 'Écho de la Bête', lvl: 1, map: 22, noUlt: 1 },
+  a4: { p: 'Aster', o: 'Malik', lvl: 2, map: 22, noUlt: 0 },
+  q0: { p: 'Malik', o: 'Inquisiteur', lvl: 1, map: 23, noUlt: 1 },
+  q1: { p: 'Malik', o: 'Sentinelle de cristal', lvl: 1, map: 21, noUlt: 1 },
+  q2: { p: 'Malik', o: 'Grand Inquisiteur Varn', lvl: 1, map: 21, noUlt: 1 },
+  q3: { p: 'Malik', o: 'L’Ombre blanche', lvl: 1, map: 21, noUlt: 1 },
+  q4: { p: 'Malik', o: 'Aster', lvl: 2, map: 22, noUlt: 0 } // boss : chemise déchirée autorisée
 };
 
 // gr = gravité, acc = adhérence du sol (1 = normal, petit = glissant)
@@ -368,7 +388,12 @@ const MAPS = [
   { n: 'Couloirs de l’Académie Prisme', note: 'aventure', gr: GR, acc: 1, adv: 1 },
   { n: 'Monde des rêves', note: 'gravité réduite', gr: GR * .75, acc: 1, adv: 1 },
   { n: 'Plateau western', note: 'aventure', gr: GR, acc: 1, adv: 1 },
-  { n: 'Grand plateau des Studios Silver', note: 'aventure', gr: GR, acc: 1, adv: 1 }
+  { n: 'Grand plateau des Studios Silver', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Docks du Vieux-Port', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Forêt des Cendres', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Parvis de Solenne', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Chambre du Sceau', note: 'aventure', gr: GR, acc: 1, adv: 1 },
+  { n: 'Les Fosses', note: 'aventure', gr: GR, acc: 1, adv: 1 }
 ];
 function rollMap(r) {
   if (r.fixMap != null) { r.mi = r.fixMap; return; }
@@ -379,6 +404,35 @@ function rollMap(r) {
 const atks = f => CH[f.c].twin ? (f.sis ? CH[f.c].alt : CH[f.c].atk) : (f.form > 0 && CH[f.c].alt) || CH[f.c].atk;
 const nf = (c, i, inp, ult, two) => ({ c, i, tm: two ? i >> 1 : i, dead: 0, x: two ? [170, 330, W - 330, W - 170][i] : (i ? W - 250 : 250), y: G, vx: 0, vy: 0, hp: CH[c].hp, face: (two ? i >> 1 : i) ? -1 : 1, stun: 0, atk: null, cds: [0, 0, 0, 0],
   block: 0, fl: 0, buff: 0, shield: 0, form: 0, inv: 0, fly: 0, crys: 0, hf: null, hook: null, hkt: 0, sz: 1, ghost: 0, portal: null, lz: 0, lzcd: 0, lzd: null, hist: [], sis: 0, cube: 0, cstep: 0, cwin: 0, rage: 0, ctl: 0, held: 0, heldBy: 0, cdAlt: [0, 0], frozen: 0, stored: 0, fzm: 1, stolen: null, slow: 0, mk: 0, mkt: 0, sil: 0, lib: 0, teth: null, ult: ult || 0, inp: inp || { l: 0, r: 0, u: 0, d: 0, a: [0, 0, 0, 0] } });
+
+// ===== SAISON 2 · chapitres 3 à 6 : Odile, Silas, Aster, Malik =====
+{
+  const F = n => CH.find(q => q.name === n), rn = (b, names) => b.atk.map((a, k) => ({ ...a, n: names[k] || a.n }));
+  const Br = F('Bruno'), Vk = F('Viking'), Kz = F('Kaze'), Ch = F('Chevalier'), Go = F('Golem'), Lp = F('Louveteau géant'), Dr = F('Dragon'), Od = F('Odile'), Ma = F('Malik'), As = F('Aster');
+  CH.push(
+    // Chapitre 3 · Odile — La Pie et le Corbeau
+    { ...Br, name: 'Douanier', adv: 1, desc: 'Douanier corrompu du Vieux-Port', hp: 85, color: '#2c3e66', atk: rn(Br, ['Matraque', 'Coup de sifflet', 'Fouille au corps']) },
+    { ...Od, name: 'Madame Velours', adv: 1, hidden: 0, desc: 'Receleuse du Vieux-Port, elle vole aussi', hp: 95, color: '#7d3c98', atk: rn(Od, ['Coup d’éventail', 'Marchandage (copie ta technique)', 'Article d’occasion', 'Liquidation totale']) },
+    { ...Vk, name: 'Le Molosse', adv: 1, desc: 'Garde du corps de la Guilde du Sel', hp: 150, bz: 1.25, color: '#4a3a2e', atk: rn(Vk, ['Mandale', 'Charge de taureau', 'Écrasement']) },
+    { ...Od, name: 'Le Corbeau', adv: 1, hidden: 0, desc: 'Le maître des Pies. Mort depuis deux ans.', hp: 135, spd: 5.7, color: '#2b2140', atk: rn(Od, ['Serres', 'Leçon n°1 (copie ta technique)', 'Ce que je t’ai appris', 'Le Grand Envol']) },
+    // Chapitre 4 · Silas — Ce qui repousse
+    { ...Lp, name: 'Loup de cendre', adv: 1, desc: 'Loup né des braises de la forêt', hp: 80, color: '#5d6873', atk: rn(Lp, ['Morsure brûlante', 'Bond de braise', 'Hurlement des cendres']) },
+    { ...Go, name: 'Bûcheron mécanique', adv: 1, desc: 'Machine à abattre du Baron Vautrin', hp: 130, color: '#8a6a3e' },
+    { ...Ch, name: 'Baron Vautrin', adv: 1, desc: 'Marchand de bois, veut raser ce qui repousse', hp: 115, color: '#2e4a3a', atk: rn(Ch, ['Coup de canne', 'Contrat signé', 'Garde rapprochée', 'Expropriation']) },
+    { ...Dr, name: 'Dragonneau de braise', adv: 1, desc: 'Le petit du dragon, né dans les cendres', hp: 105, bz: .72, color: '#e67e22' },
+    { ...Go, name: 'Mère-Racine', adv: 1, desc: 'L’esprit de la forêt, fou de chagrin', hp: 220, bz: 1.55, color: '#3e6b2a' },
+    // Chapitre 5 · Aster — Le Sceau
+    { ...Ma, name: 'Brûleur des Fosses', adv: 1, hidden: 0, desc: 'Fanatique de Malik', hp: 85, color: '#6a4a3a', atk: rn(Ma, ['Chaîne rouillée', 'Harpon', 'Torche', 'Feu des Fosses']) },
+    { ...Go, name: 'Le Colosse enchaîné', adv: 1, desc: 'Une montagne de fers et de cicatrices', hp: 170, bz: 1.4, color: '#4a4e55' },
+    { ...Kz, name: 'Sœur Cendre', adv: 1, desc: 'Lieutenante de Malik', hp: 95, color: '#8a2a1f' },
+    { ...Lp, name: 'Écho de la Bête', adv: 1, desc: 'Ce qui suinte des fissures du Sceau', hp: 140, bz: 1.4, color: '#1a1424', atk: rn(Lp, ['Griffe d’ombre', 'Bond du fond', 'Plainte']) },
+    // Chapitre 6 · Malik — Les Chaînes
+    { ...As, name: 'Inquisiteur', adv: 1, hidden: 0, desc: 'Inquisiteur de l’Ordre du Sceau', hp: 90, color: '#7a1f2a', atk: rn(As, ['Lame de l’Ordre', 'Sceau d’aveu', 'Mur de la Foi', 'Sentence']) },
+    { ...Go, name: 'Sentinelle de cristal', adv: 1, desc: 'Gardienne taillée dans le cristal du Sceau', hp: 140, color: '#9fd3e8' },
+    { ...Ch, name: 'Grand Inquisiteur Varn', adv: 1, desc: 'Celui qui tient les registres de la dîme', hp: 145, color: '#e8e4d8', atk: rn(Ch, ['Masse de jugement', 'Registre', 'Bouclier de l’Ordre', 'Purification']) },
+    { ...Kz, name: 'L’Ombre blanche', adv: 1, desc: 'La lame secrète du Grand Prêtre', hp: 110, color: '#dcdde1' }
+  );
+}
 
 const sz = f => f.sz || 1;
 // ===== 2v2 : équipes. tm = équipe (1v1 : tm = index). enemies = adversaires vivants, foe = le plus proche =====
