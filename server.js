@@ -224,7 +224,7 @@ const CH = [
     { n: 'Chemise déchirée (cadence x3 pendant 4 s)', ult: 1, type: 'rage', su: 14, ac: 1, rc: 12, cd: 0, dur: 240 }] },
   // Odile « la Pie » (perso original, admin seulement) : voleuse de techniques. K = larcin (si ça touche, elle copie la dernière technique de l'ennemi),
   // L = utilise la technique volée (une seule fois, dans les 12 s), ultime = grand cambriolage (vole la jauge d'ultime, les bonus et les projectiles de l'ennemi)
-  { name: 'Odile', hidden: 1, desc: 'Voleuse de techniques : copie l’attaque de l’ennemi, vole sa jauge d’ultime et ses bonus', hp: 90, spd: 5.4, jmp: 14.5, color: '#3fb8c9', atk: [
+  { name: 'Odile', hidden: 1, desc: 'Voleuse de techniques : copie l’attaque de l’ennemi, vole sa jauge d’ultime et ses bonus', hp: 100, spd: 5.4, jmp: 14.5, color: '#3fb8c9', atk: [
     { n: 'Griffes de pie', type: 'm', su: 4, ac: 3, rc: 8, cd: 4, dmg: 6, rng: 66, h: 42, kb: 4, st: 13 },
     { n: 'Larcin (copie la technique ennemie)', type: 'm', steal: 1, su: 6, ac: 5, rc: 14, cd: 150, dmg: 5, rng: 82, h: 60, kb: 3, st: 16, spd0: 9 },
     { n: 'Technique volée (1 utilisation)', type: 'stolen', su: 0, ac: 0, rc: 0, cd: 20 },
@@ -414,7 +414,7 @@ const nf = (c, i, inp, ult, two) => ({ c, i, tm: two ? i >> 1 : i, dead: 0, x: t
     { ...Br, name: 'Douanier', adv: 1, desc: 'Douanier corrompu du Vieux-Port', hp: 65, color: '#2c3e66', atk: rn(Br, ['Matraque', 'Coup de sifflet', 'Fouille au corps']) },
     { ...Od, name: 'Madame Velours', adv: 1, hidden: 0, desc: 'Receleuse du Vieux-Port, elle vole aussi', hp: 95, color: '#7d3c98', atk: rn(Od, ['Coup d’éventail', 'Marchandage (copie ta technique)', 'Article d’occasion', 'Liquidation totale']) },
     { ...Vk, name: 'Le Molosse', adv: 1, desc: 'Garde du corps de la Guilde du Sel', hp: 150, bz: 1.25, color: '#4a3a2e', atk: rn(Vk, ['Mandale', 'Charge de taureau', 'Écrasement']) },
-    { ...Od, name: 'Le Corbeau', adv: 1, hidden: 0, desc: 'Le maître des Pies. Mort depuis deux ans.', hp: 100, spd: 5.7, color: '#2b2140', atk: rn(Od, ['Serres', 'Leçon n°1 (copie ta technique)', 'Ce que je t’ai appris', 'Le Grand Envol']) },
+    { ...Od, name: 'Le Corbeau', adv: 1, hidden: 0, desc: 'Le maître des Pies. Mort depuis deux ans.', hp: 90, spd: 5.5, color: '#2b2140', atk: rn(Od, ['Serres', 'Leçon n°1 (copie ta technique)', 'Ce que je t’ai appris', 'Le Grand Envol']) },
     // Chapitre 4 · Silas — Ce qui repousse
     { ...Lp, name: 'Loup de cendre', adv: 1, desc: 'Loup né des braises de la forêt', hp: 80, color: '#5d6873', atk: rn(Lp, ['Morsure brûlante', 'Bond de braise', 'Hurlement des cendres']) },
     { ...Go, name: 'Bûcheron mécanique', adv: 1, desc: 'Machine à abattre du Baron Vautrin', hp: 130, color: '#8a6a3e' },
