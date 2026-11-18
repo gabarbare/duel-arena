@@ -349,7 +349,7 @@ const ADV = {
   p1: { p: 'Odile', o: 'Madame Velours', lvl: 0, map: 19, noUlt: 1 },
   p2: { p: 'Odile', o: 'Le Molosse', lvl: 0, map: 19, noUlt: 1 },
   p3: { p: 'Odile', o: 'Bruno', lvl: 1, map: 0, noUlt: 1 },
-  p4: { p: 'Odile', o: 'Le Corbeau', lvl: 2, map: 2, noUlt: 0 },
+  p4: { p: 'Odile', o: 'Le Corbeau', lvl: 1, map: 2, noUlt: 0 },
   r0: { p: 'Silas', o: 'Loup de cendre', lvl: 1, map: 20, noUlt: 1 },
   r1: { p: 'Silas', o: 'Bûcheron mécanique', lvl: 1, map: 20, noUlt: 1 },
   r2: { p: 'Silas', o: 'Baron Vautrin', lvl: 1, map: 20, noUlt: 1 },
@@ -414,7 +414,7 @@ const nf = (c, i, inp, ult, two) => ({ c, i, tm: two ? i >> 1 : i, dead: 0, x: t
     { ...Br, name: 'Douanier', adv: 1, desc: 'Douanier corrompu du Vieux-Port', hp: 65, color: '#2c3e66', atk: rn(Br, ['Matraque', 'Coup de sifflet', 'Fouille au corps']) },
     { ...Od, name: 'Madame Velours', adv: 1, hidden: 0, desc: 'Receleuse du Vieux-Port, elle vole aussi', hp: 95, color: '#7d3c98', atk: rn(Od, ['Coup d’éventail', 'Marchandage (copie ta technique)', 'Article d’occasion', 'Liquidation totale']) },
     { ...Vk, name: 'Le Molosse', adv: 1, desc: 'Garde du corps de la Guilde du Sel', hp: 150, bz: 1.25, color: '#4a3a2e', atk: rn(Vk, ['Mandale', 'Charge de taureau', 'Écrasement']) },
-    { ...Od, name: 'Le Corbeau', adv: 1, hidden: 0, desc: 'Le maître des Pies. Mort depuis deux ans.', hp: 135, spd: 5.7, color: '#2b2140', atk: rn(Od, ['Serres', 'Leçon n°1 (copie ta technique)', 'Ce que je t’ai appris', 'Le Grand Envol']) },
+    { ...Od, name: 'Le Corbeau', adv: 1, hidden: 0, desc: 'Le maître des Pies. Mort depuis deux ans.', hp: 100, spd: 5.7, color: '#2b2140', atk: rn(Od, ['Serres', 'Leçon n°1 (copie ta technique)', 'Ce que je t’ai appris', 'Le Grand Envol']) },
     // Chapitre 4 · Silas — Ce qui repousse
     { ...Lp, name: 'Loup de cendre', adv: 1, desc: 'Loup né des braises de la forêt', hp: 80, color: '#5d6873', atk: rn(Lp, ['Morsure brûlante', 'Bond de braise', 'Hurlement des cendres']) },
     { ...Go, name: 'Bûcheron mécanique', adv: 1, desc: 'Machine à abattre du Baron Vautrin', hp: 130, color: '#8a6a3e' },
