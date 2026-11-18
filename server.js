@@ -10,9 +10,9 @@ const W = 1200, // largeur de l'arène (doit être égale à WW dans index (6).h
 // ult:1 = ultime (barre pleine requise), ub:1 = ne peut pas être bloqué, multi = touche plusieurs fois
 const CH = [
   { name: 'Bruno', desc: 'Bagarreur, corps à corps', hp: 110, spd: 4.0, jmp: 13.5, color: '#e74c3c', atk: [
-    { n: 'Direct', type: 'm', su: 4, ac: 4, rc: 8, cd: 6, dmg: 7, rng: 68, h: 30, kb: 4, st: 14 },
-    { n: 'Crochet', type: 'm', su: 8, ac: 5, rc: 14, cd: 35, dmg: 13, rng: 74, h: 40, kb: 9, st: 20 },
-    { n: 'Uppercut', type: 'm', su: 12, ac: 6, rc: 24, cd: 100, dmg: 21, rng: 55, h: 80, kb: 12, st: 32, lift: -11 },
+    { n: 'Direct', type: 'm', su: 10, ac: 4, rc: 8, cd: 10, dmg: 7, rng: 68, h: 30, kb: 4, st: 14 },
+    { n: 'Crochet', type: 'm', su: 16, ac: 5, rc: 14, cd: 45, dmg: 13, rng: 74, h: 40, kb: 9, st: 20 },
+    { n: 'Uppercut', type: 'm', su: 14, ac: 6, rc: 24, cd: 110, dmg: 21, rng: 55, h: 80, kb: 12, st: 32, lift: -11 },
     { n: 'Charge rageuse', ult: 1, ub: 1, type: 'd', su: 10, ac: 14, rc: 20, cd: 0, dmg: 30, rng: 50, h: 90, kb: 18, st: 50, lift: -9, spd: 18 }] },
   { name: 'Zéphyr', desc: 'Mage, attaques à distance', hp: 90, spd: 3.6, jmp: 13, color: '#9b59b6', atk: [
     { n: 'Éclair', type: 'p', su: 6, ac: 1, rc: 8, cd: 23, dmg: 5, vx: 12, r: 7, kb: 3, st: 12, vis: 18 },
